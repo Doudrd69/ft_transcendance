@@ -1,0 +1,60 @@
+services:
+
+  db:
+    image: postgres
+    restart: always
+    environment:
+      - POSTGRES_PASSWORD=postgres
+    container_name: postgres
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data
+    ports:
+      - '5432:5432'
+    networks:
+      - app-network
+
+  server:
+    build: ./server
+    container_name: server
+    environment:
+      - PORT=${PORT}
+    ports:
+      - '3001:3001'
+    depends_on:
+      - db
+    volumes:
+      - ./server/src:/srv/app/admin-server/src
+    networks:
+      - app-network
+
+  client:
+    build: ./client
+    container_name: client
+    depends_on:
+      - server
+    ports:
+      - '3000:3000'
+    volumes:
+      - ./client/app:/srv/app/admin-client/app
+      # -./client:/app/
+      # - ./client/public:/srv/app/admin-client/public
+    networks:
+      - app-network
+
+  pgadmin:
+    image: dpage/pgadmin4
+    restart: always
+    container_name: nest-pgadmin4
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=admin@admin.com
+      - PGADMIN_DEFAULT_PASSWORD=pgadmin4
+    ports:
+      - '5050:80'
+    depends_on:
+      - db
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge

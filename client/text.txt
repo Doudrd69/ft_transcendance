@@ -1,0 +1,16 @@
+total 52
+drwxr-xr-x 15 root root   480 Sep 11 09:18 .
+drwxr-xr-x  1 root root  4096 Sep 11 08:38 ..
+-rw-r--r--  1 root root   368 Sep  7 09:17 .gitignore
+drwxr-xr-x 21 root root   672 Sep 11 09:05 .next
+-rw-r--r--  1 root root   267 Sep 11 09:16 Dockerfile
+-rw-r--r--  1 root root  1370 Sep  7 09:17 README.md
+drwxr-xr-x  8 root root   256 Sep  7 12:03 app
+-rw-r--r--  1 root root   201 Sep  7 09:17 next-env.d.ts
+-rw-r--r--  1 root root    92 Sep  7 13:02 next.config.js
+drwxr-xr-x 29 root root   928 Sep  7 09:17 node_modules
+-rw-r--r--  1 root root 16222 Sep  7 09:17 package-lock.json
+-rw-r--r--  1 root root   403 Sep  7 09:17 package.json
+drwxr-xr-x  4 root root   128 Sep  7 09:17 public
+-rw-r--r--  1 root root     0 Sep 11 09:18 text.txt
+-rw-r--r--  1 root root   595 Sep  7 09:17 tsconfig.json
