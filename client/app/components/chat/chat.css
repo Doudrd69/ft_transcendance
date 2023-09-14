@@ -1,0 +1,110 @@
+.left-half {
+	background-color: #f0f0f0;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	width: 25%;
+}
+
+.bloc-btn {
+	flex-direction: row;
+	height: 7%;
+	margin: 10px;
+	justify-content: space-between;
+	text-align: center;
+	display: flex; /* Utilisez flexbox pour diviser en colonnes */
+}
+
+.main-button {
+	/* border: 3px solid #333; */
+	border:none;
+	text-align: center;
+	overflow: hidden; 
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	height: 100%;
+	width: calc(45% - 10px);
+	border-top: none;
+	background-color:#a1a1a1 ;
+	color: #f0f0f0;
+	transition: background-color 0.3s ease;
+	text-transform: uppercase;
+	font-weight: bold;
+	border-radius:10px 
+}
+
+.main-button:hover {
+	/* Nouvelle couleur de fond lorsque vous survolez le bouton */
+	background-color: #e74c3c;
+  }
+.add-button {
+	border: 3px solid #a1a1a1;
+	text-align: center;
+	overflow: hidden; 
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	height: 100%;
+	width: 10%;
+	border-radius:10px;
+	transition: background-color 0.3s ease;
+}
+.add-button:hover {
+	/* Nouvelle couleur de fond lorsque vous survolez le bouton */
+	background-color: #13a940;
+}
+
+.bloc-discussion{
+		/* scroll-behavior: auto; */
+		box-sizing: border-box;
+		background-color:#a1a1a1 ;
+		/* border: 3px solid #333; */
+		margin: 0px 10px 10px 10px;
+		width: 95%;
+		height: 83%;
+		border-radius:10px;
+		overflow: scroll;
+		background-color:#a1a1a1 ;
+		color: #000000;
+}
+.discussion{
+		margin: 10px;
+}
+
+.bloc-message{
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	resize: none;
+}
+.message{
+	/* border: 3px solid #333; */
+	box-sizing: border-box;
+	background-color:#a1a1a1 ;
+	margin: 0px 10px 10px 10px;
+	width: 90%;
+	height: (10% - 10px);
+	border-radius:10px;
+	width: 100%;
+	padding: 10px;
+	resize: none;
+}
+.buttom-message{
+		/* scroll-behavior: auto; */
+		box-sizing: border-box;
+		/* border: 3px solid #333; */
+		margin: 0px 10px 10px 0px;
+		width: 10%;
+		height: (10% - 10px);
+		border-radius:10px;
+		overflow: scroll;
+		color: #000000;
+		background-image: url('send.png');
+		border: none;
+		background-size: contain;
+		background-repeat: no-repeat;
+		background-position: center center;
+		transition: transform 0.2s ease;
+}
+.buttom-message:hover {
+	transform: scale(1.2);
+}
