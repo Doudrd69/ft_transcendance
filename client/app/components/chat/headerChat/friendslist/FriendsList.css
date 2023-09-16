@@ -1,0 +1,22 @@
+.main-button {
+	/* border: 3px solid #333; */
+	border:none;
+	text-align: center;
+	overflow: hidden; 
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	height: 100%;
+	width: calc(45% - 10px);
+	border-top: none;
+	background-color:#a1a1a1 ;
+	color: #f0f0f0;
+	transition: background-color 0.3s ease;
+	text-transform: uppercase;
+	font-weight: bold;
+	border-radius:10px 
+}
+
+.main-button:hover {
+	/* Nouvelle couleur de fond lorsque vous survolez le bouton */
+	background-color: #e74c3c;
+  }

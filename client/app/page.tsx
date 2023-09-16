@@ -6,8 +6,6 @@ import RootLayout from './layout'
 import Chat from './components/chat/Chat'
 import Game from './components/game/Game'
 import Header from './components/header/Header'
-import styles from './globals.css'
-
 
 export default function Home() {
 	return (

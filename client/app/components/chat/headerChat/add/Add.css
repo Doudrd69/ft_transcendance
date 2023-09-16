@@ -1,0 +1,15 @@
+.add-button {
+	border: 3px solid #a1a1a1;
+	text-align: center;
+	overflow: hidden; 
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	height: 100%;
+	width: 10%;
+	border-radius:10px;
+	transition: background-color 0.3s ease;
+}
+.add-button:hover {
+	/* Nouvelle couleur de fond lorsque vous survolez le bouton */
+	background-color: #13a940;
+}

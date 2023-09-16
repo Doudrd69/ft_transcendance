@@ -1,0 +1,38 @@
+.bloc-message{
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	resize: none;
+}
+.message{
+	/* border: 3px solid #333; */
+	box-sizing: border-box;
+	background-color:#a1a1a1 ;
+	margin: 0px 10px 10px 10px;
+	width: 90%;
+	height: (10% - 10px);
+	border-radius:10px;
+	width: 100%;
+	padding: 10px;
+	resize: none;
+}
+.buttom-message{
+		/* scroll-behavior: auto; */
+		box-sizing: border-box;
+		/* border: 3px solid #333; */
+		margin: 0px 10px 10px 0px;
+		width: 10%;
+		height: (10% - 10px);
+		border-radius:10px;
+		overflow: scroll;
+		color: #000000;
+		background-image: url('send.png');
+		border: none;
+		background-size: contain;
+		background-repeat: no-repeat;
+		background-position: center center;
+		transition: transform 0.2s ease;
+}
+.buttom-message:hover {
+	transform: scale(1.2);
+}
