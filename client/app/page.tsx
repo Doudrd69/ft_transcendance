@@ -7,6 +7,7 @@ import RootLayout from './layout'
 import Chat from './components/chat/Chat'
 import Game from './components/game/Game'
 import Header from './components/header/Header'
+import Authentificationcomponent from './components/chat/auth/Authentification';
 
 export default function Home() {
 
@@ -39,12 +40,8 @@ export default function Home() {
 
 	return (
 			<RootLayout>
-					<div className="420Auth">
-						<a href="https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-4d0db0aeaaddb9bee1f99f2e27a7fee7a501130aa05cb3cffe2caf30e50418be&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2F&response_type=code">
-							<button>Se connecter avec 42</button>
-						</a>
-					</div>
 				<Header></Header>
+				{/* <Authentificationcomponent></Authentificationcomponent> */}
 				<div className="container">
 					<Chat></Chat>
 					<Game></Game>

@@ -1,0 +1,19 @@
+.block-auth{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 90%;
+}
+
+.button-auth{
+    background-color: #a1a1a1;
+    border-radius: 10px;
+    border: none;
+    height: 20vh;
+    width: 20vh;
+    transition: background-color 0.3s ease;
+}
+
+.button-auth:hover{
+ background-color: aqua;
+}

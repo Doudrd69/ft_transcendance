@@ -7,11 +7,11 @@ import FriendsListComponent from './friendslist/FriendsList';
 const BodyComponent: React.FC = () => {
 
 	return (
-        <>
+        <div className="powerlifter">
             {/* <FriendsListComponent></FriendsListComponent> */}
             <DiscussionComponent></DiscussionComponent>
             <MessageComponent></MessageComponent>
-        </>
+        </div>
 	)
 };
 export default BodyComponent;
