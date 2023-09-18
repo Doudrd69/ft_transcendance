@@ -1,8 +1,7 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
-import * as bcrypt from 'bcrypt'
-import { log } from 'console';
+// import * as bcrypt from 'bcrypt'
 
 @Injectable()
 export class AuthService {
@@ -26,24 +25,35 @@ export class AuthService {
 
 		if (response.ok) {
 			const userInfo = await response.json();
-			console.log("USERINFO --> ", JSON.stringify(userInfo));
+			// console.log("USERINFO --> ", JSON.stringify(userInfo));
+			const userDataToDB = {
+				'login': userInfo.login,
+				'firstname': userInfo.first_name,
+				'lastname': userInfo.last_name,
+				'image': userInfo.image,
+			}
+			console.log("INFO FOR DB --> ", JSON.stringify(userDataToDB));
+			if (this.usersService.findOne(userDataToDB.login)) {
+				console.log("User does not exist in DB yet");
+				this.usersService.createNew42User(userDataToDB);
+			}
 		} else {
 			throw new Error("API call to retreive userInfo failed");
 		}
 	}
 
-	async login(username: string, password: any) {
-		const user = await this.usersService.findOne(username);
+	// async login(username: string, password: any) {
+	// 	const user = await this.usersService.findOne(username);
 
-		// Check if the password match with the one hashed in our database
-		const match = await bcrypt.compare(password, user.password);
-		if (!match) {
-			throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
-		}
-		// user.isActive = true; I need to access the usersRepository.save
-		const payload = { sub: user.id, username: user.username, status: user.isActive };
-		return { access_token: await this.jwtService.signAsync(payload) };
-	}
+	// 	// Check if the password match with the one hashed in our database
+	// 	const match = await bcrypt.compare(password, user.password);
+	// 	if (!match) {
+	// 		throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
+	// 	}
+	// 	// user.isActive = true; I need to access the usersRepository.save
+	// 	const payload = { sub: user.id, username: user.username, status: user.isActive };
+	// 	return { access_token: await this.jwtService.signAsync(payload) };
+	// }
 
 	async getAccessToken(code: any) {
 

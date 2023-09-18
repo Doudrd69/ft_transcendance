@@ -16,11 +16,11 @@ export class AuthController {
 	constructor(private authService: AuthService) {}
 
 	// This function will return a JWT for authentification
-	@HttpCode(HttpStatus.OK)
-	@Post('login')
-	login(@Body() signInDto: Record<string, any>) {
-		return this.authService.login(signInDto.username, signInDto.password);
-	}
+	// @HttpCode(HttpStatus.OK)
+	// @Post('login')
+	// login(@Body() signInDto: Record<string, any>) {
+	// 	return this.authService.login(signInDto.username, signInDto.password);
+	// }
 
 	@HttpCode(HttpStatus.OK)
 	@Post('access')
