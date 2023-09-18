@@ -10,6 +10,7 @@ import Header from './components/header/Header'
 import Authentificationcomponent from './components/chat/auth/Authentification';
 
 export default function Home() {
+	const [showLogin, setShowLogin] = useState(true);
 
 	const handleAccessToken = async (code: any) => {
 		console.log("handleAccessToken gets code: " + code);
@@ -23,6 +24,7 @@ export default function Home() {
 
 		if (response.ok) {
 			console.log("handleAccessToken successfully retreived");
+			setShowLogin(false);
 		} else {
 			console.error("--handleAccessoToken failed--");
 		}
@@ -41,11 +43,14 @@ export default function Home() {
 	return (
 			<RootLayout>
 				<Header></Header>
-				{/* <Authentificationcomponent></Authentificationcomponent> */}
-				<div className="container">
+				{showLogin ? (
+					<Authentificationcomponent></Authentificationcomponent>
+				) : (
+					<div className="container">
 					<Chat></Chat>
 					<Game></Game>
-				</div>
+					</div>
+				)}
 			</RootLayout>
 	)
 }
