@@ -1,4 +1,4 @@
-import './chat.css'
+import './Chat.css'
 import React from 'react'
 import HeaderChatComponent from './headerChat/HeaderChat';
 import BodyComponent from './bodyChat/Body';

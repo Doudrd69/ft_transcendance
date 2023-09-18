@@ -1,4 +1,4 @@
-.bloc-discussion{
+.bloc-friendslist{
     /* scroll-behavior: auto; */
     box-sizing: border-box;
     background-color:#a1a1a1 ;
@@ -8,9 +8,8 @@
     height: 100%;
     border-radius:10px;
     overflow: scroll;
-    background-color:#a1a1a1 ;
     color: #000000;
 }
-.discussion{
+.amies{
     margin: 10px;
 }

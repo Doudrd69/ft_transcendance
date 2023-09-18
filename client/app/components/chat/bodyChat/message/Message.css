@@ -24,6 +24,7 @@
 		width: 10%;
 		height: (10% - 10px);
 		border-radius:10px;
+        background-color: transparent;
 		overflow: scroll;
 		color: #000000;
 		background-image: url('send.png');

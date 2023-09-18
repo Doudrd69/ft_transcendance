@@ -1,10 +1,10 @@
-import './id-discussion.css'
+import './Id-discussion.css'
 import React from 'react';
 
-const AddComponent: React.FC = () => {
+const IdDiscussionComponent: React.FC = () => {
 
 	return (
-				<button className="add-button">+</button>
+		<p className="id">Eowyn Percet</p>
 	)
 };
-export default AddComponent;
+export default IdDiscussionComponent;

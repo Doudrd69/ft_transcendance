@@ -4,7 +4,7 @@ import React from 'react';
 const BackComponent: React.FC = () => {
 
 	return (
-				<button className="Back-button">+</button>
+				<button className="back-button"></button>
 	)
 };
 export default BackComponent;
