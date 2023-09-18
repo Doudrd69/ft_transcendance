@@ -10,4 +10,4 @@ const Authentificationcomponent: React.FC = () => {
 	</div>
   )
 };
-	export default Authentificationcomponent
+	export default Authentificationcomponent;
