@@ -1,0 +1,19 @@
+.id {
+	/* border: 3px solid #333; */
+	/* border:none; */
+	text-align: center;
+	align-items: center;
+	justify-content: center;
+	display :flex;
+	overflow: hidden; 
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	height: 100%;
+	width: 90%;
+	/* border-top: none; */
+	background-color:#a1a1a1 ;
+	color: #f0f0f0;
+	text-transform: uppercase;
+	font-weight: bold;
+	border-radius:10px
+}

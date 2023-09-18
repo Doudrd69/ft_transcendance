@@ -1,0 +1,15 @@
+.bloc-friendslist{
+    /* scroll-behavior: auto; */
+    box-sizing: border-box;
+    background-color:#a1a1a1 ;
+    /* border: 3px solid #333; */
+    margin: 0px 10px 10px 10px;
+    width: (100% - 20px);
+    height: 100%;
+    border-radius:10px;
+    overflow: scroll;
+    color: #000000;
+}
+.amies{
+    margin: 10px;
+}
