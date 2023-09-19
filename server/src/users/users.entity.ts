@@ -1,4 +1,5 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToMany } from 'typeorm';
+import { GroupMember } from '../chat/entities/group_member.entity'
 
 @Entity()
 export class User {
@@ -19,4 +20,7 @@ export class User {
 
   @Column({ default: false })
   isActive: boolean;
+
+  @ManyToMany(type => GroupMember)
+  members: GroupMember[];
 }
