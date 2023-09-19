@@ -1,4 +1,4 @@
-services:
+services: '3.3'
 
   db:
     image: postgres
