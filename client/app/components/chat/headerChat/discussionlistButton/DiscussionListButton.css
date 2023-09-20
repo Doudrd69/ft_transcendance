@@ -13,10 +13,17 @@
 	transition: background-color 0.3s ease;
 	text-transform: uppercase;
 	font-weight: bold;
-	border-radius:10px 
+	border-radius:10px;
+	font-size: 20px; /* Exemple de taille de police */
+	font-family: Arial, sans-serif;
 }
 
 .main-button:hover {
 	/* Nouvelle couleur de fond lorsque vous survolez le bouton */
 	background-color: #e74c3c;
-  }
+	}
+
+.main-button.clicked {
+	/* Nouvelle couleur de fond lorsque vous survolez le bouton */
+	background-color: #e74c3c;
+	}
