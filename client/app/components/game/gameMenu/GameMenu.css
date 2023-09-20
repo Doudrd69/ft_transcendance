@@ -11,17 +11,22 @@
 }
 
 .titleClass {
-    font-size: 48px; 
+    font-size: 10%; 
     animation: growShrink 2s infinite alternate;
     margin: 0 auto;
+    overflow: hidden;
+    position: relative;
+    white-space: nowrap;
+    max-width: 100%; /* La largeur maximale du titre est celle de son conteneur */
+    text-overflow: ellipsis; /* Ajoute des points de suspension (...) pour le texte débordant */ 
 }
 
 @keyframes growShrink {
     0% {
-        font-size: 48px; /* Taille initiale */
+        font-size: 150%; /* Taille initiale */
     }
     100% {
-        font-size: 60px; /* Taille maximale (ajustez selon vos préférences) */
+        font-size: 500%; /* Taille maximale (ajustez selon vos préférences) */
     }
 }
 
@@ -32,6 +37,11 @@
     cursor: pointer;
     font-size: 16px;
     background-color: #9ea3a9;
+    max-width: 100%; /* La largeur maximale du bouton est celle de son conteneur */
+    white-space: nowrap; /* Empêche le texte de passer à la ligne */
+    overflow: hidden; /* Cache le texte débordant */
+    text-overflow: ellipsis; /* Ajoute des points de suspension (...) pour le texte débordant */
+    margin-bottom: 10px; /* Ajoutez un espace entre les boutons */
     /* background-image: url('sobre_blue.jpg');  */
 }
 
