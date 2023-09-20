@@ -9,23 +9,25 @@ export class GroupMember {
   id: number;
 
   //FK to conversation_id
-  @OneToMany(type => Conversation, conversation => conversation.id)
-  conversation: Conversation[];
+//   @OneToMany(type => Conversation, conversation => conversation.id)
+//   conversation: Conversation[];
+	@OneToOne(() => Conversation)
+	conversation: Conversation;
 
   //FK vers USER id
   @ManyToMany(type => User)
   @JoinTable({
-      name: "users", // table name for the junction table of this relation
-      joinColumn: {
-          name: "user",
-          referencedColumnName: "id"
-      },
-      inverseJoinColumn: {
-          name: "conversation",
-          referencedColumnName: "id"
-      }
+	  name: "users", // table name for the junction table of this relation
+	  joinColumn: {
+		  name: "user",
+		  referencedColumnName: "id"
+	  },
+	  inverseJoinColumn: {
+		  name: "conversation",
+		  referencedColumnName: "id"
+	  }
   })
-  users: User[];
+  user: User[];
   
   @Column({ type: 'timestamptz' }) // Recommended
   joined_datetime: Date;
