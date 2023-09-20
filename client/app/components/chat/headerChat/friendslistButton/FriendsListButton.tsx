@@ -1,10 +1,13 @@
 import './FriendsListButton.css'
-import React from 'react';
+import React, { useState } from 'react';
+import { useChat } from '../../ChatContext';
 
 const FriendsListButtonComponent: React.FC = () => {
 
+	const {showFriendsList, handleFriendsList} = useChat();
+
 	return (
-		<button className="main-button">liste d'amies</button>
+		<button className={`main-button ${showFriendsList ? 'clicked' : ''}`} onClick={handleFriendsList}>FriendsList</button>
 	)
 };
 export default FriendsListButtonComponent;

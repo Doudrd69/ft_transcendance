@@ -1,7 +1,7 @@
-import './Discussion.css'
+import './ChatDiscussion.css'
 import React from 'react';
 
-const DiscussionComponent: React.FC = () => {
+const ChatDiscussionComponent: React.FC = () => {
 
 	return (
 		<div className="bloc-discussion">
@@ -10,4 +10,4 @@ const DiscussionComponent: React.FC = () => {
 		</div>
 	)
 };
-export default DiscussionComponent;
+export default ChatDiscussionComponent;

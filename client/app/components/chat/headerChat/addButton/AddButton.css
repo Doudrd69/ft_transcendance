@@ -13,3 +13,7 @@
 	/* Nouvelle couleur de fond lorsque vous survolez le bouton */
 	background-color: #13a940;
 }
+.add-button.clicked {
+	/* Nouvelle couleur de fond lorsque vous survolez le bouton */
+	background-color: #13a940;
+	}

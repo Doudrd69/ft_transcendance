@@ -20,3 +20,8 @@
 	/* Nouvelle couleur de fond lorsque vous survolez le bouton */
 	background-color: #e74c3c;
   }
+
+.main-button.clicked {
+	/* Nouvelle couleur de fond lorsque vous survolez le bouton */
+	background-color: #e74c3c;
+  }
