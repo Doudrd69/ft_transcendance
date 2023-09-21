@@ -11,10 +11,7 @@ export class AuthService {
 	) {}
 
 	private async getUserInfo(accessTokenArray: any) {
-		console.log("--- getUserInfo ---");
 		const access_token = accessTokenArray.access_token;
-		console.log("getUserInfo got the token: ", access_token);
-
 		const token_string = "Bearer " + access_token;
 		const response = await fetch("https://api.intra.42.fr/v2/me", {
 			method: 'GET',
@@ -24,19 +21,29 @@ export class AuthService {
 		});
 
 		if (response.ok) {
-			const userInfo = await response.json();
-			// console.log("USERINFO --> ", JSON.stringify(userInfo));
+			const responseContent = await response.json();
 			const userDataToDB = {
-				'login': userInfo.login,
-				'firstname': userInfo.first_name,
-				'lastname': userInfo.last_name,
-				'image': userInfo.image,
+				'login': responseContent.login,
+				'firstname': responseContent.first_name,
+				'lastname': responseContent.last_name,
+				'image': responseContent.image,
 			}
-			console.log("INFO FOR DB --> ", JSON.stringify(userDataToDB));
-			if (this.usersService.findOne(userDataToDB.login)) {
-				console.log("User does not exist in DB yet");
-				this.usersService.createNew42User(userDataToDB);
-			}
+
+			this.usersService.findUserByLogin(userDataToDB.login).then(result => {
+					console.log("RESULT -->", result);
+					if (result) {
+						// Handle the case where the user exists
+						console.log("!! User already exists in our DB !!");
+					} else {
+						// Handle the case where the user does not exist
+						console.log("User does not exist in DB yet");
+						return this.usersService.createNew42User(userDataToDB);
+					}
+				}) .catch(error => {
+					// Handle any errors that occurred during the promise execution
+					console.error("An error occurred:", error);
+			});
+
 		} else {
 			throw new Error("API call to retreive userInfo failed");
 		}
@@ -64,8 +71,6 @@ export class AuthService {
 		data.append('code', code);
 		data.append('redirect_uri', 'http://localhost:3000/');
 
-		console.log("--> " + data);
-
 		try {
 			const response = await fetch('https://api.intra.42.fr/oauth/token', {
 				method: 'POST',
@@ -75,8 +80,8 @@ export class AuthService {
 			if (response.ok) {
 				console.log("--Request to API ok--");
 				const responseContent = await response.json();
-				console.log('Response:',  JSON.stringify(responseContent));
 				this.getUserInfo(responseContent);
+				console.log("Return of function getaccesstoken");
 			} else {
 				const errorResponse = await response.json(); // Parse the JSON response
 				console.log("Error:", errorResponse); // Log the parsed error response

@@ -58,7 +58,12 @@ export class UsersService {
 	// 	throw new NotFoundException();
 	// }
 
-	findOne(login: string): Promise<User | null> {
+	findUserByLogin(loginToSearch: string) {
+		return this.usersRepository.findOne({ where: {login: loginToSearch}});
+	}
+
+	getUserByLogin(login: string): Promise<User | null> {
+		console.log("Login to find:", login);
 		return this.usersRepository.findOne({ where: { login } });
 	}
 }

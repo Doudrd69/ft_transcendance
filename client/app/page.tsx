@@ -13,7 +13,6 @@ export default function Home() {
 	const [showLogin, setShowLogin] = useState(true);
 
 	const handleAccessToken = async (code: any) => {
-		console.log("handleAccessToken gets code: " + code);
 		const response = await fetch('http://localhost:3001/auth/access', {
 			method: 'POST',
 			headers: {
@@ -23,7 +22,7 @@ export default function Home() {
 		});
 
 		if (response.ok) {
-			console.log("handleAccessToken successfully retreived");
+			console.log("-- handleAccessToken successfully retreived --");
 			setShowLogin(false);
 		} else {
 			console.error("--handleAccessoToken failed--");
@@ -35,7 +34,7 @@ export default function Home() {
 	const searchParams = useSearchParams();
 	const code = searchParams.get('code');
 
-	if (code) {
+	if (code && showLogin) {
 		handleAccessToken(code);
 	}
 
