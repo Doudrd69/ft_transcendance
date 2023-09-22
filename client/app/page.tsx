@@ -22,14 +22,13 @@ export default function Home() {
 		});
 
 		if (response.ok) {
-			console.log("-- handleAccessToken successfully retreived --");
+			const jwt = await response.json();
+			sessionStorage.setItem("jwt", JSON.stringify(jwt));
 			setShowLogin(false);
 		} else {
-			console.error("--handleAccessoToken failed--");
+			throw new Error("Error retrieving AccessToken");
 		}
 	}
-
-	// const [showLogin, setShowLogin] = useState(false);
 
 	const searchParams = useSearchParams();
 	const code = searchParams.get('code');

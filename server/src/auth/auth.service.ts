@@ -1,5 +1,6 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
+import { User } from '../users/users.entity';
 import { JwtService } from '@nestjs/jwt';
 // import * as bcrypt from 'bcrypt'
 
@@ -10,7 +11,7 @@ export class AuthService {
 		private jwtService: JwtService,
 	) {}
 
-	private async getUserInfo(accessTokenArray: any) {
+	private async getUserInfo(accessTokenArray: any): Promise<User> {
 		const access_token = accessTokenArray.access_token;
 		const token_string = "Bearer " + access_token;
 		const response = await fetch("https://api.intra.42.fr/v2/me", {
@@ -22,30 +23,24 @@ export class AuthService {
 
 		if (response.ok) {
 			const responseContent = await response.json();
-			const userDataToDB = {
+			const userInformation = {
 				'login': responseContent.login,
 				'firstname': responseContent.first_name,
 				'lastname': responseContent.last_name,
 				'image': responseContent.image,
 			}
 
-			this.usersService.findUserByLogin(userDataToDB.login).then(result => {
-					console.log("RESULT -->", result);
-					if (result) {
-						// Handle the case where the user exists
-						console.log("!! User already exists in our DB !!");
-					} else {
-						// Handle the case where the user does not exist
-						console.log("User does not exist in DB yet");
-						return this.usersService.createNew42User(userDataToDB);
-					}
-				}) .catch(error => {
-					// Handle any errors that occurred during the promise execution
-					console.error("An error occurred:", error);
-			});
-
-		} else {
-			throw new Error("API call to retreive userInfo failed");
+			const result = await this.usersService.findUserByLogin(userInformation.login);
+			if (result) {
+				console.log("User exists in our DB");
+				return result;
+			}
+			else {
+				return this.usersService.createNew42User(userInformation);
+			}
+		}
+		else {
+			return null; // attention ici
 		}
 	}
 
@@ -71,25 +66,29 @@ export class AuthService {
 		data.append('code', code);
 		data.append('redirect_uri', 'http://localhost:3000/');
 
-		try {
-			const response = await fetch('https://api.intra.42.fr/oauth/token', {
-				method: 'POST',
-				body: data,
-			});
-		
-			if (response.ok) {
-				console.log("--Request to API ok--");
-				const responseContent = await response.json();
-				this.getUserInfo(responseContent);
-				console.log("Return of function getaccesstoken");
-			} else {
-				const errorResponse = await response.json(); // Parse the JSON response
-				console.log("Error:", errorResponse); // Log the parsed error response
-				throw new Error("Failed API return for token");
+		const response = await fetch('https://api.intra.42.fr/oauth/token', {
+			method: 'POST',
+			body: data,
+		});
+
+		if (response.ok) {
+			console.log("-- Request to API OK --");
+			const responseContent = await response.json();
+
+			try {
+				const result = await this.getUserInfo(responseContent);
+				if (result) {
+					const payload = { sub: result.id, login: result.login };
+					return { access_token: await this.jwtService.signAsync(payload) };
+				} else {
+					console.log("Unexpected result: ", result);
+				}
+			} catch (error) {
+				console.log("Error in getAccessToken: ", error);
 			}
-		} catch (error) {
-			console.error("Fetch error:", error);
-			throw error;
+		}
+		else {
+			console.log("Request to 42 API failed");
 		}
 	}
 }
