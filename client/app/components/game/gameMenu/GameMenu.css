@@ -2,42 +2,50 @@
     display : flex;
     flex-direction: column;
     justify-content: space-evenly ;
-    /* align-items: center;  */
+    align-items: center; 
     margin-bottom: 0 auto;
     height: 100%;
     width: 50%;
     margin: 0 auto;
-    /* background-image: url('sobre_blue.jpg');  */
+    background-size: cover;
+    background-position: center;
 }
 
 .titleClass {
-    font-size: 10%; 
     animation: growShrink 2s infinite alternate;
-    margin: 0 auto;
     overflow: hidden;
-    position: relative;
     white-space: nowrap;
-    max-width: 100%; /* La largeur maximale du titre est celle de son conteneur */
-    text-overflow: ellipsis; /* Ajoute des points de suspension (...) pour le texte débordant */ 
+    max-width: 200%;
+    text-overflow: ellipsis;
+    position: relative;
+    top: 10%;
+    font-size: 1vw;
+    color: rgb(125, 125, 125); /* Couleur du texte */
+    text-shadow: 
+        -2px -2px 0 rgb(0, 0, 0),   /* Ombre en haut à gauche (rouge) */
+         2px -2px 0 red,   /* Ombre en haut à droite (rouge) */
+        -2px 2px 0 red,   /* Ombre en bas à gauche (rouge) */
+         2px 2px 0 red;
 }
 
 @keyframes growShrink {
     0% {
-        font-size: 150%; /* Taille initiale */
+        font-size: 1vw; /* Taille initiale */
     }
     100% {
-        font-size: 500%; /* Taille maximale (ajustez selon vos préférences) */
+        font-size: 6vw; /* Taille maximale (ajustez selon vos préférences) */
     }
 }
 
 .buttonclass {   
     padding: 10px 20px;
     border-radius: 20px;
+    width: 100%;
     transition: background-color 0.3s ease;
     cursor: pointer;
-    font-size: 16px;
+    font-size: 1vw;
     background-color: #9ea3a9;
-    max-width: 100%; /* La largeur maximale du bouton est celle de son conteneur */
+    max-width: 200%; /* La largeur maximale du bouton est celle de son conteneur */
     white-space: nowrap; /* Empêche le texte de passer à la ligne */
     overflow: hidden; /* Cache le texte débordant */
     text-overflow: ellipsis; /* Ajoute des points de suspension (...) pour le texte débordant */

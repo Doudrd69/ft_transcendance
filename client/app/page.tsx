@@ -8,6 +8,8 @@ import Chat from './components/chat/Chat'
 import Game from './components/game/Game'
 import Header from './components/header/Header'
 import Authentificationcomponent from './components/chat/auth/Authentification';
+import { GameProvider } from './components/game/GameContext';
+
 
 export default function Home() {
 	// const [showLogin, setShowLogin] = useState(true);
@@ -47,7 +49,9 @@ export default function Home() {
 				( */}
 				<div className="container">
 					<Chat/>
-					<Game/>
+					<GameProvider>
+						<Game/>
+					</GameProvider>
 				</div>
 				{/* )} */}
 			</RootLayout>
