@@ -1,0 +1,40 @@
+.background-game {
+    display : flex;
+    flex-direction: column;
+    justify-content: space-evenly ;
+    /* align-items: center;  */
+    margin-bottom: 0 auto;
+    height: 100%;
+    width: 50%;
+    margin: 0 auto;
+    /* background-image: url('sobre_blue.jpg');  */
+}
+
+.titleClass {
+    font-size: 48px; 
+    animation: growShrink 2s infinite alternate;
+    margin: 0 auto;
+}
+
+@keyframes growShrink {
+    0% {
+        font-size: 48px; /* Taille initiale */
+    }
+    100% {
+        font-size: 60px; /* Taille maximale (ajustez selon vos préférences) */
+    }
+}
+
+.buttonclass {   
+    padding: 10px 20px;
+    border-radius: 20px;
+    transition: background-color 0.3s ease;
+    cursor: pointer;
+    font-size: 16px;
+    background-color: #9ea3a9;
+    /* background-image: url('sobre_blue.jpg');  */
+}
+
+.buttonclass:hover {
+        background-color: #ce8f07; /* Nouvelle couleur de fond au survol */
+}

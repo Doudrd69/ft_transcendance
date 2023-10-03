@@ -4,6 +4,6 @@
 	margin: 10px;
 	justify-content: space-between;
 	text-align: center;
-	display: flex; /* Utilisez flexbox pour diviser en colonnes */
-    align-items: center; /* Centre verticalement */
+	display: flex;
+    align-items: center;
 }

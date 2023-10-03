@@ -1,4 +1,4 @@
-.main-button {
+.main-button-friendslist {
 	/* border: 3px solid #333; */
 	border:none;
 	text-align: center;
@@ -8,15 +8,22 @@
 	height: 100%;
 	width: calc(45% - 10px);
 	border-top: none;
-	background-color:#a1a1a1 ;
+	background-color:var(--fourth) ;
 	color: #f0f0f0;
 	transition: background-color 0.3s ease;
 	text-transform: uppercase;
 	font-weight: bold;
-	border-radius:10px 
+	border-radius:10px;
+	font-size: 20px; /* Exemple de taille de police */
+	font-family: Arial, sans-serif;
 }
 
-.main-button:hover {
+.main-button-friendslist:hover {
 	/* Nouvelle couleur de fond lorsque vous survolez le bouton */
-	background-color: #e74c3c;
+	background-color: var(--fifth);
+  }
+
+.main-button-friendslist.clicked {
+	/* Nouvelle couleur de fond lorsque vous survolez le bouton */
+	background-color: var(--second);
   }

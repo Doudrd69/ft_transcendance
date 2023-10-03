@@ -1,15 +1,17 @@
 import './Chat.css'
-import React from 'react'
+import React, {useState} from 'react'
 import HeaderChatComponent from './headerChat/HeaderChat';
 import BodyComponent from './bodyChat/Body';
+import { ChatProvider } from './ChatContext';
 
 const ChatComponent: React.FC = () => {
-
 	return (
-		<div className="left-half">
-			<HeaderChatComponent></HeaderChatComponent>
-			<BodyComponent></BodyComponent>
-		</div>
+		<ChatProvider>
+			<div className="left-half">
+					<HeaderChatComponent/>
+					<BodyComponent/>
+			</div>
+		</ChatProvider>
 	)
 };
 

@@ -10,50 +10,46 @@ import Header from './components/header/Header'
 import Authentificationcomponent from './components/chat/auth/Authentification';
 
 export default function Home() {
-	const [showLogin, setShowLogin] = useState(true);
+	// const [showLogin, setShowLogin] = useState(true);
 
-	const handleAccessToken = async (code: any) => {
-		const response = await fetch('http://localhost:3001/auth/access', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-			},
-			body: JSON.stringify({code}),
-		});
+	// const handleAccessToken = async (code: any) => {
+	// 	console.log("handleAccessToken gets code: " + code);
+	// 	const response = await fetch('http://localhost:3001/auth/access', {
+	// 		method: 'POST',
+	// 		headers: {
+	// 			'Content-Type': 'application/json',
+	// 		},
+	// 		body: JSON.stringify({code}),
+	// 	});
 
-		if (response.ok) {
-			const jwtObject = await response.json();
-			const jwt = jwtObject.access_token;
-			sessionStorage.setItem("jwt", jwt); // soucis car j'enregistre une string pas bonne
-			setShowLogin(false);
+	// 	if (response.ok) {
+	// 		console.log("handleAccessToken successfully retreived");
+	// 		setShowLogin(false);
+	// 	} else {
+	// 		console.error("--handleAccessoToken failed--");
+	// 	}
+	// }
 
-			// Exemple pour utiliser le JWT
-			// const mdr = sessionStorage.getItem("jwt");
-			// console.log(mdr);
-		} else {
-			throw new Error("Error retrieving AccessToken");
-		}
-	}
+	// // const [showLogin, setShowLogin] = useState(false);
 
-	const searchParams = useSearchParams();
-	const code = searchParams.get('code');
+	// const searchParams = useSearchParams();
+	// const code = searchParams.get('code');
 
-	if (code && showLogin) {
-		handleAccessToken(code);
-	}
+	// if (code) {
+	// 	handleAccessToken(code);
+	// }
 
 
 	return (
 			<RootLayout>
-				<Header></Header>
-				{showLogin ? (
-					<Authentificationcomponent></Authentificationcomponent>
-				) : (
-					<div className="container">
-					<Chat></Chat>
-					<Game></Game>
-					</div>
-				)}
+				<Header/>
+				{/* {showLogin ? (<Authentificationcomponent/>) : 
+				( */}
+				<div className="container">
+					<Chat/>
+					<Game/>
+				</div>
+				{/* )} */}
 			</RootLayout>
 	)
 }

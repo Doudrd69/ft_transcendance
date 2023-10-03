@@ -11,7 +11,7 @@
 	height: 100%;
 	width: 90%;
 	/* border-top: none; */
-	background-color:#a1a1a1 ;
+	background-color:var(--second) ;
 	color: #f0f0f0;
 	text-transform: uppercase;
 	font-weight: bold;
