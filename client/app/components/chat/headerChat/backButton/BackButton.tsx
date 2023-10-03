@@ -1,10 +1,11 @@
-import './Back.css'
+import './BackButton.css'
 import React from 'react';
+import {useChat} from '../../ChatContext'
+const BackButtonComponent: React.FC = () => {
 
-const BackComponent: React.FC = () => {
-
+	const {handleDiscussionList} = useChat();
 	return (
-				<button className="back-button"></button>
+				<button className="back-button" onClick={handleDiscussionList}></button>
 	)
 };
-export default BackComponent;
+export default BackButtonComponent;

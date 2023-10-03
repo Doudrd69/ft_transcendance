@@ -36,8 +36,9 @@
 
 .button-add{
 	width: 10%;
-	height: 50%;
-	margin: 10px 10px 10px 10px;
+	height: 70%;
+	margin: 10px 10px 10px 0px;
+	background-color: transparent;
 	background-image: url('add.png'); /* Spécifiez le chemin de votre image ici */
 	background-size: cover; /* Ajuste la taille de l'image pour remplir le bouton */
 	background-size: contain;

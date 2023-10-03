@@ -27,21 +27,19 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
 	const [showDiscussionList, setDiscussionList] = useState(false);
 	const [showAdd, setAdd] = useState(false);
 	const [showChatDiscussion, setChatDiscussion] = useState(false);
-  
 
+	/*Friendlist*/
 	const activateFriendsList = () => setFriendsList(true);
 	const disableFriendsList = () => setFriendsList(false);
-
 	const handleFriendsList = () => {
 		disableDiscussionList();
 		disableAdd();
 		disableChatDiscussion();
 		activateFriendsList();
 	}
-
+	/*Discussionlist*/
 	const activateDiscussionList = () => setDiscussionList(true);
 	const disableDiscussionList = () => setDiscussionList(false);
-
 	const handleDiscussionList = () => {
 		disableFriendsList();
 		disableAdd();
@@ -49,6 +47,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
 		activateDiscussionList();
 	}
 
+	/*ChatDiscussion*/
 	const activateChatDiscussion = () => setChatDiscussion(true);
 	const disableChatDiscussion = () => setChatDiscussion(false);
 	const handleChatDiscussion = () => {
@@ -57,16 +56,15 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
 		disableAdd();
 		activateChatDiscussion();
 	}
+	/*Add*/
 	const activateAdd = () => setAdd(true);
 	const disableAdd = () => setAdd(false);
-
 	const handleAdd = () => {
 		disableDiscussionList();
 		disableFriendsList();
 		disableChatDiscussion();
 		activateAdd();
 	}
-
 
 	return (
 	<ChatContext.Provider

@@ -7,7 +7,7 @@ const FriendsListButtonComponent: React.FC = () => {
 	const {showFriendsList, handleFriendsList} = useChat();
 
 	return (
-		<button className={`main-button ${showFriendsList ? 'clicked' : ''}`} onClick={handleFriendsList}>FriendsList</button>
+		<button className={`main-button-friendslist ${showFriendsList ? 'clicked' : ''}`} onClick={handleFriendsList}>FriendsList</button>
 	)
 };
 export default FriendsListButtonComponent;

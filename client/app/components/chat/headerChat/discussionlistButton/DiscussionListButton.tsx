@@ -6,7 +6,7 @@ const DiscussionListButtonComponent: React.FC = () => {
 
 	const {showDiscussionList, handleDiscussionList} = useChat();
 		return (
-		<button  className={`main-button ${showDiscussionList ? 'clicked' : ''}`} onClick={handleDiscussionList}>discussion</button>
+		<button  className={`main-button-discussion ${showDiscussionList ? 'clicked' : ''}`} onClick={handleDiscussionList}>discussion</button>
 	)
 };
 export default DiscussionListButtonComponent;
