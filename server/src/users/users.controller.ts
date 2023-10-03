@@ -1,5 +1,6 @@
 import { Controller, Post, HttpCode, HttpStatus, Body, Get } from '@nestjs/common';
 import { UsersService } from './users.service';
+import { FriendRequestDto } from './dto/FriendRequestDto.dto';
 
 @Controller('users')
 export class UsersController {
@@ -22,4 +23,16 @@ export class UsersController {
 	// updateUser(@Body() updateUserDto: Record<string, string>) {
 	// 	return this.usersService.updateUser(updateUserDto.username, updateUserDto.newUsername);
 	// }
+
+	@HttpCode(HttpStatus.OK)
+	@Post('addfriend')
+	createFriendship(@Body() friendRequestDto: FriendRequestDto) {
+		return this.usersService.createFriendship(friendRequestDto.initiatorLogin, friendRequestDto.recipientLogin);
+	}
+
+	@HttpCode(HttpStatus.OK)
+	@Post('requestresponse')
+	updateFriendship(@Body() friendRequestDto: FriendRequestDto, flag: boolean) {
+		return this.usersService.updateFriendship(friendRequestDto.initiatorLogin, friendRequestDto.recipientLogin, flag);
+	}
 }
