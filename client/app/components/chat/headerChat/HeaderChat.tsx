@@ -9,13 +9,14 @@ import { useChat } from '../ChatContext';
 
 const HeaderChatComponent: React.FC = () => {
 
+	const {showChatDiscussion} = useChat();
 	return (
 		<div className="bloc-btn">
-			{/* <BackComponent></BackComponent>
-			<IdDiscussionComponent></IdDiscussionComponent> */}
-			<DiscussionListButtonComponent/>
-			<FriendsListButtonComponent/>
-			<AddComponent/>
+			{ showChatDiscussion && <BackComponent/>}
+			{showChatDiscussion && <IdDiscussionComponent/>}
+			{!showChatDiscussion && <DiscussionListButtonComponent/>}
+			{!showChatDiscussion && <FriendsListButtonComponent/>}
+			{!showChatDiscussion && <AddComponent/>}
 		</div>
 	)
 };

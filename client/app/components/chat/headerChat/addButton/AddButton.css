@@ -1,5 +1,5 @@
 .add-button {
-	border: 3px solid #a1a1a1;
+	border: 3px solid #404146;
 	text-align: center;
 	overflow: hidden; 
 	white-space: nowrap;
@@ -11,9 +11,9 @@
 }
 .add-button:hover {
 	/* Nouvelle couleur de fond lorsque vous survolez le bouton */
-	background-color: #13a940;
+	background-color: #8283a7;
 }
 .add-button.clicked {
 	/* Nouvelle couleur de fond lorsque vous survolez le bouton */
-	background-color: #13a940;
+	background-color: #a5d296;
 	}

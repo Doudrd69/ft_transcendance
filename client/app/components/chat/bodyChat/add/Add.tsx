@@ -2,7 +2,7 @@ import './Add.css';
 import React from 'react';
 
 const AddComponent: React.FC = () => {
-  const placeholders = ["Ajouter un ami...", "Ajouter un channel...", "Inviter à jouer une partie..."];
+  const placeholders = ["Ajouter un ami...", "Creer un channel...", "Inviter à jouer une partie..."];
 
   return (
     <div className="block-main">
