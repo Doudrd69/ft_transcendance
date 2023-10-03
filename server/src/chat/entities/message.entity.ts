@@ -12,7 +12,7 @@ export class Message {
   @Column()
   content: string;
 
-  @Column({ type: 'timestamptz' }) // Recommended
+  @Column() // Recommended
   post_datetime: Date;
 
   @OneToOne(() => Conversation)

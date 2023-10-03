@@ -40,7 +40,7 @@ import { ChatModule } from './chat/chat.module';
 
     UsersModule,
 
-    // ChatModule,
+    ChatModule,
 
   ],
   controllers: [AppController],

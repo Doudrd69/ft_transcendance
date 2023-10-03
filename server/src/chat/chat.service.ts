@@ -17,10 +17,10 @@ export class ChatService {
 		private messageRepository: Repository<Message>,
 	) {}
 
-	createConversation(name): Promise<Conversation> {
+	createConversation(conversationName): Promise<Conversation> {
 		console.log("-- createConversation --");
-		console.log("Conversation to be created: ", name);
-		const newConversation = this.conversationRepository.create({ name });
+		console.log("Conversation to be created: ", conversationName);
+		const newConversation = this.conversationRepository.create({ name: conversationName });
 		return this.conversationRepository.save(newConversation);
 	}
 
