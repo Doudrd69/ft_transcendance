@@ -7,5 +7,5 @@ export class Conversation {
 	id: number;
 
 	@Column()
-	conversationName: string;
+	name: string;
 }

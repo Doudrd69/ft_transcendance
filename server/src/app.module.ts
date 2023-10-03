@@ -2,14 +2,16 @@ import { Module } from '@nestjs/common';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { join } from 'path';
-import { User } from './users/users.entity'
+import { User } from './users/entities/users.entity'
 import { Message } from './chat/entities/message.entity'
 import { GroupMember } from './chat/entities/group_member.entity'
 import { Conversation } from './chat/entities/conversation.entity'
+import { Friendship } from './users/entities/friendship.entity';
 import { AppController } from './app.controller';
 // import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
+import { ChatModule } from './chat/chat.module';
 
 //We set the synchronize option to true, which means that TypeORM will automatically
 //generate database tables based on the entities. However, this option should be used
@@ -25,7 +27,7 @@ import { UsersModule } from './users/users.module';
       username: 'postgres',
       password: 'postgres',
       database: 'postgres',
-      entities: [User, Message, GroupMember, Conversation],
+      entities: [User, Message, GroupMember, Conversation, Friendship],
       synchronize: true,
       autoLoadEntities: true,
     }),
@@ -37,6 +39,8 @@ import { UsersModule } from './users/users.module';
     AuthModule,
 
     UsersModule,
+
+    // ChatModule,
 
   ],
   controllers: [AppController],

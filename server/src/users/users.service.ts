@@ -1,14 +1,17 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from './users.entity';
-import * as bcrypt from 'bcrypt'
+import { Repository } from 'typeorm';
+import * as bcrypt from 'bcrypt';
+import { User } from './entities/users.entity';
+import { Friendship } from './entities/friendship.entity';
 
 @Injectable()
 export class UsersService {
 	constructor(
 		@InjectRepository(User)
 		private usersRepository: Repository<User>,
+		@InjectRepository(Friendship)
+		private friendshipRepository: Repository<Friendship>,
 	) {}
 
 	// private passwordPolicy(password: string) {
@@ -57,6 +60,43 @@ export class UsersService {
 	// 	}
 	// 	throw new NotFoundException();
 	// }
+
+	createFriendship(initiatorLogin: string, recipientLogin: string) {
+		console.log("Friendship creation...");
+		this.getUserByLogin(initiatorLogin).then(initiator => {
+			this.getUserByLogin(recipientLogin).then(friend => {
+				const newFriendship = this.friendshipRepository.create({ initiator, friend });
+				return this.friendshipRepository.save(newFriendship);
+			}).catch(error => {
+				console.log("Error in second promise: ", error);
+			})
+		}).catch(error => {
+			console.log("Error in first promise: ", error);
+		});
+	}
+
+	updateFriendship(initiatorLogin: string, recipientLogin: string, flag: boolean) {
+		console.log("Friendship request responses processing...");
+		this.getUserByLogin(initiatorLogin).then(initiator => {
+			this.getUserByLogin(recipientLogin).then(friend => {
+				const frienshipToUpdate = initiator.initiatedFriendships.find(
+					(friendship) => friendship.friend.login === recipientLogin
+				);
+				if (frienshipToUpdate) {
+					frienshipToUpdate.isAccepted = flag;
+					return this.friendshipRepository.save(frienshipToUpdate); // friendship repo
+				}
+			}).catch(error => {
+				console.log("Error in second promise: ", error);
+			})
+		}).catch(error => {
+			console.log("Error in first promise: ", error);
+		})
+	}
+
+	getUserByLogin(loginToSearch: string): Promise<User> {
+		return this.usersRepository.findOne({ where: {login: loginToSearch}});
+	}
 
 	findUserByLogin(loginToSearch: string) {
 		return this.usersRepository.findOne({ where: {login: loginToSearch}});

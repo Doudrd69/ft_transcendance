@@ -2,7 +2,7 @@ import { Controller, Post, HttpCode, HttpStatus, Body, Get, Param} from '@nestjs
 import { ChatService } from './chat.service';
 import { GroupDto } from './dto/group.dto';
 import { MessageDto } from './dto/message.dto';
-import { User } from './../users/users.entity'
+import { User } from '../users/entities/users.entity'
 import { Conversation } from './entities/conversation.entity';
 import { Message } from './entities/message.entity';
 
@@ -25,7 +25,7 @@ export class ChatController {
 	@HttpCode(HttpStatus.OK)
 	@Post('newMessage')
 	createNewMessage(@Body() messageDto: MessageDto) {
-		return this.chatService.createMessage(messageDto.from_user, messageDto.content, messageDto.post_datetime, messageDto.conversation);
+		return this.chatService.createMessage(messageDto.from_user, messageDto.content, messageDto.post_datetime, messageDto.conversationName);
 	}
 
 	@Get('messages/:id')

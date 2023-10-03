@@ -22,9 +22,14 @@ export default function Home() {
 		});
 
 		if (response.ok) {
-			const jwt = await response.json();
-			sessionStorage.setItem("jwt", JSON.stringify(jwt));
+			const jwtObject = await response.json();
+			const jwt = jwtObject.access_token;
+			sessionStorage.setItem("jwt", jwt); // soucis car j'enregistre une string pas bonne
 			setShowLogin(false);
+
+			// Exemple pour utiliser le JWT
+			// const mdr = sessionStorage.getItem("jwt");
+			// console.log(mdr);
 		} else {
 			throw new Error("Error retrieving AccessToken");
 		}
