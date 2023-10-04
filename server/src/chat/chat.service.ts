@@ -41,8 +41,8 @@ export class ChatService {
 	// is created, we create the group and give it the conversation entity + the users it needs
 	createGroupMember(conversationKey: Conversation, userKey: User): Promise<GroupMember> {
 		console.log("-- createGroupMember --");
-		const joined_datetime = new Date().getHours();
-		const left_datetime = new Date().getHours();
+		const joined_datetime = new Date();
+		const left_datetime = new Date();
 		const newGroupMember = this.groupMemberRepository.create({ conversation: conversationKey, user: [userKey], joined_datetime, left_datetime });
 		return this.groupMemberRepository.save(newGroupMember);
 	}
