@@ -26,18 +26,18 @@ export default function Home() {
 
 		if (response.ok) {
 			console.log("handleAccessToken successfully retreived");
+			const token = await response.json();
+			sessionStorage.setItem("jwt", token.access_token);
 			setShowLogin(false);
 		} else {
 			console.error("--handleAccessoToken failed--");
 		}
 	}
 
-	// const [showLogin, setShowLogin] = useState(false);
-
 	const searchParams = useSearchParams();
 	const code = searchParams.get('code');
 
-	if (code) {
+	if (code && showLogin) {
 		handleAccessToken(code);
 	}
 
