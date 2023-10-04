@@ -5,6 +5,7 @@ import { Conversation } from './entities/conversation.entity';
 import { GroupMember } from './entities/group_member.entity';
 import { Message } from './entities/message.entity';
 import { User } from '../users/entities/users.entity'
+import { MessageDto } from './dto/message.dto';
 
 @Injectable()
 export class ChatService {
@@ -41,14 +42,19 @@ export class ChatService {
 
 	// Il faut envoyer la bonne Conversation pour que la FK soit correcte
 	// Revoir la fonction en ajoutant la recherche par socket?
-	createMessage(from_login: string, content: string, post_datetime: Date, conversationName: string): Promise<Message> {
+	async createMessage(messageDto: MessageDto) {
 		console.log("-- createMessage --");
-		// const conversation = conversationKey;
-		this.conversationRepository.find({ where: {name: conversationName} }).then(result => {
-			const newMessage = this.messageRepository.create({ from_login, content, post_datetime, conversation: result[0] });
+		await this.conversationRepository.find({ where: {name: messageDto.conversationName} }).then(result => {
+			console.log("========== ", messageDto.from_login);
+			const newMessage = this.messageRepository.create({
+				from_login: messageDto.from_login,
+				content: messageDto.content,
+				post_datetime: messageDto.post_datetime,
+				conversation: result[0],
+			});
 			return this.messageRepository.save(newMessage);
 		}).catch(error => {
-			console.log("Error: ", error);
+			console.log("== Error in message creation ==");
 		});
 		return;
 	}
