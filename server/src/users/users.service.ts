@@ -26,7 +26,8 @@ export class UsersService {
 		const firstname = userData.firstname;
 		const lastname = userData.lastname;
 		const image = userData.image;
-		const new42User = this.usersRepository.create({ login, firstname, lastname, image });
+		const socket = userData.socket;
+		const new42User = this.usersRepository.create({ login, firstname, lastname, image, socket});
 		return await this.usersRepository.save(new42User);
 	}
 

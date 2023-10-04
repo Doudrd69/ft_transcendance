@@ -15,16 +15,32 @@ export class ChatService {
 		private groupMemberRepository: Repository<GroupMember>,
 		@InjectRepository(Message)
 		private messageRepository: Repository<Message>,
+		@InjectRepository(User)
+		private usersRepository: Repository<User>,
 	) {}
 
-	createConversation(conversationName): Promise<Conversation> {
+	createConversation(conversationName, socketValue): Promise<Conversation> {
 		console.log("-- createConversation --");
 		console.log("Conversation to be created: ", conversationName);
 		const newConversation = this.conversationRepository.create({ name: conversationName });
-		return this.conversationRepository.save(newConversation);
+		// Creer un groupe en parallele, avec le createur de la conversation
+		this.usersRepository.find({ where: {socket: socketValue} }).then(result => {
+			this.createGroupMember(newConversation, result[0]).then(result => {
+				console.log("Group successfully created");
+				return ;
+			}).catch(error => {
+				console.log("Error during group creation :", error);
+			});
+			console.log("== Groupe was created, we can save conversation ==");
+			return this.conversationRepository.save(newConversation);
+		}).catch(error => {
+			console.log("Error during conversation creation :", error);
+		});
+		return ;
 	}
 
 	// Il faut envoyer la bonne Conversation pour que la FK soit correcte
+	// Revoir la fonction en ajoutant la recherche par socket?
 	createMessage(from_login: string, content: string, post_datetime: Date, conversationName: string): Promise<Message> {
 		console.log("-- createMessage --");
 		// const conversation = conversationKey;

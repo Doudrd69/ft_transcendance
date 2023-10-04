@@ -28,6 +28,7 @@ export class AuthService {
 				'firstname': responseContent.first_name,
 				'lastname': responseContent.last_name,
 				'image': responseContent.image,
+				'socket': 1,
 			}
 
 			const result = await this.usersService.findUserByLogin(userInformation.login);
