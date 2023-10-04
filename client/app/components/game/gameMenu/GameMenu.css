@@ -5,7 +5,7 @@
     align-items: center; 
     margin-bottom: 0 auto;
     height: 100%;
-    width: 50%;
+    width: 100%;
     margin: 0 auto;
     background-size: cover;
     background-position: center;
@@ -23,9 +23,9 @@
     color: rgb(125, 125, 125); /* Couleur du texte */
     text-shadow: 
         -2px -2px 0 rgb(0, 0, 0),   /* Ombre en haut à gauche (rouge) */
-         2px -2px 0 red,   /* Ombre en haut à droite (rouge) */
-        -2px 2px 0 red,   /* Ombre en bas à gauche (rouge) */
-         2px 2px 0 red;
+         2px -2px 0 #31081fff,   /* Ombre en haut à droite (rouge) */
+        -2px 2px 0 #31081fff,   /* Ombre en bas à gauche (rouge) */
+         2px 2px 0 #31081fff;
 }
 
 @keyframes growShrink {
@@ -33,14 +33,14 @@
         font-size: 1vw; /* Taille initiale */
     }
     100% {
-        font-size: 6vw; /* Taille maximale (ajustez selon vos préférences) */
+        font-size: 5.9vw; /* Taille maximale (ajustez selon vos préférences) */
     }
 }
 
 .buttonclass {   
     padding: 10px 20px;
     border-radius: 20px;
-    width: 100%;
+    width: 25%;
     transition: background-color 0.3s ease;
     cursor: pointer;
     font-size: 1vw;
@@ -56,3 +56,223 @@
 .buttonclass:hover {
         background-color: #ce8f07; /* Nouvelle couleur de fond au survol */
 }
+
+  
+  .paddle {
+    transform-origin: 50% 100%;
+    animation: 0.5s tilt2 ease-in infinite;
+  }
+  
+  .solid {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .surface {
+    width: 100px;
+    height: 110px;
+    background: linear-gradient(45deg, #ec1e40 0%, #ff5476 100%);
+    border-radius: 50px 50px 36px 36px;
+    box-shadow: -3px 0 #000, -6px 0 #ec1e40;
+  }
+  
+  .hold {
+    position: relative;
+    .top {
+      position: relative;
+      top: -10px;
+      left: -6px;
+      width: 40px;
+      height: 20px;
+      background:
+        linear-gradient(315deg, transparent 5px, transparent 0) bottom right,
+        linear-gradient(45deg, transparent 5px, transparent 0) bottom left;
+      background-size: 50% 50%;
+      background-repeat: no-repeat;
+      background-image:
+        radial-gradient(circle at 100% 100%, rgba(204,0,0,0) 10px, #E57729 5px),
+        radial-gradient(circle at 0 100%, rgba(204,0,0,0) 10px, #E57729 5px);
+      &:before {
+        display: block;
+        content: '';
+        position: relative;
+        left: 3px;
+        width: 40px;
+        height: 20px;
+        background:
+          linear-gradient(315deg, transparent 5px, transparent 0) bottom right,
+          linear-gradient(45deg, transparent 5px, transparent 0) bottom left;
+        background-size: 50% 50%;
+        background-repeat: no-repeat;
+        background-image:
+          radial-gradient(circle at 100% 100%, rgba(204,0,0,0) 10px, #FDB581 5px),
+          radial-gradient(circle at 0 100%, rgba(204,0,0,0) 10px, #FDB581 5px);
+      }
+      &:after {
+        display: block;
+        content: '';
+        position: relative;
+        top: -20px;
+        left: 6px;
+        width: 40px;
+        height: 20px;
+        background:
+          linear-gradient(315deg, transparent 5px, transparent 0) bottom right,
+          linear-gradient(45deg, transparent 5px, transparent 0) bottom left;
+        background-size: 50% 50%;
+        background-repeat: no-repeat;
+        background-image:
+          radial-gradient(circle at 100% 100%, rgba(204,0,0,0) 10px, #fe9f3d 5px),
+          radial-gradient(circle at 0 100%, rgba(204,0,0,0) 10px, #fe9f3d 5px);
+      }
+    }
+    .transition {
+      position: absolute;
+      top: 0px;
+      left: 10px;
+      width: 20px;
+      height: 15px;
+      background: linear-gradient(to top, #fd7724 0%, #fe9f3d 60%, #fe9f3d 100%);
+      border-radius: 100%;
+      z-index: 10;
+    }
+    .handle {
+      position: relative;
+      top: -10px;
+      left: 4px;
+      width: 20px;
+      height: 55px;
+      background: #E57729;
+      border-radius: 0 0 5px 5px;
+      &:before {
+        display: block;
+        content: '';
+        position: relative;
+        left: 3px;
+        width: 20px;
+        height: 55px;
+        background: #FDB581;
+        border-radius: 0 0 5px 5px;
+      }
+      &:after {
+        display: block;
+        content: '';
+        position: relative;
+        top: -55px;
+        left: 6px;
+        width: 20px;
+        height: 55px;
+        background: linear-gradient(to right, #fd7724 0%, #fe9f3d 30%, #fdb581 100%);
+        border-radius: 0 0 5px 5px;
+      }
+    }
+  }
+  
+  .wiggly {
+    position: absolute;
+    top: 60px;
+    transform-origin: 50px 0;
+    animation: 3s tilt infinite;
+    .string {
+      position: absolute;
+      left: 50px;
+      width: 150px;
+      height: 1px;
+      background: linear-gradient(to bottom, #fff 0%, #bbb 100%);
+      animation: 0.5s contract ease-in infinite;
+    }
+    .ball {
+      position: absolute;
+      top: -15px;
+      left: 170px;
+      width: 30px;
+      height: 30px;
+      background: radial-gradient(ellipse at top left, #fff 30%, #bbb 100%);
+      border-radius: 100%;
+      animation: 0.5s bounce ease-in infinite;
+    }
+  }
+  
+  @keyframes bounce {
+    0% {
+      left: 170px;
+      width: 30px;
+    }
+    
+    10% {
+      width: 40px;    
+    }
+    
+    50% {
+      left: 40px;
+      width: 30px;
+    }
+    
+    90% {
+      width: 40px;
+    }
+    
+    100% {
+      left: 170px;
+      width: 30px;
+    }
+  }
+  
+  @keyframes contract {
+    0% {
+      width: 150px;
+    }
+    
+    50% {
+      width: 0px;
+    }
+    
+    100% {
+      width: 150px;
+    } 
+  }
+  
+  @keyframes tilt {
+    0% {
+      transform: rotate(0deg);
+    }
+    20% {
+      transform: rotate(30deg);
+    }
+    60% {
+      transform: rotate(0deg);
+    }
+    80% {
+      transform: rotate(-30deg);
+    }
+    100% {
+      transform: rotate(0deg);
+    }
+  }
+  
+  @keyframes tilt2 {
+    0% {
+      transform: rotate(-10deg);
+    }
+    50% {
+      transform: rotate(10deg);
+    }
+    100% {
+      transform: rotate(-10deg);
+    }
+  }
+
+  .paddle-left {
+    position: absolute;
+    left: 40%; /* Ajustez la valeur selon votre préférence */
+    top: 50%; /* Centre vertical */
+    transform: translateY(-50%); /* Centre vertical */
+  }
+  
+  .paddle-right {
+    position: absolute;
+    right: 10%; /* Ajustez la valeur selon votre préférence */
+    top: 50%; /* Centre vertical */
+    transform: translateY(-50%); /* Centre vertical */
+  }

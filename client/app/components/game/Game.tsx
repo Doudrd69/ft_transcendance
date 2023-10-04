@@ -4,8 +4,7 @@ import GameMenuComponent from './gameMenu/GameMenu';
 import MatchMakingComponent from './gameMenu/gameStart/GameStart'
 import SettingsComponent from './gameMenu/gameSettings/gameSettings'
 import {useGame } from './GameContext'
-import gamePong from './gamePong/Pong';
-import Pong from './gamePong/gamePong';
+import Pong from './gamePong/GamePong';
 const GameComponent: React.FC = () => {
 	const { showGameMatchmaking, showGameSettings, showGameMenu} = useGame();
 	
@@ -14,7 +13,7 @@ const GameComponent: React.FC = () => {
 				{/* {showGameMatchmaking && <MatchMakingComponent/>}
 				{showGameMenu && <GameMenuComponent/>}
 				{showGameSettings && <SettingsComponent></SettingsComponent>} */}
-				{/* <Pong>OK</Pong> */}
+				<Pong></Pong>
 	  		</div>
 	);
   };
