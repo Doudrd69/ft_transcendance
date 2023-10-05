@@ -1,5 +1,5 @@
 export class MessageDto {
-	from_user: string;
+	from_login: string;
 	content: string;
 	post_datetime: Date;
 	conversationName: string;

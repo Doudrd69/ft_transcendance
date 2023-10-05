@@ -19,6 +19,9 @@ export class User {
   @Column()
   image: string;
 
+  @Column()
+  socket: number;
+
   @Column({ default: false })
   isActive: boolean;
 
