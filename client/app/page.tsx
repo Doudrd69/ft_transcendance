@@ -10,34 +10,34 @@ import Header from './components/header/Header'
 import Authentificationcomponent from './components/chat/auth/Authentification';
 
 export default function Home() {
-	// const [showLogin, setShowLogin] = useState(true);
+	const [showLogin, setShowLogin] = useState(true);
 
-	// const handleAccessToken = async (code: any) => {
-	// 	console.log("handleAccessToken gets code: " + code);
-	// 	const response = await fetch('http://localhost:3001/auth/access', {
-	// 		method: 'POST',
-	// 		headers: {
-	// 			'Content-Type': 'application/json',
-	// 		},
-	// 		body: JSON.stringify({code}),
-	// 	});
+	const handleAccessToken = async (code: any) => {
+		console.log("handleAccessToken gets code: " + code);
+		const response = await fetch('http://localhost:3001/auth/access', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify({code}),
+		});
 
-	// 	if (response.ok) {
-	// 		console.log("handleAccessToken successfully retreived");
-	// 		setShowLogin(false);
-	// 	} else {
-	// 		console.error("--handleAccessoToken failed--");
-	// 	}
-	// }
+		if (response.ok) {
+			console.log("handleAccessToken successfully retreived");
+			setShowLogin(false);
+		} else {
+			console.error("--handleAccessoToken failed--");
+		}
+	}
 
-	// // const [showLogin, setShowLogin] = useState(false);
+	// const [showLogin, setShowLogin] = useState(false);
 
-	// const searchParams = useSearchParams();
-	// const code = searchParams.get('code');
+	const searchParams = useSearchParams();
+	const code = searchParams.get('code');
 
-	// if (code) {
-	// 	handleAccessToken(code);
-	// }
+	if (code) {
+		handleAccessToken(code);
+	}
 
 
 	return (
