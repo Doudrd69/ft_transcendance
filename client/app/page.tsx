@@ -45,15 +45,15 @@ export default function Home() {
 	return (
 			<RootLayout>
 				<Header/>
-				{showLogin ? (<Authentificationcomponent/>) : 
-				(
+				{/* {showLogin ? (<Authentificationcomponent/>) :  */}
+				{/* ( */}
 				<div className="container">
 					<Chat/>
 					<GameProvider>
 						<Game/>
 					</GameProvider>
 				</div>
-				)}
+				{/* )} */}
 			</RootLayout>
 	)
 }

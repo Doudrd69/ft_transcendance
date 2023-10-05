@@ -3,24 +3,26 @@ import React, { useState } from 'react';
 
 const AddComponent: React.FC = () => {
 
-	const [formValue, setFormValue] = useState('');
+	const [formValues, setFormValues] = useState(['', '', '']); // Initialisez les valeurs par défaut
 
-	const handleFormInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setFormValue(e.target.value); // Update conversationValue state with the input value
+	const handleFormInput = (value, index) => {
+		const updatedFormValues = [...formValues];
+		updatedFormValues[index] = value;
+		setFormValues(updatedFormValues);
 	};
 
-	const handleConversationCreation = async (e: React.FormEvent) => {
+	const handleConversationCreation = async (e: React.FormEvent, index) => {
 
 		e.preventDefault();
 
-		console.log("Conversation to create :", formValue);
+		console.log("Conversation to create :", formValues[index]);
 		const socketValue = 1; // for testing purpose
 		const response = await fetch('http://localhost:3001/chat/newConversation', {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
 			},
-			body: JSON.stringify({formValue, socketValue}),
+			body: JSON.stringify({formValue: formValues[index], socketValue}),
 		});
 
 		if (response.ok) {
@@ -29,16 +31,17 @@ const AddComponent: React.FC = () => {
 		else {
 			console.log("Conversation creation failed");
 		}
+		return false;
 	}
 
-	const handleFriendRequest = async (e: React.FormEvent) => {
+	const handleFriendRequest = async (e: React.FormEvent, index) => {
 
 		e.preventDefault();
 
-		console.log("Friend to add :", formValue);
+		console.log("Friend to add :", formValues[index]);
 		const friendRequestDto = {
-			initiatorLogin: "ebrodeur", // to replace
-			recipientLogin: formValue,
+			initiatorLogin: "ebrodeur", // à remplacer
+			recipientLogin: formValues[index],
 		}
 		const response = await fetch('http://localhost:3001/users/addfriend', {
 			method: 'POST',
@@ -64,10 +67,10 @@ const AddComponent: React.FC = () => {
 		<div className="block-main">
 			{placeholders.map((placeholder, index) => (
 				<div className="block-add" key={index}>
-					<form onSubmit={handleFunctions[index]}>
-						<input className="input-add" type="text" placeholder={placeholder} value={formValue} onChange={handleFormInput} />
-						<button className="button-add" type="submit"></button>
+					<form  className="input-add" onSubmit={(e) => handleFunctions[index](e, index)}>
+						<input className="test" type="text" placeholder={placeholder} value={formValues[index]} onChange={(e) => handleFormInput(e.target.value, index)}/>
 					</form>
+					<button className="button-add" type="submit"></button>
 				</div>
 			))}
 		</div>

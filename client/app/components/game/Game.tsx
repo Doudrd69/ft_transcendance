@@ -13,7 +13,7 @@ const GameComponent: React.FC = () => {
 				{/* {showGameMatchmaking && <MatchMakingComponent/>}
 				{showGameMenu && <GameMenuComponent/>}
 				{showGameSettings && <SettingsComponent></SettingsComponent>} */}
-				<Pong></Pong>
+				{/* <Pong></Pong> */}
 	  		</div>
 	);
   };
