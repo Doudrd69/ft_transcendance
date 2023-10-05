@@ -23,6 +23,7 @@ export class ChatService {
 	createConversation(conversationName, socketValue): Promise<Conversation> {
 		console.log("-- createConversation --");
 		console.log("Conversation to be created: ", conversationName);
+		// verification
 		const newConversation = this.conversationRepository.create({ name: conversationName });
 		// Creer un groupe en parallele, avec le createur de la conversation
 		this.usersRepository.find({ where: {socket: socketValue} }).then(result => {

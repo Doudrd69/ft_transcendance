@@ -7,7 +7,7 @@ const AddComponent: React.FC = () => {
 
 	const handleFormInput = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setFormValue(e.target.value); // Update conversationValue state with the input value
-	  };
+	};
 
 	const handleConversationCreation = async (e: React.FormEvent) => {
 
