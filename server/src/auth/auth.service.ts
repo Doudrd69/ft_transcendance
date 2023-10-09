@@ -1,8 +1,8 @@
-import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
-import { UsersService } from '../users/users.service';
-import { User } from '../users/entities/users.entity';
-import { JwtService } from '@nestjs/jwt';
-// import * as bcrypt from 'bcrypt'
+import { Injectable, HttpException, HttpStatus } from '@nestjs/common'
+import { UsersService } from '../users/users.service'
+import { User } from '../users/entities/users.entity'
+import { JwtService } from '@nestjs/jwt'
+// import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService {
@@ -28,6 +28,7 @@ export class AuthService {
 				'firstname': responseContent.first_name,
 				'lastname': responseContent.last_name,
 				'image': responseContent.image,
+				'socket': 1,
 			}
 
 			const result = await this.usersService.findUserByLogin(userInformation.login);

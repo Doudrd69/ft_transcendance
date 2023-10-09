@@ -1,7 +1,10 @@
 import './GameStart.css'
 import React from 'react';
+import { useGame } from '../../GameContext';
 
 const MatchMaking: React.FC = () => {
+
+    const {showGameMenu, handleGameMenu} = useGame();
     return (
         <div className="matchmakingClass">
             <div className="cs-loader">
@@ -14,6 +17,7 @@ const MatchMaking: React.FC = () => {
                     <label>●</label>
                 </div>
             </div>
+                    <button className={`cancel-button ${showGameMenu ? 'clicked' : ''}`} onClick={handleGameMenu}>Cancel</button>
         </div>
     );
 };

@@ -13,7 +13,8 @@ RUN npm install	&& \
 	npm install pg	&& \
 	npm i bcrypt && \
 	npm i @types/bcrypt && \
-	npm i --save @nestjs/websockets @nestjs/platform-socket.io
+	npm i --save @nestjs/websockets @nestjs/platform-socket.io \
+	npm install speakeasy qrcode
 
 COPY . .
 

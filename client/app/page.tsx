@@ -8,6 +8,8 @@ import Chat from './components/chat/Chat'
 import Game from './components/game/Game'
 import Header from './components/header/Header'
 import Authentificationcomponent from './components/chat/auth/Authentification';
+import { GameProvider } from './components/game/GameContext';
+
 
 export default function Home() {
 	const [showLogin, setShowLogin] = useState(true);
@@ -24,18 +26,18 @@ export default function Home() {
 
 		if (response.ok) {
 			console.log("handleAccessToken successfully retreived");
+			const token = await response.json();
+			sessionStorage.setItem("jwt", token.access_token);
 			setShowLogin(false);
 		} else {
 			console.error("--handleAccessoToken failed--");
 		}
 	}
 
-	// const [showLogin, setShowLogin] = useState(false);
-
 	const searchParams = useSearchParams();
 	const code = searchParams.get('code');
 
-	if (code) {
+	if (code && showLogin) {
 		handleAccessToken(code);
 	}
 
@@ -43,11 +45,13 @@ export default function Home() {
 	return (
 			<RootLayout>
 				<Header/>
-				{/* {showLogin ? (<Authentificationcomponent/>) : 
-				( */}
+				{/* {showLogin ? (<Authentificationcomponent/>) :  */}
+				{/* ( */}
 				<div className="container">
 					<Chat/>
-					<Game/>
+					<GameProvider>
+						<Game/>
+					</GameProvider>
 				</div>
 				{/* )} */}
 			</RootLayout>

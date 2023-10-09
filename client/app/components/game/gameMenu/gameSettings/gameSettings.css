@@ -1,0 +1,77 @@
+.settingsBlock {
+  block-size: 80%;
+  background-color: #9e8770;
+  text-align: center;
+  margin-left: 10%;
+  margin-top: 5%;
+  padding: 10px 20px;
+  border-radius: 20px;
+  height: 80%;
+  width: 80%;
+}
+
+.customGameBlock {
+  block-size: 35%;
+  background-color: #c4a78a;
+  height: 80%;
+  width: 35%;
+  margin-left: 10%;
+  margin-top: 5%;
+}
+
+.cancel-button {
+    
+    padding: 10px 20px;
+    border-radius: 20px;
+    background-color: #d90f0f; /* Couleur du bouton "Cancel" */
+    color: #fff; /* Couleur du texte */
+    font-size: 16px;
+    border: none;
+    cursor: pointer;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    position: absolute;
+    margin-top: -2%;
+    left: 50%;
+    transform: translatex(-50%);
+  }
+
+  .cancel-button-container {
+    margin-top: 25%; /* Ajoutez de l'espace entre le texte "PONG!!" et le bouton "Cancel" */
+    text-align: center;
+  }
+
+  .cancel-button:hover {
+    background-color: #c0392b; /* Nouvelle couleur de fond au survol */
+  }
+
+  .settingsClass {
+    text-align: center;
+    margin-top: 10%;
+  }
+
+h1 {
+    font-size: 24px;
+}
+
+.setting-option {
+    margin: 20px 0;
+}
+
+label {
+    display: inline-block;
+    width: 150px;
+    font-size: 16px;
+}
+
+input[type="checkbox"],
+input[type="text"],
+select {
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+    width: 200px;
+    margin-left: 10px;
+}
