@@ -27,8 +27,7 @@ const SendBoxComponent: React.FC = () => {
 				console.log("!! SOCKET EMIT on message !!");
 			});
 			socketInUse.off('message');
-		}
-		
+
 		const response = await fetch('http://localhost:3001/chat/newMessage', {
 			method: 'POST',
 			headers: {

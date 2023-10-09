@@ -18,11 +18,7 @@ import { GroupMember } from './entities/group_member.entity';
 		TypeOrmModule.forFeature([Friendship]),
 		TypeOrmModule.forFeature([GroupMember])
 	],
-<<<<<<< HEAD
 	providers: [ChatService, UsersService],
-=======
-	providers: [ChatService ,SocketGateway],
->>>>>>> f154292 (Oh misere)
 	exports: [ChatService],
 	controllers: [ChatController],
 })
