@@ -12,7 +12,8 @@ RUN npm install	&& \
 	npm install @nestjs/serve-static && \
 	npm install pg	&& \
 	npm i bcrypt && \
-	npm i @types/bcrypt
+	npm i @types/bcrypt && \
+	npm i --save @nestjs/websockets @nestjs/platform-socket.io
 
 COPY . .
 
