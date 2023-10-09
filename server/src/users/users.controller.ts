@@ -41,6 +41,25 @@ export class UsersController {
 	}
 
 	@HttpCode(HttpStatus.OK)
+	@Post('upload-avatar')
+	@UseInterceptors(FileInterceptor('avatar')) // 'avatar' is the field name in the form
+	uploadAvatar(@UploadedFile() avatar: any) {
+		// `avatar` contains the uploaded file data
+		return this.usersService.uploadAvatar(avatar);
+	}
+
+	@Get(':id/avatar')
+	getAvatar(@Param('id') userId: number, @Res() res: Response) {
+	//   const user = await this.userService.findById(userId);
+	//   if (!user || !user.avatarImage) {
+	// 	return res.status(404).send('Avatar not found');
+	//   }
+	  
+	//   res.setHeader('Content-Type', 'image/jpeg'); // Set appropriate content type
+	//   res.send(user.avatarImage);
+	}
+
+	@HttpCode(HttpStatus.OK)
 	@Post('addfriend')
 	createFriendship(@Body() friendRequestDto: FriendRequestDto) {
 		return this.usersService.createFriendship(friendRequestDto);
