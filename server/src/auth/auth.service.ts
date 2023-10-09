@@ -2,7 +2,16 @@ import { Injectable, HttpException, HttpStatus } from '@nestjs/common'
 import { UsersService } from '../users/users.service'
 import { User } from '../users/entities/users.entity'
 import { JwtService } from '@nestjs/jwt'
+import { speakeasy } from 'speakeasy'
+import { QRCode } from 'qrcode'
+import dotenv from 'dotenv';
 // import * as bcrypt from 'bcrypt';
+
+dotenv.config();
+
+const redirectUri = process.env.SERVER_REDIRECT_URI;
+const clientId = process.env.SERVER_TOKEN_CLIENT_ID;
+const clientSecret = process.env.SERVER_TOKEN_CLIENT_SECRET;
 
 @Injectable()
 export class AuthService {
@@ -26,7 +35,6 @@ export class AuthService {
 			const userInformation = {
 				'login': responseContent.login,
 				'firstname': responseContent.first_name,
-				'lastname': responseContent.last_name,
 				'image': responseContent.image,
 				'socket': 1,
 			}
@@ -58,14 +66,31 @@ export class AuthService {
 	// 	return { access_token: await this.jwtService.signAsync(payload) };
 	// }
 
+	// async handle2FA() {
+
+	// 	const secret = speakeasy.generateSecrete();
+	// 	// recup l'utilisateur et l'envoyer dans la fonction d'enregistrement du secret
+	// 	this.usersService.register2FASecret(secret);
+	// 	// Get the data URL of the authenticator URL
+	// 	QRCode.toDataURL(secret.otpauth_url, function(err, data_url) {
+	// 		console.log(data_url);
+	// 		// Display this data URL to the user in an <img> tag
+	// 		// return a json object with the data_url
+	// 		return JSON.stringify(data_url);
+	// 	});
+	// 	// Then I display the QRCode to the user, he scans it, we get a code, we make a request to a server-function which will verify
+	// 	// the token with the temp_secret, and if true, we save the secret.
+	// }
+
 	async getAccessToken(code: any) {
 
 		const data = new URLSearchParams();
+		console.log("TEEEEEST: ", JSON.stringify(clientId));
 		data.append('grant_type', 'authorization_code');
-		data.append('client_id', 'u-s4t2ud-4d0db0aeaaddb9bee1f99f2e27a7fee7a501130aa05cb3cffe2caf30e50418be');
-		data.append('client_secret', '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');
+		data.append('client_id', clientId);
+		data.append('client_secret', clientSecret);
 		data.append('code', code);
-		data.append('redirect_uri', 'http://localhost:3000/');
+		data.append('redirect_uri', redirectUri);
 
 		const response = await fetch('https://api.intra.42.fr/oauth/token', {
 			method: 'POST',
@@ -75,11 +100,11 @@ export class AuthService {
 		if (response.ok) {
 			console.log("-- Request to API OK --");
 			const responseContent = await response.json();
-
+			
 			try {
 				const result = await this.getUserInfo(responseContent);
 				if (result) {
-					const payload = { sub: result.id, login: result.login };
+					const payload = { sub: result.id, login: result.login }; // MODIFY FOR MORE INFORMATION IN PAYLOAD
 					return { access_token: await this.jwtService.signAsync(payload) };
 				} else {
 					console.log("Unexpected result: ", result);
@@ -89,7 +114,7 @@ export class AuthService {
 			}
 		}
 		else {
-			console.log("Request to 42 API failed");
+			console.log("-- Request to API FAILED --");
 		}
 	}
 }

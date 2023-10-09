@@ -13,7 +13,8 @@ RUN npm install	&& \
 	npm install pg	&& \
 	npm i bcrypt && \
 	npm i @types/bcrypt && \
-	npm install speakeasy qrcode
+	npm install speakeasy qrcode && \
+	npm install dotenv @types/node
 
 COPY . .
 

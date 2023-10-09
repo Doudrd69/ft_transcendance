@@ -22,15 +22,30 @@ export class UsersService {
 	// 	return false;
 	// }
 
-	async createNew42User(userData): Promise<User> {
+	// register2FASecret(secret: string) {
+	// 	const userToUpdate = this.usersRepository.find();
+	// 	userToUpdate.TFA_temp_secret = secret;
+	// 	return this.usersRepository.save(userToUpdate);
+	// }
+
+	createNew42User(userData) {
 		console.log("In DB registration: ", JSON.stringify(userData));
 		const login = userData.login;
 		const firstname = userData.firstname;
-		const lastname = userData.lastname;
+		// const lastname = userData.lastname;
 		const image = userData.image;
 		const socket = userData.socket;
-		const new42User = this.usersRepository.create({ login, firstname, lastname, image, socket});
-		return await this.usersRepository.save(new42User);
+		const new42User = this.usersRepository.create({ login, firstname, image, socket});
+		return this.usersRepository.save(new42User);
+	}
+
+	updateUsername(newUsername: string, userLogin: string) {
+		this.getUserByLogin(userLogin).then(userToUpdate => {
+			userToUpdate.username = newUsername;
+			return this.usersRepository.save(userToUpdate);
+		}).catch(error => {
+			console.log("Error: cannot update username :", error);
+		});
 	}
 
 	// il faudra recuperer un user (ou un moyen de l'identifier : socket, login etc)

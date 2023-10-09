@@ -17,7 +17,7 @@ const MessageComponent: React.FC = () => {
 			from_login: "ebrodeur",
 			content: messageValue,
 			post_datetime: new Date(),
-			conversationName: "JeSuisLeNouveauChan",
+			conversationName: "UnAutreSuperChan",
 		}
 		const response = await fetch('http://localhost:3001/chat/newMessage', {
 			method: 'POST',

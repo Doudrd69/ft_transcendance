@@ -13,11 +13,17 @@ export class User {
   @Column()
   firstname: string;
 
-  @Column()
-  lastname: string;
+  @Column({default: "guest"})
+  username: string;
 
   @Column()
   image: string;
+
+  @Column({default: ""})
+  TFA_secret: string;
+
+  @Column({default: ""})
+  TFA_temp_secret: string;
 
   @Column()
   socket: number;

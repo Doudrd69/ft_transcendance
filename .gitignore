@@ -1,1 +1,3 @@
 pgdata
+node_modules
+.env
