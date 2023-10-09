@@ -28,14 +28,22 @@ export class UsersService {
 	// 	return this.usersRepository.save(userToUpdate);
 	// }
 
+	uploadAvatar(avatar: any) {
+		this.getUserByLogin("").then(userToUpdate => {
+			userToUpdate.avatarImage = avatar.buffer;
+			return this.usersRepository.save(userToUpdate);
+		}).catch(error => {
+			console.log("Error: cannot upload avatar image: ", error);
+		});
+	}
+
 	createNew42User(userData) {
 		console.log("In DB registration: ", JSON.stringify(userData));
 		const login = userData.login;
 		const firstname = userData.firstname;
-		// const lastname = userData.lastname;
-		const image = userData.image;
+		const officialProfileImage = userData.image;
 		const socket = userData.socket;
-		const new42User = this.usersRepository.create({ login, firstname, image, socket});
+		const new42User = this.usersRepository.create({ login, firstname, officialProfileImage, socket});
 		return this.usersRepository.save(new42User);
 	}
 

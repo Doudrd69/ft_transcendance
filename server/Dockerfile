@@ -8,13 +8,14 @@ COPY package*.json ./
 
 RUN npm install	&& \
 	npm install @nestjs/jwt && \
+	npm install @types/node && \
 	npm install @nestjs/typeorm && \
 	npm install @nestjs/serve-static && \
 	npm install pg	&& \
 	npm i bcrypt && \
 	npm i @types/bcrypt && \
 	npm install speakeasy qrcode && \
-	npm install dotenv @types/node
+	npm install dotenv
 
 COPY . .
 

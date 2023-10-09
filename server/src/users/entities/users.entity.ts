@@ -17,7 +17,10 @@ export class User {
   username: string;
 
   @Column()
-  image: string;
+  officialProfileImage: string;
+
+  @Column({ type: 'bytea', default: null, nullable: true })
+  avatarImage: Buffer;
 
   @Column({default: ""})
   TFA_secret: string;

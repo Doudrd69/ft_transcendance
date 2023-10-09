@@ -1,6 +1,7 @@
-import { Controller, Post, HttpCode, HttpStatus, Body, Get } from '@nestjs/common';
+import { Controller, Post, HttpCode, HttpStatus, Body, Get, UploadedFile, UseInterceptors, Param, Res } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { FriendRequestDto } from './dto/FriendRequestDto.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('users')
 export class UsersController {
@@ -23,6 +24,25 @@ export class UsersController {
 	// updateUser(@Body() updateUserDto: Record<string, string>) {
 	// 	return this.usersService.updateUser(updateUserDto.username, updateUserDto.newUsername);
 	// }
+
+	@HttpCode(HttpStatus.OK)
+	@Post('upload-avatar')
+	@UseInterceptors(FileInterceptor('avatar')) // 'avatar' is the field name in the form
+	uploadAvatar(@UploadedFile() avatar: any) {
+		// `avatar` contains the uploaded file data
+		return this.usersService.uploadAvatar(avatar);
+	}
+
+	@Get(':id/avatar')
+	getAvatar(@Param('id') userId: number, @Res() res: Response) {
+	//   const user = await this.userService.findById(userId);
+	//   if (!user || !user.avatarImage) {
+	// 	return res.status(404).send('Avatar not found');
+	//   }
+	  
+	//   res.setHeader('Content-Type', 'image/jpeg'); // Set appropriate content type
+	//   res.send(user.avatarImage);
+	}
 
 	@HttpCode(HttpStatus.OK)
 	@Post('addfriend')
