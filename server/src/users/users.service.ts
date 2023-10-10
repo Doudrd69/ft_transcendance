@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, Res } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 import * as bcrypt from 'bcrypt'
@@ -28,14 +28,28 @@ export class UsersService {
 	// 	return this.usersRepository.save(userToUpdate);
 	// }
 
-	uploadAvatar(avatar: any) {
-		this.getUserByLogin("").then(userToUpdate => {
-			userToUpdate.avatarImage = avatar.buffer;
-			return this.usersRepository.save(userToUpdate);
-		}).catch(error => {
-			console.log("Error: cannot upload avatar image: ", error);
-		});
-	}
+	// getAvatarById(userId: number, res: Response) {
+	// 	this.usersRepository.findOne({ where: {id: userId}}).then(
+	// 		user => {
+	// 			if (user.avatarImage) {
+	// 				res.setHeader('Content-Type', 'image/jpeg'); // Set appropriate content type
+	// 				return res.send(user.avatarImage);
+	// 			}
+	// 		}).catch(
+	// 			error => {
+	// 				return res.status(404).send('Avatar not found: ', error);
+	// 		}
+	// 	);
+	// }
+
+	// uploadAvatar(avatar: any) {
+	// 	this.getUserByLogin("").then(userToUpdate => {
+	// 		userToUpdate.avatarImage = avatar.buffer;
+	// 		return this.usersRepository.save(userToUpdate);
+	// 	}).catch(error => {
+	// 		console.log("Error: cannot upload avatar image: ", error);
+	// 	});
+	// }
 
 	createNew42User(userData) {
 		console.log("In DB registration: ", JSON.stringify(userData));

@@ -28,7 +28,6 @@ export class AuthController {
 	// 	return this.authService.handle2FA();
 	// }
 
-	@HttpCode(HttpStatus.OK)
 	@Post('access')
 	getAccessToken(@Body() requestBody: {code: string}) {
 		const { code } = requestBody; // Access the 'code' property within the object

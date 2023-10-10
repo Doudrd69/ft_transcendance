@@ -21,16 +21,18 @@ export class AuthService {
 	) {}
 
 	private async getUserInfo(accessTokenArray: any): Promise<User> {
+
 		const access_token = accessTokenArray.access_token;
 		const token_string = "Bearer " + access_token;
-		const response = await fetch("https://api.intra.42.fr/v2/me", {
-			method: 'GET',
-			headers: {
-				'Authorization': token_string,
-			},
-		});
 
-		if (response.ok) {
+		try {
+			const response = await fetch("https://api.intra.42.fr/v2/me", {
+				method: 'GET',
+				headers: {
+					'Authorization': token_string,
+				},
+			});
+			
 			const responseContent = await response.json();
 			const userInformation = {
 				'login': responseContent.login,
@@ -47,9 +49,8 @@ export class AuthService {
 			else {
 				return this.usersService.createNew42User(userInformation);
 			}
-		}
-		else {
-			return null; // attention ici
+		} catch (error) {
+			throw new Error("Error: " + error);
 		}
 	}
 
@@ -85,36 +86,34 @@ export class AuthService {
 	async getAccessToken(code: any) {
 
 		const data = new URLSearchParams();
-		console.log("TEEEEEST: ", JSON.stringify(clientId));
 		data.append('grant_type', 'authorization_code');
 		data.append('client_id', clientId);
 		data.append('client_secret', clientSecret);
 		data.append('code', code);
 		data.append('redirect_uri', redirectUri);
 
-		const response = await fetch('https://api.intra.42.fr/oauth/token', {
-			method: 'POST',
-			body: data,
-		});
+		try {
+			const response = await fetch('https://api.intra.42.fr/oauth/token', {
+				method: 'POST',
+				body: data,
+			});
 
-		if (response.ok) {
-			console.log("-- Request to API OK --");
-			const responseContent = await response.json();
 			
-			try {
-				const result = await this.getUserInfo(responseContent);
-				if (result) {
-					const payload = { sub: result.id, login: result.login }; // MODIFY FOR MORE INFORMATION IN PAYLOAD
-					return { access_token: await this.jwtService.signAsync(payload) };
-				} else {
-					console.log("Unexpected result: ", result);
-				}
-			} catch (error) {
-				console.log("Error in getAccessToken: ", error);
+			if (response.ok) {
+				console.log("-- Request to API --");
+				const responseContent = await response.json();
+
+				const payload = {
+					sub: responseContent.id,
+					login: responseContent.login,
+				};
+				const accessToken = await this.jwtService.signAsync(payload);
+				return { access_token: accessToken };
 			}
-		}
-		else {
-			console.log("-- Request to API FAILED --");
+			throw new Error("Cannot extract from response");
+		} catch (error) {
+			console.error("-- Request to API FAILED --");
+			throw new Error("Request to API failed" + error);
 		}
 	}
 }
