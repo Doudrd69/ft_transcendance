@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, Res } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 import * as bcrypt from 'bcrypt'
@@ -22,15 +22,52 @@ export class UsersService {
 	// 	return false;
 	// }
 
-	async createNew42User(userData): Promise<User> {
+	// register2FASecret(secret: string) {
+	// 	const userToUpdate = this.usersRepository.find();
+	// 	userToUpdate.TFA_temp_secret = secret;
+	// 	return this.usersRepository.save(userToUpdate);
+	// }
+
+	// getAvatarById(userId: number, res: Response) {
+	// 	this.usersRepository.findOne({ where: {id: userId}}).then(
+	// 		user => {
+	// 			if (user.avatarImage) {
+	// 				res.setHeader('Content-Type', 'image/jpeg'); // Set appropriate content type
+	// 				return res.send(user.avatarImage);
+	// 			}
+	// 		}).catch(
+	// 			error => {
+	// 				return res.status(404).send('Avatar not found: ', error);
+	// 		}
+	// 	);
+	// }
+
+	// uploadAvatar(avatar: any) {
+	// 	this.getUserByLogin("").then(userToUpdate => {
+	// 		userToUpdate.avatarImage = avatar.buffer;
+	// 		return this.usersRepository.save(userToUpdate);
+	// 	}).catch(error => {
+	// 		console.log("Error: cannot upload avatar image: ", error);
+	// 	});
+	// }
+
+	createNew42User(userData) {
 		console.log("In DB registration: ", JSON.stringify(userData));
 		const login = userData.login;
 		const firstname = userData.firstname;
-		const lastname = userData.lastname;
-		const image = userData.image;
+		const officialProfileImage = userData.image;
 		const socket = userData.socket;
-		const new42User = this.usersRepository.create({ login, firstname, lastname, image, socket});
-		return await this.usersRepository.save(new42User);
+		const new42User = this.usersRepository.create({ login, firstname, officialProfileImage, socket});
+		return this.usersRepository.save(new42User);
+	}
+
+	updateUsername(newUsername: string, userLogin: string) {
+		this.getUserByLogin(userLogin).then(userToUpdate => {
+			userToUpdate.username = newUsername;
+			return this.usersRepository.save(userToUpdate);
+		}).catch(error => {
+			console.log("Error: cannot update username :", error);
+		});
 	}
 
 	// il faudra recuperer un user (ou un moyen de l'identifier : socket, login etc)

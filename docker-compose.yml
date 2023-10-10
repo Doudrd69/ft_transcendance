@@ -5,7 +5,10 @@ services:
     image: postgres
     restart: always
     environment:
-      - POSTGRES_PASSWORD=postgres
+      - HOSTNAME=${HOSTNAME}
+      - DB_USERNAME=${DB_USERNAME}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - DB_NAME=${DB_NAME}
     container_name: postgres
     volumes:
       - ./pgdata:/var/lib/postgresql/data
@@ -18,7 +21,14 @@ services:
     build: ./server
     container_name: server
     environment:
-      - PORT=${PORT}
+      - PORT=${SERVER_PORT}
+      - HOSTNAME=${HOSTNAME}
+      - DB_USERNAME=${DB_USERNAME}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - DB_NAME=${DB_NAME}
+      - SERVER_REDIRECT_URI=${SERVER_REDIRECT_URI}
+      - SERVER_TOKEN_CLIENT_ID=${SERVER_TOKEN_CLIENT_ID}
+      - SERVER_TOKEN_CLIENT_SECRET=${SERVER_TOKEN_CLIENT_SECRET}
     ports:
       - '3001:3001'
     depends_on:
@@ -47,8 +57,8 @@ services:
     restart: always
     container_name: nest-pgadmin4
     environment:
-      - PGADMIN_DEFAULT_EMAIL=admin@admin.com
-      - PGADMIN_DEFAULT_PASSWORD=pgadmin4
+      - PGADMIN_DEFAULT_EMAIL=${PG_ADMIN}
+      - PGADMIN_DEFAULT_PASSWORD=${PG_PASSWORD}
     ports:
       - '5050:80'
     depends_on:

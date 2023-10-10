@@ -13,11 +13,20 @@ export class User {
   @Column()
   firstname: string;
 
-  @Column()
-  lastname: string;
+  @Column({default: "guest"})
+  username: string;
 
   @Column()
-  image: string;
+  officialProfileImage: string;
+
+  @Column({ type: 'bytea', default: null, nullable: true })
+  avatarImage: Buffer;
+
+  @Column({default: ""})
+  TFA_secret: string;
+
+  @Column({default: ""})
+  TFA_temp_secret: string;
 
   @Column()
   socket: number;

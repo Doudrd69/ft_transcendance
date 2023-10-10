@@ -3,15 +3,15 @@ import React, { useState } from 'react';
 
 const AddComponent: React.FC = () => {
 
-	const [formValues, setFormValues] = useState(['', '', '']); // Initialisez les valeurs par défaut
+	const [formValues, setFormValues] = useState<string[]>(['', '', '']); // Initialisez les valeurs par défaut
 
-	const handleFormInput = (value, index) => {
+	const handleFormInput = (value: string, index: number) => {
 		const updatedFormValues = [...formValues];
 		updatedFormValues[index] = value;
 		setFormValues(updatedFormValues);
 	};
 
-	const handleConversationCreation = async (e: React.FormEvent, index) => {
+	const handleConversationCreation = async (e: React.FormEvent, index: number) => {
 
 		e.preventDefault();
 
@@ -34,7 +34,7 @@ const AddComponent: React.FC = () => {
 		return false;
 	}
 
-	const handleFriendRequest = async (e: React.FormEvent, index) => {
+	const handleFriendRequest = async (e: React.FormEvent, index: number) => {
 
 		e.preventDefault();
 
@@ -61,7 +61,6 @@ const AddComponent: React.FC = () => {
 
 	const placeholders = ["Ajouter un ami...", "Creer un channel...", "Inviter à jouer une partie..."];
 	const handleFunctions = [handleFriendRequest, handleConversationCreation];
-
 
 	return (
 		<div className="block-main">
