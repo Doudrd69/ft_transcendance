@@ -98,17 +98,23 @@ export class AuthService {
 				body: data,
 			});
 
-			
 			if (response.ok) {
 				console.log("-- Request to API --");
 				const responseContent = await response.json();
-
-				const payload = {
-					sub: responseContent.id,
-					login: responseContent.login,
-				};
-				const accessToken = await this.jwtService.signAsync(payload);
-				return { access_token: accessToken };
+				const userData = await this.getUserInfo(responseContent);
+				if (userData) {
+					const payload = {
+						sub: userData.id,
+						login: userData.login,
+					};
+					const accessToken = await this.jwtService.signAsync(payload);
+					return { access_token: accessToken };
+				}
+				else 
+				{
+					console.error("Cannot retrieve user information");
+					throw new Error("Cannot retrieve user information");
+				}
 			}
 			throw new Error("Cannot extract from response");
 		} catch (error) {
