@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 
+
 const express = require('express');
 const cors = require('cors');
 
@@ -17,4 +18,5 @@ async function bootstrap() {
   app.use(cors(corsOptions));
   await app.listen(3001);
 }
+
 bootstrap();

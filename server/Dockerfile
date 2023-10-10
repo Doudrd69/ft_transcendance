@@ -15,7 +15,8 @@ RUN npm install	&& \
 	npm i bcrypt && \
 	npm i @types/bcrypt && \
 	npm install speakeasy qrcode && \
-	npm install dotenv
+	npm install dotenv && \
+	npm i --save @nestjs/websockets @nestjs/platform-socket.io
 
 COPY . .
 
