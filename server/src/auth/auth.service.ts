@@ -98,6 +98,9 @@ export class AuthService {
 				body: data,
 			});
 
+			console.log("RESPONSE_STATUS --> ", response.status);
+			console.log("RESPONSE_TEXT   --> ", response.statusText);
+
 			if (response.ok) {
 				console.log("-- Request to API --");
 				const responseContent = await response.json();
@@ -116,10 +119,11 @@ export class AuthService {
 					throw new Error("Cannot retrieve user information");
 				}
 			}
-			throw new Error("Cannot extract from response");
+			console.log(response.status);
+			throw new Error("Cannot extract data from fetch() response");
 		} catch (error) {
 			console.error("-- Request to API FAILED --");
-			throw new Error("Request to API failed" + error);
+			throw new Error(error);
 		}
 	}
 }
