@@ -98,9 +98,6 @@ export class AuthService {
 				body: data,
 			});
 
-			console.log("RESPONSE_STATUS --> ", response.status);
-			console.log("RESPONSE_TEXT   --> ", response.statusText);
-
 			if (response.ok) {
 				console.log("-- Request to API --");
 				const responseContent = await response.json();
