@@ -22,11 +22,14 @@ export class UsersService {
 	// 	return false;
 	// }
 
-	// register2FASecret(secret: string) {
-	// 	const userToUpdate = this.usersRepository.find();
-	// 	userToUpdate.TFA_temp_secret = secret;
-	// 	return this.usersRepository.save(userToUpdate);
-	// }
+	register2FASecret(login: string, secret: string) {
+		this.getUserByLogin(login).then(userToUpdate => {
+			userToUpdate.TFA_temp_secret = secret;
+			return this.usersRepository.save(userToUpdate);
+		}).catch(error => {
+			throw new Error(error);
+		});
+	}
 
 	// getAvatarById(userId: number, res: Response) {
 	// 	this.usersRepository.findOne({ where: {id: userId}}).then(

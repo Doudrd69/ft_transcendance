@@ -2,10 +2,11 @@ import { Injectable, HttpException, HttpStatus } from '@nestjs/common'
 import { UsersService } from '../users/users.service'
 import { User } from '../users/entities/users.entity'
 import { JwtService } from '@nestjs/jwt'
-import { speakeasy } from 'speakeasy'
-import { QRCode } from 'qrcode'
 import dotenv from 'dotenv';
 // import * as bcrypt from 'bcrypt';
+
+var speakeasy = require("speakeasy");
+var QRCode = require('qrcode');
 
 dotenv.config();
 
@@ -67,21 +68,32 @@ export class AuthService {
 	// 	return { access_token: await this.jwtService.signAsync(payload) };
 	// }
 
-	// async handle2FA() {
+	async handle2FA(login: any) {
 
-	// 	const secret = speakeasy.generateSecrete();
-	// 	// recup l'utilisateur et l'envoyer dans la fonction d'enregistrement du secret
-	// 	this.usersService.register2FASecret(secret);
-	// 	// Get the data URL of the authenticator URL
-	// 	QRCode.toDataURL(secret.otpauth_url, function(err, data_url) {
-	// 		console.log(data_url);
-	// 		// Display this data URL to the user in an <img> tag
-	// 		// return a json object with the data_url
-	// 		return JSON.stringify(data_url);
-	// 	});
-	// 	// Then I display the QRCode to the user, he scans it, we get a code, we make a request to a server-function which will verify
-	// 	// the token with the temp_secret, and if true, we save the secret.
-	// }
+		try {
+			console.log("LOGIN --> ", login);
+			const secret = speakeasy.generateSecret({length: 20});
+			this.usersService.register2FASecret(login, secret);
+			// Get the data URL of the authenticator URL
+			QRCode.toDataURL(secret.otpauth_url, function(err, data_url) {
+				if (err) {
+					console.error(err);
+					throw new Error(err);
+				}
+				else {
+					console.log(data_url);
+					// Resolve the promise with the data_url
+					console.log("Returning QRCode URL");
+					console.log("JSON to return", { qrcodeUrl: data_url });
+					return { qrcodeUrl: data_url };
+				}
+			});
+		}
+		catch (error) {
+			console.log("-- 2FA activation failed --");
+			throw new Error("HANDLE 2FA" + error);
+		}
+	}
 
 	async getAccessToken(code: any) {
 
