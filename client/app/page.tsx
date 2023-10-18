@@ -22,7 +22,8 @@ export default function Home() {
 				'Content-Type': 'application/json',
 			},
 			body: JSON.stringify({code}),
-		});
+		}
+		);
 
 		if (response.ok) {
 			console.log("handleAccessToken successfully retreived");

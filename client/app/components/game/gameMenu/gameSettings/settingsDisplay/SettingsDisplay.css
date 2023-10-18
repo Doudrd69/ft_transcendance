@@ -1,0 +1,31 @@
+.displayoption
+{
+	display:flex;
+	justify-content: center;
+    align-items: center;
+	position: relative;
+	justify-content: center;
+	margin: 0 auto;
+    margin-top: -50%;
+}
+
+.setting-option {
+    position: relative;
+}
+
+label {
+    display: inline-block;
+    width: 150px;
+    font-size: 16px;
+}
+
+input[type="checkbox"],
+input[type="text"],
+select {
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+    width: 200px;
+    margin-left: 10px;
+}

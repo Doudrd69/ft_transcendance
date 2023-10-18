@@ -9,7 +9,7 @@ import { Message } from './entities/message.entity';
 @Controller('chat')
 export class ChatController {
 	constructor(private chatService: ChatService) {}
-
+	
 	@HttpCode(HttpStatus.OK)
 	@Post('newConversation')
 	createNewConversation(@Body() requestBody: {conversationValue: string}) {
