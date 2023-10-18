@@ -14,22 +14,50 @@
       white-space: nowrap;
       text-overflow: ellipsis;
       position: relative;
+      display: flex;
   }
 
   .cancel-button {
     padding: 1% 2%;
-    background-color: #31081fff;
-    color: #31081fff;
+    background-color: rgb(255, 0, 0);
+    color: rgb(255, 255, 255);
     cursor: pointer;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
     position: relative;
-    top: 70%;
-    width: 20%;
+    border: none;
+    border-radius: 20px;
+    /* top: 70%;
+    width: 20%; */
+    left: 40%;
+    top: 30%;
     max-width: 400px;
     font-size: 1vw;
+    display: flex;
   }
+
+  .cancel-button:active {
+    animation: push 0.5s;
+ }
+
+ @keyframes push {
+    0% {
+          font-size: 1vw;
+       }
+       25% {
+          font-size: 0.80vw;
+       }
+       50% {
+          font-size: 1.4vw;
+       }
+       75% {
+          font-size: 0.94vw;
+       }
+       100% {
+          font-size: 1vw;
+       }
+ }
 
   @keyframes textAnimation {
       0% {

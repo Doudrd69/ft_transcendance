@@ -57,6 +57,27 @@
         background-color: #ce8f07; /* Nouvelle couleur de fond au survol */
 }
 
+.buttonclass:active {
+  animation: push 0.5s;
+}
+
+@keyframes push {
+  0% {
+        font-size: 1vw;
+     }
+     25% {
+        font-size: 0.80vw;
+     }
+     50% {
+        font-size: 1.4vw;
+     }
+     75% {
+        font-size: 0.94vw;
+     }
+     100% {
+        font-size: 1vw;
+     }
+}
   
   .paddle {
     transform-origin: 50% 100%;

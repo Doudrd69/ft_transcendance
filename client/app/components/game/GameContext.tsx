@@ -13,12 +13,27 @@ const GameContext = createContext<{
     activateGameMenu: () => void;
 	disableGameMenu: () => void;
 	handleGameMenu: () => void;
+    showSettingsGame: boolean;
+    activateSettingsGame: () => void;
+	disableSettingsGame: () => void;
+	handleSettingsGame: () => void;
+    showSettingsDisplay:boolean,
+    activateSettingsDisplay: () => void;
+	disableSettingsDisplay: () => void;
+	handleSettingsDisplay: () => void;
+    showSettingsKeyboard: boolean;
+    activateSettingsKeyboard: () => void;
+	disableSettingsKeyboard: () => void;
+	handleSettingsKeyboard: () => void;
 } | undefined>(undefined);
 
 export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [showGameMatchmaking, setGameMatchmaking] = useState(false);
     const [showGameSettings, setGameSettings] = useState(false);
     const [showGameMenu, setGameMenu] = useState(true);
+    const [showSettingsGame, setSettingsGame] = useState(false);
+    const [showSettingsDisplay, setSettingsDisplay] = useState(false);
+    const [showSettingsKeyboard, setSettingsKeyboard] = useState(false);
 
     const activateGameMatchmaking = () => setGameMatchmaking(true);
 	const disableGameMatchmaking = () => setGameMatchmaking(false);
@@ -35,6 +50,9 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
 	const handleGameMenu = () => {
 		disableGameMatchmaking();
 		disableGameSettings();
+        disableSettingsDisplay();
+        disableSettingsGame();
+        disableSettingsKeyboard();
         activateGameMenu();
 	}
 
@@ -45,6 +63,34 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
 		disableGameMenu();
 		disableGameMatchmaking();
         activateGameSettings();
+        activateSettingsGame();        
+	}
+
+    const activateSettingsGame = () => setSettingsGame(true);
+	const disableSettingsGame = () => setSettingsGame(false);
+
+	const handleSettingsGame = () => {
+		disableSettingsDisplay();
+		disableSettingsKeyboard();
+        activateSettingsGame();
+	}
+
+    const activateSettingsDisplay = () => setSettingsDisplay(true);
+	const disableSettingsDisplay = () => setSettingsDisplay(false);
+
+	const handleSettingsDisplay = () => {
+		disableSettingsGame();
+		disableSettingsKeyboard();
+        activateSettingsDisplay();
+	}
+
+    const activateSettingsKeyboard = () => setSettingsKeyboard(true);
+	const disableSettingsKeyboard = () => setSettingsKeyboard(false);
+
+	const handleSettingsKeyboard= () => {
+		disableSettingsGame();
+		disableSettingsDisplay();
+        activateSettingsKeyboard();
 	}
 
 	return (
@@ -64,6 +110,21 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
             handleGameSettings,
             activateGameSettings,
             disableGameSettings,
+
+            showSettingsGame,
+            handleSettingsGame,
+            activateSettingsGame,
+            disableSettingsGame,
+
+            showSettingsDisplay,
+            handleSettingsDisplay,
+            activateSettingsDisplay,
+            disableSettingsDisplay,
+
+            showSettingsKeyboard,
+            handleSettingsKeyboard,
+            activateSettingsKeyboard,
+            disableSettingsKeyboard,
 
 		}}
 	>
