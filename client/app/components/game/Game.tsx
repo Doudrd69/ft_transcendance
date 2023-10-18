@@ -20,7 +20,8 @@ const GameComponent: React.FC = () => {
 				{showSettingsDisplay && <SettingsDisplay></SettingsDisplay>}
 				{showSettingsGame && <SettingsGame></SettingsGame>}
 				{showSettingsKeyboard && <SettingsKeyboard></SettingsKeyboard>} */}
-				<Pong></Pong>
+				{showGameSettings && <SettingsComponent></SettingsComponent>} */}
+				{/* <Pong></Pong> */}
 	  		</div>
 	);
   };

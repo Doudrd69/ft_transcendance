@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToOne, JoinColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from 'typeorm';
 import { Conversation } from './conversation.entity';
 
 @Entity()
@@ -15,7 +15,6 @@ export class Message {
   @Column() // Recommended
   post_datetime: Date;
 
-  @OneToOne(() => Conversation)
-  @JoinColumn()
+  @ManyToOne(() => Conversation, (conversation) => conversation.messages)
   conversation: Conversation;
 }

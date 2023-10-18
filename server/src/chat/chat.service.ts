@@ -5,6 +5,7 @@ import { Conversation } from './entities/conversation.entity';
 import { GroupMember } from './entities/group_member.entity';
 import { Message } from './entities/message.entity';
 import { User } from '../users/entities/users.entity'
+import { MessageDto } from './dto/message.dto';
 
 @Injectable()
 export class ChatService {
@@ -15,24 +16,46 @@ export class ChatService {
 		private groupMemberRepository: Repository<GroupMember>,
 		@InjectRepository(Message)
 		private messageRepository: Repository<Message>,
+		@InjectRepository(User)
+		private usersRepository: Repository<User>,
 	) {}
 
-	createConversation(conversationName): Promise<Conversation> {
+	createConversation(conversationName, socketValue): Promise<Conversation> {
 		console.log("-- createConversation --");
 		console.log("Conversation to be created: ", conversationName);
+		// verification
 		const newConversation = this.conversationRepository.create({ name: conversationName });
-		return this.conversationRepository.save(newConversation);
+		// Creer un groupe en parallele, avec le createur de la conversation
+		this.usersRepository.find({ where: {socket: socketValue} }).then(result => {
+			this.createGroupMember(newConversation, result[0]).then(result => {
+				console.log("Group successfully created");
+				return ;
+			}).catch(error => {
+				console.log("Error during group creation :", error);
+			});
+			console.log("== Groupe was created, we can save conversation ==");
+			return this.conversationRepository.save(newConversation);
+		}).catch(error => {
+			console.log("Error during conversation creation :", error);
+		});
+		return ;
 	}
 
 	// Il faut envoyer la bonne Conversation pour que la FK soit correcte
-	createMessage(from_login: string, content: string, post_datetime: Date, conversationName: string): Promise<Message> {
+	// Revoir la fonction en ajoutant la recherche par socket?
+	async createMessage(messageDto: MessageDto) {
 		console.log("-- createMessage --");
-		// const conversation = conversationKey;
-		this.conversationRepository.find({ where: {name: conversationName} }).then(result => {
-			const newMessage = this.messageRepository.create({ from_login, content, post_datetime, conversation: result[0] });
+		await this.conversationRepository.find({ where: {name: messageDto.conversationName} }).then(result => {
+			console.log("========== ", messageDto.from_login);
+			const newMessage = this.messageRepository.create({
+				from_login: messageDto.from_login,
+				content: messageDto.content,
+				post_datetime: messageDto.post_datetime,
+				conversation: result[0],
+			});
 			return this.messageRepository.save(newMessage);
 		}).catch(error => {
-			console.log("Error: ", error);
+			console.log("== Error in message creation ==");
 		});
 		return;
 	}

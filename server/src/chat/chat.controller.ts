@@ -12,9 +12,9 @@ export class ChatController {
 	
 	@HttpCode(HttpStatus.OK)
 	@Post('newConversation')
-	createNewConversation(@Body() requestBody: {conversationValue: string}) {
-		const { conversationValue } = requestBody;
-		return this.chatService.createConversation(conversationValue);
+	createNewConversation(@Body() data: { formValue: string, socketValue: number }) {
+		const { formValue, socketValue } = data;
+		return this.chatService.createConversation(formValue, socketValue);
 	}
 
 	@HttpCode(HttpStatus.OK)
@@ -27,7 +27,7 @@ export class ChatController {
 	@Post('newMessage')
 	createNewMessage(@Body() messageDto: MessageDto) {
 		console.log(messageDto);
-		return this.chatService.createMessage(messageDto.from_user, messageDto.content, messageDto.post_datetime, messageDto.conversationName);
+		return this.chatService.createMessage(messageDto);
 	}
 
 	@Get('messages/:id')

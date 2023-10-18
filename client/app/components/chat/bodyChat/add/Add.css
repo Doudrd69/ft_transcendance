@@ -3,6 +3,14 @@
 	flex-direction: column;
 	/* justify-content: space-between; */
 }
+.test{
+	background-color: #a1a1a1;
+	padding: 10px;
+	border: none;
+	border-radius: 10px;
+	margin: 0px 10px;
+	flex: 1;
+}
 .block-add{
 	display: flex;
 	align-items: center;
@@ -20,12 +28,6 @@
 	display: flex;
  	align-items: center;
 	width: 90%;
-	border: none;
-	border-radius: 10px;
-	margin: 10px 10px 10px 10px;
-	padding: 5px;
-	background-color:#a1a1a1 ;
-	resize: none;
 	font-size: 20px; /* Exemple de taille de police */
 	font-family: Arial, sans-serif;
 	overflow: hidden;

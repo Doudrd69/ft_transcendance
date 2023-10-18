@@ -22,7 +22,12 @@ export class AuthController {
 	// 	return this.authService.login(signInDto.username, signInDto.password);
 	// }
 
-	@HttpCode(HttpStatus.OK)
+	// @HttpCode(HttpStatus.OK)
+	// @Post('2fa')
+	// activate2FA() {
+	// 	return this.authService.handle2FA();
+	// }
+
 	@Post('access')
 	getAccessToken(@Body() requestBody: {code: string}) {
 		const { code } = requestBody; // Access the 'code' property within the object

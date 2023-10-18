@@ -1,9 +1,11 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import * as bcrypt from 'bcrypt';
-import { User } from './entities/users.entity';
-import { Friendship } from './entities/friendship.entity';
+import { Injectable, NotFoundException, Res } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm'
+import { Repository } from 'typeorm'
+import * as bcrypt from 'bcrypt'
+import { User } from './entities/users.entity'
+import { Friendship } from './entities/friendship.entity'
+import { speakeasy } from 'speakeasy'
+import { QRCode } from 'qrcode'
 
 @Injectable()
 export class UsersService {
@@ -20,45 +22,64 @@ export class UsersService {
 	// 	return false;
 	// }
 
-	async createNew42User(userData): Promise<User> {
+	// register2FASecret(secret: string) {
+	// 	const userToUpdate = this.usersRepository.find();
+	// 	userToUpdate.TFA_temp_secret = secret;
+	// 	return this.usersRepository.save(userToUpdate);
+	// }
+
+	// getAvatarById(userId: number, res: Response) {
+	// 	this.usersRepository.findOne({ where: {id: userId}}).then(
+	// 		user => {
+	// 			if (user.avatarImage) {
+	// 				res.setHeader('Content-Type', 'image/jpeg'); // Set appropriate content type
+	// 				return res.send(user.avatarImage);
+	// 			}
+	// 		}).catch(
+	// 			error => {
+	// 				return res.status(404).send('Avatar not found: ', error);
+	// 		}
+	// 	);
+	// }
+
+	// uploadAvatar(avatar: any) {
+	// 	this.getUserByLogin("").then(userToUpdate => {
+	// 		userToUpdate.avatarImage = avatar.buffer;
+	// 		return this.usersRepository.save(userToUpdate);
+	// 	}).catch(error => {
+	// 		console.log("Error: cannot upload avatar image: ", error);
+	// 	});
+	// }
+
+	createNew42User(userData) {
 		console.log("In DB registration: ", JSON.stringify(userData));
 		const login = userData.login;
 		const firstname = userData.firstname;
-		const lastname = userData.lastname;
-		const image = userData.image;
-		const new42User = this.usersRepository.create({ login, firstname, lastname, image });
-		return await this.usersRepository.save(new42User);
+		const officialProfileImage = userData.image;
+		const socket = userData.socket;
+		const new42User = this.usersRepository.create({ login, firstname, officialProfileImage, socket});
+		return this.usersRepository.save(new42User);
 	}
 
-	// async createNewUser(username: string, password: string): Promise<User> {
-	// 	const userToCreate = await this.usersRepository.findOne({ where: { username } });
-	// 	if (!userToCreate) {
-	// 		const saltOrRounds = 10;
-	// 		if (this.passwordPolicy(password)) {
-	// 			password = await bcrypt.hash(password, saltOrRounds);
-	// 			const newUser = this.usersRepository.create({ username, password });
-	// 			return await this.usersRepository.save(newUser);
-	// 		}
-	// 		throw new Error('Password policy : 8 characters minimum');
-	// 	}
-	// 	throw new Error('User with this username already exists');
-	// }
+	updateUsername(newUsername: string, userLogin: string) {
+		this.getUserByLogin(userLogin).then(userToUpdate => {
+			userToUpdate.username = newUsername;
+			return this.usersRepository.save(userToUpdate);
+		}).catch(error => {
+			console.log("Error: cannot update username :", error);
+		});
+	}
 
-	// async deleteUser(username: string) {
-	// 	const userToDelete = await this.usersRepository.findOne({ where: { username } });
-	// 	if (userToDelete) {
-	// 		return await this.usersRepository.delete(username);
-	// 	}
-	// 	throw new NotFoundException();
-	// }
-
-	// async updateUser(username: string, newUsername: string) {
-	// 	const userToUpdate = await this.usersRepository.findOne({ where: { username } });
-	// 	if (userToUpdate) {
-	// 		userToUpdate.username = newUsername;
-	// 		return await this.usersRepository.save(userToUpdate);
-	// 	}
-	// 	throw new NotFoundException();
+	// il faudra recuperer un user (ou un moyen de l'identifier : socket, login etc)
+	// generateSecretKeyFor2FA(value: string, flag: boolean) {
+	// 	const secret = speakeasy.generateSecret();
+	// 	const userSecretKey = secret.base32;
+	// 	//find le bon user
+	// 	const userToUpdate = this.usersRepository.find({where: {login: value} });
+	// 	userToUpdate.secret = userSecretKey;
+	// 	this.usersRepository.save(userToUpdate);
+	// 	if (flag)
+	// 		return generateQRcode();
 	// }
 
 	createFriendship(initiatorLogin: string, recipientLogin: string) {
@@ -74,26 +95,26 @@ export class UsersService {
 			console.log("Error in first promise: ", error);
 		});
 	}
-
+	
 	updateFriendship(initiatorLogin: string, recipientLogin: string, flag: boolean) {
 		console.log("Friendship request responses processing...");
 		this.getUserByLogin(initiatorLogin).then(initiator => {
 			this.getUserByLogin(recipientLogin).then(friend => {
 				const frienshipToUpdate = initiator.initiatedFriendships.find(
 					(friendship) => friendship.friend.login === recipientLogin
-				);
-				if (frienshipToUpdate) {
-					frienshipToUpdate.isAccepted = flag;
-					return this.friendshipRepository.save(frienshipToUpdate); // friendship repo
-				}
+					);
+					if (frienshipToUpdate) {
+						frienshipToUpdate.isAccepted = flag;
+						return this.friendshipRepository.save(frienshipToUpdate); // friendship repo
+					}
+				}).catch(error => {
+					console.log("Error in second promise: ", error);
+				})
 			}).catch(error => {
-				console.log("Error in second promise: ", error);
+				console.log("Error in first promise: ", error);
 			})
-		}).catch(error => {
-			console.log("Error in first promise: ", error);
-		})
-	}
-
+		}
+		
 	getUserByLogin(loginToSearch: string): Promise<User> {
 		return this.usersRepository.findOne({ where: {login: loginToSearch}});
 	}
@@ -101,4 +122,35 @@ export class UsersService {
 	findUserByLogin(loginToSearch: string) {
 		return this.usersRepository.findOne({ where: {login: loginToSearch}});
 	}
-}
+
+		// async createNewUser(username: string, password: string): Promise<User> {
+		// 	const userToCreate = await this.usersRepository.findOne({ where: { username } });
+		// 	if (!userToCreate) {
+		// 		const saltOrRounds = 10;
+		// 		if (this.passwordPolicy(password)) {
+		// 			password = await bcrypt.hash(password, saltOrRounds);
+		// 			const newUser = this.usersRepository.create({ username, password });
+		// 			return await this.usersRepository.save(newUser);
+		// 		}
+		// 		throw new Error('Password policy : 8 characters minimum');
+		// 	}
+		// 	throw new Error('User with this username already exists');
+		// }
+	
+		// async deleteUser(username: string) {
+		// 	const userToDelete = await this.usersRepository.findOne({ where: { username } });
+		// 	if (userToDelete) {
+		// 		return await this.usersRepository.delete(username);
+		// 	}
+		// 	throw new NotFoundException();
+		// }
+	
+		// async updateUser(username: string, newUsername: string) {
+		// 	const userToUpdate = await this.usersRepository.findOne({ where: { username } });
+		// 	if (userToUpdate) {
+		// 		userToUpdate.username = newUsername;
+		// 		return await this.usersRepository.save(userToUpdate);
+		// 	}
+		// 	throw new NotFoundException();
+		// }
+	}

@@ -12,26 +12,32 @@ import { GameProvider } from './components/game/GameContext';
 
 
 export default function Home() {
+
 	const [showLogin, setShowLogin] = useState(true);
 
 	const handleAccessToken = async (code: any) => {
-		console.log("handleAccessToken gets code: " + code);
-		const response = await fetch('http://localhost:3001/auth/access', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-			},
-			body: JSON.stringify({code}),
-		}
-		);
 
-		if (response.ok) {
-			console.log("handleAccessToken successfully retreived");
-			const token = await response.json();
-			sessionStorage.setItem("jwt", token.access_token);
-			setShowLogin(false);
-		} else {
-			console.error("--handleAccessoToken failed--");
+		try {
+			const response = await fetch('http://localhost:3001/auth/access', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({code}),
+			});
+
+			console.log("Request to API done, now logging...");
+
+			if (response.ok) {
+				console.log("-- Fetch to API successed --");
+				const token = await response.json();
+				sessionStorage.setItem("jwt", token.access_token);
+				setShowLogin(false);
+				return true;
+			}
+			throw new Error("Cannot retrieve data from response");
+		} catch (error) {
+			console.error("Fetch to API failed: ", error);
 		}
 	}
 
