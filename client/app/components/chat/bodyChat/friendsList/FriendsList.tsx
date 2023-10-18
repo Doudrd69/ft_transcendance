@@ -54,4 +54,4 @@ const FriendsListComponent: React.FC = () => {
 	)
 }
 
-export default FriendsListComponent
+export default FriendsListComponent;

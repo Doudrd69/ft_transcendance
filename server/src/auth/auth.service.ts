@@ -116,10 +116,11 @@ export class AuthService {
 					throw new Error("Cannot retrieve user information");
 				}
 			}
-			throw new Error("Cannot extract from response");
+			console.log(response.status);
+			throw new Error("Cannot extract data from fetch() response");
 		} catch (error) {
 			console.error("-- Request to API FAILED --");
-			throw new Error("Request to API failed" + error);
+			throw new Error(error);
 		}
 	}
 }
