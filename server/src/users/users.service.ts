@@ -22,13 +22,20 @@ export class UsersService {
 	// 	return false;
 	// }
 
-	register2FASecret(login: string, secret: string) {
+	register2FATempSecret(login: string, secret: string) {
 		this.getUserByLogin(login).then(userToUpdate => {
 			userToUpdate.TFA_temp_secret = secret;
 			return this.usersRepository.save(userToUpdate);
 		}).catch(error => {
 			throw new Error(error);
 		});
+	}
+
+	save2FASecret(user: User, code: any) {
+		user.TFA_secret = code;
+		// user.TFA_enabled = true;
+		console.log("-- 2FA ENABLED --");
+		return this.usersRepository.save(user);
 	}
 
 	// getAvatarById(userId: number, res: Response) {

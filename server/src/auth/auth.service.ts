@@ -73,26 +73,49 @@ export class AuthService {
 		try {
 			console.log("LOGIN --> ", login);
 			const secret = speakeasy.generateSecret({length: 20});
-			this.usersService.register2FASecret(login, secret);
-			// Get the data URL of the authenticator URL
-			QRCode.toDataURL(secret.otpauth_url, function(err, data_url) {
-				if (err) {
-					console.error(err);
-					throw new Error(err);
-				}
-				else {
-					console.log(data_url);
-					// Resolve the promise with the data_url
-					console.log("Returning QRCode URL");
-					console.log("JSON to return", { qrcodeUrl: data_url });
-					return { qrcodeUrl: data_url };
-				}
+			this.usersService.register2FATempSecret(login, secret.base32);
+			const qrcodeURL = await new Promise<string>((resolve, reject) => {
+				QRCode.toDataURL(secret.otpauth_url, function(err, data_url) {
+					if (err)
+					{
+						console.error(err);
+						reject(err);
+					}
+					else
+					{
+						console.log(data_url);
+						resolve(data_url);
+					}
+				});
 			});
+			return { qrcodeURL };
 		}
 		catch (error) {
 			console.log("-- 2FA activation failed --");
-			throw new Error("HANDLE 2FA" + error);
+			throw new Error("HANDLE 2FA FAILED" + error);
 		}
+	}
+
+	async verifyCode(code: any) {
+		const login = "ebrodeur";
+		this.usersService.getUserByLogin(login).then(user => {
+			var verified = speakeasy.totp.verify({ secret: user.TFA_temp_secret,
+				encoding: 'base32',
+				token: code });
+			if (verified)
+			{
+				console.log("-- CODE VERIFIED --");
+				// fair une fonction dans userService qui prend un user et le code en param
+				this.usersService.save2FASecret(user, code);
+			}
+			else {
+				console.error("-- INVALID CODE --");
+				throw new Error("Invalide code");
+			}
+		}).catch(error => {
+			console.error(error);
+			throw Error(error);
+		});
 	}
 
 	async getAccessToken(code: any) {
