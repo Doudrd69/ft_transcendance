@@ -3,14 +3,14 @@ import React, { useState } from 'react';
 
 const HeaderComponent: React.FC = () => {
 
-	const [buttonValue, setButtonValue] = useState('');
-	const [checkCodeValue, setcheckCodeValue] = useState('');
-	const [showQRCode, setShowQRCode] = useState(false);
+	const [handle2faButton, set2faButtonValue] = useState('');
+	const [authenticatorCodeInput, setAuthenticatorCodeInput] = useState('');
 
-	// const handleButtonInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-	// 	setButtonValue(e.target.value); // Update conversationValue state with the input value
-	// };
+	const handleAuthenticatorCodeInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+		setAuthenticatorCodeInput(e.target.value);
+	};
 
+	// Function to generate a QRCode for 2FA
 	const handle2FA = async (e: React.FormEvent) => {
 
 		e.preventDefault();
@@ -36,17 +36,20 @@ const HeaderComponent: React.FC = () => {
 		}
 	}
 
-	// fair eun input pour rentrer le code de verif
-	const checkAuthenticatorCode = async () => {
+	// Function to check Authenticator Code
+	const checkAuthenticatorCode = async (e: React.FormEvent) => {
 		
-		const test = "101276";
+		e.preventDefault();
+
+		console.log("Code to verify = ", authenticatorCodeInput);
+		const code = authenticatorCodeInput;
 
 		const response = await fetch('http://localhost:3001/auth/checkCode', {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
 			},
-			body: JSON.stringify({test}),
+			body: JSON.stringify({code}),
 		});
 
 		if (response.ok) {
@@ -60,12 +63,16 @@ const HeaderComponent: React.FC = () => {
 		return (
 			<div className="header">
 				<h1>BIENVENUE SUR TRANSCENDANCE !</h1>
+
 				<form onSubmit={handle2FA}>
-					<button type="submit" value={buttonValue} >ACTIVATE 2FA</button>
+					<button type="submit" value={handle2faButton} >ACTIVATE 2FA</button>
 				</form>
+
 				<form onSubmit={checkAuthenticatorCode}>
-					<button type="submit" value={checkCodeValue} >CHECK 2FA</button>
+					<input type="text" placeholder="Authenticator code..." value={authenticatorCodeInput} onChange={handleAuthenticatorCodeInput}></input>
+					<button type="submit" >CHECK 2FA</button>
 				</form>
+
 			</div>
 		);
 	};

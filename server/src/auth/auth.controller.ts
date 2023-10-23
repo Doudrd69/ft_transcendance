@@ -38,7 +38,7 @@ export class AuthController {
 
 	@Post('access')
 	getAccessToken(@Body() requestBody: {code: string}) {
-		const { code } = requestBody; // Access the 'code' property within the object
+		const { code } = requestBody;
 		return this.authService.getAccessToken(code);
 	}
 

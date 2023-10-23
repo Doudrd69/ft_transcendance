@@ -99,6 +99,8 @@ export class AuthService {
 	async verifyCode(code: any) {
 		const login = "ebrodeur";
 		this.usersService.getUserByLogin(login).then(user => {
+			console.log("TFA_TEMP -> ", user.TFA_temp_secret);
+			console.log("CODE -> ", code);
 			var verified = speakeasy.totp.verify({ secret: user.TFA_temp_secret,
 				encoding: 'base32',
 				token: code });
