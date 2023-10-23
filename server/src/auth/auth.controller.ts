@@ -26,7 +26,7 @@ export class AuthController {
 	@Post('2fa')
 	activate2FA(@Body() requestBody: {login: string}) {
 		const { login } = requestBody;
-		return this.authService.handle2FA(login);
+		return this.authService.activate2FA(login);
 	}
 
 	@Post('checkCode')

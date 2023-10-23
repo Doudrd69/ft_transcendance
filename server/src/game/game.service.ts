@@ -5,19 +5,19 @@ import { InjectRepository } from '@nestjs/typeorm';
 @Injectable()
 export class GameService
 {
-	constructor
-    (
+	// constructor
+    // (
 		
-	) {}
-    createGame(gameName): Promise<GameData>
-    {
-		const newGame = this.
-	}
+	// ) {}
+    // createGame(gameName): Promise<GameData>
+    // {
+	// 	const newGame = this.
+	// }
 
-	moveUser() {
+	// moveUser() {
 
-	}
+	// }
 
-	recalcuteBallPosition
-	// quand est ce quon bouge la boule ?
+	// recalcuteBallPosition
+	// // quand est ce quon bouge la boule ?
 }

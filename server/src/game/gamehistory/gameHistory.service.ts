@@ -5,12 +5,12 @@ import { InjectRepository } from '@nestjs/typeorm';
 @Injectable()
 export class GameHistoryService
 {
-	constructor
-    (
+	// constructor
+    // (
 		
-	) {}
-    createGame(GameName): Promise<>
-    {
-	}
+	// ) {}
+    // createGame(GameName): Promise<>
+    // {
+	// }
 
 }

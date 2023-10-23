@@ -69,6 +69,7 @@ export class AuthService {
 		data.append('redirect_uri', redirectUri);
 
 		try {
+			// If 2FA enabled, call it here before 42API request?
 			const response = await fetch('https://api.intra.42.fr/oauth/token', {
 				method: 'POST',
 				body: data,
@@ -118,7 +119,7 @@ export class AuthService {
 	/***							2FA							***/
 	/**************************************************************/
 
-	async handle2FA(login: any) {
+	async activate2FA(login: any) {
 
 		try {
 			const secret = speakeasy.generateSecret();
@@ -150,6 +151,7 @@ export class AuthService {
 		}
 	}
 
+	// When the user has enabled 2FA we display a form and request a code
 	async verifyCode(code: any) {
 		const login = "ebrodeur";
 

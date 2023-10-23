@@ -17,6 +17,12 @@ export default function Home() {
 
 	const handleAccessToken = async (code: any) => {
 
+		if (sessionStorage.getItem("jwt")) {
+			// setShowLogin(false); CAUSING HYDRATION
+			console.log("User is already logged");
+			return ;
+		}
+
 		try {
 			const response = await fetch('http://localhost:3001/auth/access', {
 				method: 'POST',
@@ -26,28 +32,26 @@ export default function Home() {
 				body: JSON.stringify({code}),
 			});
 
-			console.log("Request to API done, now logging...");
-
 			if (response.ok) {
 				console.log("-- Fetch to API successed --");
 				const token = await response.json();
 				sessionStorage.setItem("jwt", token.access_token);
 				setShowLogin(false);
-				return true;
+				return ;
 			}
-			throw new Error("Cannot retrieve data from response");
+			throw new Error("Authentification failed");
 		} catch (error) {
-			console.error("Fetch to API failed: ", error);
+			console.error(error);
 		}
 	}
-
+	
 	const searchParams = useSearchParams();
 	const code = searchParams.get('code');
-
+	
 	if (code && showLogin) {
 		handleAccessToken(code);
 	}
-
+	
 
 	return (
 			<RootLayout>
