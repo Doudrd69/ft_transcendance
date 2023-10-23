@@ -21,6 +21,10 @@ export class AuthService {
 		private jwtService: JwtService,
 	) {}
 
+	/**************************************************************/
+	/***					AUTHENTIFICATION					***/
+	/**************************************************************/
+
 	private async getUserInfo(accessTokenArray: any): Promise<User> {
 
 		const access_token = accessTokenArray.access_token;
@@ -53,71 +57,6 @@ export class AuthService {
 		} catch (error) {
 			throw new Error("Error: " + error);
 		}
-	}
-
-	// async login(username: string, password: any) {
-	// 	const user = await this.usersService.findOne(username);
-
-	// 	// Check if the password match with the one hashed in our database
-	// 	const match = await bcrypt.compare(password, user.password);
-	// 	if (!match) {
-	// 		throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
-	// 	}
-	// 	// user.isActive = true; I need to access the usersRepository.save
-	// 	const payload = { sub: user.id, username: user.username, status: user.isActive };
-	// 	return { access_token: await this.jwtService.signAsync(payload) };
-	// }
-
-	async handle2FA(login: any) {
-
-		try {
-			console.log("LOGIN --> ", login);
-			const secret = speakeasy.generateSecret({length: 20});
-			this.usersService.register2FATempSecret(login, secret.base32);
-			const qrcodeURL = await new Promise<string>((resolve, reject) => {
-				QRCode.toDataURL(secret.otpauth_url, function(err, data_url) {
-					if (err)
-					{
-						console.error(err);
-						reject(err);
-					}
-					else
-					{
-						console.log(data_url);
-						resolve(data_url);
-					}
-				});
-			});
-			return { qrcodeURL };
-		}
-		catch (error) {
-			console.log("-- 2FA activation failed --");
-			throw new Error("HANDLE 2FA FAILED" + error);
-		}
-	}
-
-	async verifyCode(code: any) {
-		const login = "ebrodeur";
-		this.usersService.getUserByLogin(login).then(user => {
-			console.log("TFA_TEMP -> ", user.TFA_temp_secret);
-			console.log("CODE -> ", code);
-			var verified = speakeasy.totp.verify({ secret: user.TFA_temp_secret,
-				encoding: 'base32',
-				token: code });
-			if (verified)
-			{
-				console.log("-- CODE VERIFIED --");
-				// fair une fonction dans userService qui prend un user et le code en param
-				this.usersService.save2FASecret(user, code);
-			}
-			else {
-				console.error("-- INVALID CODE --");
-				throw new Error("Invalide code");
-			}
-		}).catch(error => {
-			console.error(error);
-			throw Error(error);
-		});
 	}
 
 	async getAccessToken(code: any) {
@@ -158,6 +97,96 @@ export class AuthService {
 		} catch (error) {
 			console.error("-- Request to API FAILED --");
 			throw new Error(error);
+		}
+	}
+
+
+	// async login(username: string, password: any) {
+	// 	const user = await this.usersService.findOne(username);
+
+	// 	// Check if the password match with the one hashed in our database
+	// 	const match = await bcrypt.compare(password, user.password);
+	// 	if (!match) {
+	// 		throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
+	// 	}
+	// 	// user.isActive = true; I need to access the usersRepository.save
+	// 	const payload = { sub: user.id, username: user.username, status: user.isActive };
+	// 	return { access_token: await this.jwtService.signAsync(payload) };
+	// }
+
+	/**************************************************************/
+	/***							2FA							***/
+	/**************************************************************/
+
+	async handle2FA(login: any) {
+
+		try {
+			const secret = speakeasy.generateSecret();
+
+			// We find the user activating 2FA and save the temporary secret
+			this.usersService.register2FATempSecret(login, secret.base32);
+
+			// This function will retunr a QRCode URL we can use on client side
+			// to enable 2FA with an authenticator service
+			const qrcodeURL = await new Promise<string>((resolve, reject) => {
+				QRCode.toDataURL(secret.otpauth_url, function(err, data_url) {
+					if (err)
+					{
+						console.error(err);
+						reject(err);
+					}
+					else
+					{
+						console.log(data_url);
+						resolve(data_url);
+					}
+				});
+			});
+			return { qrcodeURL };
+		}
+		catch (error) {
+			console.error("!! 2FA activation failed !!");
+			throw new Error("QRCode generation failed: " + error);
+		}
+	}
+
+	async verifyCode(code: any) {
+		const login = "ebrodeur";
+
+		// We find the user whose need a check to retrieve its temporary secret
+		// and compare it with the code he has on its authenticator service
+		try {
+			this.usersService.getUserByLogin(login).then(user => {
+				console.log("TFA_TEMP -> ", user.TFA_temp_secret);
+				console.log("CODE -> ", code);
+				const base32secret = user.TFA_temp_secret;
+	
+				// This function will return true if the code given by the client is correct
+				var verified = speakeasy.totp.verify({
+					secret: base32secret,
+					encoding: 'base32',
+					token: code
+				});
+		
+				if (verified)
+				{
+					console.log("-- CODE VERIFIED --");
+					this.usersService.save2FASecret(user, code, true);
+					return true;
+				}
+				else {
+					console.error("-- INVALID CODE --");
+					this.usersService.save2FASecret(user, "", false);
+					throw Error("Invalide code");
+				}
+			}).catch(error => {
+				console.error(error);
+				throw Error(error);
+			});
+		}
+		catch (error) {
+			console.error("!! Token verification failed !!");
+			throw new Error("Token verification failed: " + error);
 		}
 	}
 }

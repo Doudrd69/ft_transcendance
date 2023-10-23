@@ -53,7 +53,7 @@ const HeaderComponent: React.FC = () => {
 		});
 
 		if (response.ok) {
-			console.log("-- Code OK / 2FA ACTIVATED --");
+			console.log("-- Code OK, 2FA ENABLED --");
 		}
 		else {
 			console.log("-- 2FA activation FAILED --");
@@ -70,7 +70,7 @@ const HeaderComponent: React.FC = () => {
 
 				<form onSubmit={checkAuthenticatorCode}>
 					<input type="text" placeholder="Authenticator code..." value={authenticatorCodeInput} onChange={handleAuthenticatorCodeInput}></input>
-					<button type="submit" >CHECK 2FA</button>
+					<button type="submit" >CHECK CODE</button>
 				</form>
 
 			</div>
