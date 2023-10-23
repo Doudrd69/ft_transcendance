@@ -23,14 +23,22 @@ export class AuthController {
 	// }
 
 	// @HttpCode(HttpStatus.OK)
-	// @Post('2fa')
-	// activate2FA() {
-	// 	return this.authService.handle2FA();
-	// }
+	@Post('2fa')
+	activate2FA(@Body() requestBody: {login: string}) {
+		const { login } = requestBody;
+		return this.authService.handle2FA(login);
+	}
+
+	@Post('checkCode')
+	verifyCode(@Body() requestBody: {code: string}) {
+		const { code } = requestBody;
+		return this.authService.verifyCode(code);
+	}
+
 
 	@Post('access')
 	getAccessToken(@Body() requestBody: {code: string}) {
-		const { code } = requestBody; // Access the 'code' property within the object
+		const { code } = requestBody;
 		return this.authService.getAccessToken(code);
 	}
 

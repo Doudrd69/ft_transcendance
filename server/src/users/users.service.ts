@@ -16,17 +16,22 @@ export class UsersService {
 		private friendshipRepository: Repository<Friendship>,
 	) {}
 
-	// private passwordPolicy(password: string) {
-	// 	if (password.length >= 8)
-	// 		return true;
-	// 	return false;
-	// }
+	register2FATempSecret(login: string, secret: string) {
+		this.getUserByLogin(login).then(userToUpdate => {
+			userToUpdate.TFA_temp_secret = secret;
+			return this.usersRepository.save(userToUpdate);
+		}).catch(error => {
+			throw new Error(error);
+		});
+	}
 
-	// register2FASecret(secret: string) {
-	// 	const userToUpdate = this.usersRepository.find();
-	// 	userToUpdate.TFA_temp_secret = secret;
-	// 	return this.usersRepository.save(userToUpdate);
-	// }
+	save2FASecret(user: User, code: any, flag: boolean) {
+		// hash le code?
+		user.TFA_secret = code;
+		user.TFA_isEnabled = flag;
+		console.log("-- 2FA UPDATED --");
+		return this.usersRepository.save(user);
+	}
 
 	// getAvatarById(userId: number, res: Response) {
 	// 	this.usersRepository.findOne({ where: {id: userId}}).then(
@@ -69,18 +74,6 @@ export class UsersService {
 			console.log("Error: cannot update username :", error);
 		});
 	}
-
-	// il faudra recuperer un user (ou un moyen de l'identifier : socket, login etc)
-	// generateSecretKeyFor2FA(value: string, flag: boolean) {
-	// 	const secret = speakeasy.generateSecret();
-	// 	const userSecretKey = secret.base32;
-	// 	//find le bon user
-	// 	const userToUpdate = this.usersRepository.find({where: {login: value} });
-	// 	userToUpdate.secret = userSecretKey;
-	// 	this.usersRepository.save(userToUpdate);
-	// 	if (flag)
-	// 		return generateQRcode();
-	// }
 
 	createFriendship(initiatorLogin: string, recipientLogin: string) {
 		console.log("Friendship creation...");

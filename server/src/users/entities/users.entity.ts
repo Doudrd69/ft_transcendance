@@ -28,6 +28,9 @@ export class User {
   @Column({default: ""})
   TFA_temp_secret: string;
 
+  @Column({default: false})
+  TFA_isEnabled: boolean;
+
   @Column()
   socket: number;
 
