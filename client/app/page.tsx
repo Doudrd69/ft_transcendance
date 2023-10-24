@@ -14,14 +14,13 @@ import { GameProvider } from './components/game/GameContext';
 export default function Home() {
 
 	const [showLogin, setShowLogin] = useState(true);
+	const searchParams = useSearchParams();
+	const code = searchParams.get('code');
 
-	const handleAccessToken = async (code: any) => {
+	const handleAccessToken = async (code: any): Promise<boolean> => {
 
-		if (sessionStorage.getItem("jwt")) {
-			// setShowLogin(false); CAUSING HYDRATION
-			console.log("User is already logged");
-			return ;
-		}
+		if (showLogin)
+			return true;
 
 		try {
 			const response = await fetch('http://localhost:3001/auth/access', {
@@ -36,22 +35,28 @@ export default function Home() {
 				console.log("-- Fetch to API successed --");
 				const token = await response.json();
 				sessionStorage.setItem("jwt", token.access_token);
-				setShowLogin(false);
-				return ;
+				return true;
 			}
-			throw new Error("Authentification failed");
+			else {
+				throw new Error("Authentification failed");
+			}
 		} catch (error) {
-			console.error(error);
+			throw error;
 		}
 	}
 	
-	const searchParams = useSearchParams();
-	const code = searchParams.get('code');
-	
-	if (code && showLogin) {
-		handleAccessToken(code);
-	}
-	
+	useEffect(() => {
+		if (code && showLogin) {
+		  handleAccessToken(code)
+			.then(result => {;
+			  setShowLogin(false);
+			})
+			.catch(error => {
+			  setShowLogin(true);
+			  console.error(error);
+			});
+		}
+	  }, [code, showLogin]);
 
 	return (
 			<RootLayout>

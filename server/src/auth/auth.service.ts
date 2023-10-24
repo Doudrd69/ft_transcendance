@@ -55,7 +55,7 @@ export class AuthService {
 				return this.usersService.createNew42User(userInformation);
 			}
 		} catch (error) {
-			throw new Error("Error: " + error);
+			throw new Error(error);
 		}
 	}
 
@@ -93,11 +93,13 @@ export class AuthService {
 					throw new Error("Cannot retrieve user information");
 				}
 			}
-			console.log(response.status);
-			throw new Error("Cannot extract data from fetch() response");
+			else {
+				console.log(response.status);
+				throw new Error("Cannot extract data from fetch() response");
+			}
 		} catch (error) {
 			console.error("-- Request to API FAILED --");
-			throw new Error(error);
+			throw error;
 		}
 	}
 
