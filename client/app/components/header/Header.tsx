@@ -11,7 +11,7 @@ const HeaderComponent: React.FC = () => {
 	};
 
 	// Function to generate a QRCode for 2FA
-	const handle2FA = async (e: React.FormEvent) => {
+	const activate2FA = async (e: React.FormEvent) => {
 
 		e.preventDefault();
 
@@ -64,7 +64,7 @@ const HeaderComponent: React.FC = () => {
 			<div className="header">
 				<h1>BIENVENUE SUR TRANSCENDANCE !</h1>
 
-				<form onSubmit={handle2FA}>
+				<form onSubmit={activate2FA}>
 					<button type="submit" value={handle2faButton} >ACTIVATE 2FA</button>
 				</form>
 

@@ -55,7 +55,7 @@ export class AuthService {
 				return this.usersService.createNew42User(userInformation);
 			}
 		} catch (error) {
-			throw new Error("Error: " + error);
+			throw new Error(error);
 		}
 	}
 
@@ -69,6 +69,7 @@ export class AuthService {
 		data.append('redirect_uri', redirectUri);
 
 		try {
+			// If 2FA enabled, call it here before 42API request?
 			const response = await fetch('https://api.intra.42.fr/oauth/token', {
 				method: 'POST',
 				body: data,
@@ -92,11 +93,13 @@ export class AuthService {
 					throw new Error("Cannot retrieve user information");
 				}
 			}
-			console.log(response.status);
-			throw new Error("Cannot extract data from fetch() response");
+			else {
+				console.log(response.status);
+				throw new Error("Cannot extract data from fetch() response");
+			}
 		} catch (error) {
 			console.error("-- Request to API FAILED --");
-			throw new Error(error);
+			throw error;
 		}
 	}
 
@@ -118,7 +121,7 @@ export class AuthService {
 	/***							2FA							***/
 	/**************************************************************/
 
-	async handle2FA(login: any) {
+	async activate2FA(login: any) {
 
 		try {
 			const secret = speakeasy.generateSecret();
@@ -150,6 +153,7 @@ export class AuthService {
 		}
 	}
 
+	// When the user has enabled 2FA we display a form and request a code
 	async verifyCode(code: any) {
 		const login = "ebrodeur";
 
