@@ -20,12 +20,6 @@ export class UsersController {
 	// }
 
 	// @HttpCode(HttpStatus.OK)
-	// @Post('updateName')
-	// updateUser(@Body() updateUserDto: Record<string, string>) {
-	// 	return this.usersService.updateUser(updateUserDto.username, updateUserDto.newUsername);
-	// }
-
-	// @HttpCode(HttpStatus.OK)
 	// @Post('upload-avatar')
 	// @UseInterceptors(FileInterceptor('avatar')) // 'avatar' is the field name in the form
 	// uploadAvatar(@UploadedFile() avatar: any) {
@@ -37,6 +31,16 @@ export class UsersController {
 	// getAvatar(@Param('id') userId: number, @Res() res: Response) {
 	// 	return this.usersService.getAvatarById(userId, res);
 	// }
+
+	@HttpCode(HttpStatus.OK)
+	@Post('updateUsername')
+	updateUsername(@Body() requestBody: {login: string, string: string}) {
+		const { login } = requestBody;
+		const { string } = requestBody;
+		console.log("LOGIN --> ", login);
+		console.log("STRING --> ", string);
+		return this.usersService.updateUsername(login, string);
+	}
 
 	@HttpCode(HttpStatus.OK)
 	@Post('addfriend')
