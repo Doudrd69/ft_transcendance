@@ -5,9 +5,14 @@ const HeaderComponent: React.FC = () => {
 
 	const [handle2faButton, set2faButtonValue] = useState('');
 	const [authenticatorCodeInput, setAuthenticatorCodeInput] = useState('');
+	const [username, setUsername] = useState('');
 
 	const handleAuthenticatorCodeInput = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setAuthenticatorCodeInput(e.target.value);
+	};
+
+	const handleUsernameInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+		setUsername(e.target.value);
 	};
 
 	// Function to generate a QRCode for 2FA
@@ -60,6 +65,32 @@ const HeaderComponent: React.FC = () => {
 		}
 	}
 
+	// Function to change username
+	const changeUsername = async (e: React.FormEvent) => {
+
+		e.preventDefault();
+
+		const data = {
+			login: "ebrodeur",
+			string: username,
+		};
+
+		const response = await fetch('http://localhost:3001/users/updateUsername', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify(data),
+		});
+
+		if (response.ok) {
+			console.log("Username successfully updated!");
+		}
+		else {
+			console.error("Username cannot be changed");
+		}
+	}
+
 		return (
 			<div className="header">
 				<h1>BIENVENUE SUR TRANSCENDANCE !</h1>
@@ -71,6 +102,11 @@ const HeaderComponent: React.FC = () => {
 				<form onSubmit={checkAuthenticatorCode}>
 					<input type="text" placeholder="Authenticator code..." value={authenticatorCodeInput} onChange={handleAuthenticatorCodeInput}></input>
 					<button type="submit" >CHECK CODE</button>
+				</form>
+
+				<form onSubmit={changeUsername}>
+					<input type="text" placeholder="Username..." value={username} onChange={handleUsernameInput}></input>
+					<button type="submit" >Change username</button>
 				</form>
 
 			</div>

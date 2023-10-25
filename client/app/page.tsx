@@ -20,7 +20,7 @@ export default function Home() {
 	const handleAccessToken = async (code: any): Promise<boolean> => {
 
 		if (showLogin)
-			return true;
+			return true; 
 
 		try {
 			const response = await fetch('http://localhost:3001/auth/access', {

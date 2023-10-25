@@ -16,6 +16,10 @@ export class UsersService {
 		private friendshipRepository: Repository<Friendship>,
 	) {}
 
+	/**************************************************************/
+	/***							2FA							***/
+	/**************************************************************/
+
 	register2FATempSecret(login: string, secret: string) {
 		this.getUserByLogin(login).then(userToUpdate => {
 			userToUpdate.TFA_temp_secret = secret;
@@ -32,6 +36,10 @@ export class UsersService {
 		console.log("-- 2FA UPDATED --");
 		return this.usersRepository.save(user);
 	}
+
+	/**************************************************************/
+	/***					USER MANAGEMENT						***/
+	/**************************************************************/
 
 	// getAvatarById(userId: number, res: Response) {
 	// 	this.usersRepository.findOne({ where: {id: userId}}).then(
@@ -66,12 +74,13 @@ export class UsersService {
 		return this.usersRepository.save(new42User);
 	}
 
-	updateUsername(newUsername: string, userLogin: string) {
-		this.getUserByLogin(userLogin).then(userToUpdate => {
+	updateUsername(login: string, newUsername: string) {
+		this.getUserByLogin(login).then(userToUpdate => {
 			userToUpdate.username = newUsername;
 			return this.usersRepository.save(userToUpdate);
 		}).catch(error => {
-			console.log("Error: cannot update username :", error);
+			console.log("Cannot update username :", error);
+			throw new Error(error);
 		});
 	}
 
@@ -134,15 +143,6 @@ export class UsersService {
 		// 	const userToDelete = await this.usersRepository.findOne({ where: { username } });
 		// 	if (userToDelete) {
 		// 		return await this.usersRepository.delete(username);
-		// 	}
-		// 	throw new NotFoundException();
-		// }
-	
-		// async updateUser(username: string, newUsername: string) {
-		// 	const userToUpdate = await this.usersRepository.findOne({ where: { username } });
-		// 	if (userToUpdate) {
-		// 		userToUpdate.username = newUsername;
-		// 		return await this.usersRepository.save(userToUpdate);
 		// 	}
 		// 	throw new NotFoundException();
 		// }
