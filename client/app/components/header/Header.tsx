@@ -59,6 +59,7 @@ const HeaderComponent: React.FC = () => {
 
 		if (response.ok) {
 			console.log("-- Code OK, 2FA ENABLED --");
+			sessionStorage.setItem("2faEnabled", "true");
 		}
 		else {
 			console.log("-- 2FA activation FAILED --");
