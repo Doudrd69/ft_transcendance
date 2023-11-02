@@ -57,8 +57,11 @@ export default function Home() {
 		}
 	}
 
-	//Runs on the first render
-	//And any time any dependency value changes
+	const handle2FADone = () => {
+		setShow2FAForm(false);
+	}
+
+	//Runs on the first render and any time any dependency value changes
 	useEffect(() => {
 		if (code && showLogin) {
 			handleAccessToken(code).then(result => {
@@ -68,13 +71,13 @@ export default function Home() {
 				console.error(error);
 			});
 		}
-	}, [code, showLogin]);
+	}, [showLogin]);
 
 	return (
 			<RootLayout>
 				<Header/>
 				{showLogin ? (<Authentificationcomponent />) :
-					show2FAForm ? (<TFAComponent />) :
+					show2FAForm ? (<TFAComponent on2FADone={handle2FADone} />) :
 					(
   					  <div className="container">
   					    <Chat />

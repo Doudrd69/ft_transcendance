@@ -1,6 +1,10 @@
 import React, { useState } from 'react';
 
-const TFAComponent: React.FC = () => {
+interface TFAComponentProps {
+	on2FADone: () => void; // Define the on2FADone prop as a function
+  }
+
+const TFAComponent: React.FC<TFAComponentProps>  = ({ on2FADone}) => {
 
 
 	const [authenticatorCodeInput, setAuthenticatorCodeInput] = useState('');
@@ -27,7 +31,7 @@ const TFAComponent: React.FC = () => {
 
 		if (response.ok) {
 			console.log("-- Code OK, 2FA ENABLED --");
-			sessionStorage.setItem("2faEnabled", "true");
+			on2FADone();
 		}
 		else {
 			console.log("-- 2FA activation FAILED --");
@@ -43,5 +47,7 @@ const TFAComponent: React.FC = () => {
 		</div>
 	);
 };
+
+// voir react hook-form  pour les form au lieu des useState
 
 export default TFAComponent;
