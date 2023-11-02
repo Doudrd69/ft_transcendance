@@ -69,12 +69,11 @@ export class AuthService {
 		data.append('redirect_uri', redirectUri);
 
 		try {
-			// If 2FA enabled, call it here before 42API request?
 			const response = await fetch('https://api.intra.42.fr/oauth/token', {
 				method: 'POST',
 				body: data,
 			});
-
+			
 			if (response.ok) {
 				console.log("-- Request to API --");
 				const responseContent = await response.json();
@@ -83,6 +82,7 @@ export class AuthService {
 					const payload = {
 						sub: userData.id,
 						login: userData.login,
+						tfa_enabled: userData.TFA_isEnabled,
 					};
 					const accessToken = await this.jwtService.signAsync(payload);
 					return { access_token: accessToken };

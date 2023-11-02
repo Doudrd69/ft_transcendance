@@ -37,8 +37,6 @@ export class UsersController {
 	updateUsername(@Body() requestBody: {login: string, string: string}) {
 		const { login } = requestBody;
 		const { string } = requestBody;
-		console.log("LOGIN --> ", login);
-		console.log("STRING --> ", string);
 		return this.usersService.updateUsername(login, string);
 	}
 
