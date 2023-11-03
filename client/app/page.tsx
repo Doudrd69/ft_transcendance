@@ -13,7 +13,7 @@ import { GameProvider } from './components/game/GameContext';
 
 export default function Home() {
 
-	const [showLogin, setShowLogin] = useState(true);
+	const [showLogin, setShowLogin] = useState(false);
 
 	const handleAccessToken = async (code: any) => {
 
@@ -47,7 +47,6 @@ export default function Home() {
 	if (code && showLogin) {
 		handleAccessToken(code);
 	}
-
 
 	return (
 			<RootLayout>

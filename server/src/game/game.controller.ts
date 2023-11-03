@@ -1,17 +1,13 @@
-import { Controller, Post, HttpCode, HttpStatus, Body, Get, Param} from '@nestjs/common';
-import { GameService } from './game.service';
-import { gameData } from './entities/games.entity';
+import { Controller, Get, Post, Body, Param, Patch, Delete, BadRequestException, Logger, Request} from '@nestjs/common';
+import { User } from '../users/entities/users.entity';
+import { MatchmakingService } from './matchmaking/matchmaking.service';
 
+@Controller('game')
+export class GameController {
+  constructor(private matchmakingService: MatchmakingService) {}
 
-@Controller('gameHistory')
-export class GameController
-{
-    constructor(private gameHistoryService: GameService) {}
-
-    @HttpCode(HttpStatus.OK)
-    @Post('newGame')
-    createNewGame(@Body() gameHistorydata: {gameData})
-    {
-		return this.gameService.createGame(gameData); 
-    }
+  @Post('join')
+  joinGame(player: User) {
+    this.matchmakingService.addPlayerToQueue(player);
+  }
 }

@@ -9,8 +9,8 @@ export class GameHistoryService
     (
 		
 	) {}
-    createGame(GameName): Promise<>
-    {
-	}
+    // createGame(GameName): Promise<>
+    // {
+	// }
 
 }
