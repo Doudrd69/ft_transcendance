@@ -75,7 +75,7 @@ const Menu: React.FC = () => {
         <h1 className='titleClass'>PONG GAME</h1>
       </div>
       <div className="background-game">
-        <button className={`buttonclass ${showGameMatchmaking ? 'clicked' : ''}`} onClick={handleStartClick} onClick={handleGameMatchmaking}>START GAME</button>
+        <button className={`buttonclass ${showGameMatchmaking ? 'clicked' : ''}`} onClick={handleGameMatchmaking}>START GAME</button>
         <button className={`buttonclass ${showGameSettings ? 'clicked' : ''}`} onClick={handleGameSettings}>PROFILE</button>
         <button className={`buttonclass ${showGameSettings ? 'clicked' : ''}`} onClick={handleGameSettings}>SETTINGS</button>
       </div>

@@ -55,10 +55,7 @@ if (!dbPass || !dbUsername || !dbName || !dbHost) {
 
   ],
   controllers: [AppController],
-<<<<<<< HEAD
-=======
   providers: [GameGateway],
   // providers: [AppService],
->>>>>>> add gateway
 })
 export class AppModule {}
