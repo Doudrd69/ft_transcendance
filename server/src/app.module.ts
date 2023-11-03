@@ -10,7 +10,10 @@ import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { ChatModule } from './chat/chat.module';
+<<<<<<< HEAD
 import { GatewayModule } from './gateway/gateway.module';
+=======
+>>>>>>> af55e8d (add gateway)
 import { GameGateway } from './game/game.gateway';
 import { GameModule } from './game/game.module';
 
