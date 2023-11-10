@@ -11,7 +11,6 @@ import Header from './components/header/Header'
 import Authentificationcomponent from './components/chat/auth/Authentification';
 import { GameProvider } from './components/game/GameContext';
 
-
 export default function Home() {
 
 	const [showLogin, setShowLogin] = useState(true);
@@ -50,9 +49,9 @@ export default function Home() {
 				return true;
 			}
 			else {
-				throw new Error("Authentification failed");
+				return false;
 			}
-		} catch (error) {
+			} catch (error) {
 			throw error;
 		}
 	}
@@ -63,13 +62,12 @@ export default function Home() {
 
 	//Runs on the first render and any time any dependency value changes
 	useEffect(() => {
+		console.log("1 : " + showLogin);
 		if (code && showLogin) {
 			handleAccessToken(code).then(result => {
 				setShowLogin(false);
-			}).catch(error => {
-				setShowLogin(true);
-				console.error(error);
-			});
+				console.log(result + " !!!!!!!!!!");
+			})
 		}
 	}, [showLogin]);
 
@@ -79,11 +77,11 @@ export default function Home() {
 				{showLogin ? (<Authentificationcomponent />) :
 					show2FAForm ? (<TFAComponent on2FADone={handle2FADone} />) :
 					(
-  					  <div className="container">
-  					    <Chat />
-  					    <GameProvider>
-  					      <Game />
-  					    </GameProvider>
+					  <div className="container">
+  						<Chat />
+  						<GameProvider>
+  						  <Game />
+  						</GameProvider>
   					  </div>
   					)
 				}
