@@ -1,7 +1,10 @@
-import { Controller, Post } from '@nestjs/common';
-import { MatchmakingService } from './matchmaking/matchmaking.service';
-import { User } from '../users/entities/users.entity';
+import { Module } from '@nestjs/common';
+import { GameGateway } from './game.gateway';
 
+@Module({
+  providers: [GameGateway],
+})
+export class SocketModule {}
 
 /* en gros, ce que je ne comprends pas c'est que j'ai cree un service de matchmaking 
 pas comment l'utiliser, faudrait que j'arrive a comprendre qui sont mes utilisateurs
