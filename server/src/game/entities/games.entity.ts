@@ -1,7 +1,7 @@
 import { Entity, Column, PrimaryGeneratedColumn, ManyToMany, OneToMany } from 'typeorm';
 
 @Entity()
-export class GameData
+export class Game
 {
 	@PrimaryGeneratedColumn()
   	id: number;

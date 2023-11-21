@@ -1,32 +1,15 @@
-import { SubscribeMessage, WebSocketGateway } from '@nestjs/websockets';
-import { Socket, Server } from 'socket.io';
-
-export enum ClientEvents
-{
-  Ping = 'client.ping',
-}
-
-export enum ServerEvents
-{
-  Pong = 'server.pong',
-}
+import { SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
+import { Server, Socket } from 'socket.io';
 
 @WebSocketGateway()
-export class GameGateway
-{
-  @SubscribeMessage(ClientEvents.Ping)
-  onPing(client: Socket): void
-  {
-    client.emit(ServerEvents.Pong, {
-      message: 'pong',
-    });
-  }
-  
-  handleConnection(client: Socket) {
-    console.log(`Client ${client.id} connected.`);
+export class GameGateway {
+  @WebSocketServer()
+  private server: Server;
+
+  @SubscribeMessage('joinMatchmaking')
+  handleJoinMatchmaking(client: Socket, user: any): void {
+    // Traitez ici la logique pour ajouter le joueur à la file d'attente (similaire à votre implémentation précédente)
   }
 
-  handleDisconnect(client: Socket) {
-    console.log(`Client ${client.id} disconnected.`);
-  }
+  // Ajoutez d'autres méthodes pour gérer les événements Socket.io liés au matchmaking
 }
