@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import dotenv from 'dotenv';
-import { join } from 'path';
 import { User } from './users/entities/users.entity'
 import { Message } from './chat/entities/message.entity'
 import { Conversation } from './chat/entities/conversation.entity'
