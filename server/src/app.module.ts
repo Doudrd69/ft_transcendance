@@ -1,8 +1,6 @@
 import { Module } from '@nestjs/common';
-import { ServeStaticModule } from '@nestjs/serve-static';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import dotenv from 'dotenv';
-import { join } from 'path';
 import { User } from './users/entities/users.entity'
 import { Message } from './chat/entities/message.entity'
 import { GroupMember } from './chat/entities/group_member.entity'
@@ -13,6 +11,7 @@ import { AppController } from './app.controller';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { ChatModule } from './chat/chat.module';
+import { GatewayModule } from './gateway/gateway.module';
 
 //We set the synchronize option to true, which means that TypeORM will automatically
 //generate database tables based on the entities. However, this option should be used
@@ -45,18 +44,15 @@ if (!dbPass || !dbUsername || !dbName || !dbHost) {
       autoLoadEntities: true,
     }),
 
-    ServeStaticModule.forRoot({
-      rootPath: join(__dirname, 'client'),
-    }),
-
     AuthModule,
 
     UsersModule,
 
     ChatModule,
 
+    GatewayModule,
+
   ],
   controllers: [AppController],
-  // providers: [AppService],
 })
 export class AppModule {}

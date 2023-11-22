@@ -14,11 +14,12 @@ const MessageComponent: React.FC = () => {
 		e.preventDefault();
 
 		const messageDto = {
-			from_login: "ebrodeur",
+			from_login: sessionStorage.getItem("currentUserLogin"),
 			content: messageValue,
 			post_datetime: new Date(),
 			conversationName: "UnAutreSuperChan",
 		}
+
 		const response = await fetch('http://localhost:3001/chat/newMessage', {
 			method: 'POST',
 			headers: {

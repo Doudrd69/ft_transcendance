@@ -1,6 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-
+import { IoAdapter } from '@nestjs/platform-socket.io' 
 
 const express = require('express');
 const cors = require('cors');
@@ -12,10 +12,14 @@ const corsOptions = {
   credentials: true,  // Enable CORS with credentials (e.g., cookies)
 };
 
-
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
   app.use(cors(corsOptions));
+
+  // const httpAdapter = app.getHttpAdapter();
+  // app.useWebSocketAdapter(new IoAdapter(httpAdapter));
+
   await app.listen(3001);
 }
 
