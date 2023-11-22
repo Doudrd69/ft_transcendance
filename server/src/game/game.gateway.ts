@@ -1,10 +1,14 @@
 import { SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 
-@WebSocketGateway()
+@WebSocketGateway({
+  cors: {
+    origin: ['http://localhost:3000']
+  },
+})
 export class GameGateway {
   @WebSocketServer()
-  private server: Server;
+  server: Server;
 
   @SubscribeMessage('joinMatchmaking')
   handleJoinMatchmaking(client: Socket, user: any): void {
