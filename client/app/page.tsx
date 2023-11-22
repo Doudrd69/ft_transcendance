@@ -23,6 +23,9 @@ interface FriendRequestDto {
 export default function Home() {
 	
 	const socket = io('http://localhost:3001');
+	const userSocket = io('http://localhost:3001/user')
+	const gameSocket = io('http://localhost:3001/game')
+
 
 	const [showLogin, setShowLogin] = useState(true);
 	const [show2FAForm, setShow2FAForm] = useState(false);
@@ -118,7 +121,7 @@ export default function Home() {
 
 	// Friend request use-effect
 	useEffect(() => {
-		socket.on('friendRequest', (friendRequestDto: FriendRequestDto) => {
+		userSocket.on('friendRequest', (friendRequestDto: FriendRequestDto) => {
 			// mouais a revoir
 			if (sessionStorage.getItem("currentUserLogin") === friendRequestDto.recipient) {
 				notifyFriendRequest(friendRequestDto.initiator);
@@ -126,31 +129,48 @@ export default function Home() {
 		});
 
 		return () => {
-			socket.off('friendRequest');
+			userSocket.off('friendRequest');
 		}
-	}, [socket]);
+	}, [userSocket]);
 
 	// Socket use-effect
 	useEffect(() => {
 
-		socket.on('connect', () => {
+		userSocket.on('connect', () => {
 			console.log('Client is connecting... ');
 			if (socket.connected)
-				console.log("Client connected: ", socket.id);
+				console.log("Client connected: ", userSocket.id);
 		})
 
-		socket.on('disconnect', () => {
+		userSocket.on('disconnect', () => {
 			console.log('Disconnected from the server');
 		})
 
-		socket.on('disconnect', () => {
+		userSocket.on('disconnect', () => {
 			console.log('Disconnected from the server');
 		})
 
 		return () => {
 			console.log('Unregistering events...');
-			socket.off('connect');
-			socket.off('disconnect');
+			userSocket.off('connect');
+			userSocket.off('disconnect');
+		}
+	})
+
+	useEffect(() => {
+
+		gameSocket.on('connect', () => {
+			console.log('Youpi une connexion!');
+		})
+
+		gameSocket.on('disconnect', () => {
+			console.log('Disconnected from the server');
+		})
+
+		return () => {
+			console.log('Unregistering events...');
+			gameSocket.off('connect');
+			gameSocket.off('disconnect');
 		}
 	})
 
@@ -174,8 +194,8 @@ export default function Home() {
 					show2FAForm ? (<TFAComponent on2FADone={handle2FADone} />) :
 					(
 					  <div className="container">
-						<ToastContainer />
-						<Chat socket={socket}/>
+                        <ToastContainer />
+						<Chat socket={userSocket}/>
 						<GameProvider>
 						  <Game />
 						</GameProvider>
@@ -185,3 +205,5 @@ export default function Home() {
 			</RootLayout>
 	)
 }
+
+// https://www.delightfulengineering.com/blog/nest-websockets/basics

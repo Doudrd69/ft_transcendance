@@ -3,6 +3,7 @@ import { OnModuleInit } from '@nestjs/common'
 import { Server } from 'socket.io'
 
 @WebSocketGateway({
+  namespace: 'user',
   cors: {
     origin: ['http://localhost:3000']
   },
@@ -17,7 +18,7 @@ export class GeneralGateway implements OnModuleInit {
     this.server.on('connect', (socket) => {
       console.log("Client is connecting...");
       if (socket.connected)
-      console.log("Client connected: ", socket.id);
+        console.log("Client connected: ", socket.id);
     });
   }
 

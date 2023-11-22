@@ -8,19 +8,18 @@ const Settings: React.FC = () => {
     return (
         <div className="settings">
             <div className="settingsBlock">
-                <div className="optionBlock">
-                    <div className="menu-button-container">
-                        <button className={`menu-button ${showGameMenu ? 'clicked' : ''}`} onClick={handleGameMenu}>Menu</button>
-                    </div>
+                <div className="leftbox">
+                    <button className={`personal ${showSettingsGame ? 'clicked' : ''}`} onClick={handleSettingsGame}></button>
+                    <button className={`display ${showSettingsDisplay ? 'clicked' : ''}`} onClick={handleSettingsDisplay}></button>
+                    <button className={`settingsButton ${showSettingsKeyboard ? 'clicked' : ''}`} onClick={handleSettingsKeyboard}></button>
                 </div>
-            </div>
-            <div className="leftbox">
-                <button className={`personal ${showSettingsGame? 'clicked' : ''}`} onClick={handleSettingsGame}></button>
-                <button className={`display ${showSettingsDisplay? 'clicked' : ''}`} onClick={handleSettingsDisplay}></button>
-                <button className={`settingsButton ${showSettingsKeyboard? 'clicked' : ''}`} onClick={handleSettingsKeyboard}></button>
+
+                <div className="menu-button-container">
+                    <button className={`menu-button ${showGameMenu ? 'clicked' : ''}`} onClick={handleGameMenu}>Menu</button>
+                </div>
             </div>
         </div>
     );
 };
 
-export default Settings
+export default Settings;

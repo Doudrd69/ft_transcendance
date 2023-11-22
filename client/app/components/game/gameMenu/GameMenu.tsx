@@ -1,13 +1,39 @@
 import './GameMenu.css'
-import React from 'react';
 import MatchMaking from './gameStart/GameStart'
 import Settings from './gameSettings/gameSettings'
 import {useGame } from '../GameContext'
+import React, { useState } from 'react';
 
 
 const Menu: React.FC = () => {
 
   const {showGameMatchmaking, showGameSettings, handleGameSettings, handleGameMatchmaking} = useGame();
+  
+  const handleStartClick = async () => {
+    const currentUserLogin = sessionStorage.getItem("currentUserLogin");
+
+    if (currentUserLogin !== null) {
+    const response = await fetch('http://localhost:3001/game/join', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ playerName: currentUserLogin }), // Sending an object with playerName property
+    });
+
+    if (response.ok) {
+      console.log('Player successfully joined the lobby:', response.statusText);
+    } else {
+      console.log(response.statusText);
+      console.log("Player can't join the lobby");
+    }
+  } else {
+    console.log('currentUserLogin is null');
+  }
+
+  return false;
+};
+
   return (
     <div className="background-game">
       <div className="paddle paddle-left">
@@ -42,8 +68,8 @@ const Menu: React.FC = () => {
         <h1 className='titleClass'>PONG GAME</h1>
       </div>
       <div className="background-game">
-        <button className={`buttonclass ${showGameMatchmaking ? 'clicked' : ''}`} onClick={handleGameMatchmaking}>START GAME</button>
-        <button className={`buttonclass ${showGameSettings ? 'clicked' : ''}`} onClick={handleGameSettings}>PROFILE</button>
+        <button className={`buttonclass ${showGameMatchmaking ? 'clicked' : ''}`} onClick={() =>{ handleStartClick(); handleGameMatchmaking(); }}>START GAME</button>
+        <button className="buttonclass" >PROFILE</button>
         <button className={`buttonclass ${showGameSettings ? 'clicked' : ''}`} onClick={handleGameSettings}>SETTINGS</button>
       </div>
     </div>
