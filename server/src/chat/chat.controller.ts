@@ -5,10 +5,12 @@ import { MessageDto } from './dto/message.dto';
 import { User } from '../users/entities/users.entity'
 import { Conversation } from './entities/conversation.entity';
 import { Message } from './entities/message.entity';
+import { GeneralGateway } from 'src/gateway/gateway';
 
 @Controller('chat')
 export class ChatController {
-	constructor(private chatService: ChatService) {}
+	constructor(private chatService: ChatService,
+				private gateway: GeneralGateway) {}
 	
 	@HttpCode(HttpStatus.OK)
 	@Post('newConversation')
@@ -26,7 +28,7 @@ export class ChatController {
 	@HttpCode(HttpStatus.OK)
 	@Post('newMessage')
 	createNewMessage(@Body() messageDto: MessageDto) {
-		console.log(messageDto);
+		console.log("db: ", messageDto);
 		return this.chatService.createMessage(messageDto);
 	}
 

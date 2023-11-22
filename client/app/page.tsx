@@ -10,15 +10,15 @@ import TFAComponent from './components/TFA/TFAComponent'
 import Header from './components/header/Header'
 import Authentificationcomponent from './components/chat/auth/Authentification';
 import { GameProvider } from './components/game/GameContext';
-// import { io, Socket } from 'socket.io-client';
+import { io, Socket } from 'socket.io-client'
+
 
 export default function Home() {
-
-	// const socket: Socket = io('http://localhost:3000');
+	
+	const socket = io('http://localhost:3001');
 
 	const [showLogin, setShowLogin] = useState(true);
 	const [show2FAForm, setShow2FAForm] = useState(false);
-	// const [isConnected, setIsConnected] = useState(socket.connected);
 
 	const searchParams = useSearchParams();
 	const code = searchParams.get('code');
@@ -73,20 +73,17 @@ export default function Home() {
 		setShow2FAForm(false);
 	}
 
-	// useEffect(() => {
+	useEffect(() => {
 
-	// 	socket.on('connect', () => {
-	// 		setIsConnected(true);
-	// 		socket.emit('message', 'Hello, server!');
-	// 		console.log("New socket connection");
-	// 	});
+		socket.on('connect', () => {
+			console.log('Youpi une connexion!');
+		})
 
-	// 	socket.off('disconnect', () => {
-	// 		setIsConnected(false);
-	// 		console.log("Socket disconnected");
-	// 	});
-
-	// }, [])
+		return () => {
+			console.log('Unregistering events...');
+			socket.off('connect');
+		}
+	})
 
 	useEffect(() => {
 		if (code && showLogin) {

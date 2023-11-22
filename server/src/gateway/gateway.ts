@@ -2,22 +2,25 @@ import { WebSocketGateway, WebSocketServer, SubscribeMessage, MessageBody } from
 import { OnModuleInit } from '@nestjs/common'
 import { Server } from 'socket.io'
 
-@WebSocketGateway()
+@WebSocketGateway({
+  cors: {
+    origin: ['http://localhost:3000']
+  },
+})
 export class GeneralGateway implements OnModuleInit {
 
   @WebSocketServer()
   server: Server;
 
   onModuleInit() {
-    this.server.on('connection', (socket) => {
-      console.log(socket.id);
-      console.log("Connected");
+    this.server.on('connect', (socket) => {
+      console.log("Connected : ", socket.id);
     });
   }
 
   @SubscribeMessage('message')
   handleMessage(@MessageBody() data: any){
-    console.log(data);
+    console.log("socket: ", data);
     this.server.emit('onMessage', {
       msg: 'New message',
       content: data,
