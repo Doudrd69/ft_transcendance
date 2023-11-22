@@ -10,13 +10,34 @@ import TFAComponent from './components/TFA/TFAComponent'
 import Header from './components/header/Header'
 import Authentificationcomponent from './components/chat/auth/Authentification';
 import { GameProvider } from './components/game/GameContext';
+// import { io, Socket } from 'socket.io-client';
 
 export default function Home() {
 
+	// const socket: Socket = io('http://localhost:3000');
+
 	const [showLogin, setShowLogin] = useState(true);
 	const [show2FAForm, setShow2FAForm] = useState(false);
+	// const [isConnected, setIsConnected] = useState(socket.connected);
+
 	const searchParams = useSearchParams();
 	const code = searchParams.get('code');
+
+	const setUserSession = async (jwt: string) => {
+
+		const jwtArray = jwt?.split('.');
+		if (jwtArray.length != 0) {
+			const payload = JSON.parse(atob(jwtArray[1]));
+			console.log(payload.sub);
+			console.log(payload.login);
+			console.log(payload.tfa_enabled);
+			sessionStorage.setItem("currentUserID", payload.sub);
+			sessionStorage.setItem("currentUserLogin", payload.login);
+			if (payload.tfa_enabled) {
+				setShow2FAForm(true);
+			}
+		}
+	}
 
 	const handleAccessToken = async (code: any): Promise<boolean> => {
 
@@ -30,22 +51,14 @@ export default function Home() {
 			});
 
 			if (response.ok) {
+
 				console.log("-- Fetch to API successed --");
+
 				const token = await response.json();
 				sessionStorage.setItem("jwt", token.access_token);
 				const jwt = sessionStorage.getItem("jwt");
-				if (jwt) {
-					const jwtArray = jwt?.split('.');
-					if (jwtArray.length != 0) {
-						const payload = JSON.parse(atob(jwtArray[1]));
-						console.log(payload.sub);
-						console.log(payload.login);
-						console.log(payload.tfa_enabled);
-						if (payload.tfa_enabled) {
-							setShow2FAForm(true);
-						}
-					}
-				}
+				if (jwt)
+					await setUserSession(jwt);
 				return true;
 			}
 			else {
@@ -60,13 +73,25 @@ export default function Home() {
 		setShow2FAForm(false);
 	}
 
-	//Runs on the first render and any time any dependency value changes
+	// useEffect(() => {
+
+	// 	socket.on('connect', () => {
+	// 		setIsConnected(true);
+	// 		socket.emit('message', 'Hello, server!');
+	// 		console.log("New socket connection");
+	// 	});
+
+	// 	socket.off('disconnect', () => {
+	// 		setIsConnected(false);
+	// 		console.log("Socket disconnected");
+	// 	});
+
+	// }, [])
+
 	useEffect(() => {
-		console.log("1 : " + showLogin);
 		if (code && showLogin) {
 			handleAccessToken(code).then(result => {
 				setShowLogin(false);
-				console.log(result + " !!!!!!!!!!");
 			})
 		}
 	}, [showLogin]);
@@ -78,13 +103,15 @@ export default function Home() {
 					show2FAForm ? (<TFAComponent on2FADone={handle2FADone} />) :
 					(
 					  <div className="container">
-  						<Chat />
-  						<GameProvider>
-  						  <Game />
-  						</GameProvider>
-  					  </div>
-  					)
+						<Chat />
+						<GameProvider>
+						  <Game />
+						</GameProvider>
+					  </div>
+					)
 				}
 			</RootLayout>
 	)
 }
+
+// https://www.delightfulengineering.com/blog/nest-websockets/basics
