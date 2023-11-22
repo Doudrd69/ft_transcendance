@@ -1,101 +1,93 @@
 // ChatContext.tsx
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useReducer } from 'react';
 
-// Créez un contexte
-const ChatContext = createContext<{
+// Définir les types d'action
+type ActionType =
+  | 'ACTIVATE'
+  | 'DISABLE'
+  | 'TOGGLE'
+  | 'SET'
+  | 'SET_CURRENT_CONVERSATION';
+
+// Définir l'interface de l'action
+interface Action {
+  type: ActionType;
+  payload?: string | null | undefined; // Utilisé pour les actions qui ont un payload
+}
+
+// Définir l'interface de l'état
+interface ChatState {
 	showFriendsList: boolean;
-	activateFriendsList: () => void;
-	disableFriendsList: () => void;
-	handleFriendsList: () => void;
-	showDiscussionList: boolean;
-	activateDiscussionList: () => void;
-	disableDiscussionList: () => void;
-	handleDiscussionList: () => void;
 	showAdd: boolean;
-	handleAdd: () => void;
-	activateAdd: () => void;
-	disableAdd: () => void;
-	showChatDiscussion: boolean;
-	activateChatDiscussion: () => void;
-	disableChatDiscussion: () => void;
-	handleChatDiscussion: () => void;
+	showChatList: boolean;
+	showChat: boolean;
+	showChannelList: boolean;
+	showChannel: boolean;
+	currentConversation: string | null;
+	[key: string]: boolean | string | null;
+}
+
+// État initial
+const initialState: ChatState = {
+  showFriendsList: false,
+  showChatList: false,
+  showChannelList: false,
+  showChat: false,
+  showChannel: false,
+  showAdd: false,
+  currentConversation: null,
+};
+
+// Réducteur
+const chatReducer = (state: ChatState, action: Action): ChatState => {
+	switch (action.type) {
+		case 'ACTIVATE':
+			return { ...state, [action.payload!]: true };
+	  	case 'DISABLE':
+			return { ...state, [action.payload!]: false };
+		case 'TOGGLE':
+			return Object.keys(state).reduce((acc, key) => {
+		  		acc[key] = key === action.payload ? true : false;
+		  	return acc;
+			}, {} as ChatState);
+		case 'SET':
+			if (typeof action.payload === 'object' && action.payload !== null) {
+			  return Object.assign({}, state, action.payload);
+			} else {
+			  // Gérer le cas où action.payload n'est pas un objet
+			  return state;
+			}
+		case 'SET_CURRENT_CONVERSATION':
+				return { ...state, currentConversation: action.payload || null }; // Mettre à jour la conversation actuelle 
+	  default:
+		return state;
+	}
+  };
+  
+// Contexte
+const ChatContext = createContext<{
+  state: ChatState;
+  dispatch: React.Dispatch<Action>;
 } | undefined>(undefined);
 
-// Créez un fournisseur de contexte
-export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-	const [showFriendsList, setFriendsList] = useState(false);
-	const [showDiscussionList, setDiscussionList] = useState(false);
-	const [showAdd, setAdd] = useState(false);
-	const [showChatDiscussion, setChatDiscussion] = useState(false);
-
-	/*Friendlist*/
-	const activateFriendsList = () => setFriendsList(true);
-	const disableFriendsList = () => setFriendsList(false);
-	const handleFriendsList = () => {
-		disableDiscussionList();
-		disableAdd();
-		disableChatDiscussion();
-		activateFriendsList();
-	}
-	/*Discussionlist*/
-	const activateDiscussionList = () => setDiscussionList(true);
-	const disableDiscussionList = () => setDiscussionList(false);
-	const handleDiscussionList = () => {
-		disableFriendsList();
-		disableAdd();
-		disableChatDiscussion();
-		activateDiscussionList();
-	}
-
-	/*ChatDiscussion*/
-	const activateChatDiscussion = () => setChatDiscussion(true);
-	const disableChatDiscussion = () => setChatDiscussion(false);
-	const handleChatDiscussion = () => {
-		disableDiscussionList();
-		disableFriendsList();
-		disableAdd();
-		activateChatDiscussion();
-	}
-	/*Add*/
-	const activateAdd = () => setAdd(true);
-	const disableAdd = () => setAdd(false);
-	const handleAdd = () => {
-		disableDiscussionList();
-		disableFriendsList();
-		disableChatDiscussion();
-		activateAdd();
-	}
-
+// Fournisseur de contexte
+export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({children,}) => {
+	const [state, dispatch] = useReducer(chatReducer, initialState);
+	
 	return (
-	<ChatContext.Provider
-		value={{
-		showFriendsList,
-		handleFriendsList,
-		activateFriendsList,
-		disableFriendsList,
-		
-		activateAdd,
-		handleAdd,
-		showAdd,
-		disableAdd,
-		
-		handleDiscussionList,
-		showDiscussionList,
-		activateDiscussionList,
-		disableDiscussionList,
-
-		handleChatDiscussion,
-		showChatDiscussion,
-		activateChatDiscussion,
-		disableChatDiscussion,
-		}}
-	>
+		<ChatContext.Provider value={{ state, dispatch }}>
 		{children}
-	</ChatContext.Provider>
+		</ChatContext.Provider>
 	);
 };
 
-// Créez un hook personnalisé pour utiliser le contexte
+// Action creator pour définir la conversation actuelle
+export const setCurrentConversation = (payload: string | null): Action => ({
+	type: 'SET_CURRENT_CONVERSATION',
+	payload,
+  });
+  
+// Hook personnalisé pour utiliser le contexte
 export const useChat = () => {
   const context = useContext(ChatContext);
   if (context === undefined) {

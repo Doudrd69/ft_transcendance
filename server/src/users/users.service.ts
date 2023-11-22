@@ -6,6 +6,8 @@ import { User } from './entities/users.entity'
 import { Friendship } from './entities/friendship.entity'
 import { speakeasy } from 'speakeasy'
 import { QRCode } from 'qrcode'
+import { FriendRequestDto } from './dto/FriendRequestDto.dto';
+import { Conversation } from 'src/chat/entities/conversation.entity';
 
 @Injectable()
 export class UsersService {
@@ -64,13 +66,35 @@ export class UsersService {
 	// 	});
 	// }
 
-	createNew42User(userData) {
-		console.log("In DB registration: ", JSON.stringify(userData));
-		const login = userData.login;
-		const firstname = userData.firstname;
-		const officialProfileImage = userData.image;
-		const socket = userData.socket;
-		const new42User = this.usersRepository.create({ login, firstname, officialProfileImage, socket});
+	async createNewUser(username: string): Promise<User> {
+		const userToCreate = await this.usersRepository.findOne({ where: {username: username } });
+		if (!userToCreate) {
+			// const saltOrRounds = 10;
+			// password = await bcrypt.hash(password, saltOrRounds);
+			const newUser = new User();
+			newUser.login = username;
+			newUser.firstname = username;
+			newUser.username = username;
+			newUser.officialProfileImage = "";
+			return await this.usersRepository.save(newUser);
+		}
+		throw new Error('User with this username already exists');
+	}
+
+	// async deleteUser(username: string) {
+	// 	const userToDelete = await this.usersRepository.findOne({ where: { username } });
+	// 	if (userToDelete) {
+	// 		return await this.usersRepository.delete(username);
+	// 	}
+	// 	throw new NotFoundException();
+	// }
+
+	async createNew42User(userData) {
+		const new42User = new User();
+		new42User.login = userData.login;
+		new42User.firstname = userData.firstname;
+		new42User.officialProfileImage = userData.image;
+		new42User.groups = [];
 		return this.usersRepository.save(new42User);
 	}
 
@@ -84,66 +108,129 @@ export class UsersService {
 		});
 	}
 
-	createFriendship(initiatorLogin: string, recipientLogin: string) {
-		console.log("Friendship creation...");
-		this.getUserByLogin(initiatorLogin).then(initiator => {
-			this.getUserByLogin(recipientLogin).then(friend => {
-				const newFriendship = this.friendshipRepository.create({ initiator, friend });
-				return this.friendshipRepository.save(newFriendship);
-			}).catch(error => {
-				console.log("Error in second promise: ", error);
-			})
-		}).catch(error => {
-			console.log("Error in first promise: ", error);
+	/**************************************************************/
+	/***				FRIENDSHIP MANAGEMENT					***/
+	/**************************************************************/
+
+	async createFriendship(friendRequestDto: FriendRequestDto): Promise<Friendship | null> {
+
+		console.log("DTO received in createFrienship : ", friendRequestDto);
+
+		const initiator = await this.usersRepository.findOne({
+			where: {login: friendRequestDto.initiatorLogin},
+			relations: ["initiatedFriendships"],
 		});
+
+		const recipient = await this.usersRepository.findOne({
+			where: {login: friendRequestDto.recipientLogin},
+			relations: ["initiatedFriendships"],
+		});
+
+		if (initiator && recipient) {
+			
+			// Check if the frienships already exists in DB
+			// Only works one way, need to check the reverse (initiator <-> friend)
+			const friendshipAlreadyExists = await this.friendshipRepository.findOne({
+				where: {initiator: initiator, friend: recipient},
+			});
+			
+			if (!friendshipAlreadyExists) {
+	
+				let newFriendship = new Friendship();
+				newFriendship.initiator = initiator;
+				newFriendship.friend = recipient;
+				return await this.friendshipRepository.save(newFriendship);
+			}
+			// if the frienship already exists between the users, don't do anything
+			return null;
+		}
+		throw Error("Fatal error");
 	}
 	
-	updateFriendship(initiatorLogin: string, recipientLogin: string, flag: boolean) {
-		console.log("Friendship request responses processing...");
-		this.getUserByLogin(initiatorLogin).then(initiator => {
-			this.getUserByLogin(recipientLogin).then(friend => {
-				const frienshipToUpdate = initiator.initiatedFriendships.find(
-					(friendship) => friendship.friend.login === recipientLogin
-					);
-					if (frienshipToUpdate) {
-						frienshipToUpdate.isAccepted = flag;
-						return this.friendshipRepository.save(frienshipToUpdate); // friendship repo
-					}
-				}).catch(error => {
-					console.log("Error in second promise: ", error);
-				})
-			}).catch(error => {
-				console.log("Error in first promise: ", error);
-			})
+	async updateFriendship(friendRequestDto: FriendRequestDto, flag: boolean): Promise<Friendship> {
+
+		console.log("==== UPDATING FRIENDSHIP TO ", flag, " ====");
+
+		const initiator = await this.usersRepository.findOne({
+			where: {login: friendRequestDto.initiatorLogin},
+			relations: ["initiatedFriendships", "acceptedFriendships"],
+		});
+
+		const friend = await this.usersRepository.findOne({
+			where: {login: friendRequestDto.recipientLogin},
+			relations: ["initiatedFriendships", "acceptedFriendships"],
+		});
+
+		if (initiator && friend) {
+
+			let friendshipToUpdate = new Friendship();
+			friendshipToUpdate = await this.friendshipRepository.findOne({
+				where: {initiator: initiator, friend: friend},
+			});
+
+			friendshipToUpdate.isAccepted = flag;
+			await this.friendshipRepository.save(friendshipToUpdate);
+
+			// Reload initiator and friend entities
+  			const initiator2 = await this.usersRepository.findOne({
+    			where: { login: friendRequestDto.initiatorLogin },
+    			relations: ["initiatedFriendships", "acceptedFriendships"],
+  			});
+
+  			const friend2 = await this.usersRepository.findOne({
+    			where: { login: friendRequestDto.recipientLogin },
+    			relations: ["initiatedFriendships", "acceptedFriendships"],
+  			});
+
+			console.log(initiator2.login, " Init after updt --> ", initiator2.initiatedFriendships);
+			console.log(friend2.login, " Init after updt --> ", friend2.initiatedFriendships);
+
+			console.log(initiator2.login, " Accepted after updt --> ", initiator2.acceptedFriendships);
+			console.log(friend2.login, " Accepted after updt --> ", friend2.acceptedFriendships);
+
+			return friendshipToUpdate;
 		}
-		
-	getUserByLogin(loginToSearch: string): Promise<User> {
-		return this.usersRepository.findOne({ where: {login: loginToSearch}});
+		return ;
 	}
 
+	async acceptFriendship(friendRequestDto: FriendRequestDto): Promise<Friendship> {
+
+		const newFriendship = await this.updateFriendship(friendRequestDto, true);
+		if (newFriendship) {
+			console.log("Updated friendship : ", newFriendship);
+			return newFriendship
+		}
+		console.log("Fatal error: could not add ", friendRequestDto.initiatorLogin, " to your friend list");
+		return ;
+	}
+
+	/**************************************************************/
+	/***					GETTERS						***/
+	/**************************************************************/
+		
 	findUserByLogin(loginToSearch: string) {
 		return this.usersRepository.findOne({ where: {login: loginToSearch}});
 	}
 
-		// async createNewUser(username: string, password: string): Promise<User> {
-		// 	const userToCreate = await this.usersRepository.findOne({ where: { username } });
-		// 	if (!userToCreate) {
-		// 		const saltOrRounds = 10;
-		// 		if (this.passwordPolicy(password)) {
-		// 			password = await bcrypt.hash(password, saltOrRounds);
-		// 			const newUser = this.usersRepository.create({ username, password });
-		// 			return await this.usersRepository.save(newUser);
-		// 		}
-		// 		throw new Error('Password policy : 8 characters minimum');
-		// 	}
-		// 	throw new Error('User with this username already exists');
-		// }
-	
-		// async deleteUser(username: string) {
-		// 	const userToDelete = await this.usersRepository.findOne({ where: { username } });
-		// 	if (userToDelete) {
-		// 		return await this.usersRepository.delete(username);
-		// 	}
-		// 	throw new NotFoundException();
-		// }
+	getUserByLogin(loginToSearch: string): Promise<User> {
+		return this.usersRepository.findOne({ where: {login: loginToSearch}});
 	}
+
+	async getFriendships(username: string): Promise<Friendship[]> {
+
+		console.log(username, " friend list loading...");
+		let user = new User();
+		user = await this.usersRepository.findOne({
+			where: {login: username},
+			relations: ["initiatedFriendships.friend", "acceptedFriendships.initiator"],
+		});
+
+		if (user) {
+			let initiatedfriends = await user.initiatedFriendships.filter((friendship: Friendship) => friendship.isAccepted);
+			let acceptedfriends = await user.acceptedFriendships.filter((friendship: Friendship) => friendship.isAccepted);
+			const friends = [...initiatedfriends, ...acceptedfriends];
+			return friends;
+		}
+		return ;
+	}
+}

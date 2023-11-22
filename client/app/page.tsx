@@ -10,13 +10,80 @@ import TFAComponent from './components/TFA/TFAComponent'
 import Header from './components/header/Header'
 import Authentificationcomponent from './components/chat/auth/Authentification';
 import { GameProvider } from './components/game/GameContext';
+import { io, Socket } from 'socket.io-client'
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { totalmem } from 'os';
+
+interface FriendRequestDto {
+	initiator: string;
+	recipient: string;
+}
 
 export default function Home() {
+	
+	const socket = io('http://localhost:3001');
+	const userSocket = io('http://localhost:3001/user')
+	const gameSocket = io('http://localhost:3001/game')
 
-	const [showLogin, setShowLogin] = useState(true);
+
+	const [showLogin, setShowLogin] = useState(false);
 	const [show2FAForm, setShow2FAForm] = useState(false);
+
 	const searchParams = useSearchParams();
 	const code = searchParams.get('code');
+
+	const friendRequestValidation = async (initiatorLogin: string) => {
+
+		const acceptedFriendRequestDto = {
+			initiatorLogin: initiatorLogin,
+			recipientLogin: sessionStorage.getItem("currentUserLogin"),
+		}
+
+		const response = await fetch('http://localhost:3001/users/acceptFriendRequest', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify(acceptedFriendRequestDto),
+		});
+
+		if (response.ok) {
+			console.log("User added to your friend list!");
+			//faire ici un call toast pour mettre une notif?
+		}
+		else {
+			console.error("Fatal error: friend request failed");
+		}
+	};
+
+	const Msg = ({ closeToast, toastProps, initiatorLogin }: any) => (
+		<div>
+		  You received a friend request from  {initiatorLogin}
+		  <button onClick={() => friendRequestValidation(initiatorLogin)}>Accept</button>
+		  <button onClick={closeToast}>Deny</button>
+		</div>
+	)
+
+	const notifyFriendRequest = (initiatorLogin: string) => { 
+		toast.info(<Msg initiatorLogin={initiatorLogin}/>);
+	};
+
+
+	const setUserSession = async (jwt: string) => {
+
+		const jwtArray = jwt?.split('.');
+		if (jwtArray.length != 0) {
+			const payload = JSON.parse(atob(jwtArray[1]));
+			console.log(payload.sub);
+			console.log(payload.login);
+			sessionStorage.setItem("currentUserID", payload.sub);
+			sessionStorage.setItem("currentUserLogin", payload.login);
+			if (payload.tfa_enabled) {
+				setShow2FAForm(true);
+			}
+		}
+	}
 
 	const handleAccessToken = async (code: any): Promise<boolean> => {
 
@@ -30,22 +97,14 @@ export default function Home() {
 			});
 
 			if (response.ok) {
+
 				console.log("-- Fetch to API successed --");
+
 				const token = await response.json();
 				sessionStorage.setItem("jwt", token.access_token);
 				const jwt = sessionStorage.getItem("jwt");
-				if (jwt) {
-					const jwtArray = jwt?.split('.');
-					if (jwtArray.length != 0) {
-						const payload = JSON.parse(atob(jwtArray[1]));
-						console.log(payload.sub);
-						console.log(payload.login);
-						console.log(payload.tfa_enabled);
-						if (payload.tfa_enabled) {
-							setShow2FAForm(true);
-						}
-					}
-				}
+				if (jwt)
+					await setUserSession(jwt);
 				return true;
 			}
 			else {
@@ -60,16 +119,73 @@ export default function Home() {
 		setShow2FAForm(false);
 	}
 
-	//Runs on the first render and any time any dependency value changes
+	// Friend request use-effect
 	useEffect(() => {
-		console.log("1 : " + showLogin);
-		if (code && showLogin) {
-			handleAccessToken(code).then(result => {
-				setShowLogin(false);
-				console.log(result + " !!!!!!!!!!");
-			})
+		userSocket.on('friendRequest', (friendRequestDto: FriendRequestDto) => {
+			// mouais a revoir
+			if (sessionStorage.getItem("currentUserLogin") === friendRequestDto.recipient) {
+				notifyFriendRequest(friendRequestDto.initiator);
+			}
+		});
+
+		return () => {
+			userSocket.off('friendRequest');
 		}
-	}, [showLogin]);
+	}, [userSocket]);
+
+	// Socket use-effect
+	useEffect(() => {
+
+		userSocket.on('connect', () => {
+			console.log('Client is connecting... ');
+			if (socket.connected)
+				console.log("Client connected: ", userSocket.id);
+		})
+
+		userSocket.on('disconnect', () => {
+			console.log('Disconnected from the server');
+		})
+
+		userSocket.on('disconnect', () => {
+			console.log('Disconnected from the server');
+		})
+
+		return () => {
+			console.log('Unregistering events...');
+			userSocket.off('connect');
+			userSocket.off('disconnect');
+		}
+	})
+
+	useEffect(() => {
+
+		gameSocket.on('connect', () => {
+			console.log('Youpi une connexion!');
+		})
+
+		gameSocket.on('disconnect', () => {
+			console.log('Disconnected from the server');
+		})
+
+		return () => {
+			console.log('Unregistering events...');
+			gameSocket.off('connect');
+			gameSocket.off('disconnect');
+		}
+	})
+
+	// Login use-effect
+	// useEffect(() => {
+	// 	if (code && showLogin) {
+	// 		handleAccessToken(code).then(result => {
+	// 			setShowLogin(false);
+	// 		})
+	// 	}
+	// }, [showLogin]);
+	useEffect(() => {
+		if (sessionStorage.getItem("currentUserLogin") != null)
+			setShowLogin(false);
+	});
 
 	return (
 			<RootLayout>
@@ -78,13 +194,16 @@ export default function Home() {
 					show2FAForm ? (<TFAComponent on2FADone={handle2FADone} />) :
 					(
 					  <div className="container">
-  						<Chat />
-  						<GameProvider>
-  						  <Game />
-  						</GameProvider>
-  					  </div>
-  					)
+                        <ToastContainer />
+						<Chat socket={userSocket}/>
+						<GameProvider>
+						  <Game />
+						</GameProvider>
+					  </div>
+					)
 				}
 			</RootLayout>
 	)
 }
+
+// https://www.delightfulengineering.com/blog/nest-websockets/basics

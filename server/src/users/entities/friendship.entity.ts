@@ -14,4 +14,4 @@ export class Friendship {
 
   @Column({ default: false })
   isAccepted: boolean;
-}
+} 

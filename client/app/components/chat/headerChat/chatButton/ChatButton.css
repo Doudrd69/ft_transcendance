@@ -1,0 +1,44 @@
+.main-button-chat {
+  border: none;
+  text-align: center;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  height: 100%;
+  width: calc(30% - 10px);
+  border-top: none;
+  background-color: var(--fourth);
+  color: #f0f0f0;
+  transition: background-color 0.3s ease;
+  text-transform: uppercase;
+  font-weight: bold;
+  border-radius: 10px;
+  position: relative;
+  font-size: 20px;
+  font-family: Arial, sans-serif;
+
+  /* Créer une pseudo-classe ::before pour l'image */
+}
+.image-main-button-chat {
+  background-image: url('chat.png');
+  background-repeat: no-repeat;
+
+  background-position: center center;
+  background-color: transparent;
+  /* Filtre pour rendre l'image en blanc */
+  /* filter: brightness(0) invert(1); */
+}
+
+.logo-class {
+	filter: brightness(0) invert(1);
+  }
+
+.main-button-chat:hover {
+	/* Nouvelle couleur de fond lorsque vous survolez le bouton */
+	background-color: var(--fifth);
+	}
+
+.main-button-chat.clicked {
+	/* Nouvelle couleur de fond lorsque vous survolez le bouton */
+	background-color: var(--second);
+	}

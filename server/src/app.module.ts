@@ -1,20 +1,18 @@
 import { Module } from '@nestjs/common';
-import { ServeStaticModule } from '@nestjs/serve-static';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import dotenv from 'dotenv';
-import { join } from 'path';
 import { User } from './users/entities/users.entity'
 import { Message } from './chat/entities/message.entity'
-import { GroupMember } from './chat/entities/group_member.entity'
 import { Conversation } from './chat/entities/conversation.entity'
 import { Friendship } from './users/entities/friendship.entity';
 import { AppController } from './app.controller';
-// import { AppService } from './app.service';
+import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { ChatModule } from './chat/chat.module';
-
-//We set the synchronize option to true, which means that TypeORM will automatically
+import { GatewayModule } from './gateway/gateway.module';
+import { GameGateway } from './game/game.gateway';
+import { GameModule } from './game/game.module';
 //generate database tables based on the entities. However, this option should be used
 //with caution in production because it can cause data loss and conflicts.
 
@@ -30,7 +28,13 @@ if (!dbPass || !dbUsername || !dbName || !dbHost) {
 }
 
 
+if (!dbPass || !dbUsername || !dbName || !dbHost) {
+  throw new Error('One or more required environment variables are missing.');
+}
+
+
 @Module({
+	
   imports: [
 
     TypeOrmModule.forRoot({
@@ -40,13 +44,9 @@ if (!dbPass || !dbUsername || !dbName || !dbHost) {
       username: dbUsername,
       password: dbPass,
       database: dbName,
-      entities: [User, Message, GroupMember, Conversation, Friendship],
+      entities: [User, Message, Conversation, Friendship],
       synchronize: true,
       autoLoadEntities: true,
-    }),
-
-    ServeStaticModule.forRoot({
-      rootPath: join(__dirname, 'client'),
     }),
 
     AuthModule,
@@ -55,8 +55,12 @@ if (!dbPass || !dbUsername || !dbName || !dbHost) {
 
     ChatModule,
 
+    GatewayModule,
+
+    GameModule,
+
   ],
   controllers: [AppController],
-  // providers: [AppService],
+  providers: [AppService],
 })
 export class AppModule {}

@@ -1,23 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
+import { User } from '../users/entities/users.entity';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Lobby } from './entities/lobby.entity';
 
 @Injectable()
-export class GameService
-{
-	// constructor
-    // (
-		
-	// ) {}
-    // createGame(gameName): Promise<GameData>
-    // {
-	// 	const newGame = this.
-	// }
-
-	// moveUser() {
-
-	// }
-
-	// recalcuteBallPosition
-	// // quand est ce quon bouge la boule ?
+export class GameService {
+  constructor(
+    @InjectRepository(Lobby)
+    private lobbyRepository: Repository<Lobby>,
+    @InjectRepository(User)
+		private playersRepository: Repository<User>,
+  ) {}
 }

@@ -2,19 +2,22 @@ import { Module } from '@nestjs/common'
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ChatController } from './chat.controller'
 import { ChatService } from './chat.service'
-import { GroupMember } from './entities/group_member.entity';
 import { Message } from './entities/message.entity';
 import { Conversation } from './entities/conversation.entity';
 import { User } from '../users/entities/users.entity'
+import { Friendship } from 'src/users/entities/friendship.entity';
+import { UsersService } from 'src/users/users.service';
+import { GroupMember } from './entities/group_member.entity';
 
 @Module({
 	imports: [
 		TypeOrmModule.forFeature([Conversation]),
-		TypeOrmModule.forFeature([GroupMember]),
 		TypeOrmModule.forFeature([Message]),
-		TypeOrmModule.forFeature([User])
+		TypeOrmModule.forFeature([User]),
+		TypeOrmModule.forFeature([Friendship]),
+		TypeOrmModule.forFeature([GroupMember])
 	],
-	providers: [ChatService],
+	providers: [ChatService, UsersService],
 	exports: [ChatService],
 	controllers: [ChatController],
 })

@@ -2,16 +2,18 @@ import { Controller, Post, HttpCode, HttpStatus, Body, Get, UploadedFile, UseInt
 import { UsersService } from './users.service';
 import { FriendRequestDto } from './dto/FriendRequestDto.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { Friendship } from './entities/friendship.entity';
 
 @Controller('users')
 export class UsersController {
 	constructor(private usersService: UsersService) {}
 
-	// @HttpCode(HttpStatus.OK)
-	// @Post('signup')
-	// createNewUser(@Body() signUpDto: Record<string, string>) {
-	// 	return this.usersService.createNewUser(signUpDto.username, signUpDto.password);
-	// }
+	@HttpCode(HttpStatus.OK)
+	@Post('signup')
+	createNewUser(@Body() requestBody: { username: string }) {
+		const { username } = requestBody;
+		return this.usersService.createNewUser(username);
+	}
 
 	// @HttpCode(HttpStatus.OK)
 	// @Post('delete')
@@ -42,13 +44,25 @@ export class UsersController {
 
 	@HttpCode(HttpStatus.OK)
 	@Post('addfriend')
-	createFriendship(@Body() friendRequestDto: FriendRequestDto) {
-		return this.usersService.createFriendship(friendRequestDto.initiatorLogin, friendRequestDto.recipientLogin);
+	createFriendship(@Body() friendRequestDto: FriendRequestDto): Promise<Friendship | null> {
+		return this.usersService.createFriendship(friendRequestDto);
 	}
 
 	@HttpCode(HttpStatus.OK)
-	@Post('requestresponse')
+	@Post('friendRequestResponse')
 	updateFriendship(@Body() friendRequestDto: FriendRequestDto, flag: boolean) {
-		return this.usersService.updateFriendship(friendRequestDto.initiatorLogin, friendRequestDto.recipientLogin, flag);
+		return this.usersService.updateFriendship(friendRequestDto, flag);
+	}
+
+
+	@HttpCode(HttpStatus.OK)
+	@Post('acceptFriendRequest')
+	acceptFriendship(@Body() friendRequestDto: FriendRequestDto): Promise<Friendship> {
+		return this.usersService.acceptFriendship(friendRequestDto);
+	}
+
+	@Get('getFriends/:username')
+	getFriendsList(@Param('username') username: string): Promise<Friendship[]> {
+		return this.usersService.getFriendships(username);
 	}
 }

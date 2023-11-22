@@ -1,0 +1,29 @@
+.main-button-channel {
+	/* border: 3px solid #333; */
+	border:none;
+	text-align: center;
+	overflow: hidden; 
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	height: 100%;
+	width: calc(30% - 10px);
+	border-top: none;
+	background-color: var(--fourth) ;
+	color: #f0f0f0;
+	transition: background-color 0.3s ease;
+	text-transform: uppercase;
+	font-weight: bold;
+	border-radius:10px;
+	font-size: 20px; /* Exemple de taille de police */
+	font-family: Arial, sans-serif;
+}
+
+.main-button-channel:hover {
+	/* Nouvelle couleur de fond lorsque vous survolez le bouton */
+	background-color: var(--fifth);
+	}
+
+.main-button-channel.clicked {
+	/* Nouvelle couleur de fond lorsque vous survolez le bouton */
+	background-color: var(--second);
+	}

@@ -7,9 +7,9 @@ WORKDIR /srv/app/admin-client
 
 COPY package*.json ./
 
-RUN npm install
-	# npm install react-router-dom && \
-	# npm install react-bootstrap
+RUN npm install && \
+	npm install -y socket.io-client && \
+	npm install -y react-toastify
 
 COPY . .
 RUN npm run build

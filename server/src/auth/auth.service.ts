@@ -3,6 +3,7 @@ import { UsersService } from '../users/users.service'
 import { User } from '../users/entities/users.entity'
 import { JwtService } from '@nestjs/jwt'
 import dotenv from 'dotenv';
+import { request } from 'http';
 // import * as bcrypt from 'bcrypt';
 
 var speakeasy = require("speakeasy");
@@ -19,14 +20,14 @@ export class AuthService {
 	constructor(
 		private usersService: UsersService,
 		private jwtService: JwtService,
-	) {}
-
-	/**************************************************************/
-	/***					AUTHENTIFICATION					***/
-	/**************************************************************/
-
-	private async getUserInfo(accessTokenArray: any): Promise<User> {
-
+		) {}
+		
+		/**************************************************************/
+		/***					AUTHENTIFICATION					***/
+		/**************************************************************/
+		
+		private async getUserInfo(accessTokenArray: any): Promise<User> {
+			
 		const access_token = accessTokenArray.access_token;
 		const token_string = "Bearer " + access_token;
 
@@ -60,7 +61,7 @@ export class AuthService {
 	}
 
 	async getAccessToken(code: any) {
-
+		
 		const data = new URLSearchParams();
 		data.append('grant_type', 'authorization_code');
 		data.append('client_id', clientId);
@@ -69,11 +70,11 @@ export class AuthService {
 		data.append('redirect_uri', redirectUri);
 
 		try {
+			console.log(data)
 			const response = await fetch('https://api.intra.42.fr/oauth/token', {
 				method: 'POST',
 				body: data,
 			});
-			
 			if (response.ok) {
 				console.log("-- Request to API --");
 				const responseContent = await response.json();

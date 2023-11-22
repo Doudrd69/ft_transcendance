@@ -12,11 +12,13 @@ RUN npm install	&& \
 	npm install @nestjs/typeorm && \
 	npm install @nestjs/serve-static && \
 	npm install pg	&& \
-	npm i bcrypt && \
-	npm i @types/bcrypt && \
+	npm install bcrypt && \
+	npm install @types/bcrypt && \
 	npm install speakeasy qrcode && \
 	npm install dotenv && \
-	npm i --save @nestjs/websockets @nestjs/platform-socket.io
+	npm install socket.io && \
+	npm install @nestjs/websockets && \
+	npm install @nestjs/platform-socket.io
 
 COPY . .
 
