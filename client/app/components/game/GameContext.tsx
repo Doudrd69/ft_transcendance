@@ -72,7 +72,6 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
 	const handleSettingsGame = () => {
 		disableSettingsDisplay();
 		disableSettingsKeyboard();
-        activateSettingsGame();
 	}
 
     const activateSettingsDisplay = () => setSettingsDisplay(true);
@@ -140,3 +139,8 @@ export const useGame = () => {
     }
     return context;
   };
+
+  /**
+   * REGARDER USE REDUCER hook react native pour stocker les usestates
+   * 
+   */

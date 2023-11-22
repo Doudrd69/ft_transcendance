@@ -25,7 +25,6 @@ const ChannelListComponent: React.FC = () => {
 	  setConversations((prevConversations: Conversation[]) => [...prevConversations, ...userData]);
 	} else {
 	  console.log("Fatal error");
-
 	}
   };
   const userData = {
