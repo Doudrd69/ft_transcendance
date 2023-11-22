@@ -8,7 +8,6 @@ import { Server } from 'socket.io'
     origin: ['http://localhost:3000']
   },
 })
-
 export class GeneralGateway implements OnModuleInit {
 
   @WebSocketServer()
