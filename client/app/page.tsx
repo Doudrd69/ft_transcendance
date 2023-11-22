@@ -28,6 +28,8 @@ export default function Home() {
 
 	// const socket: Socket = io('http://localhost:3000');
 
+	// const socket: Socket = io('http://localhost:3000');
+
 	const [showLogin, setShowLogin] = useState(true);
 	const [show2FAForm, setShow2FAForm] = useState(false);
 
@@ -195,3 +197,5 @@ export default function Home() {
 			</RootLayout>
 	)
 }
+
+// https://www.delightfulengineering.com/blog/nest-websockets/basics
