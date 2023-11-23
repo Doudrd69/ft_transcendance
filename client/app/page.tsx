@@ -79,9 +79,14 @@ export default function Home() {
 			console.log('Youpi une connexion!');
 		})
 
+		socket.on('disconnect', () => {
+			console.log('Disconnected from the server');
+		})
+
 		return () => {
 			console.log('Unregistering events...');
 			socket.off('connect');
+			socket.off('disconnect');
 		}
 	})
 
@@ -100,7 +105,7 @@ export default function Home() {
 					show2FAForm ? (<TFAComponent on2FADone={handle2FADone} />) :
 					(
 					  <div className="container">
-						<Chat />
+						<Chat socket={socket}/>
 						<GameProvider>
 						  <Game />
 						</GameProvider>

@@ -6,8 +6,9 @@ import { useChat } from '../ChatContext';
 import ChatDiscussionComponent from './chatDiscussion/ChatDiscussion';
 import AddComponent from './add/Add';
 import FriendsListComponent from './friendsList/FriendsList';
+import { Socket } from 'socket.io-client'
 
-const BodyComponent: React.FC = () => {
+const BodyComponent = (socket: {socket: Socket}) => {
 	const {showFriendsList, showDiscussionList, showAdd, showChatDiscussion} = useChat();
 
 	return (
@@ -16,7 +17,7 @@ const BodyComponent: React.FC = () => {
 			{showDiscussionList && <DiscussionListComponent/>}
 			{showAdd && <AddComponent/>}
 			{showChatDiscussion && <ChatDiscussionComponent/>}
-			{showChatDiscussion && <MessageComponent/>}
+			{showChatDiscussion && <MessageComponent socket={socket.socket}/>}
 		</div>
 	)
 };
