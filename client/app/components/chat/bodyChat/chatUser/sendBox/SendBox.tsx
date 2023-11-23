@@ -1,7 +1,8 @@
 import './SendBox.css'
 import React, { useState } from 'react';
+import { Socket } from 'socket.io-client'
 
-const SendBoxComponent: React.FC = () => {
+const MessageComponent = (socket: {socket: Socket}) => {
 
 	const socketInUse = socket.socket;
 	const [messageValue, setMessageValue] = useState('');
@@ -27,6 +28,15 @@ const SendBoxComponent: React.FC = () => {
 				console.log("!! SOCKET EMIT on message !!");
 			});
 			socketInUse.off('message');
+
+		if (socketInUSe.connected) {
+			socketInUSe.emit('message', messageDto, () => {
+				console.log("Message Sent!");
+			});
+		}
+		else {
+			console.log("Socket not connected");
+		}
 
 		const response = await fetch('http://localhost:3001/chat/newMessage', {
 			method: 'POST',
