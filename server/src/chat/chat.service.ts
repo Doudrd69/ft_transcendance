@@ -20,6 +20,14 @@ export class ChatService {
 		private usersRepository: Repository<User>,
 	) {}
 
+	private getAllMessages(conversationName: string): Message[] {
+
+		this.conversationRepository.find({ where: {name: conversationName}}).then(conversation => {
+			return this.messageRepository.find({ where: {conversation}});
+		})
+		return ;
+	}
+
 	createConversation(conversationName, socketValue): Promise<Conversation> {
 		console.log("-- createConversation --");
 		console.log("Conversation to be created: ", conversationName);
@@ -72,5 +80,16 @@ export class ChatService {
 
 	getMessageById(id) {
 		return this.messageRepository.findOne(id);
+	}
+
+	getLastTenMessages(conversationName: string): Message[] {
+
+		const allMessages = this.getAllMessages(conversationName);
+
+		// Sort messages by timestamp or another criteria to get the latest ones
+		const sortedMessages = allMessages.sort((a, b) => b.id - a.id);
+
+		// Return the last 10 messages
+		return sortedMessages.slice(0, 10);
 	}
 }

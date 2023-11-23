@@ -76,7 +76,7 @@ export default function Home() {
 	useEffect(() => {
 
 		socket.on('connect', () => {
-			console.log('Youpi une connexion!');
+			console.log('New connection!');
 		})
 
 		socket.on('disconnect', () => {

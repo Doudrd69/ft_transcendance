@@ -16,7 +16,7 @@ const BodyComponent = (socket: {socket: Socket}) => {
 			{showFriendsList && <FriendsListComponent/>}
 			{showDiscussionList && <DiscussionListComponent/>}
 			{showAdd && <AddComponent/>}
-			{showChatDiscussion && <ChatDiscussionComponent/>}
+			{showChatDiscussion && <ChatDiscussionComponent socket={socket.socket}/>}
 			{showChatDiscussion && <MessageComponent socket={socket.socket}/>}
 		</div>
 	)
