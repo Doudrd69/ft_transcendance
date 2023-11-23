@@ -43,6 +43,15 @@ const SendBoxComponent = (socket: {socket: Socket}) => {
 			console.log("Socket not connected");
 		}
 
+		if (socketInUSe.connected) {
+			socketInUSe.emit('message', messageDto, () => {
+				console.log("Message Sent!");
+			});
+		}
+		else {
+			console.log("Socket not connected");
+		}
+
 		const response = await fetch('http://localhost:3001/chat/newMessage', {
 				method: 'POST',
 				headers: {
