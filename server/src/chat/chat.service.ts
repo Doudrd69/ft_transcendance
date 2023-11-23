@@ -155,4 +155,15 @@ export class ChatService {
 
 		return allConversations;
 	}
+
+	getLastTenMessages(conversationName: string): Message[] {
+
+		const allMessages = this.getAllMessages(conversationName);
+
+		// Sort messages by timestamp or another criteria to get the latest ones
+		const sortedMessages = allMessages.sort((a, b) => b.id - a.id);
+
+		// Return the last 10 messages
+		return sortedMessages.slice(0, 10);
+	}
 }
