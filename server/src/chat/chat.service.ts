@@ -25,6 +25,7 @@ export class ChatService {
 		private usersService: UsersService,
 	) {}
 
+<<<<<<< HEAD
 	private async getAllMessages(conversationName: string): Promise<Message[]> {
 
 		console.log("Searching for: ", conversationName, " conversation");
@@ -45,6 +46,33 @@ export class ChatService {
 		userToFind = await this.usersRepository.findOne({
 			where: { login: userName },
 			relations: ["groups"],
+=======
+	private getAllMessages(conversationName: string): Message[] {
+
+		this.conversationRepository.find({ where: {name: conversationName}}).then(conversation => {
+			return this.messageRepository.find({ where: {conversation}});
+		})
+		return ;
+	}
+
+	createConversation(conversationName, socketValue): Promise<Conversation> {
+		console.log("-- createConversation --");
+		console.log("Conversation to be created: ", conversationName);
+		// verification
+		const newConversation = this.conversationRepository.create({ name: conversationName });
+		// Creer un groupe en parallele, avec le createur de la conversation
+		this.usersRepository.find({ where: {socket: socketValue} }).then(result => {
+			this.createGroupMember(newConversation, result[0]).then(result => {
+				console.log("Group successfully created");
+				return ;
+			}).catch(error => {
+				console.log("Error during group creation :", error);
+			});
+			console.log("== Groupe was created, we can save conversation ==");
+			return this.conversationRepository.save(newConversation);
+		}).catch(error => {
+			console.log("Error during conversation creation :", error);
+>>>>>>> cf752e9 (Trying to retreive messages from conversation and display them)
 		});
 		if (userToFind) {
 			console.log("==> Looking for ", userToFind.login, " conversations...");
@@ -143,6 +171,7 @@ export class ChatService {
 		return allMessages;
 	}
 
+<<<<<<< HEAD
 	async getConversations(userName: string): Promise<GroupMember[]> {
 
 		const allConversations = await this.getAllConversations(userName);
@@ -154,3 +183,16 @@ export class ChatService {
 		return allConversations;
 	}
 }
+=======
+	getLastTenMessages(conversationName: string): Message[] {
+
+		const allMessages = this.getAllMessages(conversationName);
+
+		// Sort messages by timestamp or another criteria to get the latest ones
+		const sortedMessages = allMessages.sort((a, b) => b.id - a.id);
+
+		// Return the last 10 messages
+		return sortedMessages.slice(0, 10);
+	}
+}
+>>>>>>> cf752e9 (Trying to retreive messages from conversation and display them)

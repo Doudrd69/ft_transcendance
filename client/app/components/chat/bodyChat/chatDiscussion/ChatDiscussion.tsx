@@ -59,6 +59,7 @@ const ReceiveBoxComponent = (socket: {socket: Socket}) => {
 			console.log(error);
 		}
 	}
+<<<<<<< HEAD
 
 	// Here we retreive the last sent message and we "insert" it in the messages array
 	useEffect(() => {
@@ -93,6 +94,17 @@ const ReceiveBoxComponent = (socket: {socket: Socket}) => {
 					</div>
 				</>
 			))}
+=======
+
+	return (
+		<div className="bloc-discussion-chat">
+			{messages.map((message: any) => (
+				<>
+					<p className="discussion-chat">{message.content}</p>
+					<p className="discussion-chat">{message.date}</p>
+				</>
+		))}
+>>>>>>> cf752e9 (Trying to retreive messages from conversation and display them)
 		</div>
 	)
 };
