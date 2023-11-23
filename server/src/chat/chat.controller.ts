@@ -36,4 +36,9 @@ export class ChatController {
 	getMessage(@Param('id') id: number): Promise<Message | null> {
 		return this.chatService.getMessageById(id);
 	}
+
+	@Get(':conversationName')
+	getMessagesFormConversation(@Param('conversationName') conversationName: string): Message[] {
+		return this.chatService.getLastTenMessages(conversationName);
+	}
 }
