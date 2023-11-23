@@ -91,10 +91,12 @@ export class ChatService {
 			where: { login: conversationDto.username},
 			relations: ['groups'],
 		});
+
 		if (user) {
 
 			const conv = new Conversation();
 			conv.name = conversationDto.name;
+			conv.is_channel = conversationDto.is_channel;
 			await this.conversationRepository.save(conv);
 
 			const group = await this.createGroup(conv);

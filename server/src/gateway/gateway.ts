@@ -3,7 +3,6 @@ import { OnModuleInit } from '@nestjs/common'
 import { Server } from 'socket.io'
 
 @WebSocketGateway({
-  namespace: 'user',
   cors: {
     origin: ['http://localhost:3000']
   },
@@ -13,13 +12,15 @@ export class GeneralGateway implements OnModuleInit {
 
   @WebSocketServer()
   server: Server;
-  
+
   onModuleInit() {
     this.server.on('connect', (socket) => {
-      console.log("User Connected : ", socket.id);
+      console.log("Client is connecting...");
+      if (socket.connected)
+      console.log("Client connected: ", socket.id);
     });
   }
-  
+
   @SubscribeMessage('message')
   handleMessage(@MessageBody() dto: any) {
     console.log("Sender is: ", dto.from);
@@ -33,7 +34,7 @@ export class GeneralGateway implements OnModuleInit {
 
   @SubscribeMessage('addFriend')
   handleFriendRequest(@MessageBody() dto: any) {
-    console.log("Friend request initiated by ", dto.initiatorLogin);
+    console.log("DTO in gateway: ", dto);
     this.server.emit('friendRequest', {
       initiator: dto.initiatorLogin,
       recipient: dto.recipientLogin,

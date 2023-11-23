@@ -15,9 +15,16 @@ const BodyComponent = (socket: {socket: Socket}) => {
 	return (
 		<div className="powerlifter">
 			{showFriendsList && <FriendsListComponent/>}
+<<<<<<< HEAD
 			{showChatList && <ChatListComponent/>}
 			{showChannelList && <ChannelListComponent/>}
 			{showAdd && <AddComponent socket={socket.socket}/>}
+=======
+			{showDiscussionList && <DiscussionListComponent/>}
+			{showAdd && <AddComponent/>}
+			{showChatDiscussion && <ChatDiscussionComponent socket={socket.socket}/>}
+			{showChatDiscussion && <MessageComponent socket={socket.socket}/>}
+>>>>>>> cf752e9 (Trying to retreive messages from conversation and display them)
 		</div>
 	)
 };

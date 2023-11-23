@@ -7,7 +7,6 @@ import { User } from '../users/entities/users.entity'
 import { Conversation } from './entities/conversation.entity';
 import { Message } from './entities/message.entity';
 import { GroupMember } from './entities/group_member.entity';
-import { GeneralGateway } from 'src/gateway/gateway';
 
 @Controller('chat')
 export class ChatController {
