@@ -1,8 +1,11 @@
 import './Message.css'
 import React, { useState } from 'react';
+import { Socket } from 'socket.io-client'
 
-const MessageComponent: React.FC = () => {
+const MessageComponent = (socket: {socket: Socket}) => {
 
+	const socketInUSe = socket.socket;
+	console.log("Socket ID in message", socket.socket.id);
 	const [messageValue, setMessageValue] = useState('');
 
 	const handleMessageInput = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -18,6 +21,15 @@ const MessageComponent: React.FC = () => {
 			content: messageValue,
 			post_datetime: new Date(),
 			conversationName: "UnAutreSuperChan",
+		}
+
+		if (socketInUSe.connected) {
+			socketInUSe.emit('message', messageDto, () => {
+				console.log("Message Sent!");
+			});
+		}
+		else {
+			console.log("Socket not connected");
 		}
 
 		const response = await fetch('http://localhost:3001/chat/newMessage', {
