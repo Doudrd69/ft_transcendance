@@ -9,20 +9,26 @@ const MessageComponent = (socket: {socket: Socket}) => {
 	const [messageValue, setMessageValue] = useState('');
 
 	const handleMessageInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setMessageValue(e.target.value); // Update conversationValue state with the input value
+		setMessageValue(e.target.value);
 	};
 	
 	const messageDto = {
 		from_login: sessionStorage.getItem("currentUserLogin"),
 		content: messageValue,
 		post_datetime: new Date(),
-		conversationName: "UnAutreSuperChan",
+		conversationName: "test",
 	}
 
 	const handleMessage = async (e: React.FormEvent) => {
 
 		e.preventDefault();
 
+		if (socketInUse.connected) {
+	
+			socketInUse.emit('message', messageDto, () => {
+				console.log("Message has been sent");
+			});
+		}
 		
 		const response = await fetch('http://localhost:3001/chat/newMessage', {
 			method: 'POST',
@@ -41,21 +47,15 @@ const MessageComponent = (socket: {socket: Socket}) => {
 
 	}
 	
-	useEffect(() => {
-		if (socketInUse.connected) {
+	// useEffect(() => {
+	// 	else {
+	// 		console.log("Socket not connected");
+	// 	}
 
-			socketInUse.emit('message', messageDto, () => {
-				console.log("Message Sent!");
-			});
-		}
-		else {
-			console.log("Socket not connected");
-		}
-
-		return () => {
-			socketInUse.off('message');
-		}
-	}, [socketInUse])
+	// 	return () => {
+	// 		socketInUse.off('message');
+	// 	}
+	// }, [socketInUse])
 
 	return (
 			<div className="bloc-message">
