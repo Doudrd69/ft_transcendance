@@ -98,14 +98,26 @@ const ReceiveBoxComponent = (socket: {socket: Socket}) => {
 
 	return (
 		<div className="bloc-discussion-chat">
-			{messages.map((message: any) => (
+			<p className="discussion-chat">{newMessage}</p>
+			{messages.map((message: Message) => (
 				<>
 					<p className="discussion-chat">{message.content}</p>
-					<p className="discussion-chat">{message.date}</p>
 				</>
+<<<<<<< HEAD
 		))}
 >>>>>>> cf752e9 (Trying to retreive messages from conversation and display them)
 		</div>
 	)
 };
 export default ReceiveBoxComponent;
+=======
+			))}
+		</div>
+	)
+};
+export default ChatDiscussionComponent;
+
+// On affiche d'abord l'historique des messages
+// Ensuite on affiche le dernier message envoye grace a la bdd
+// On envoie le nouveau message en direct grace au socket
+>>>>>>> 6d405b8 (UPDATE: we have the beginning of a worcking chat)
