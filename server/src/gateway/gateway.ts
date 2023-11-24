@@ -1,6 +1,6 @@
 import { WebSocketGateway, WebSocketServer, SubscribeMessage, MessageBody } from '@nestjs/websockets';
 import { OnModuleInit } from '@nestjs/common'
-import { Server } from 'socket.io'
+import { io, Server } from 'socket.io'
 
 @WebSocketGateway({
   cors: {
@@ -12,7 +12,7 @@ export class GeneralGateway implements OnModuleInit {
 
   @WebSocketServer()
   server: Server;
-
+  
   onModuleInit() {
     this.server.on('connect', (socket) => {
       console.log("Client is connecting...");
@@ -20,7 +20,7 @@ export class GeneralGateway implements OnModuleInit {
       console.log("Client connected: ", socket.id);
     });
   }
-
+  
   @SubscribeMessage('message')
   handleMessage(@MessageBody() dto: any) {
     console.log("Sender is: ", dto.from);
