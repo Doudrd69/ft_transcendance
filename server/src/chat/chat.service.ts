@@ -94,11 +94,7 @@ export class ChatService {
 			console.error("Fatal error: messsages not found");
 			return [];
 		}
-		
-		// Return the last 10 messages
-		const last10Messages = allMessages.slice(-10);
-		console.log("Messages: ", last10Messages);
 
-		return last10Messages; // Reverse the array to get the correct order
+		return allMessages;
 	}
 }
