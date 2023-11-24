@@ -12,16 +12,23 @@ const ChatDiscussionComponent = (socket: {socket: Socket}) => {
 	const conversationName = "test";
 	const socketInUse = socket.socket;
 	const [messages, setMessages] = useState<Message[]>([]);
-	const [newMessage, setNewMessage] = useState("");
+	const [newMessage, setNewMessage] = useState<Message | undefined>();
 
-
-	socketInUse.on('onMessage', (message: Message) => {
-		console.log("Received message from gateway: ", message.content);
-		setNewMessage(message.content);
-
-		getMessage();
-	});
-
+	
+	// Here we retreive the last sent message and set the newMessage for instant display 
+	useEffect(() => {
+		socketInUse.on('onMessage', (message: Message) => {
+			console.log("== TRIGGERED ==");
+			setNewMessage(message);
+		});
+		
+		return () => {
+			console.log("Cleaning socket event");
+			socketInUse.off('onMessage')
+		}
+	}, [socketInUse, messages]);
+	
+	// This function will retreive all the messages from the conversation and set the messages array for display
 	const getMessage = async () => {
 		
 		try {
@@ -38,19 +45,26 @@ const ChatDiscussionComponent = (socket: {socket: Socket}) => {
 		}
 	}
 
+	useEffect(() => {
+		getMessage();
+	}, []);
+
+	useEffect(() => {
+		if (newMessage) {
+			console.log("== CHECK ==");
+			setMessages((prevMessages: Message[]) => [...prevMessages, newMessage]);
+		}
+	}, [newMessage])
+
 	return (
 		<div className="bloc-discussion-chat">
-			<p className="discussion-chat">{newMessage}</p>
 			{messages.map((message: Message) => (
 				<>
 					<p className="discussion-chat">{message.content}</p>
 				</>
 			))}
+			{newMessage && <p className="discussion-chat">{newMessage.content}</p>}
 		</div>
 	)
 };
 export default ChatDiscussionComponent;
-
-// On affiche d'abord l'historique des messages
-// Ensuite on affiche le dernier message envoye grace a la bdd
-// On envoie le nouveau message en direct grace au socket

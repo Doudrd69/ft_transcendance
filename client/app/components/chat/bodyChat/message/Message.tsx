@@ -7,6 +7,7 @@ const MessageComponent = (socket: {socket: Socket}) => {
 	const socketInUse = socket.socket;
 	console.log("Socket ID in message", socket.socket.id);
 	const [messageValue, setMessageValue] = useState('');
+	const [triggerEvent, setTriggerEvent] = useState(false);
 
 	const handleMessageInput = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setMessageValue(e.target.value);
@@ -23,12 +24,7 @@ const MessageComponent = (socket: {socket: Socket}) => {
 
 		e.preventDefault();
 
-		if (socketInUse.connected) {
-	
-			socketInUse.emit('message', messageDto, () => {
-				console.log("Message has been sent");
-			});
-		}
+		setTriggerEvent(true);
 		
 		const response = await fetch('http://localhost:3001/chat/newMessage', {
 			method: 'POST',
@@ -47,15 +43,21 @@ const MessageComponent = (socket: {socket: Socket}) => {
 
 	}
 	
-	// useEffect(() => {
-	// 	else {
-	// 		console.log("Socket not connected");
-	// 	}
+	useEffect(() => {
+		if (socketInUse.connected) {
+	
+			socketInUse.emit('message', messageDto, () => {
+				console.log("Message has been sent");
+			});
+		}
+		else {
+			console.log("Socket not connected");
+		}
 
-	// 	return () => {
-	// 		socketInUse.off('message');
-	// 	}
-	// }, [socketInUse])
+		return () => {
+			socketInUse.off('message');
+		}
+	}, [socketInUse, triggerEvent])
 
 	return (
 			<div className="bloc-message">
