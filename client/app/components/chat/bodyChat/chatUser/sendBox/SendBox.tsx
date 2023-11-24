@@ -6,6 +6,7 @@ const MessageComponent = (socket: {socket: Socket}) => {
 
 	const socketInUse = socket.socket;
 	const [messageValue, setMessageValue] = useState('');
+	const [triggerEvent, setTriggerEvent] = useState(false);
 
 	const handleMessageInput = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setMessageValue(e.target.value);
