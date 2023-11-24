@@ -28,17 +28,17 @@ export class ChatController {
 	@HttpCode(HttpStatus.OK)
 	@Post('newMessage')
 	createNewMessage(@Body() messageDto: MessageDto) {
-		console.log("db: ", messageDto);
 		return this.chatService.createMessage(messageDto);
 	}
 
-	@Get('messages/:id')
+	@Get(':id')
 	getMessage(@Param('id') id: number): Promise<Message | null> {
 		return this.chatService.getMessageById(id);
 	}
 
-	@Get(':conversationName')
-	getMessagesFormConversation(@Param('conversationName') conversationName: string): Message[] {
+	@Get('getMessages/:conversationName')
+	getMessagesFormConversation(@Param('conversationName') conversationName: string): Promise<Message[]> {
+		console.log("convName endpoint");
 		return this.chatService.getLastTenMessages(conversationName);
 	}
 }

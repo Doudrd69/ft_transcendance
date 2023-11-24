@@ -14,15 +14,16 @@ export class GeneralGateway implements OnModuleInit {
 
   onModuleInit() {
     this.server.on('connect', (socket) => {
-      console.log("Connected : ", socket.id);
+      console.log("Client is connecting...");
+      if (socket.connected)
+      console.log("Client connected: ", socket.id);
     });
   }
 
   @SubscribeMessage('message')
-  handleMessage(@MessageBody() dto: any){
+  handleMessage(@MessageBody() dto: any) {
     console.log("Sender: ", dto.from_login);
     this.server.emit('onMessage', {
-      msg: 'New message',
       content: dto.content,
       date: dto.post_datetime,
     });
