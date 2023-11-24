@@ -156,14 +156,19 @@ export class ChatService {
 		return allConversations;
 	}
 
-	getLastTenMessages(conversationName: string): Message[] {
+	async getLastTenMessages(conversationName: string): Promise<Message[]> {
 
-		const allMessages = this.getAllMessages(conversationName);
-
-		// Sort messages by timestamp or another criteria to get the latest ones
-		const sortedMessages = allMessages.sort((a, b) => b.id - a.id);
-
+		console.log("-- GET MESSAGES --");
+		const allMessages = await this.getAllMessages(conversationName);
+		if (!allMessages) {
+			console.error("Fatal error: messsages not found");
+			return [];
+		}
+		
 		// Return the last 10 messages
-		return sortedMessages.slice(0, 10);
+		const last10Messages = allMessages.slice(-10);
+		console.log("Messages: ", last10Messages);
+
+		return last10Messages; // Reverse the array to get the correct order
 	}
 }
