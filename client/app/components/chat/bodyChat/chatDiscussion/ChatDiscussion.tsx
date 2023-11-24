@@ -10,41 +10,28 @@ interface Message {
 const ChatDiscussionComponent = (socket: {socket: Socket}) => {
 
 	const conversationName = "test";
-
 	const socketInUse = socket.socket;
 	const [messages, setMessages] = useState<Message[]>([]);
-	// const [messageContent, setMessageContent] = useState("");
-	// const [dateSent, setDateSent] = useState("");
-  
-	// Reakl-time message rendering
-	useEffect(() => {
-	  // Set up the event listener for 'onMessage' when the component mounts
-	  const onMessageHandler = (data: any) => {
-		console.log(data);
-		// setMessageContent(data.content);
-		// setDateSent(data.date);
-		setMessages((prevMessages: any) => [...prevMessages, data.content]);
-	  };
-	  
-	  socketInUse.on('onMessage', onMessageHandler);
-	  // Clean up the event listener when the component is unmounted
-	  return () => {
-		  socketInUse.off('onMessage', onMessageHandler);
-		};
-	}, [socketInUse]);
+	const [newMessage, setNewMessage] = useState("");
 
-	const getMessage = async (e: React.FormEvent) => {
 
-		e.preventDefault();
+	socketInUse.on('onMessage', (message: Message) => {
+		console.log("Received message from gateway: ", message.content);
+		setNewMessage(message.content);
 
+		getMessage();
+	});
+
+	const getMessage = async () => {
+		
 		try {
-			const response = await fetch ('http://localhost/chat/${conversationName}', {
+			const response = await fetch (`http://localhost:3001/chat/getMessages/${conversationName}`, {
 				method: 'GET',
 			});
-
+			
 			if (response.ok) {
 				const messageList = await response.json();
-				setMessages((prevMessages: any) => [...prevMessages, messageList]);
+				setMessages((prevMessages: Message[]) => [...prevMessages, ...messageList]);
 			}
 		} catch (error) {
 			console.log(error);
@@ -53,13 +40,17 @@ const ChatDiscussionComponent = (socket: {socket: Socket}) => {
 
 	return (
 		<div className="bloc-discussion-chat">
-			{messages.map((message: any) => (
+			<p className="discussion-chat">{newMessage}</p>
+			{messages.map((message: Message) => (
 				<>
 					<p className="discussion-chat">{message.content}</p>
-					<p className="discussion-chat">{message.date}</p>
 				</>
-		))}
+			))}
 		</div>
 	)
 };
 export default ChatDiscussionComponent;
+
+// On affiche d'abord l'historique des messages
+// Ensuite on affiche le dernier message envoye grace a la bdd
+// On envoie le nouveau message en direct grace au socket
