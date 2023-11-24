@@ -1,5 +1,5 @@
 import { SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
-import { Server, Socket } from 'socket.io';
+import { Server, Socket, io } from 'socket.io';
 
 @WebSocketGateway({
   cors: {
@@ -9,6 +9,14 @@ import { Server, Socket } from 'socket.io';
 export class GameGateway {
   @WebSocketServer()
   server: Server;
+
+
+  const gameSocket = io.of("/game");
+  
+  gameSocket.on("connection", socket => {
+    console.log("someone connected");
+  });
+  gameSocket.emit("hi", "everyone!");
 
   @SubscribeMessage('joinMatchmaking')
   handleJoinMatchmaking(client: Socket, user: any): void {
