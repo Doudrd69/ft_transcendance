@@ -6,10 +6,10 @@ export class GameHistoryController
 {
     constructor(private gameHistoryService: GameHistoryService) {}
 
-//     @HttpCode(HttpStatus.OK)
-//     @Post('newGame')
-//     createNewGame(@Body() gameHistorydata: {gameData})
-//     {
-// 		return this.gameHistoryService.createNewGame(gameData); 
-//     }
+    // @HttpCode(HttpStatus.OK)
+    // @Post('newGame')
+    // createNewGame(@Body() gameHistorydata: {gameData})
+    // {
+		//   return this.gameHistoryService.createNewGame(gameData); 
+    // }
 }
