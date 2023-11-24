@@ -12,6 +12,7 @@ import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { ChatModule } from './chat/chat.module';
 import { GatewayModule } from './gateway/gateway.module';
+import { GameGateway } from './game/game.gateway';
 
 //We set the synchronize option to true, which means that TypeORM will automatically
 //generate database tables based on the entities. However, this option should be used
@@ -54,5 +55,10 @@ if (!dbPass || !dbUsername || !dbName || !dbHost) {
 
   ],
   controllers: [AppController],
+<<<<<<< HEAD
+=======
+  providers: [GameGateway],
+  // providers: [AppService],
+>>>>>>> add gateway
 })
 export class AppModule {}
