@@ -76,7 +76,9 @@ export default function Home() {
 	useEffect(() => {
 
 		socket.on('connect', () => {
-			console.log('Youpi une connexion!');
+			console.log('Client is connecting... ');
+			if (socket.connected)
+				console.log("Client connected: ", socket.id);
 		})
 
 		socket.on('disconnect', () => {

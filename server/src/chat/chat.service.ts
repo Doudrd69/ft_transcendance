@@ -20,6 +20,19 @@ export class ChatService {
 		private usersRepository: Repository<User>,
 	) {}
 
+	private async getAllMessages(conversationName: string): Promise<Message[]> {
+
+		console.log("Conv to search: ", conversationName);
+		const conversation = await this.conversationRepository.find({ where: {name: conversationName} });
+		if (!conversation) {
+			console.error("Conversatio  not found");
+			return [];
+		}
+
+		const messages = await this.messageRepository.find({ where: {conversation: conversation}});
+		return messages;
+	}
+
 	createConversation(conversationName, socketValue): Promise<Conversation> {
 		console.log("-- createConversation --");
 		console.log("Conversation to be created: ", conversationName);
@@ -46,7 +59,6 @@ export class ChatService {
 	async createMessage(messageDto: MessageDto) {
 		console.log("-- createMessage --");
 		await this.conversationRepository.find({ where: {name: messageDto.conversationName} }).then(result => {
-			console.log("========== ", messageDto.from_login);
 			const newMessage = this.messageRepository.create({
 				from_login: messageDto.from_login,
 				content: messageDto.content,
@@ -70,7 +82,23 @@ export class ChatService {
 		return this.groupMemberRepository.save(newGroupMember);
 	}
 
-	getMessageById(id) {
-		return this.messageRepository.findOne(id);
+	getMessageById(id: number) {
+		return this.messageRepository.findOne({ where: {id: id} });
+	}
+
+	async getLastTenMessages(conversationName: string): Promise<Message[]> {
+
+		console.log("-- GET MESSAGES --");
+		const allMessages = await this.getAllMessages(conversationName);
+		if (!allMessages) {
+			console.error("Fatal error: messsages not found");
+			return [];
+		}
+		
+		// Return the last 10 messages
+		const last10Messages = allMessages.slice(-10);
+		console.log("Messages: ", last10Messages);
+
+		return last10Messages; // Reverse the array to get the correct order
 	}
 }
