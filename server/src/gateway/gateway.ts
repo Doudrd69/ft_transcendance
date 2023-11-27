@@ -23,10 +23,12 @@ export class GeneralGateway implements OnModuleInit {
 
   @SubscribeMessage('message')
   handleMessage(@MessageBody() dto: any) {
-    console.log("Sender is: ", dto.from_login);
+    console.log("Sender is: ", dto.from);
     this.server.emit('onMessage', {
+      from: dto.from,
       content: dto.content,
-      date: dto.post_datetime,
+      post_datetime: dto.post_datetime,
+      conversationName: dto.conversationName,
     });
   }
 }
