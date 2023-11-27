@@ -39,14 +39,31 @@
 .discussion-chat-content{
 	font-family: 'Courier New', Courier, monospace;
 	margin: 10px;
-	margin-top: 5%;
-	background-color:slategray;
-	padding: 2%;
 	width: fit-content;
-	border-radius: 15px 15px 15px 5px;
 }
-
-.discussion-chat-date{
+  
+.my-message {
+	/* Your styling for messages sent by you */
+	background-color:cornflowerblue; /* Change this to your desired style */
+	border-radius: 15px 15px 5px 15px;
+	margin-left: auto;
+	
+}
+  
+.other-message {
+	/* Your styling for messages sent by others */
+	background-color: slategray; /* Change this to your desired style */
+	border-radius: 15px 15px 15px 5px;
+	margin-right: auto;
+	width: fit-content;
+}
+  
+.discussion-chat-content {
+	font-family: 'Courier New', Courier, monospace;
+	padding: 2%;
+}
+  
+.discussion-chat-date {
 	font-family: 'Courier New', Courier, monospace;
 	font-size: small;
 	margin: 10px;
