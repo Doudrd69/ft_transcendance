@@ -7,6 +7,7 @@ import { Server } from 'socket.io'
     origin: ['http://localhost:3000']
   },
 })
+
 export class GeneralGateway implements OnModuleInit {
 
   @WebSocketServer()
@@ -22,7 +23,7 @@ export class GeneralGateway implements OnModuleInit {
 
   @SubscribeMessage('message')
   handleMessage(@MessageBody() dto: any) {
-    console.log("Sender: ", dto.from_login);
+    console.log("Sender is: ", dto.from_login);
     this.server.emit('onMessage', {
       content: dto.content,
       date: dto.post_datetime,

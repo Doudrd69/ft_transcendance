@@ -15,7 +15,7 @@ import { GeneralGateway } from 'src/gateway/gateway';
 		TypeOrmModule.forFeature([Message]),
 		TypeOrmModule.forFeature([User])
 	],
-	providers: [ChatService, GeneralGateway],
+	providers: [ChatService],
 	exports: [ChatService],
 	controllers: [ChatController],
 })
