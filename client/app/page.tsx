@@ -173,10 +173,6 @@ export default function Home() {
 			console.log('Disconnected from the server');
 		})
 
-		socket.on('disconnect', () => {
-			console.log('Disconnected from the server');
-		})
-
 		return () => {
 			console.log('Unregistering events...');
 			userSocket.off('connect');
