@@ -7,7 +7,7 @@ export class Message {
   id: number;
 
   @Column()
-  from_login: string;
+  from: string;
 
   @Column()
   content: string;

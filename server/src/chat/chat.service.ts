@@ -60,14 +60,14 @@ export class ChatService {
 		console.log("-- createMessage --");
 		await this.conversationRepository.find({ where: {name: messageDto.conversationName} }).then(result => {
 			const newMessage = this.messageRepository.create({
-				from_login: messageDto.from_login,
+				from: messageDto.from,
 				content: messageDto.content,
 				post_datetime: messageDto.post_datetime,
 				conversation: result[0],
 			});
 			return this.messageRepository.save(newMessage);
 		}).catch(error => {
-			console.log("== Error in message creation ==");
+			console.log(error);
 		});
 		return;
 	}
