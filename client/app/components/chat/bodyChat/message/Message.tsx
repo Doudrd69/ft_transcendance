@@ -12,8 +12,8 @@ const MessageComponent = (socket: {socket: Socket}) => {
 	};
 	
 	const messageDto = {
-		// from: sessionStorage.getItem("currentUserLogin"),
-		from: "ebrodeur",
+		from: sessionStorage.getItem("currentUserLogin"), // when 42log is true
+		// from: "ebrodeur",	// when 42log is false
 		content: messageValue,
 		post_datetime: new Date(),
 		conversationName: "test2",

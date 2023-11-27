@@ -11,8 +11,17 @@ interface Message {
 
 const ChatDiscussionComponent = (socket: {socket: Socket}) => {
 
+	
+	const conversationName = "test2";
+	const socketInUse = socket.socket;
+	const [messages, setMessages] = useState<Message[]>([]);
+	
+	const isMyMessage = (message: Message): boolean => {
+		return message.from === sessionStorage.getItem("currentUserLogin");
+	};
+	
 	const formatDateTime = (dateTimeString: string) => {
-		const options = {
+		const options: Intl.DateTimeFormatOptions = {
 		  day: 'numeric',
 		  month: 'numeric',
 		  year: 'numeric',
@@ -24,14 +33,6 @@ const ChatDiscussionComponent = (socket: {socket: Socket}) => {
 		const formattedDate = new Intl.DateTimeFormat('en-GB', options).format(new Date(dateTimeString));
 		return formattedDate;
 	  };
-
-	const conversationName = "test2";
-	const socketInUse = socket.socket;
-	const [messages, setMessages] = useState<Message[]>([]);
-
-	const isMyMessage = (message: Message): boolean => {
-		return message.from === "ebrodeur";
-	};
 
 	// This function will retreive all the messages from the conversation and set the messages array for display
 	const getMessage = async () => {
@@ -72,8 +73,10 @@ const ChatDiscussionComponent = (socket: {socket: Socket}) => {
 		<div className="bloc-discussion-chat">
 			{messages.map((message: Message) => (
 				<>
-					<p className="discussion-chat-content">{message.content}</p>
-					<p className="discussion-chat-date">{formatDateTime(message.post_datetime)}</p>
+				    <div className={`message-container ${isMyMessage(message) ? 'my-message' : 'other-message'}`}>
+						<p className="discussion-chat-content">{message.content}</p>
+						<p className="discussion-chat-date">{formatDateTime(message.post_datetime)}</p>
+					</div>
 				</>
 			))}
 		</div>
