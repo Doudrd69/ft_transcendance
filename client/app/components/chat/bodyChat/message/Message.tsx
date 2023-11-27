@@ -5,7 +5,6 @@ import { Socket } from 'socket.io-client'
 const MessageComponent = (socket: {socket: Socket}) => {
 
 	const socketInUse = socket.socket;
-	console.log("Socket ID in message", socket.socket.id);
 	const [messageValue, setMessageValue] = useState('');
 
 	const handleMessageInput = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -24,10 +23,10 @@ const MessageComponent = (socket: {socket: Socket}) => {
 		e.preventDefault();
 
 		if (socketInUse.connected) {
-	
 			socketInUse.emit('message', messageDto, () => {
-				console.log("Message has been sent");
+				console.log("!! SOCKET EMIT on message !!");
 			});
+			socketInUse.off('message');
 		}
 		
 		const response = await fetch('http://localhost:3001/chat/newMessage', {
@@ -48,10 +47,6 @@ const MessageComponent = (socket: {socket: Socket}) => {
 	}
 	
 	// useEffect(() => {
-	// 	else {
-	// 		console.log("Socket not connected");
-	// 	}
-
 	// 	return () => {
 	// 		socketInUse.off('message');
 	// 	}

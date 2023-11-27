@@ -22,7 +22,7 @@ export class ChatService {
 
 	private async getAllMessages(conversationName: string): Promise<Message[]> {
 
-		console.log("Conv to search: ", conversationName);
+		console.log("Searching for: ", conversationName, " conversation");
 		const conversation = await this.conversationRepository.find({ where: {name: conversationName} });
 		if (!conversation) {
 			console.error("Conversatio  not found");
@@ -86,19 +86,14 @@ export class ChatService {
 		return this.messageRepository.findOne({ where: {id: id} });
 	}
 
-	async getLastTenMessages(conversationName: string): Promise<Message[]> {
+	async getMessages(conversationName: string): Promise<Message[]> {
 
-		console.log("-- GET MESSAGES --");
 		const allMessages = await this.getAllMessages(conversationName);
 		if (!allMessages) {
 			console.error("Fatal error: messsages not found");
 			return [];
 		}
-		
-		// Return the last 10 messages
-		const last10Messages = allMessages.slice(-10);
-		console.log("Messages: ", last10Messages);
 
-		return last10Messages; // Reverse the array to get the correct order
+		return allMessages;
 	}
 }

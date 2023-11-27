@@ -5,12 +5,10 @@ import { MessageDto } from './dto/message.dto';
 import { User } from '../users/entities/users.entity'
 import { Conversation } from './entities/conversation.entity';
 import { Message } from './entities/message.entity';
-import { GeneralGateway } from 'src/gateway/gateway';
 
 @Controller('chat')
 export class ChatController {
-	constructor(private chatService: ChatService,
-				private gateway: GeneralGateway) {}
+	constructor(private chatService: ChatService) {}
 	
 	@HttpCode(HttpStatus.OK)
 	@Post('newConversation')
@@ -37,8 +35,8 @@ export class ChatController {
 	}
 
 	@Get('getMessages/:conversationName')
-	getMessagesFormConversation(@Param('conversationName') conversationName: string): Promise<Message[]> {
+	getMessagesFromConversation(@Param('conversationName') conversationName: string): Promise<Message[]> {
 		console.log("convName endpoint");
-		return this.chatService.getLastTenMessages(conversationName);
+		return this.chatService.getMessages(conversationName);
 	}
 }
