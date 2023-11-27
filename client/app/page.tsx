@@ -17,7 +17,7 @@ export default function Home() {
 	
 	const socket = io('http://localhost:3001');
 
-	const [showLogin, setShowLogin] = useState(false);
+	const [showLogin, setShowLogin] = useState(true);
 	const [show2FAForm, setShow2FAForm] = useState(false);
 
 	const searchParams = useSearchParams();
