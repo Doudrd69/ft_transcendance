@@ -11,8 +11,7 @@ import { GeneralGateway } from 'src/gateway/gateway';
 
 @Controller('chat')
 export class ChatController {
-	constructor(private chatService: ChatService,
-				private gateway: GeneralGateway) {}
+	constructor(private chatService: ChatService) {}
 	
 	@HttpCode(HttpStatus.OK)
 	@Post('newConversation')
