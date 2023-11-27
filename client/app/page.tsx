@@ -193,8 +193,13 @@ export default function Home() {
 					show2FAForm ? (<TFAComponent on2FADone={handle2FADone} />) :
 					(
 					  <div className="container">
+<<<<<<< HEAD
                         <ToastContainer />
 						<Chat socket={userSocket}/>
+=======
+						<ToastContainer />
+						<Chat userSocket={userSocket}/>
+>>>>>>> 689eafd (gateway try)
 						<GameProvider>
 						  <Game />
 						</GameProvider>
