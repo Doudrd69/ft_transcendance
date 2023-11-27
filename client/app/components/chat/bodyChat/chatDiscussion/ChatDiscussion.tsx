@@ -12,8 +12,26 @@ interface Message {
 
 const ReceiveBoxComponent = (socket: {socket: Socket}) => {
 
+<<<<<<< HEAD
 	const { state } = useChat();
 	// const conversationName = state.currentConversation;
+=======
+	const formatDateTime = (dateTimeString: string) => {
+		const options = {
+		  day: 'numeric',
+		  month: 'numeric',
+		  year: 'numeric',
+		  hour: '2-digit',
+		  minute: '2-digit',
+		  second: '2-digit',
+		};
+	  
+		const formattedDate = new Intl.DateTimeFormat('en-GB', options).format(new Date(dateTimeString));
+		return formattedDate;
+	  };
+
+	const conversationName = "test2";
+>>>>>>> c98ea9b (Display fixed)
 	const socketInUse = socket.socket;
 	const [messages, setMessages] = useState<Message[]>([]);
 	const messagesContainerRef = useRef<HTMLDivElement>(null);
