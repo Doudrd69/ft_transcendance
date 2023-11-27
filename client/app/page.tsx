@@ -16,8 +16,8 @@ import { io, Socket } from 'socket.io-client'
 export default function Home() {
 	
 	const socket = io('http://localhost:3001');
-	const userSocket = io('http://localhost:3001/')
-	const gameSocket = io('http://localhost:3001/')
+	const userSocket = io('http://localhost:3001/user')
+	const gameSocket = io('http://localhost:3001/game')
 
 	const [showLogin, setShowLogin] = useState(true);
 	const [show2FAForm, setShow2FAForm] = useState(false);
@@ -77,18 +77,18 @@ export default function Home() {
 
 	useEffect(() => {
 
-		socket.on('connect', () => {
+		userSocket.on('connect', () => {
 			console.log('Youpi une connexion!');
 		})
 
-		socket.on('disconnect', () => {
+		userSocket.on('disconnect', () => {
 			console.log('Disconnected from the server');
 		})
 
 		return () => {
 			console.log('Unregistering events...');
-			socket.off('connect');
-			socket.off('disconnect');
+			userSocket.off('connect');
+			userSocket.off('disconnect');
 		}
 	})
 
@@ -107,7 +107,7 @@ export default function Home() {
 					show2FAForm ? (<TFAComponent on2FADone={handle2FADone} />) :
 					(
 					  <div className="container">
-						<Chat socket={socket}/>
+						<Chat userSocket={userSocket}/>
 						<GameProvider>
 						  <Game />
 						</GameProvider>

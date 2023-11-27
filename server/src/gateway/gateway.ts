@@ -1,8 +1,9 @@
 import { WebSocketGateway, WebSocketServer, SubscribeMessage, MessageBody } from '@nestjs/websockets';
 import { OnModuleInit } from '@nestjs/common'
-import { io, Server } from 'socket.io'
+import { Server } from 'socket.io'
 
 @WebSocketGateway({
+  namespace: 'user',
   cors: {
     origin: ['http://localhost:3000']
   },
