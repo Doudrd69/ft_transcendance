@@ -1,22 +1,36 @@
-import './ChatDiscussion.css'
-import React, { useState , useEffect } from 'react';
+import './ReceiveBoxChannel.css'
+import React, { useState , useEffect, useRef } from 'react';
 import { Socket } from 'socket.io-client'
+import { useChat } from '../../../ChatContext';
 
 interface Message {
 	from: string;
 	content: string;
-<<<<<<< HEAD
-	date: string;
-=======
 	post_datetime: string;
 	conversationName: string;
->>>>>>> 61b0433 (Display fixed)
 }
 
-const ChatDiscussionComponent = (socket: {socket: Socket}) => {
+const ReceiveBoxChannelComponent = (socket: {socket: Socket}) => {
 
+	const { state } = useChat();
+	// const conversationName = state.currentConversation;
+	const socketInUse = socket.socket;
+	const [messages, setMessages] = useState<Message[]>([]);
+	const messagesContainerRef = useRef<HTMLDivElement>(null);
+	
+	const isMyMessage = (message: Message): boolean => {
+		return message.from === sessionStorage.getItem("currentUserLogin");
+	};
+
+	const scrollToBottom = () => {
+		if (messagesContainerRef.current) {
+		  const container = messagesContainerRef.current;
+		  container.scrollTop = container.scrollHeight;
+		}
+	};
+	
 	const formatDateTime = (dateTimeString: string) => {
-		const options = {
+		const options: Intl.DateTimeFormatOptions = {
 		  day: 'numeric',
 		  month: 'numeric',
 		  year: 'numeric',
@@ -29,31 +43,11 @@ const ChatDiscussionComponent = (socket: {socket: Socket}) => {
 		return formattedDate;
 	  };
 
-	const conversationName = "test2";
-	const socketInUse = socket.socket;
-	const [messages, setMessages] = useState<Message[]>([]);
-	const [newMessage, setNewMessage] = useState("");
-
-
-	socketInUse.on('onMessage', (message: Message) => {
-		console.log("Received message from gateway: ", message.content);
-		setNewMessage(message.content);
-
-		getMessage();
-	});
-
-<<<<<<< HEAD
-=======
-	const isMyMessage = (message: Message): boolean => {
-		return message.from === "ebrodeur";
-	};
-
 	// This function will retreive all the messages from the conversation and set the messages array for display
->>>>>>> 61b0433 (Display fixed)
 	const getMessage = async () => {
 		
 		try {
-			const response = await fetch (`http://localhost:3001/chat/getMessages/${conversationName}`, {
+			const response = await fetch (`http://localhost:3001/chat/getMessages/${state.currentConversation}`, {
 				method: 'GET',
 			});
 			
@@ -66,8 +60,6 @@ const ChatDiscussionComponent = (socket: {socket: Socket}) => {
 		}
 	}
 
-<<<<<<< HEAD
-=======
 	// Here we retreive the last sent message and we "insert" it in the messages array
 	useEffect(() => {
 		socketInUse.on('onMessage', (message: Message) => {
@@ -86,21 +78,21 @@ const ChatDiscussionComponent = (socket: {socket: Socket}) => {
 		getMessage();
 	}, []);
 
->>>>>>> 61b0433 (Display fixed)
+	useEffect(() => {
+		scrollToBottom();
+	}, [messages]);
+
 	return (
-		<div className="bloc-discussion-chat">
-			<p className="discussion-chat">{newMessage}</p>
-			{messages.map((message: Message) => (
+		<div ref={messagesContainerRef} className="bloc-channel-chat">
+			{messages.map((message: Message, id: number) => (
 				<>
-					<p className="discussion-chat-content">{message.content}</p>
-					<p className="discussion-chat-date">{formatDateTime(message.post_datetime)}</p>
+					<div key={id} className={`message-container ${isMyMessage(message) ? 'my-message' : 'other-message'}`}>
+						<p className="channel-chat-content">{message.content}</p>
+						<p className="channel-chat-date">{formatDateTime(message.post_datetime)}</p>
+					</div>
 				</>
 			))}
 		</div>
 	)
 };
-export default ChatDiscussionComponent;
-
-// On affiche d'abord l'historique des messages
-// Ensuite on affiche le dernier message envoye grace a la bdd
-// On envoie le nouveau message en direct grace au socket
+export default ReceiveBoxChannelComponent;
