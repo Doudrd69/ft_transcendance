@@ -3,6 +3,7 @@ import { OnModuleInit } from '@nestjs/common'
 import { Server } from 'socket.io'
 
 @WebSocketGateway({
+  namespace: 'user',
   cors: {
     origin: ['http://localhost:3000']
   },
