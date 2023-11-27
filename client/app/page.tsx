@@ -146,10 +146,6 @@ export default function Home() {
 			console.log('Disconnected from the server');
 		})
 
-		socket.on('disconnect', () => {
-			console.log('Disconnected from the server');
-		})
-
 		return () => {
 			console.log('Unregistering events...');
 			userSocket.off('connect');
@@ -189,7 +185,7 @@ export default function Home() {
 					show2FAForm ? (<TFAComponent on2FADone={handle2FADone} />) :
 					(
 					  <div className="container">
-						<Chat socket={userSocket}/>
+						<Chat userSocket={userSocket}/>
 						<GameProvider>
 						  <Game />
 						</GameProvider>
