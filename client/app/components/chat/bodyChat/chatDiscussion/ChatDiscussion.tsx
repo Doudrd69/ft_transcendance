@@ -3,8 +3,10 @@ import React, { useState , useEffect } from 'react';
 import { Socket } from 'socket.io-client'
 
 interface Message {
+	from: string;
 	content: string;
-	date: string;
+	post_datetime: string;
+	conversationName: string;
 }
 
 const ChatDiscussionComponent = (socket: {socket: Socket}) => {
@@ -50,6 +52,24 @@ const ChatDiscussionComponent = (socket: {socket: Socket}) => {
 			console.log(error);
 		}
 	}
+
+	// Here we retreive the last sent message and we "insert" it in the messages array
+	useEffect(() => {
+		socketInUse.on('onMessage', (message: Message) => {
+			if (message)
+				setMessages((prevMessages: Message[]) => [...prevMessages, message]);
+		});
+		
+		return () => {
+			socketInUse.off('onMessage')
+		}
+	}, [socketInUse]);
+	
+	// Loading the conversation (retrieving all messages on component rendering)
+	useEffect(() => {
+		console.log("Loading conversation...");
+		getMessage();
+	}, []);
 
 	return (
 		<div className="bloc-discussion-chat">

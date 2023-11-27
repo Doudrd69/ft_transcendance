@@ -13,7 +13,8 @@ const MessageComponent = (socket: {socket: Socket}) => {
 	};
 	
 	const messageDto = {
-		from_login: sessionStorage.getItem("currentUserLogin"),
+		// from: sessionStorage.getItem("currentUserLogin"),
+		from: "ebrodeur",
 		content: messageValue,
 		post_datetime: new Date(),
 		conversationName: "UnAutreSuperChan",
