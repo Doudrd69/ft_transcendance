@@ -150,5 +150,3 @@ export default function Home() {
 			</RootLayout>
 	)
 }
-
-// https://www.delightfulengineering.com/blog/nest-websockets/basics

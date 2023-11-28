@@ -8,6 +8,25 @@ const HeaderComponent: React.FC = () => {
 	const [handle2faButton, set2faButtonValue] = useState('');
 	const [authenticatorCodeInput, setAuthenticatorCodeInput] = useState('');
 	const [username, setUsername] = useState('');
+	const [notification, setNotification] = useState(0);
+
+	const notify = () => { 
+		
+		console.log(notification);
+		switch (notification) {
+
+			case 0:
+				return ;
+			
+			case 1:
+				toast("Username has been updated");
+				return ;
+
+			case 2:
+				toast("Authenticator code is verified");
+		}
+	};
+
 
 	const notify = (flag: number) => { 
 		
