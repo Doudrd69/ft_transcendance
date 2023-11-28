@@ -1,6 +1,10 @@
 import './DiscussionList.css'
-import React from 'react';
-import {useChat} from '../../ChatContext'
+import React, { useEffect, useState } from 'react';
+import { useChat } from '../../ChatContext'
+
+interface Conversation {
+	name: string;
+}
 
 const DiscussionListComponent: React.FC = () => {
 
@@ -16,6 +20,30 @@ const DiscussionListComponent: React.FC = () => {
 	// 	const userData = await Response.json();
 	// 	userData.login();
 	// }
+
+	const [conversations, setConversations] = useState<Conversation[]>([]);
+	const user = sessionStorage.getItem("currentUserLogin");
+
+	const loadDiscussions = async () => {
+
+		const response = await fetch(`http://localhost:3001/chat/getConversations/${user}`, {
+			method: 'GET',
+		});
+
+		if (response.ok) {
+			const userData = await response.json();
+			setConversations((prevConversations: Conversation[]) => [...prevConversations, ...userData]);
+			console.log(conversations);
+		}
+		else {
+			console.log("Fatal error");
+		}
+	};
+
+	// On first render we load each discussion form the back-end (all groups where user is)
+	// and the status of the discussion (if is a user to know if he's online or not)
+	// Then we can update the status through sockets
+ 
 	const {handleChatDiscussion} = useChat();
 	const userData = {
 		discussion: [
@@ -36,7 +64,13 @@ const DiscussionListComponent: React.FC = () => {
 			"on",
 			"on",
 		]
-	};
+	}
+
+	useEffect(() => {
+		console.log("Loading conversations...");
+		loadDiscussions();
+	}, []);
+
 	return (
 		<div className="bloc-discussion-list">
 			{userData.discussion.map((user, index) => (

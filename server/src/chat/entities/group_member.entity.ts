@@ -8,26 +8,20 @@ export class GroupMember {
   @PrimaryGeneratedColumn()
   id: number;
 
-  //FK to conversation_id
-//   @OneToMany(type => Conversation, conversation => conversation.id)
-//   conversation: Conversation[];
-	@OneToOne(() => Conversation)
-	conversation: Conversation;
-
-  //FK vers USER id
   @ManyToMany(type => User)
   @JoinTable({
-	  name: "group_relation", // table name for the junction table of this relation
+	  name: "user_to_conversation",
 	  joinColumn: {
-		  name: "user",
+		  name: "conversation",
 		  referencedColumnName: "id"
 	  },
 	  inverseJoinColumn: {
-		  name: "conversation",
+		  name: "user",
 		  referencedColumnName: "id"
 	  }
   })
-  user: User[];
+  users: User[];
+  // peut etre mettre conversation ici
   
   @Column({ type: 'timestamptz' }) // Recommended
   joined_datetime: Date;
