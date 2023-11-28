@@ -14,11 +14,14 @@ const ReceiveBoxComponent = (socket: {socket: Socket}) => {
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 	const { state } = useChat();
 	// const conversationName = state.currentConversation;
 =======
 =======
 	
+=======
+>>>>>>> aefff37 (Reworked friendship (isse with dto transmission) + trying to implement notifications)
 	const conversationName = "test2";
 	const socketInUse = socket.socket;
 	const [messages, setMessages] = useState<Message[]>([]);

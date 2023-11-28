@@ -134,6 +134,17 @@ export default function Home() {
 	}, [userSocket]);
 
 	useEffect(() => {
+		socket.on('friendRequest', (friendRequestDto: FriendRequestDto) => {
+			if (sessionStorage.getItem("currentUserLogin") === friendRequestDto.recipient)
+				console.log("You received a friend request from ", friendRequestDto.initiator);
+		});
+
+		return () => {
+			socket.off('friendRequest');
+		}
+	}, [socket]);
+
+	useEffect(() => {
 
 		userSocket.on('connect', () => {
 			console.log('Client is connecting... ');
@@ -204,5 +215,3 @@ export default function Home() {
 			</RootLayout>
 	)
 }
-
-// https://www.delightfulengineering.com/blog/nest-websockets/basics
