@@ -43,7 +43,7 @@ export class UsersController {
 	@HttpCode(HttpStatus.OK)
 	@Post('addfriend')
 	createFriendship(@Body() friendRequestDto: FriendRequestDto) {
-		return this.usersService.createFriendship(friendRequestDto.initiatorLogin, friendRequestDto.recipientLogin);
+		return this.usersService.createFriendship(friendRequestDto);
 	}
 
 	@HttpCode(HttpStatus.OK)

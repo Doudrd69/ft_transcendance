@@ -6,6 +6,7 @@ import { User } from './entities/users.entity'
 import { Friendship } from './entities/friendship.entity'
 import { speakeasy } from 'speakeasy'
 import { QRCode } from 'qrcode'
+import { FriendRequestDto } from './dto/FriendRequestDto.dto';
 
 @Injectable()
 export class UsersService {
@@ -84,10 +85,11 @@ export class UsersService {
 		});
 	}
 
-	createFriendship(initiatorLogin: string, recipientLogin: string) {
-		console.log("Friendship creation...");
-		this.getUserByLogin(initiatorLogin).then(initiator => {
-			this.getUserByLogin(recipientLogin).then(friend => {
+	createFriendship(friendRequestDto: FriendRequestDto) {
+		this.getUserByLogin(friendRequestDto.initiatorLogin).then(initiator => {
+			this.getUserByLogin(friendRequestDto.recipientLogin).then(friend => {
+				console.log("Initiator: ", initiator.login);
+				console.log("Recipient: ", friend.login);
 				const newFriendship = this.friendshipRepository.create({ initiator, friend });
 				return this.friendshipRepository.save(newFriendship);
 			}).catch(error => {

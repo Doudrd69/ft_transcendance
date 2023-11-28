@@ -17,7 +17,7 @@ export class GroupMember {
   //FK vers USER id
   @ManyToMany(type => User)
   @JoinTable({
-	  name: "users", // table name for the junction table of this relation
+	  name: "group_relation", // table name for the junction table of this relation
 	  joinColumn: {
 		  name: "user",
 		  referencedColumnName: "id"

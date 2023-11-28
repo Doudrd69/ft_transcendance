@@ -12,9 +12,9 @@ export class ChatController {
 	
 	@HttpCode(HttpStatus.OK)
 	@Post('newConversation')
-	createNewConversation(@Body() data: { formValue: string, socketValue: number }) {
-		const { formValue, socketValue } = data;
-		return this.chatService.createConversation(formValue, socketValue);
+	createNewConversation(@Body() data: { formValue: string, username: string}) {
+		const { formValue, username } = data;
+		return this.chatService.createConversation(formValue, username);
 	}
 
 	@HttpCode(HttpStatus.OK)
