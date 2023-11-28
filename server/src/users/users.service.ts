@@ -100,12 +100,11 @@ export class UsersService {
 		});
 	}
 	
-	updateFriendship(initiatorLogin: string, recipientLogin: string, flag: boolean) {
-		console.log("Friendship request responses processing...");
-		this.getUserByLogin(initiatorLogin).then(initiator => {
-			this.getUserByLogin(recipientLogin).then(friend => {
+	updateFriendship(friendRequestDto: FriendRequestDto, flag: boolean) {
+		this.getUserByLogin(friendRequestDto.initiatorLogin).then(initiator => {
+			this.getUserByLogin(friendRequestDto.recipientLogin).then(friend => {
 				const frienshipToUpdate = initiator.initiatedFriendships.find(
-					(friendship) => friendship.friend.login === recipientLogin
+					(friendship) => friendship.friend.login === friendRequestDto.recipientLogin
 					);
 					if (frienshipToUpdate) {
 						frienshipToUpdate.isAccepted = flag;
@@ -117,7 +116,7 @@ export class UsersService {
 			}).catch(error => {
 				console.log("Error in first promise: ", error);
 			})
-		}
+	}
 		
 	getUserByLogin(loginToSearch: string): Promise<User> {
 		return this.usersRepository.findOne({ where: {login: loginToSearch}});

@@ -11,6 +11,9 @@ import Header from './components/header/Header'
 import Authentificationcomponent from './components/chat/auth/Authentification';
 import { GameProvider } from './components/game/GameContext';
 import { io, Socket } from 'socket.io-client'
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { totalmem } from 'os';
 
 interface FriendRequestDto {
 	initiator: string;
@@ -26,6 +29,13 @@ export default function Home() {
 
 	const searchParams = useSearchParams();
 	const code = searchParams.get('code');
+
+	const notifyFriendRequest = (recipientUsername: string) => { 
+		toast.info("You received a new friend request", {
+			onClose: () => console.log("Notif closed"),
+			autoClose: false,
+		});
+	};
 
 	const setUserSession = async (jwt: string) => {
 
@@ -79,8 +89,10 @@ export default function Home() {
 
 	useEffect(() => {
 		socket.on('friendRequest', (friendRequestDto: FriendRequestDto) => {
-			if (sessionStorage.getItem("currentUserLogin") === friendRequestDto.recipient)
+			if (sessionStorage.getItem("currentUserLogin") === friendRequestDto.recipient) {
 				console.log("You received a friend request from ", friendRequestDto.initiator);
+				notifyFriendRequest(friendRequestDto.initiator);
+			}
 		});
 
 		return () => {

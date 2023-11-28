@@ -17,7 +17,7 @@ const HeaderComponent: React.FC = () => {
 				return ;
 			
 			case 1:
-				toast("Username has been updated");
+				toast.success("Username has been updated");
 				return ;
 
 			case 2:
