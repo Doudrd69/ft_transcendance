@@ -16,6 +16,7 @@ const ChatListComponent: React.FC = () => {
 	// 	const userData = await Response.json();
 	// 	userData.login();
 	// }
+	const { state, dispatch } = useChat();
 
 	const [conversations, setConversations] = useState<Conversation[]>([]);
 	const user = sessionStorage.getItem("currentUserLogin");

@@ -155,15 +155,4 @@ export class ChatService {
 
 		return allConversations;
 	}
-
-	async getMessages(conversationName: string): Promise<Message[]> {
-
-		const allMessages = await this.getAllMessages(conversationName);
-		if (!allMessages) {
-			console.error("Fatal error: messsages not found");
-			return [];
-		}
-
-		return allMessages;
-	}
 }
