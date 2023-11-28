@@ -1,8 +1,10 @@
 import './Add.css';
 import React, { useState } from 'react';
+import { Socket } from 'socket.io-client';
 
-const AddComponent: React.FC = () => {
+const AddComponent = (socket: {socket: Socket}) => {
 
+	const socketInUse = socket.socket;
 	const [formValues, setFormValues] = useState<string[]>(['', '', '']); // Initialisez les valeurs par défaut
 
 	const handleFormInput = (value: string, index: number) => {
@@ -16,13 +18,13 @@ const AddComponent: React.FC = () => {
 		e.preventDefault();
 
 		console.log("Conversation to create :", formValues[index]);
-		const socketValue = 1; // for testing purpose
+		const user = sessionStorage.getItem("currentUserLogin");
 		const response = await fetch('http://localhost:3001/chat/newConversation', {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
 			},
-			body: JSON.stringify({formValue: formValues[index], socketValue}),
+			body: JSON.stringify({formValue: formValues[index], user}),
 		});
 
 		if (response.ok) {
@@ -40,19 +42,25 @@ const AddComponent: React.FC = () => {
 
 		console.log("Friend to add :", formValues[index]);
 		const friendRequestDto = {
-			initiatorLogin: "ebrodeur", // à remplacer
+			initiatorLogin: sessionStorage.getItem("currentUserLogin"), // à remplacer
 			recipientLogin: formValues[index],
 		}
+
 		const response = await fetch('http://localhost:3001/users/addfriend', {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
 			},
-			body: JSON.stringify({friendRequestDto}),
+			body: JSON.stringify(friendRequestDto),
 		});
-
+		
 		if (response.ok) {
 			console.log("Friend request successfully created");
+			if (socketInUse.connected) {
+				socketInUse.emit('addFriend', friendRequestDto, () => {
+					console.log("FriendRequest sent to General gateway");
+				});
+			}
 		}
 		else {
 			console.log("Friend request creation failed");

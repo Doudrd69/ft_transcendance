@@ -33,13 +33,14 @@ export class ChatService {
 		return messages;
 	}
 
-	createConversation(conversationName, socketValue): Promise<Conversation> {
+	createConversation(conversationName: string, username: string): Promise<Conversation> {
 		console.log("-- createConversation --");
 		console.log("Conversation to be created: ", conversationName);
 		// verification
 		const newConversation = this.conversationRepository.create({ name: conversationName });
 		// Creer un groupe en parallele, avec le createur de la conversation
-		this.usersRepository.find({ where: {socket: socketValue} }).then(result => {
+		// attention username != login
+		this.usersRepository.find({ where: {login: username} }).then(result => {
 			this.createGroupMember(newConversation, result[0]).then(result => {
 				console.log("Group successfully created");
 				return ;
@@ -78,7 +79,7 @@ export class ChatService {
 		console.log("-- createGroupMember --");
 		const joined_datetime = new Date();
 		const left_datetime = new Date();
-		const newGroupMember = this.groupMemberRepository.create({ conversation: conversationKey, user: [userKey], joined_datetime, left_datetime });
+		const newGroupMember = this.groupMemberRepository.create({ user: [userKey], conversation: conversationKey, joined_datetime, left_datetime });
 		return this.groupMemberRepository.save(newGroupMember);
 	}
 
