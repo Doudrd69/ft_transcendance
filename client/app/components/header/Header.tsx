@@ -1,11 +1,32 @@
 import './header.css'
 import React, { useState } from 'react';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const HeaderComponent: React.FC = () => {
 
 	const [handle2faButton, set2faButtonValue] = useState('');
 	const [authenticatorCodeInput, setAuthenticatorCodeInput] = useState('');
 	const [username, setUsername] = useState('');
+	const [notification, setNotification] = useState(0);
+
+	const notify = () => { 
+		
+		console.log(notification);
+		switch (notification) {
+
+			case 0:
+				return ;
+			
+			case 1:
+				toast("Username has been updated");
+				return ;
+
+			case 2:
+				toast("Authenticator code is verified");
+		}
+	};
+
 
 	const handleAuthenticatorCodeInput = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setAuthenticatorCodeInput(e.target.value);
@@ -86,6 +107,8 @@ const HeaderComponent: React.FC = () => {
 
 		if (response.ok) {
 			console.log("Username successfully updated!");
+			setNotification(1);
+			notify();
 		}
 		else {
 			console.error("Username cannot be changed");
@@ -102,12 +125,13 @@ const HeaderComponent: React.FC = () => {
 
 				<form onSubmit={checkAuthenticatorCode}>
 					<input type="text" placeholder="Authenticator code..." value={authenticatorCodeInput} onChange={handleAuthenticatorCodeInput}></input>
-					<button type="submit" >CHECK CODE</button>
+					<button type="submit">CHECK CODE</button>
 				</form>
 
 				<form onSubmit={changeUsername}>
 					<input type="text" placeholder="Username..." value={username} onChange={handleUsernameInput}></input>
-					<button type="submit" >Change username</button>
+					<button type="submit">Change username</button>
+					<ToastContainer />
 				</form>
 
 			</div>

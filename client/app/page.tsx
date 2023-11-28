@@ -12,6 +12,10 @@ import Authentificationcomponent from './components/chat/auth/Authentification';
 import { GameProvider } from './components/game/GameContext';
 import { io, Socket } from 'socket.io-client'
 
+interface FriendRequestDto {
+	initiator: string;
+	recipient: string;
+}
 
 export default function Home() {
 	
@@ -74,6 +78,17 @@ export default function Home() {
 	}
 
 	useEffect(() => {
+		socket.on('friendRequest', (friendRequestDto: FriendRequestDto) => {
+			if (sessionStorage.getItem("currentUserLogin") === friendRequestDto.recipient)
+				console.log("You received a friend request from ", friendRequestDto.initiator);
+		});
+
+		return () => {
+			socket.off('friendRequest');
+		}
+	}, [socket]);
+
+	useEffect(() => {
 
 		socket.on('connect', () => {
 			console.log('Client is connecting... ');
@@ -117,5 +132,3 @@ export default function Home() {
 			</RootLayout>
 	)
 }
-
-// https://www.delightfulengineering.com/blog/nest-websockets/basics

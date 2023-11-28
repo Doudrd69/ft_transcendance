@@ -11,7 +11,6 @@ interface Message {
 
 const ChatDiscussionComponent = (socket: {socket: Socket}) => {
 
-	
 	const conversationName = "test2";
 	const socketInUse = socket.socket;
 	const [messages, setMessages] = useState<Message[]>([]);
