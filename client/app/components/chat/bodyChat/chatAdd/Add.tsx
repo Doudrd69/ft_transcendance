@@ -17,10 +17,10 @@ const AddComponent = (socket: {socket: Socket}) => {
 
 		e.preventDefault();
 
-		console.log("Conversation to create :", formValues[index]);
 		const conversationDto = {
 			name: formValues[index],
 			username: sessionStorage.getItem("currentUserLogin"),
+			is_channel: true,
 		}
 
 		const response = await fetch('http://localhost:3001/chat/newConversation', {
@@ -44,9 +44,8 @@ const AddComponent = (socket: {socket: Socket}) => {
 
 		e.preventDefault();
 
-		console.log("Friend to add :", formValues[index]);
 		const friendRequestDto = {
-			initiatorLogin: sessionStorage.getItem("currentUserLogin"), // à remplacer
+			initiatorLogin: sessionStorage.getItem("currentUserLogin"),
 			recipientLogin: formValues[index],
 		}
 
@@ -59,10 +58,14 @@ const AddComponent = (socket: {socket: Socket}) => {
 		});
 		
 		if (response.ok) {
-			console.log("Friend request successfully created");
-			if (socketInUse.connected) {
+			const data = await response.text();
+			const parsedData = data ? JSON.parse(data) : null;
+		
+			console.log("From back --> ", parsedData);
+
+			if (socketInUse.connected && parsedData) {
 				socketInUse.emit('addFriend', friendRequestDto, () => {
-					console.log("FriendRequest sent to General gateway");
+					console.log("FriendRequest sent to gateway");
 				});
 			}
 		}
