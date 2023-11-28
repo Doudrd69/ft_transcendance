@@ -145,6 +145,17 @@ export default function Home() {
 
 	// Socket use-effect
 	useEffect(() => {
+		socket.on('friendRequest', (friendRequestDto: FriendRequestDto) => {
+			if (sessionStorage.getItem("currentUserLogin") === friendRequestDto.recipient)
+				console.log("You received a friend request from ", friendRequestDto.initiator);
+		});
+
+		return () => {
+			socket.off('friendRequest');
+		}
+	}, [socket]);
+
+	useEffect(() => {
 
 		userSocket.on('connect', () => {
 			console.log('Client is connecting... ');
