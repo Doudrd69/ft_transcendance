@@ -2,6 +2,7 @@ import { Controller, Post, HttpCode, HttpStatus, Body, Get, Param} from '@nestjs
 import { ChatService } from './chat.service';
 import { GroupDto } from './dto/group.dto';
 import { MessageDto } from './dto/message.dto';
+import { ConversationDto } from './dto/conversation.dto';
 import { User } from '../users/entities/users.entity'
 import { Conversation } from './entities/conversation.entity';
 import { Message } from './entities/message.entity';
@@ -12,9 +13,9 @@ export class ChatController {
 	
 	@HttpCode(HttpStatus.OK)
 	@Post('newConversation')
-	createNewConversation(@Body() data: { formValue: string, username: string}) {
-		const { formValue, username } = data;
-		return this.chatService.createConversation(formValue, username);
+	createNewConversation(@Body() conversationDto: ConversationDto) {
+		console.log("user is ", conversationDto.username);
+		return this.chatService.createConversation(conversationDto);
 	}
 
 	@HttpCode(HttpStatus.OK)
@@ -36,7 +37,11 @@ export class ChatController {
 
 	@Get('getMessages/:conversationName')
 	getMessagesFromConversation(@Param('conversationName') conversationName: string): Promise<Message[]> {
-		console.log("convName endpoint");
 		return this.chatService.getMessages(conversationName);
+	}
+
+	@Get('getConversations/:userName')
+	getConversationsFromUser(@Param('userName') userName: string): Promise <Conversation[]> {
+		return this.chatService.getConversations(userName);
 	}
 }

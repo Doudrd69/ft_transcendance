@@ -18,13 +18,18 @@ const AddComponent = (socket: {socket: Socket}) => {
 		e.preventDefault();
 
 		console.log("Conversation to create :", formValues[index]);
-		const user = sessionStorage.getItem("currentUserLogin");
+		const conversationDto = {
+			name: formValues[index],
+			username: sessionStorage.getItem("currentUserLogin"),
+		}
+
+		console.log("user is ", conversationDto.username);
 		const response = await fetch('http://localhost:3001/chat/newConversation', {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
 			},
-			body: JSON.stringify({formValue: formValues[index], user}),
+			body: JSON.stringify(conversationDto),
 		});
 
 		if (response.ok) {
