@@ -8,12 +8,10 @@ const HeaderComponent: React.FC = () => {
 	const [handle2faButton, set2faButtonValue] = useState('');
 	const [authenticatorCodeInput, setAuthenticatorCodeInput] = useState('');
 	const [username, setUsername] = useState('');
-	const [notification, setNotification] = useState(0);
 
-	const notify = () => { 
+	const notify = (flag: number) => { 
 		
-		console.log(notification);
-		switch (notification) {
+		switch (flag) {
 
 			case 0:
 				return ;
@@ -107,8 +105,7 @@ const HeaderComponent: React.FC = () => {
 
 		if (response.ok) {
 			console.log("Username successfully updated!");
-			setNotification(1);
-			notify();
+			notify(1);
 		}
 		else {
 			console.error("Username cannot be changed");
