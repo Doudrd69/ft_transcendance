@@ -1,5 +1,5 @@
 import './ChatDiscussion.css'
-import React, { useState , useEffect } from 'react';
+import React, { useState , useEffect, useRef } from 'react';
 import { Socket } from 'socket.io-client'
 
 interface Message {
@@ -14,9 +14,17 @@ const ChatDiscussionComponent = (socket: {socket: Socket}) => {
 	const conversationName = "test2";
 	const socketInUse = socket.socket;
 	const [messages, setMessages] = useState<Message[]>([]);
+	const messagesContainerRef = useRef<HTMLDivElement>(null);
 	
 	const isMyMessage = (message: Message): boolean => {
 		return message.from === sessionStorage.getItem("currentUserLogin");
+	};
+
+	const scrollToBottom = () => {
+		if (messagesContainerRef.current) {
+		  const container = messagesContainerRef.current;
+		  container.scrollTop = container.scrollHeight;
+		}
 	};
 	
 	const formatDateTime = (dateTimeString: string) => {
@@ -68,8 +76,12 @@ const ChatDiscussionComponent = (socket: {socket: Socket}) => {
 		getMessage();
 	}, []);
 
+	useEffect(() => {
+		scrollToBottom();
+	}, [messages]);
+
 	return (
-		<div className="bloc-discussion-chat">
+		<div ref={messagesContainerRef} className="bloc-discussion-chat">
 			{messages.map((message: Message) => (
 				<>
 				    <div className={`message-container ${isMyMessage(message) ? 'my-message' : 'other-message'}`}>

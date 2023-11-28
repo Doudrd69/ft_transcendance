@@ -47,8 +47,8 @@ export class UsersController {
 	}
 
 	@HttpCode(HttpStatus.OK)
-	@Post('requestresponse')
+	@Post('friendRequestResponse')
 	updateFriendship(@Body() friendRequestDto: FriendRequestDto, flag: boolean) {
-		return this.usersService.updateFriendship(friendRequestDto.initiatorLogin, friendRequestDto.recipientLogin, flag);
+		return this.usersService.updateFriendship(friendRequestDto, flag);
 	}
 }
