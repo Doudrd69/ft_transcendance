@@ -7,6 +7,7 @@ import { Message } from './entities/message.entity';
 import { User } from '../users/entities/users.entity'
 import { MessageDto } from './dto/message.dto';
 import { ConversationDto } from './dto/conversation.dto';
+import { GroupDto } from './dto/group.dto';
 
 import { UsersService } from 'src/users/users.service';
 
@@ -36,6 +37,15 @@ export class ChatService {
 		const messages = await this.messageRepository.find({ where: {conversation: conversation}});
 		return messages;
 	}
+
+	// private async findConversationsForUser(userId: number): Promise<Conversation[]> {
+	// 	return this.groupMemberRepository
+	// 	.createQueryBuilder('groupMember')
+	// 	.leftJoinAndSelect('groupMember.conversations', 'conversation')
+	// 	.leftJoin('groupMember.users', 'user')
+	// 	.where('user.id = :userId', { userId })
+	// 	.getMany();
+	//   }
 
 	private async getAllConversations(userName: string): Promise<Conversation[]> {
 

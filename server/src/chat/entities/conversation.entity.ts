@@ -11,9 +11,6 @@ export class Conversation {
 	@Column()
 	name: string;
 
-	// @OneToOne(() => GroupMember)
-	// group_member: GroupMember;
-
 	@OneToMany(() => Message, (message) => message.conversation)
 	messages: Message[];
   
