@@ -6,6 +6,7 @@ import { ConversationDto } from './dto/conversation.dto';
 import { User } from '../users/entities/users.entity'
 import { Conversation } from './entities/conversation.entity';
 import { Message } from './entities/message.entity';
+import { GroupMember } from './entities/group_member.entity';
 
 @Controller('chat')
 export class ChatController {
@@ -13,15 +14,14 @@ export class ChatController {
 	
 	@HttpCode(HttpStatus.OK)
 	@Post('newConversation')
-	createNewConversation(@Body() conversationDto: ConversationDto) {
-		console.log("user is ", conversationDto.username);
+	createNewConversation(@Body() conversationDto: ConversationDto): Promise<Conversation> {
 		return this.chatService.createConversation(conversationDto);
 	}
 
 	@HttpCode(HttpStatus.OK)
 	@Post('newGroup')
-	createNewGroupMember(@Body() groupDto: GroupDto) {
-		return this.chatService.createGroupMember(groupDto.conversation, groupDto.user);
+	createNewGroupMember(@Body() groupDto: GroupDto): Promise<GroupMember> {
+		return this.chatService.createGroupMember(groupDto);
 	}
 
 	@HttpCode(HttpStatus.OK)

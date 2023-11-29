@@ -7,6 +7,7 @@ import { Message } from './entities/message.entity';
 import { User } from '../users/entities/users.entity'
 import { MessageDto } from './dto/message.dto';
 import { ConversationDto } from './dto/conversation.dto';
+import { GroupDto } from './dto/group.dto';
 
 @Injectable()
 export class ChatService {
@@ -34,52 +35,56 @@ export class ChatService {
 		return messages;
 	}
 
+	// private async findConversationsForUser(userId: number): Promise<Conversation[]> {
+	// 	return this.groupMemberRepository
+	// 	.createQueryBuilder('groupMember')
+	// 	.leftJoinAndSelect('groupMember.conversations', 'conversation')
+	// 	.leftJoin('groupMember.users', 'user')
+	// 	.where('user.id = :userId', { userId })
+	// 	.getMany();
+	//   }
+
 	private async getAllConversations(userName: string): Promise<Conversation[]> {
 
 		// login != username, penser a changer ca
 		const userToFind = await this.usersRepository.findOne({ where: { login: userName } });
 		if (userToFind) {
-			console.log("User --> ", userToFind.login);
-			const groups = await this.groupMemberRepository.find({
-				where: { users: userToFind },
-				relations: ["users"], // Load the associated conversation
+			console.log("Looking for ", userToFind.login, " conversations...");
+			const groups = await this.usersRepository.find({
+				where: { login: userName },
+				relations: ["members"],
 			});
-			if (!groups) {
-				console.error("Fatal error: no groups found");
-				return [];
-			}
 			console.log("Groups --> ", groups);
-			// here i should retreive the conversations from the groups
-			const conversations = groups.map((group: GroupMember) => group.users);
-			console.log("CONV --> ", conversations);
+			// const groups = await this.groupMemberRepository.find({
+			// 	where: { },
+			// 	relations: ["conversations"],
+			// });
+			// if (!groups) {
+			// 	console.error("Fatal error: no groups found");
+			// 	return [];
+			// }
+			// console.log("Groups --> ", groups);
+			// const conversations = groups.map((group: GroupMember) => group.conversations);
+			// // const allConversations = [].concat(...conversations);
+			// console.log("Conv --> ", conversations);
 			return [];
 		}
 		console.error("Fatal error: user not found");
 		return [];
 	}
 
-	createConversation(conversationDto: ConversationDto): Promise<Conversation> {
+	async createConversation(conversationDto: ConversationDto): Promise<Conversation> {
 
-		const newConversation = this.conversationRepository.create({ name: conversationDto.name });
-		// Creer un groupe en parallele, avec le createur de la conversation
-		// attention username != login
-		this.usersRepository.find({ where: {login: conversationDto.username} }).then(result => {
-			this.createGroupMember(newConversation, result[0]).then(result => {
-				console.log("Group successfully created");
-				return ;
-			}).catch(error => {
-				console.log("Error during group creation :", error);
-			});
-			console.log("== Groupe was created, we can save conversation ==");
-			return this.conversationRepository.save(newConversation);
+		await this.usersRepository.findOne({ where: { login: conversationDto.username } }).then(user => {
+			const newConversation = this.conversationRepository.create({ name: conversationDto.name });
+			if (newConversation)
+				return this.conversationRepository.save(newConversation);
 		}).catch(error => {
-			console.log("Error during conversation creation :", error);
+			console.log(error);
 		});
 		return ;
 	}
 
-	// Il faut envoyer la bonne Conversation pour que la FK soit correcte
-	// Revoir la fonction en ajoutant la recherche par socket?
 	async createMessage(messageDto: MessageDto) {
 		console.log("-- createMessage --");
 		await this.conversationRepository.find({ where: {name: messageDto.conversationName} }).then(result => {
@@ -96,15 +101,23 @@ export class ChatService {
 		return;
 	}
 
-	// We call this function with the createConversion: as soon as the conversation
-	// is created, we create the group and give it the conversation entity + the users it needs
-	createGroupMember(conversationKey: Conversation, userKey: User): Promise<GroupMember> {
-		console.log("-- createGroupMember --");
-		console.log("Add ", userKey.login);
-		const joined_datetime = new Date();
-		const left_datetime = new Date();
-		const newGroupMember = this.groupMemberRepository.create({ users: [userKey], joined_datetime, left_datetime });
-		return this.groupMemberRepository.save(newGroupMember);
+	async createGroupMember(groupDto: GroupDto): Promise<GroupMember> {
+		
+		console.log("-- Creating Group --");
+		const user = await this.usersRepository.findOne({ where: { login: groupDto.user } });
+		const conversation = await this.conversationRepository.findOne({ where: { name: groupDto.conversation} });
+
+		if (user && conversation) {
+			console.log("--> Linking conversation ", conversation.name, " with ID ", conversation.id ," to user ", user.login);
+			const joined_datetime = new Date();
+			const left_datetime = new Date();
+			const newGroup = this.groupMemberRepository.create({ conversation: conversation, joined_datetime, left_datetime });
+			this.groupMemberRepository.save(newGroup);
+			user.members = [newGroup];
+			this.usersRepository.save(user);
+			return newGroup;
+		}
+		return ;
 	}
 
 	getMessageById(id: number) {

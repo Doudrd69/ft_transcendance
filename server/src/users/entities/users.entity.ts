@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToMany, OneToMany } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToMany, OneToMany, JoinTable, JoinColumn, } from 'typeorm';
 import { GroupMember } from '../../chat/entities/group_member.entity'
 import { Friendship } from './friendship.entity';
 
@@ -38,6 +38,17 @@ export class User {
   isActive: boolean;
 
   @ManyToMany(type => GroupMember)
+  @JoinTable({
+	  name: "user_to_member",
+	  joinColumn: {
+		  name: "user",
+		  referencedColumnName: "id"
+	  },
+	  inverseJoinColumn: {
+		  name: "member",
+		  referencedColumnName: "id"
+	  }
+  })
   members: GroupMember[];
 
   @OneToMany(() => Friendship, (friendship) => friendship.initiator)
