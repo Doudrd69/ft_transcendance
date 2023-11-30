@@ -10,34 +10,6 @@ export class GroupMember {
 
   @ManyToOne(() => Conversation)
   conversation: Conversation;
-
-  // @ManyToMany(type => User)
-  // @JoinTable({
-	//   name: "user_to_conversation",
-	//   joinColumn: {
-	// 	  name: "user",
-	// 	  referencedColumnName: "id"
-	//   },
-	//   inverseJoinColumn: {
-	// 	  name: "conversation",
-	// 	  referencedColumnName: "id"
-	//   }
-  // })
-  // users: User[];
-
-  // @ManyToMany(type => Conversation)
-  // @JoinTable({
-	//   name: "user_to_conversation",
-	//   joinColumn: {
-	// 	  name: "conversation",
-	// 	  referencedColumnName: "id"
-	//   },
-	//   inverseJoinColumn: {
-	// 	  name: "user",
-	// 	  referencedColumnName: "id"
-	//   }
-  // })
-  // conversations: Conversation[];
   
   @Column({ type: 'timestamptz' })
   joined_datetime: Date;

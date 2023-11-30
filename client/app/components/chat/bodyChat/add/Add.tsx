@@ -33,27 +33,6 @@ const AddComponent = (socket: {socket: Socket}) => {
 
 		if (response.ok) {
 			console.log("Conversation successfully created");
-			// const conversation = await response.json();
-
-			const groupeMemberDto = {
-				conversation: formValues[index],
-				user: sessionStorage.getItem("currentUserLogin"),
-			}
-
-			const createGroupe = await fetch('http://localhost:3001/chat/newGroup', {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-				body: JSON.stringify(groupeMemberDto),
-			});
-
-			if (createGroupe.ok) {
-				console.log("Group successfullu created");
-			}
-			else {
-				console.log("Group creation failed");
-			}
 		}
 		else {
 			console.log("Conversation creation failed");

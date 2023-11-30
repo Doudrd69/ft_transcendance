@@ -65,13 +65,14 @@ export class UsersService {
 	// 	});
 	// }
 
-	createNew42User(userData) {
-		console.log("In DB registration: ", JSON.stringify(userData));
-		const login = userData.login;
-		const firstname = userData.firstname;
-		const officialProfileImage = userData.image;
-		const socket = userData.socket;
-		const new42User = this.usersRepository.create({ login, firstname, officialProfileImage, socket});
+	async createNew42User(userData) {
+		const new42User = this.usersRepository.create({
+			login: userData.login,
+			firstname: userData.firstname,
+			officialProfileImage: userData.image,
+			socket: userData.socket,
+			conversations: [],
+		});
 		return this.usersRepository.save(new42User);
 	}
 

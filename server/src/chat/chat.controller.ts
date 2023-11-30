@@ -18,11 +18,11 @@ export class ChatController {
 		return this.chatService.createConversation(conversationDto);
 	}
 
-	@HttpCode(HttpStatus.OK)
-	@Post('newGroup')
-	createNewGroupMember(@Body() groupDto: GroupDto): Promise<GroupMember> {
-		return this.chatService.createGroupMember(groupDto);
-	}
+	// @HttpCode(HttpStatus.OK)
+	// @Post('newGroup')
+	// createNewGroupMember(@Body() groupDto: GroupDto): Promise<GroupMember> {
+	// 	return this.chatService.createGroupMember(groupDto);
+	// }
 
 	@HttpCode(HttpStatus.OK)
 	@Post('newMessage')
