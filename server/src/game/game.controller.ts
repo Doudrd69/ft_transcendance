@@ -1,13 +1,18 @@
 import { Controller, Get, Post, Body, Param, Patch, Delete, BadRequestException, Logger, Request} from '@nestjs/common';
 import { User } from '../users/entities/users.entity';
-import { MatchmakingService } from './matchmaking/matchmaking.service';
+import { GameService } from './game.service';
 
 @Controller('game')
 export class GameController {
-  constructor(private matchmakingService: MatchmakingService) {}
+  constructor(private GameService: GameService) {}
 
   @Post('join')
-  joinGame(player: User) {
-    this.matchmakingService.addPlayerToQueue(player);
+  joinGame(@Body() player: User) {
+    return { message: 'Joueur rejoint avec succès', playerName: User.name };
   }
 }
+
+
+/*soit utiliser un guard soit utiliser un decorateur getUSer
+regarder postman app
+*/

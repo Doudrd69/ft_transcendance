@@ -2,7 +2,7 @@ import { Entity, Column, PrimaryGeneratedColumn, ManyToMany, JoinTable } from 't
 import { User } from '../../users/entities/users.entity';
 
 @Entity()
-export class MatchmakingQueue
+export class Lobby
 {
 	@PrimaryGeneratedColumn()
 	id: number;

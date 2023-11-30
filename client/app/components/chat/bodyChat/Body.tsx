@@ -22,3 +22,5 @@ const BodyComponent = (socket: {socket: Socket}) => {
 	)
 };
 export default BodyComponent;
+
+/* pap donner le dossier  */

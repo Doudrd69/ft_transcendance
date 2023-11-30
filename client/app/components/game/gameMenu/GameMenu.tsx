@@ -1,44 +1,30 @@
 import './GameMenu.css'
-import React from 'react';
 import MatchMaking from './gameStart/GameStart'
 import Settings from './gameSettings/gameSettings'
 import {useGame } from '../GameContext'
+import React, { useState } from 'react';
 
 
 const Menu: React.FC = () => {
 
   const {showGameMatchmaking, showGameSettings, handleGameSettings, handleGameMatchmaking} = useGame();
   
-  const handleStartClick = () => {
-    // Créez ici les données du joueur que vous souhaitez envoyer
-    const player = {
-      name: "TestUser",
-      // Ajoutez d'autres propriétés du joueur ici
-    };
-
-    // Utilisez fetch pour envoyer le joueur au matchmaking
-    fetch('http://localhost:3000/game/join', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(player),
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error('Erreur lors de la requête');
-        }
-        return response.json();
-      })
-      .then((data) => {
-        // Gérer la réponse du serveur (data) ici
-        console.log('Réponse du serveur :', data);
-        // Si le joueur est ajouté à la file d'attente, vous pouvez mettre à jour l'interface utilisateur ou effectuer d'autres actions.
-      })
-      .catch((error) => {
-        // Gérer les erreurs ici
-        console.error('Erreur :', error);
-      });
+  const handleStartClick = async () => {
+    const response = await fetch('http://localhost:3001/game/join', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify("myname"),
+		});
+    
+		if (response.ok) {
+			console.log("Player successfully join the game");
+		}
+		else {
+			console.log("Player can't join the game");
+		}
+		return false;
   };
 
   return (
@@ -75,7 +61,7 @@ const Menu: React.FC = () => {
         <h1 className='titleClass'>PONG GAME</h1>
       </div>
       <div className="background-game">
-        <button className={`buttonclass ${showGameMatchmaking ? 'clicked' : ''}`} onClick={handleStartClick}>START GAME</button>
+        <button className={`buttonclass ${showGameMatchmaking ? 'clicked' : ''}`} onClick={() =>{ handleStartClick(); handleGameMatchmaking(); }}>START GAME</button>
         <button className={`buttonclass ${showGameSettings ? 'clicked' : ''}`} onClick={handleGameSettings}>PROFILE</button>
         <button className={`buttonclass ${showGameSettings ? 'clicked' : ''}`} onClick={handleGameSettings}>SETTINGS</button>
       </div>

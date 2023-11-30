@@ -93,6 +93,23 @@ export default function Home() {
 	})
 
 	useEffect(() => {
+
+		gameSocket.on('connect', () => {
+			console.log('Youpi une connexion!');
+		})
+
+		gameSocket.on('disconnect', () => {
+			console.log('Disconnected from the server');
+		})
+
+		return () => {
+			console.log('Unregistering events...');
+			gameSocket.off('connect');
+			gameSocket.off('disconnect');
+		}
+	})
+
+	useEffect(() => {
 		if (code && showLogin) {
 			handleAccessToken(code).then(result => {
 				setShowLogin(false);
@@ -107,7 +124,7 @@ export default function Home() {
 					show2FAForm ? (<TFAComponent on2FADone={handle2FADone} />) :
 					(
 					  <div className="container">
-						<Chat userSocket={userSocket}/>
+						<Chat socket={userSocket}/>
 						<GameProvider>
 						  <Game />
 						</GameProvider>

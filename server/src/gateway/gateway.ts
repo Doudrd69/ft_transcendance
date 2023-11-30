@@ -15,7 +15,7 @@ export class GeneralGateway implements OnModuleInit {
   
   onModuleInit() {
     this.server.on('connect', (socket) => {
-      console.log("Connected : ", socket.id);
+      console.log("User Connected : ", socket.id);
     });
   }
   

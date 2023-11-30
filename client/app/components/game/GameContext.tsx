@@ -140,3 +140,8 @@ export const useGame = () => {
     }
     return context;
   };
+
+  /**
+   * REGARDER USE REDUCER hook react native pour stocker les usestates
+   * 
+   */
