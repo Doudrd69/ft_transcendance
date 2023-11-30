@@ -1,6 +1,7 @@
 import { Entity, Column, PrimaryGeneratedColumn, ManyToMany, OneToMany, JoinTable, JoinColumn, } from 'typeorm';
 import { GroupMember } from '../../chat/entities/group_member.entity'
 import { Friendship } from './friendship.entity';
+import { Conversation } from 'src/chat/entities/conversation.entity';
 
 @Entity()
 export class User {
@@ -37,19 +38,19 @@ export class User {
   @Column({ default: false })
   isActive: boolean;
 
-  @ManyToMany(type => GroupMember)
+  @ManyToMany(type => Conversation)
   @JoinTable({
-	  name: "user_to_member",
+	  name: "user_to_conversation",
 	  joinColumn: {
 		  name: "user",
 		  referencedColumnName: "id"
 	  },
 	  inverseJoinColumn: {
-		  name: "member",
+		  name: "conversation",
 		  referencedColumnName: "id"
 	  }
   })
-  members: GroupMember[];
+  conversations: Conversation[];
 
   @OneToMany(() => Friendship, (friendship) => friendship.initiator)
   initiatedFriendships: Friendship[];
