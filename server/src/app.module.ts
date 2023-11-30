@@ -10,14 +10,8 @@ import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { ChatModule } from './chat/chat.module';
-<<<<<<< HEAD
 import { GatewayModule } from './gateway/gateway.module';
-=======
->>>>>>> af55e8d (add gateway)
 import { GameGateway } from './game/game.gateway';
-import { GameModule } from './game/game.module';
-
-//We set the synchronize option to true, which means that TypeORM will automatically
 //generate database tables based on the entities. However, this option should be used
 //with caution in production because it can cause data loss and conflicts.
 

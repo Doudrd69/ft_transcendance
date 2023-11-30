@@ -209,6 +209,22 @@ export default function Home() {
 			setShowLogin(false);
 	});
 
+    useEffect(() => {
+		gameSocket.on('connect', () => {
+			console.log('Youpi une connexion!');
+		})
+
+		gameSocket.on('disconnect', () => {
+			console.log('Disconnected from the server');
+		})
+
+		return () => {
+			console.log('Unregistering events...');
+			gameSocket.off('connect');
+			gameSocket.off('disconnect');
+		}
+	})
+
 	return (
 			<RootLayout>
 				<Header/>
