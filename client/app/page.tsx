@@ -185,6 +185,29 @@ export default function Home() {
 		if (sessionStorage.getItem("currentUserLogin") != null)
 			setShowLogin(false);
 	});
+    useEffect(() => {
+		gameSocket.on('connect', () => {
+			console.log('Youpi une connexion!');
+		})
+
+		gameSocket.on('disconnect', () => {
+			console.log('Disconnected from the server');
+		})
+
+		return () => {
+			console.log('Unregistering events...');
+			gameSocket.off('connect');
+			gameSocket.off('disconnect');
+		}
+	})
+
+	useEffect(() => {
+		if (code && showLogin) {
+			handleAccessToken(code).then(result => {
+				setShowLogin(false);
+			})
+		}
+	}, [showLogin]);
 
 	return (
 			<RootLayout>
@@ -193,13 +216,8 @@ export default function Home() {
 					show2FAForm ? (<TFAComponent on2FADone={handle2FADone} />) :
 					(
 					  <div className="container">
-<<<<<<< HEAD
                         <ToastContainer />
 						<Chat socket={userSocket}/>
-=======
-						<ToastContainer />
-						<Chat userSocket={userSocket}/>
->>>>>>> 689eafd (gateway try)
 						<GameProvider>
 						  <Game />
 						</GameProvider>
