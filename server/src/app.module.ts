@@ -51,7 +51,7 @@ if (!dbPass || !dbUsername || !dbName || !dbHost) {
       username: dbUsername,
       password: dbPass,
       database: dbName,
-      entities: [User, Message, GroupMember, Conversation, Friendship],
+      entities: [User, Message, Conversation, Friendship],
       synchronize: true,
       autoLoadEntities: true,
     }),

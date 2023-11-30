@@ -38,15 +38,6 @@ export class ChatService {
 		return messages;
 	}
 
-	// private async findConversationsForUser(userId: number): Promise<Conversation[]> {
-	// 	return this.groupMemberRepository
-	// 	.createQueryBuilder('groupMember')
-	// 	.leftJoinAndSelect('groupMember.conversations', 'conversation')
-	// 	.leftJoin('groupMember.users', 'user')
-	// 	.where('user.id = :userId', { userId })
-	// 	.getMany();
-	//   }
-
 	private async getAllConversations(userName: string): Promise<Conversation[]> {
 
 		// login != username, penser a changer ca

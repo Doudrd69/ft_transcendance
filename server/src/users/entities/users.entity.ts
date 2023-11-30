@@ -35,7 +35,7 @@ export class User {
   @Column({ default: false })
   isActive: boolean;
 
-  @ManyToMany(type => GroupMember)
+  @ManyToMany(type => Conversation)
   @JoinTable({
 	  name: "user_to_group",
 	  joinColumn: {
