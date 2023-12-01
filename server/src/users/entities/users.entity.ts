@@ -1,10 +1,10 @@
 import { Entity, Column, PrimaryGeneratedColumn, ManyToMany, OneToMany, JoinTable, JoinColumn, } from 'typeorm';
-import { GroupMember } from '../../chat/entities/group_member.entity'
 import { Friendship } from './friendship.entity';
 import { Conversation } from 'src/chat/entities/conversation.entity';
 
 @Entity()
 export class User {
+
   @PrimaryGeneratedColumn()
   id: number;
 

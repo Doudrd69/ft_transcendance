@@ -2,24 +2,23 @@ import { Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Conversation } from './entities/conversation.entity';
-import { GroupMember } from './entities/group_member.entity';
+// import { GroupMember } from './entities/group_member.entity';
 import { Message } from './entities/message.entity';
 import { User } from '../users/entities/users.entity'
 import { MessageDto } from './dto/message.dto';
 import { ConversationDto } from './dto/conversation.dto';
-import { GroupDto } from './dto/group.dto';
+import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class ChatService {
 	constructor(
 		@InjectRepository(Conversation)
 		private conversationRepository: Repository<Conversation>,
-		@InjectRepository(GroupMember)
-		private groupMemberRepository: Repository<GroupMember>,
 		@InjectRepository(Message)
 		private messageRepository: Repository<Message>,
 		@InjectRepository(User)
 		private usersRepository: Repository<User>,
+		private usersService: UsersService,
 	) {}
 
 	private async getAllMessages(conversationName: string): Promise<Message[]> {
@@ -38,13 +37,14 @@ export class ChatService {
 	private async getAllConversations(userName: string): Promise<Conversation[]> {
 
 		// login != username, penser a changer ca
-		const userToFind = await this.usersRepository.findOne({ where: { login: userName } });
+		const userToFind = await this.usersRepository.findOne({
+			where: { login: userName },
+			relations: ["conversations"],
+		});
 		if (userToFind) {
-			console.log("Looking for ", userToFind.login, " conversations...");
-			const conversations = userToFind.conversations;
-			console.log(conversations);
-			// const list = conversations.map((conversation: Conversation) => conversation.name);
-			// console.log(list);
+			console.log("==> Looking for ", userToFind.login, " conversations...");
+			if (userToFind.conversations && Array.isArray(userToFind.conversations))
+				console.log(userToFind.conversations);
 			return [];
 		}
 		console.error("Fatal error: user not found");
@@ -53,14 +53,21 @@ export class ChatService {
 
 	async createConversation(conversationDto: ConversationDto): Promise<Conversation> {
 
-		const user = await this.usersRepository.findOne({ where: { login: conversationDto.username } });
+		const user = await this.usersRepository.findOne({
+			where: { login: conversationDto.username},
+			relations: ['conversations'],
+		  });
 		if (user) {
-			const newConversation = await this.conversationRepository.create({ name: conversationDto.name });
-			await this.conversationRepository.save(newConversation);
-			user.conversations = [newConversation];
-			// user.conversations = [...user.conversations, newConversation];
+			const conv = new Conversation();
+			conv.name = conversationDto.name;
+			await this.conversationRepository.save(conv);
+			console.log("---> ", user.conversations);
+			if (Array.isArray(user.conversations)) {
+				console.log("== IS ARRAY ==");
+				user.conversations.push(conv);
+			}
 			await this.usersRepository.save(user);
-			return newConversation;
+			return conv;
 		}
 		return ;
 	}
