@@ -2,11 +2,12 @@ import { Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Conversation } from './entities/conversation.entity';
-// import { GroupMember } from './entities/group_member.entity';
+import { GroupMember } from './entities/group_member.entity';
 import { Message } from './entities/message.entity';
 import { User } from '../users/entities/users.entity'
 import { MessageDto } from './dto/message.dto';
 import { ConversationDto } from './dto/conversation.dto';
+
 import { UsersService } from 'src/users/users.service';
 
 @Injectable()
@@ -16,6 +17,8 @@ export class ChatService {
 		private conversationRepository: Repository<Conversation>,
 		@InjectRepository(Message)
 		private messageRepository: Repository<Message>,
+		@InjectRepository(GroupMember)
+		private groupMemberRepository: Repository<GroupMember>,
 		@InjectRepository(User)
 		private usersRepository: Repository<User>,
 		private usersService: UsersService,
@@ -39,12 +42,15 @@ export class ChatService {
 		// login != username, penser a changer ca
 		const userToFind = await this.usersRepository.findOne({
 			where: { login: userName },
-			relations: ["conversations"],
+			relations: ["groups"],
 		});
 		if (userToFind) {
 			console.log("==> Looking for ", userToFind.login, " conversations...");
-			if (userToFind.conversations && Array.isArray(userToFind.conversations))
-				console.log(userToFind.conversations);
+			if (userToFind.groups && Array.isArray(userToFind.groups)) {
+				console.log(userToFind.groups);
+				const conversations = userToFind.groups.map((group: GroupMember) => group.conversation);
+				console.log(conversations);
+			}
 			return [];
 		}
 		console.error("Fatal error: user not found");
@@ -55,18 +61,25 @@ export class ChatService {
 
 		const user = await this.usersRepository.findOne({
 			where: { login: conversationDto.username},
-			relations: ['conversations'],
-		  });
+			relations: ['groups'],
+		});
 		if (user) {
+
 			const conv = new Conversation();
 			conv.name = conversationDto.name;
 			await this.conversationRepository.save(conv);
-			console.log("---> ", user.conversations);
-			if (Array.isArray(user.conversations)) {
-				console.log("== IS ARRAY ==");
-				user.conversations.push(conv);
+
+			const group = new GroupMember();
+			group.joined_datetime = new Date();
+			group.conversation = conv;
+			await this.groupMemberRepository.save(group);
+			console.log("---> ", user.groups);
+
+			if (Array.isArray(user.groups)) {
+				console.log("== GROUPS IS ARRAY ==");
+				user.groups.push(group);
+				await this.usersRepository.save(user);
 			}
-			await this.usersRepository.save(user);
 			return conv;
 		}
 		return ;
@@ -87,26 +100,6 @@ export class ChatService {
 		});
 		return;
 	}
-
-	// async createGroupMember(groupDto: GroupDto): Promise<GroupMember> {
-		
-	// 	console.log("-- Creating Group --");
-	// 	const user = await this.usersRepository.findOne({ where: { login: groupDto.user } });
-	// 	const conversation = await this.conversationRepository.findOne({ where: { name: groupDto.conversation} });
-
-	// 	if (user && conversation) {
-	// 		console.log("--> Linking conversation ", conversation.name, " with ID ", conversation.id ," to user ", user.login);
-	// 		const joined_datetime = new Date();
-	// 		const left_datetime = new Date();
-	// 		const newGroup = await this.groupMemberRepository.create({ conversation: conversation, joined_datetime, left_datetime });
-	// 		await this.groupMemberRepository.save(newGroup);
-	// 		// user.members = 
-    // 		// await this.usersRepository.save(user);
-    
-    // 		return newGroup;
-	// 	}
-	// 	return ;
-	// }
 
 	getMessageById(id: number) {
 		return this.messageRepository.findOne({ where: {id: id} });
