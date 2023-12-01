@@ -1,9 +1,10 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToMany, OneToMany } from 'typeorm';
-import { GroupMember } from '../../chat/entities/group_member.entity'
+import { Entity, Column, PrimaryGeneratedColumn, ManyToMany, OneToMany, JoinTable, JoinColumn, } from 'typeorm';
 import { Friendship } from './friendship.entity';
+import { Conversation } from 'src/chat/entities/conversation.entity';
 
 @Entity()
 export class User {
+
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -37,8 +38,19 @@ export class User {
   @Column({ default: false })
   isActive: boolean;
 
-  @ManyToMany(type => GroupMember)
-  members: GroupMember[];
+  @ManyToMany(type => Conversation)
+  @JoinTable({
+	  name: "user_to_conversation",
+	  joinColumn: {
+		  name: "user",
+		  referencedColumnName: "id"
+	  },
+	  inverseJoinColumn: {
+		  name: "conversation",
+		  referencedColumnName: "id"
+	  }
+  })
+  conversations: Conversation[];
 
   @OneToMany(() => Friendship, (friendship) => friendship.initiator)
   initiatedFriendships: Friendship[];
