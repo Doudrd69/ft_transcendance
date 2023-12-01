@@ -71,8 +71,7 @@ export class UsersService {
 		new42User.login = userData.login;
 		new42User.firstname = userData.firstname;
 		new42User.officialProfileImage = userData.image;
-		new42User.socket = userData.socket;
-		new42User.conversations = [];
+		new42User.groups = [];
 		return this.usersRepository.save(new42User);
 	}
 
