@@ -3,7 +3,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import dotenv from 'dotenv';
 import { User } from './users/entities/users.entity'
 import { Message } from './chat/entities/message.entity'
-import { GroupMember } from './chat/entities/group_member.entity'
 import { Conversation } from './chat/entities/conversation.entity'
 import { Friendship } from './users/entities/friendship.entity';
 import { AppController } from './app.controller';

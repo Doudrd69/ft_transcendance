@@ -7,6 +7,7 @@ import { Friendship } from './entities/friendship.entity'
 import { speakeasy } from 'speakeasy'
 import { QRCode } from 'qrcode'
 import { FriendRequestDto } from './dto/FriendRequestDto.dto';
+import { Conversation } from 'src/chat/entities/conversation.entity';
 
 @Injectable()
 export class UsersService {
@@ -66,13 +67,12 @@ export class UsersService {
 	// }
 
 	async createNew42User(userData) {
-		const new42User = this.usersRepository.create({
-			login: userData.login,
-			firstname: userData.firstname,
-			officialProfileImage: userData.image,
-			socket: userData.socket,
-			conversations: [],
-		});
+		const new42User = new User();
+		new42User.login = userData.login;
+		new42User.firstname = userData.firstname;
+		new42User.officialProfileImage = userData.image;
+		new42User.socket = userData.socket;
+		new42User.conversations = [];
 		return this.usersRepository.save(new42User);
 	}
 
