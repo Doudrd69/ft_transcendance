@@ -10,19 +10,22 @@ const Menu: React.FC = () => {
   const {showGameMatchmaking, showGameSettings, handleGameSettings, handleGameMatchmaking} = useGame();
   
   const handleStartClick = async () => {
+    const player = {
+        login : "wmonacho",
+    }
     const response = await fetch('http://localhost:3001/game/join', {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
 			},
-			body: JSON.stringify("myname"),
+			body: JSON.stringify(player),
 		});
     
 		if (response.ok) {
-			console.log("Player successfully join the game");
+			console.log('Player successfully join the lobby :', response.statusText );
 		}
 		else {
-			console.log("Player can't join the game");
+			console.log("Player can't join the lobby");
 		}
 		return false;
   };
@@ -62,7 +65,7 @@ const Menu: React.FC = () => {
       </div>
       <div className="background-game">
         <button className={`buttonclass ${showGameMatchmaking ? 'clicked' : ''}`} onClick={() =>{ handleStartClick(); handleGameMatchmaking(); }}>START GAME</button>
-        <button className={`buttonclass ${showGameSettings ? 'clicked' : ''}`} onClick={handleGameSettings}>PROFILE</button>
+        <button className="buttonclass" >PROFILE</button>
         <button className={`buttonclass ${showGameSettings ? 'clicked' : ''}`} onClick={handleGameSettings}>SETTINGS</button>
       </div>
     </div>

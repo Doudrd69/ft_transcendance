@@ -72,7 +72,6 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
 	const handleSettingsGame = () => {
 		disableSettingsDisplay();
 		disableSettingsKeyboard();
-        activateSettingsGame();
 	}
 
     const activateSettingsDisplay = () => setSettingsDisplay(true);

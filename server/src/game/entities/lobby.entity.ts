@@ -7,8 +7,11 @@ export class Lobby
 	@PrimaryGeneratedColumn()
 	id: number;
 
+	@Column()
+	name: string;
+
 	@ManyToMany(type => User)
 
 	@JoinTable()
-	waitingUsers: User[];
+	lobbyTable: User[];
 }

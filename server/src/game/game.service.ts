@@ -8,6 +8,8 @@ import { Lobby } from './entities/lobby.entity';
 export class GameService {
   constructor(
     @InjectRepository(Lobby)
-    private matchmakingRepository: Repository<Lobby>,
+    private lobbyRepository: Repository<Lobby>,
+    @InjectRepository(User)
+		private playersRepository: Repository<User>,
   ) {}
 }

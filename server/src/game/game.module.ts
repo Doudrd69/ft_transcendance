@@ -4,22 +4,20 @@ import { GameController } from './game.controller';
 import { GameService } from './game.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Lobby } from './entities/lobby.entity';
+import { UsersService } from 'src/users/users.service';
+import { UsersController } from 'src/users/users.controller';
+import { User } from 'src/users/entities/users.entity';
+import { Friendship } from 'src/users/entities/friendship.entity';
+import { LobbyService } from './matchmaking/matchmaking.service';
 
 @Module({
   imports: [
       TypeOrmModule.forFeature([Lobby]),
+      TypeOrmModule.forFeature([User]),
+      TypeOrmModule.forFeature([Friendship]),
   ],
-  controllers: [GameController],
-  providers: [GameGateway, GameService],
-  exports: [GameService],
+  controllers: [GameController, UsersController],
+  providers: [GameGateway, GameService, UsersService, LobbyService],
+  exports: [GameService, UsersService],
 })
 export class GameModule {}
-
-/* en gros, ce que je ne comprends pas c'est que j'ai cree un service de matchmaking 
-pas comment l'utiliser, faudrait que j'arrive a comprendre qui sont mes utilisateurs
-je dois prendre ceux de l'auth?
-je dois aussi comprendre comment relier mon service de matchmaking au front avec mon bouton play
-ensuite il y a aussi le faite de creer une room?
-le fait de partager les postions des paddles et balle
-Donc deja comment relier le backend au front?
-*/

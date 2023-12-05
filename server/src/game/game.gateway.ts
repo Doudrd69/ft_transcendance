@@ -1,4 +1,4 @@
-import { WebSocketGateway, WebSocketServer, SubscribeMessage, OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect, ConnectedSocket } from '@nestjs/websockets';
+import { WebSocketGateway, WebSocketServer, SubscribeMessage, OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect, ConnectedSocket, MessageBody } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 
 @WebSocketGateway({
@@ -24,14 +24,15 @@ export class GameGateway {
     console.log(`Game disconnected mama: ${client.id}`);
   }
 
-  @SubscribeMessage('message')
-  handleMessage(@ConnectedSocket() client: Socket, data: string): void {
+  @SubscribeMessage('Game')
+  handleGame(@ConnectedSocket() client: Socket, data: string): void {
     this.server.emit('message', data); // Diffuse à tous les clients dans le namespace 'game'
   }
 
-  @SubscribeMessage('joinMatchmaking')
-  handleJoinMatchmaking(client: Socket, user: any): void {
+  @SubscribeMessage('joinLobby')
+  handleJoinLobby(client: Socket, data: string): string {
     console.log("JOINMATCHMAKING");
+    return (data); // a changer
     // Traitez ici la logique pour ajouter le joueur à la file d'attente (similaire à votre implémentation précédente)
   }
 
