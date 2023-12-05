@@ -6,7 +6,7 @@
 	white-space: nowrap;
 	text-overflow: ellipsis;
 	height: 100%;
-	width: calc(45% - 10px);
+	width: calc(30% - 10px);
 	border-top: none;
 	background-color:var(--fourth) ;
 	color: #f0f0f0;

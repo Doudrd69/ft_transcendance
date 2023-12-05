@@ -1,5 +1,5 @@
-.bloc-discussion-chat{
-	scroll-behavior: auto;
+.bloc-receive-chat{
+	/* scroll-behavior: auto; */
 	box-sizing: border-box;
 	background-color:var(--fourth) ;
 	/* border: 3px solid #333; */
@@ -10,8 +10,12 @@
 	overflow: scroll;
 	color: var(--first);
 }
+<<<<<<< HEAD:client/app/components/chat/bodyChat/chatDiscussion/ChatDiscussion.css
 
 .message-container {
+=======
+.receive-chat{
+>>>>>>> c9a4a1b (je detruis transcendence):client/app/components/chat/bodyChat/chatUser/receiveBox/ReceiveBox.css
 	margin: 10px;
 	width: fit-content;
 }

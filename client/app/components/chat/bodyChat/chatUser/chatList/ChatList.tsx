@@ -1,12 +1,8 @@
-import './DiscussionList.css'
-import React, { useEffect, useState } from 'react';
-import { useChat } from '../../ChatContext'
+import './ChatList.css';
+import React from 'react';
+import {useChat} from '../../../ChatContext';
 
-interface Conversation {
-	name: string;
-}
-
-const DiscussionListComponent: React.FC = () => {
+const ChatListComponent: React.FC = () => {
 
 	// const retreiveUser = async () => {
 	// 	const response = await fetch("http://localhost:3001/getUser", {
@@ -77,7 +73,8 @@ const DiscussionListComponent: React.FC = () => {
 			{userData.discussion.map((user, index) => (
 			<div className = "bloc-button-discussion-list">
 				<div className={`profil-discussion-list ${userData.online[index]}`}/>
-				<button className="discussion-list" onClick={handleChatDiscussion}>
+				<button	className="discussion-list" 
+						onClick={() => dispatch({ type: 'TOGGLE', payload: 'showChat' })}>
 					{user}
 				</button>
 			</div>
@@ -85,4 +82,4 @@ const DiscussionListComponent: React.FC = () => {
 		</div>
 	)
 };
-export default DiscussionListComponent;
+export default ChatListComponent;

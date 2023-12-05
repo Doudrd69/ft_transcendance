@@ -1,7 +1,6 @@
-import './Body.css'
-import React, {useState} from 'react';
-import MessageComponent from './message/Message';
-import DiscussionListComponent from './discussionList/DiscussionList';
+// BodyComponent.tsx
+import './Body.css';
+import React from 'react';
 import { useChat } from '../ChatContext';
 import ChatDiscussionComponent from './chatDiscussion/ChatDiscussion';
 import AddComponent from './add/Add';

@@ -50,9 +50,9 @@
 	background-image: url('ajouter-un-groupe.png');
 	background-size: cover; /* Ajuste la taille de l'image pour remplir le cercle */
 	background-repeat: no-repeat;
+	background-size: contain; /* Ajuste la taille de l'image pour contenir le bouton */
 	background-position: center center;
 	background-color:  white;
-	background-size: contain; /* Ajuste la taille de l'image pour contenir le bouton */
 	background-color: transparent;
 	border:none;
 	transition: transform 0.2s ease;
