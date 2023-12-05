@@ -40,7 +40,8 @@ export class ChatService {
 	private async getAllConversations(userName: string): Promise<Conversation[]> {
 
 		// login != username, penser a changer ca
-		const userToFind = await this.usersRepository.findOne({
+		let userToFind = new User();
+		userToFind = await this.usersRepository.findOne({
 			where: { login: userName },
 			relations: ["groups"],
 		});
@@ -50,11 +51,38 @@ export class ChatService {
 				console.log(userToFind.groups);
 				const conversations = userToFind.groups.map((group: GroupMember) => group.conversation);
 				console.log(conversations);
+				return conversations;
 			}
 			return [];
 		}
 		console.error("Fatal error: user not found");
 		return [];
+	}
+
+	private async createGroup(conversation: Conversation): Promise<GroupMember> {
+		
+		const group = new GroupMember();
+		group.joined_datetime = new Date();
+		group.conversation = conversation;
+		return await this.groupMemberRepository.save(group);
+	}
+
+	async addUserToConversation(username: string, conversationName: string) {
+
+		// login != username, penser a changer ca
+		const conversation = await this.conversationRepository.findOne({ where: {name: conversationName} });
+		if (conversation) {
+
+			const userToAdd = await this.usersRepository.findOne({
+				where: { login: username},
+				relations: ['groups'],
+			});
+
+			if (userToAdd) {
+				const newGroup = await this.createGroup(conversation);
+				userToAdd.groups.push(newGroup);
+			}
+		}
 	}
 
 	async createConversation(conversationDto: ConversationDto): Promise<Conversation> {
@@ -69,14 +97,14 @@ export class ChatService {
 			conv.name = conversationDto.name;
 			await this.conversationRepository.save(conv);
 
-			const group = new GroupMember();
-			group.joined_datetime = new Date();
-			group.conversation = conv;
-			await this.groupMemberRepository.save(group);
+			// const group = new GroupMember();
+			// group.joined_datetime = new Date();
+			// group.conversation = conv;
+			// await this.groupMemberRepository.save(group);
+			const group = await this.createGroup(conv);
 			console.log("---> ", user.groups);
 
 			if (Array.isArray(user.groups)) {
-				console.log("== GROUPS IS ARRAY ==");
 				user.groups.push(group);
 				await this.usersRepository.save(user);
 			}
@@ -87,22 +115,23 @@ export class ChatService {
 
 	async createMessage(messageDto: MessageDto) {
 		console.log("-- createMessage --");
-		await this.conversationRepository.find({ where: {name: messageDto.conversationName} }).then(result => {
-			const newMessage = this.messageRepository.create({
-				from: messageDto.from,
-				content: messageDto.content,
-				post_datetime: messageDto.post_datetime,
-				conversation: result[0],
-			});
+		let conversation = new Conversation();
+		conversation = await this.conversationRepository.findOne({ where: {name: messageDto.conversationName } }); 
+		if (conversation) {
+			const newMessage = new Message();
+			newMessage.from = messageDto.from;
+			newMessage.content = messageDto.content;
+			newMessage.post_datetime = messageDto.post_datetime;
+			newMessage.conversation = conversation;
+
 			return this.messageRepository.save(newMessage);
-		}).catch(error => {
-			console.log(error);
-		});
+		}
+		console.error("Fatal error: message could not be created");
 		return;
 	}
 
-	getMessageById(id: number) {
-		return this.messageRepository.findOne({ where: {id: id} });
+	getMessageById(idToFind: number) {
+		return this.messageRepository.findOne({ where: {id: idToFind} });
 	}
 
 	async getMessages(conversationName: string): Promise<Message[]> {

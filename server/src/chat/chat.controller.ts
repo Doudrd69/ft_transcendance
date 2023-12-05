@@ -30,7 +30,7 @@ export class ChatController {
 		return this.chatService.createMessage(messageDto);
 	}
 
-	@Get(':id')
+	@Get('getMesssage/:id')
 	getMessage(@Param('id') id: number): Promise<Message | null> {
 		return this.chatService.getMessageById(id);
 	}

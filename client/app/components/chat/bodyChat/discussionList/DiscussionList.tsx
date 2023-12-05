@@ -32,6 +32,7 @@ const DiscussionListComponent: React.FC = () => {
 
 		if (response.ok) {
 			const userData = await response.json();
+			console.log("Raw userData: ", userData);
 			setConversations((prevConversations: Conversation[]) => [...prevConversations, ...userData]);
 			console.log(conversations);
 		}
