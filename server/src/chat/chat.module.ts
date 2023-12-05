@@ -6,6 +6,7 @@ import { GroupMember } from './entities/group_member.entity';
 import { Message } from './entities/message.entity';
 import { Conversation } from './entities/conversation.entity';
 import { User } from '../users/entities/users.entity'
+import { SocketGateway } from './chat.socket.gateway';
 
 @Module({
 	imports: [
@@ -14,7 +15,7 @@ import { User } from '../users/entities/users.entity'
 		TypeOrmModule.forFeature([Message]),
 		TypeOrmModule.forFeature([User])
 	],
-	providers: [ChatService],
+	providers: [ChatService ,SocketGateway],
 	exports: [ChatService],
 	controllers: [ChatController],
 })

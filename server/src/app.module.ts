@@ -8,7 +8,7 @@ import { GroupMember } from './chat/entities/group_member.entity'
 import { Conversation } from './chat/entities/conversation.entity'
 import { Friendship } from './users/entities/friendship.entity';
 import { AppController } from './app.controller';
-// import { AppService } from './app.service';
+import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { ChatModule } from './chat/chat.module';
@@ -18,6 +18,7 @@ import { ChatModule } from './chat/chat.module';
 //with caution in production because it can cause data loss and conflicts.
 
 @Module({
+	
   imports: [
 
     TypeOrmModule.forRoot({
@@ -44,6 +45,6 @@ import { ChatModule } from './chat/chat.module';
 
   ],
   controllers: [AppController],
-  // providers: [AppService],
+  providers: [AppService],
 })
 export class AppModule {}

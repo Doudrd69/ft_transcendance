@@ -5,6 +5,7 @@ import { MessageDto } from './dto/message.dto';
 import { User } from '../users/entities/users.entity'
 import { Conversation } from './entities/conversation.entity';
 import { Message } from './entities/message.entity';
+import { SocketGateway } from './chat.socket.gateway';
 
 @Controller('chat')
 export class ChatController {
