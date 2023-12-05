@@ -33,7 +33,7 @@ export default function Home() {
 	const notifyFriendRequest = (recipientUsername: string) => { 
 		toast.info("You received a new friend request", {
 			onClose: () => console.log("Notif closed"),
-			autoClose: false,
+			// autoClose: false,
 		});
 	};
 
