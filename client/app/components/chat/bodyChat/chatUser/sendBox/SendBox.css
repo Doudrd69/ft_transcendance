@@ -1,0 +1,37 @@
+.bloc-send-chat{
+	display: flex;
+	justify-content: space-between;
+	resize: none;
+	
+}
+.input-chat{
+	/* border: 3px solid #333; */
+	box-sizing: border-box;
+	background-color:#a1a1a1 ;
+	margin: 0px 10px 10px 10px;
+	width: 90%;
+	border-radius:10px;
+	width: 100%;
+	padding: 10px;
+	resize: none;
+}
+.button-send{
+		/* scroll-behavior: auto; */
+		box-sizing: border-box;
+		/* border: 3px solid #333; */
+		margin: 0px 10px 10px 0px;
+		width: 10%;
+		border-radius:10px;
+		background-color: transparent;
+		overflow: scroll;
+		color: #000000;
+		background-image: url('send.png');
+		border: none;
+		background-size: contain;
+		background-repeat: no-repeat;
+		background-position: center center;
+		transition: transform 0.2s ease;
+}
+.button-send:hover {
+	transform: scale(1.2);
+}

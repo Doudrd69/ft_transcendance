@@ -1,4 +1,4 @@
-.main-button-discussion {
+.main-button-channel {
 	/* border: 3px solid #333; */
 	border:none;
 	text-align: center;
@@ -6,7 +6,7 @@
 	white-space: nowrap;
 	text-overflow: ellipsis;
 	height: 100%;
-	width: calc(45% - 10px);
+	width: calc(30% - 10px);
 	border-top: none;
 	background-color: var(--fourth) ;
 	color: #f0f0f0;
@@ -18,12 +18,12 @@
 	font-family: Arial, sans-serif;
 }
 
-.main-button-discussion:hover {
+.main-button-channel:hover {
 	/* Nouvelle couleur de fond lorsque vous survolez le bouton */
 	background-color: var(--fifth);
 	}
 
-.main-button-discussion.clicked {
+.main-button-channel.clicked {
 	/* Nouvelle couleur de fond lorsque vous survolez le bouton */
 	background-color: var(--second);
 	}

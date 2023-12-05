@@ -1,8 +1,7 @@
-import './Message.css'
-import React, { useState, useEffect } from 'react';
-import { Socket } from 'socket.io-client'
+import './SendBox.css'
+import React, { useState } from 'react';
 
-const MessageComponent = (socket: {socket: Socket}) => {
+const SendBoxComponent: React.FC = () => {
 
 	const socketInUse = socket.socket;
 	const [messageValue, setMessageValue] = useState('');
@@ -54,12 +53,10 @@ const MessageComponent = (socket: {socket: Socket}) => {
 	// }, [socketInUse])
 
 	return (
-			<div className="bloc-message">
-				<form onSubmit={handleMessage}>
-					<input className="message" placeholder="message..." value={messageValue} onChange={handleMessageInput}></input>
-					<button className="buttom-message" type="submit"></button>
+				<form className="bloc-send-chat" onSubmit={handleMessage}>
+					<input className="input-chat" placeholder="message..." value={messageValue} onChange={handleMessageInput}></input>
+					<button className="button-send" type="submit"></button>
 				</form>
-			</div>
 	)
 };
-export default MessageComponent;
+export default SendBoxComponent;

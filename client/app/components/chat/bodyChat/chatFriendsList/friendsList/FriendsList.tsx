@@ -47,7 +47,7 @@ const FriendsListComponent: React.FC = () => {
 							{user}
 						</div>
 					</div>
-					{activeIndex === index && <FriendsListTabComponent />}
+					{activeIndex === index && <FriendsListTabComponent user={user}/>}
 				</div>
 			))}
 		</div>
