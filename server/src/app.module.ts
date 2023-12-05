@@ -6,7 +6,7 @@ import { Message } from './chat/entities/message.entity'
 import { Conversation } from './chat/entities/conversation.entity'
 import { Friendship } from './users/entities/friendship.entity';
 import { AppController } from './app.controller';
-// import { AppService } from './app.service';
+import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { ChatModule } from './chat/chat.module';
@@ -29,6 +29,7 @@ if (!dbPass || !dbUsername || !dbName || !dbHost) {
 
 
 @Module({
+	
   imports: [
 
     TypeOrmModule.forRoot({
