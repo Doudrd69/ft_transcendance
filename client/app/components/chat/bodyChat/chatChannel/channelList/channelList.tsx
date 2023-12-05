@@ -1,8 +1,8 @@
-import './DiscussionList.css'
+import './ChannelList.css'
 import React from 'react';
-import {useChat} from '../../ChatContext'
+import {useChat} from '../../../ChatContext'
 
-const DiscussionListComponent: React.FC = () => {
+const ChannelListComponent: React.FC = () => {
 
 	// const retreiveUser = async () => {
 	// 	const response = await fetch("http://localhost:3001/getUser", {
@@ -16,9 +16,9 @@ const DiscussionListComponent: React.FC = () => {
 	// 	const userData = await Response.json();
 	// 	userData.login();
 	// }
-	const {handleChatDiscussion} = useChat();
+	const { state, dispatch } = useChat();
 	const userData = {
-		discussion: [
+		channel: [
 			"Eowyn Percetcheveux",
 			"Edouard Brodeur",
 			"Zoe Roffi",
@@ -38,11 +38,12 @@ const DiscussionListComponent: React.FC = () => {
 		]
 	};
 	return (
-		<div className="bloc-discussion-list">
-			{userData.discussion.map((user, index) => (
-			<div className = "bloc-button-discussion-list">
-				<div className={`profil-discussion-list ${userData.online[index]}`}/>
-				<button className="discussion-list" onClick={handleChatDiscussion}>
+		<div className="bloc-channel-list">
+			{userData.channel.map((user, index) => (
+			<div className = "bloc-button-channel-list">
+				<div className={`profil-channel-list ${userData.online[index]}`}/>
+				<button	className="channel-list" 
+						onClick={() => dispatch({ type: 'TOGGLE', payload: 'showChannelchannel' })}>
 					{user}
 				</button>
 			</div>
@@ -50,4 +51,4 @@ const DiscussionListComponent: React.FC = () => {
 		</div>
 	)
 };
-export default DiscussionListComponent;
+export default ChannelListComponent;

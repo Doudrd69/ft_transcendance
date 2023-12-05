@@ -1,4 +1,4 @@
-.bloc-discussion-chat{
+.bloc-receive-chat{
 	/* scroll-behavior: auto; */
 	box-sizing: border-box;
 	background-color:var(--fourth) ;
@@ -10,6 +10,6 @@
 	overflow: scroll;
 	color: var(--first);
 }
-.discussion-chat{
+.receive-chat{
 	margin: 10px;
 }

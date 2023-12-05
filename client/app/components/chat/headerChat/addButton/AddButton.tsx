@@ -3,9 +3,10 @@ import React from 'react';
 import { useChat } from '../../ChatContext';
 
 const AddComponent: React.FC = () => {
-	const {showAdd, handleAdd} = useChat();
+	const { state, dispatch } = useChat();
 	return (
-			<button className={`add-button ${showAdd ? 'clicked' : ''}`} onClick={handleAdd}>+</button>
+			<button className={`add-button ${state.showAdd ? 'clicked' : ''}`} 
+			onClick={() => dispatch({ type: 'TOGGLE', payload: 'showAdd' })}>+</button>
 	)
 };
 export default AddComponent;

@@ -1,7 +1,7 @@
-import './Message.css'
+import './SendBoxChannel.css'
 import React, { useState } from 'react';
 
-const MessageComponent: React.FC = () => {
+const SendBoxChannelComponent: React.FC = () => {
 
 	const [messageValue, setMessageValue] = useState('');
 
@@ -36,12 +36,10 @@ const MessageComponent: React.FC = () => {
 	}
 
 	return (
-			<div className="bloc-message">
-				<form onSubmit={handleMessage}>
-					<input className="message" placeholder="message..." value={messageValue} onChange={handleMessageInput}></input>
-					<button className="buttom-message" type="submit"></button>
+				<form className="bloc-send-chat-channel" onSubmit={handleMessage}>
+					<input className="input-chat-channel" placeholder="message..." value={messageValue} onChange={handleMessageInput}></input>
+					<button className="button-send-channel" type="submit"></button>
 				</form>
-			</div>
 	)
 };
-export default MessageComponent;
+export default SendBoxChannelComponent;

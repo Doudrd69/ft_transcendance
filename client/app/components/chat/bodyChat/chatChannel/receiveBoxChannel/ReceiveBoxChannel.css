@@ -1,0 +1,15 @@
+.bloc-receive-channel-chat{
+	/* scroll-behavior: auto; */
+	box-sizing: border-box;
+	background-color:var(--fourth) ;
+	/* border: 3px solid #333; */
+	margin: 0px 10px 10px 10px;
+	width: (100% - 20px);
+	height: 100%;
+	border-radius:10px;
+	overflow: scroll;
+	color: var(--first);
+}
+.receive-channel-chat{
+	margin: 10px;
+}

@@ -5,13 +5,13 @@ const AddComponent: React.FC = () => {
 
 	const [formValues, setFormValues] = useState(['', '', '']); // Initialisez les valeurs par défaut
 
-	const handleFormInput = (value, index) => {
+	const handleFormInput = (value: string, index: number) => {
 		const updatedFormValues = [...formValues];
 		updatedFormValues[index] = value;
 		setFormValues(updatedFormValues);
 	};
 
-	const handleConversationCreation = async (e: React.FormEvent, index) => {
+	const handleConversationCreation = async (e: React.FormEvent, index: number) => {
 
 		e.preventDefault();
 
@@ -34,7 +34,7 @@ const AddComponent: React.FC = () => {
 		return false;
 	}
 
-	const handleFriendRequest = async (e: React.FormEvent, index) => {
+	const handleFriendRequest = async (e: React.FormEvent, index: number) => {
 
 		e.preventDefault();
 
