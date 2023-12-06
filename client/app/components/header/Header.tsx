@@ -10,24 +10,6 @@ const HeaderComponent: React.FC = () => {
 	const [username, setUsername] = useState('');
 	const [notification, setNotification] = useState(0);
 
-	const notify = () => { 
-		
-		console.log(notification);
-		switch (notification) {
-
-			case 0:
-				return ;
-			
-			case 1:
-				toast("Username has been updated");
-				return ;
-
-			case 2:
-				toast("Authenticator code is verified");
-		}
-	};
-
-
 	const notify = (flag: number) => { 
 		
 		switch (flag) {
