@@ -2,7 +2,7 @@ import './SendBox.css'
 import React, { useState } from 'react';
 import { Socket } from 'socket.io-client'
 
-const MessageComponent = (socket: {socket: Socket}) => {
+const SendBoxComponent = (socket: {socket: Socket}) => {
 
 	const socketInUse = socket.socket;
 	const [messageValue, setMessageValue] = useState('');
@@ -24,42 +24,36 @@ const MessageComponent = (socket: {socket: Socket}) => {
 		e.preventDefault();
 
 		if (socketInUse.connected) {
-			socketInUse.emit('message', messageDto, () => {
-				console.log("!! SOCKET EMIT on message !!");
-			});
+				socketInUse.emit('message', messageDto, () => {
+					console.log("!! SOCKET EMIT on message !!");
+				});
 			socketInUse.off('message');
 
-		if (socketInUSe.connected) {
-			socketInUSe.emit('message', messageDto, () => {
-				console.log("Message Sent!");
+			if (socketInUse.connected) {
+				socketInUse.emit('message', messageDto, () => {
+					console.log("Message Sent!");
+				});
+			}
+			else {
+				console.log("Socket not connected");
+			}
+
+			const response = await fetch('http://localhost:3001/chat/newMessage', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify(messageDto),
 			});
+				
+			if (response.ok) {
+				console.log("Message sent and created in DB");
+			}
+			else {
+				console.log("Message creation failed");
+			}
 		}
-		else {
-			console.log("Socket not connected");
-		}
-
-		const response = await fetch('http://localhost:3001/chat/newMessage', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-			},
-			body: JSON.stringify(messageDto),
-		});
-		
-		if (response.ok) {
-			console.log("Message sent and created in DB");
-		}
-		else {
-			console.log("Message creation failed");
-		}
-
 	}
-	
-	// useEffect(() => {
-	// 	return () => {
-	// 		socketInUse.off('message');
-	// 	}
-	// }, [socketInUse])
 
 	return (
 				<form className="bloc-send-chat" onSubmit={handleMessage}>

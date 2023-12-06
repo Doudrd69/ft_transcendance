@@ -1,6 +1,10 @@
 import './ChatList.css';
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {useChat} from '../../../ChatContext';
+
+interface Conversation {
+	name: string;
+}
 
 const ChatListComponent: React.FC = () => {
 
@@ -38,11 +42,6 @@ const ChatListComponent: React.FC = () => {
 		}
 	};
 
-	// On first render we load each discussion form the back-end (all groups where user is)
-	// and the status of the discussion (if is a user to know if he's online or not)
-	// Then we can update the status through sockets
- 
-	const {handleChatDiscussion} = useChat();
 	const userData = {
 		discussion: [
 			"Eowyn Percetcheveux",
