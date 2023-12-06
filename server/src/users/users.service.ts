@@ -85,46 +85,83 @@ export class UsersService {
 		});
 	}
 
-	createFriendship(friendRequestDto: FriendRequestDto) {
-		this.getUserByLogin(friendRequestDto.initiatorLogin).then(initiator => {
-			this.getUserByLogin(friendRequestDto.recipientLogin).then(friend => {
-				console.log("Initiator: ", initiator.login);
-				console.log("Recipient: ", friend.login);
-				const newFriendship = this.friendshipRepository.create({ initiator, friend });
-				return this.friendshipRepository.save(newFriendship);
-			}).catch(error => {
-				console.log("Error in second promise: ", error);
-			})
-		}).catch(error => {
-			console.log("Error in first promise: ", error);
+	async createFriendship(friendRequestDto: FriendRequestDto) {
+
+		const initiator = await this.usersRepository.findOne({
+			where: {login: friendRequestDto.initiatorLogin},
+			relations: ["initiatedFriendships"],
 		});
+
+		const friend = await this.usersRepository.findOne({
+			where: {login: friendRequestDto.recipientLogin},
+			relations: ["initiatedFriendships"],
+		});
+
+		if (initiator && friend) {
+			console.log("Initiator -> ", initiator.initiatedFriendships);
+			console.log("Friend    -> ", friend.initiatedFriendships);
+
+			let newFriendship = new Friendship();
+			newFriendship.initiator = initiator;
+			newFriendship.friend = friend;
+			await this.friendshipRepository.save(newFriendship);
+			return newFriendship;
+		}
+
+		return ;
 	}
 	
-	updateFriendship(friendRequestDto: FriendRequestDto, flag: boolean) {
-		this.getUserByLogin(friendRequestDto.initiatorLogin).then(initiator => {
-			this.getUserByLogin(friendRequestDto.recipientLogin).then(friend => {
-				const frienshipToUpdate = initiator.initiatedFriendships.find(
-					(friendship) => friendship.friend.login === friendRequestDto.recipientLogin
-					);
-					if (frienshipToUpdate) {
-						frienshipToUpdate.isAccepted = flag;
-						return this.friendshipRepository.save(frienshipToUpdate); // friendship repo
-					}
-				}).catch(error => {
-					console.log("Error in second promise: ", error);
-				})
-			}).catch(error => {
-				console.log("Error in first promise: ", error);
-			})
+	async updateFriendship(friendRequestDto: FriendRequestDto, flag: boolean) {
+
+		const initiator = await this.usersRepository.findOne({
+			where: {login: friendRequestDto.initiatorLogin},
+			relations: ["initiatedFriendships", "acceptedFriendships"],
+		});
+
+		const friend = await this.usersRepository.findOne({
+			where: {login: friendRequestDto.recipientLogin},
+			relations: ["initiatedFriendships", "acceptedFriendships"],
+		});
+
+		if (initiator && friend) {
+
+			const friendshipToUpdate = await this.friendshipRepository.findOne({
+				where: {initiator: initiator, friend: friend},
+			});
+
+			friendshipToUpdate.isAccepted = flag;
+			await this.friendshipRepository.save(friendshipToUpdate);
+			console.log("Update -> ", friendshipToUpdate);
+			return friendshipToUpdate;
+		}
 	}
 		
+	findUserByLogin(loginToSearch: string) {
+		return this.usersRepository.findOne({ where: {login: loginToSearch}});
+	}
+
 	getUserByLogin(loginToSearch: string): Promise<User> {
 		return this.usersRepository.findOne({ where: {login: loginToSearch}});
 	}
 
-	findUserByLogin(loginToSearch: string) {
-		return this.usersRepository.findOne({ where: {login: loginToSearch}});
+	async getFriendships(username: string): Promise<Friendship[]> {
+
+		const user = await this.usersRepository.findOne({
+			where: {login: username},
+			relations: ["initiatedFriendships", "initiatedFriendships.friend"],
+		});
+		if (user) {
+			const friendsname = user.initiatedFriendships.filter(friendship => !friendship.isAccepted).map((friendship) => friendship.friend.login);
+			console.log("Names -> ", friendsname);
+			const pendingFriendRequests = user.initiatedFriendships.filter(friendship => !friendship.isAccepted);
+			console.log("Pending -> ", pendingFriendRequests);
+			const friends = user.initiatedFriendships.filter(friendship => friendship.isAccepted);
+			console.log("Friends --> ", friends);
+			return friends;
+		}
+		return ;
 	}
+
 
 		// async createNewUser(username: string, password: string): Promise<User> {
 		// 	const userToCreate = await this.usersRepository.findOne({ where: { username } });

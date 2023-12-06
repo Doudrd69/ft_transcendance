@@ -8,6 +8,7 @@ interface Conversation {
 }
 
 const ChannelListComponent: React.FC = () => {
+
 	const { state, dispatch } = useChat();
 
 	const [conversations, setConversations] = useState<Conversation[]>([]);
