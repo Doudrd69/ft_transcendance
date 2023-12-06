@@ -7,10 +7,7 @@ import { Friendship } from './entities/friendship.entity'
 import { speakeasy } from 'speakeasy'
 import { QRCode } from 'qrcode'
 import { FriendRequestDto } from './dto/FriendRequestDto.dto';
-<<<<<<< HEAD
 import { Conversation } from 'src/chat/entities/conversation.entity';
-=======
->>>>>>> aefff37 (Reworked friendship (isse with dto transmission) + trying to implement notifications)
 
 @Injectable()
 export class UsersService {
@@ -236,5 +233,4 @@ export class UsersService {
 		}
 		return ;
 	}
-
 }
