@@ -38,7 +38,7 @@ export class ChatService {
 		return messages;
 	}
 
-	private async getAllConversations(userName: string): Promise<Conversation[]> {
+	private async getAllConversations(userName: string): Promise<GroupMember[]> {
 
 		// login != username, penser a changer ca
 		let userToFind = new User();
@@ -49,9 +49,8 @@ export class ChatService {
 		if (userToFind) {
 			console.log("==> Looking for ", userToFind.login, " conversations...");
 			if (userToFind.groups && Array.isArray(userToFind.groups)) {
-				console.log(userToFind.groups);
-				const conversations = userToFind.groups.map((group: GroupMember) => group.conversation);
-				console.log(conversations);
+				const conversations = userToFind.groups;
+				console.log("conversations --> ", conversations);
 				return conversations;
 			}
 			return [];
@@ -98,10 +97,6 @@ export class ChatService {
 			conv.name = conversationDto.name;
 			await this.conversationRepository.save(conv);
 
-			// const group = new GroupMember();
-			// group.joined_datetime = new Date();
-			// group.conversation = conv;
-			// await this.groupMemberRepository.save(group);
 			const group = await this.createGroup(conv);
 			console.log("---> ", user.groups);
 
@@ -146,7 +141,7 @@ export class ChatService {
 		return allMessages;
 	}
 
-	async getConversations(userName: string): Promise<Conversation[]> {
+	async getConversations(userName: string): Promise<GroupMember[]> {
 
 		const allConversations = await this.getAllConversations(userName);
 		if (!allConversations) {

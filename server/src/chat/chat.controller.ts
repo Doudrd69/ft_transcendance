@@ -42,7 +42,7 @@ export class ChatController {
 	}
 
 	@Get('getConversations/:userName')
-	getConversationsFromUser(@Param('userName') userName: string): Promise <Conversation[]> {
+	getConversationsFromUser(@Param('userName') userName: string): Promise <GroupMember[]> {
 		return this.chatService.getConversations(userName);
 	}
 }
