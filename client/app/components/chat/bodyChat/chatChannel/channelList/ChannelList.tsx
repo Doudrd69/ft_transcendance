@@ -1,6 +1,10 @@
 import './ChannelList.css'
-import React from 'react';
-import {useChat} from '../../../ChatContext'
+import React, { useState, useEffect } from 'react';
+import {useChat} from '../../../ChatContext';
+
+interface Conversation {
+	name: string;
+}
 
 const ChannelListComponent: React.FC = () => {
 
@@ -17,6 +21,27 @@ const ChannelListComponent: React.FC = () => {
 	// 	userData.login();
 	// }
 	const { state, dispatch } = useChat();
+
+	const [conversations, setConversations] = useState<Conversation[]>([]);
+	const user = sessionStorage.getItem("currentUserLogin");
+
+	const loadDiscussions = async () => {
+
+		const response = await fetch(`http://localhost:3001/chat/getConversations/${user}`, {
+			method: 'GET',
+		});
+
+		if (response.ok) {
+			const userData = await response.json();
+			console.log("Raw userData: ", userData);
+			setConversations((prevConversations: Conversation[]) => [...prevConversations, ...userData]);
+			console.log(conversations);
+		}
+		else {
+			console.log("Fatal error");
+		}
+	};
+
 	const userData = {
 		channel: [
 			"Eowyn Percetcheveux",

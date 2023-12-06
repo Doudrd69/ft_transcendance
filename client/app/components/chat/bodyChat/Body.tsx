@@ -2,21 +2,22 @@
 import './Body.css';
 import React from 'react';
 import { useChat } from '../ChatContext';
-import ChatDiscussionComponent from './chatDiscussion/ChatDiscussion';
-import AddComponent from './add/Add';
-import FriendsListComponent from './friendsList/FriendsList';
 import { Socket } from 'socket.io-client'
+import FriendsListComponent from './chatFriendsList/ChatFriendsList'
+import ChatListComponent from './chatUser/chatList/ChatList';
+import AddComponent from './chatAdd/Add';
+import ChannelListComponent from './chatChannel/channelList/ChannelList';
 
 const BodyComponent = (socket: {socket: Socket}) => {
-	const {showFriendsList, showDiscussionList, showAdd, showChatDiscussion} = useChat();
 
+	const { state } = useChat();
+	const {showFriendsList, showChatList, showAdd, showChannelList} = state;
 	return (
 		<div className="powerlifter">
 			{showFriendsList && <FriendsListComponent/>}
-			{showDiscussionList && <DiscussionListComponent/>}
+			{showChatList && <ChatListComponent/>}
+			{showChannelList && <ChannelListComponent/>}
 			{showAdd && <AddComponent socket={socket.socket}/>}
-			{showChatDiscussion && <ChatDiscussionComponent socket={socket.socket}/>}
-			{showChatDiscussion && <MessageComponent socket={socket.socket}/>}
 		</div>
 	)
 };
