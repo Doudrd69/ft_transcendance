@@ -3,23 +3,11 @@ import React, { useState, useEffect } from 'react';
 import {useChat} from '../../../ChatContext';
 
 interface Conversation {
+	id: number;
 	name: string;
 }
 
 const ChannelListComponent: React.FC = () => {
-
-	// const retreiveUser = async () => {
-	// 	const response = await fetch("http://localhost:3001/getUser", {
-	// 		method : 'GET',
-	// 		headers:{
-	// 			'Authorization':,
-	// 		},
-	// 	});
-	// }
-	// if (response.ok){
-	// 	const userData = await Response.json();
-	// 	userData.login();
-	// }
 	const { state, dispatch } = useChat();
 
 	const [conversations, setConversations] = useState<Conversation[]>([]);
@@ -33,7 +21,7 @@ const ChannelListComponent: React.FC = () => {
 
 		if (response.ok) {
 			const userData = await response.json();
-			console.log("Raw userData: ", userData);
+			console.log("Channels (groups) : ", userData);
 			setConversations((prevConversations: Conversation[]) => [...prevConversations, ...userData]);
 			console.log(conversations);
 		}
@@ -43,15 +31,7 @@ const ChannelListComponent: React.FC = () => {
 	};
 
 	const userData = {
-		channel: [
-			"Eowyn Percetcheveux",
-			"Edouard Brodeur",
-			"Zoe Roffi",
-			"Frederic Monachon",
-			"Jean du Jardinage",
-			"Xavier Ni elle ni moi",
-			"WiNi Monachon"
-		],
+		discussion: conversations,
 		online:[
 			"on",
 			"off",
@@ -61,19 +41,27 @@ const ChannelListComponent: React.FC = () => {
 			"on",
 			"on",
 		]
-	};
+	}
+
+	useEffect(() => {
+		console.log("Loading conversations...");
+		loadDiscussions();
+	}, []);
+
 	return (
-		<div className="bloc-channel-list">
-			{userData.channel.map((user, index) => (
-			<div className = "bloc-button-channel-list">
-				<div className={`profil-channel-list ${userData.online[index]}`}/>
-				<button	className="channel-list" 
-						onClick={() => dispatch({ type: 'TOGGLE', payload: 'showChannelchannel' })}>
-					{user}
-				</button>
-			</div>
-			))}
-		</div>
+		<div className="bloc-discussion-list">
+		{userData.discussion.map((conversations, index) => (
+		  <div key={index} className="bloc-button-discussion-list">
+			<div className={`profil-discussion-list ${userData.online[index]}`} />
+			<button
+			  className="discussion-list"
+			  onClick={() => dispatch({ type: 'TOGGLE', payload: 'showChat' })}
+			>
+			  {conversations.name}
+			</button>
+		  </div>
+		))}
+	  </div>
 	)
 };
 export default ChannelListComponent;
