@@ -79,6 +79,21 @@ const FriendsListComponent: React.FC = () => {
 		  ))}
 		</div>
 	)
+	// return (
+	// 	<div className="bloc-friendslist">
+	// 		{userData.discussion.map((user, index) => (
+	// 			<div className='tab-and-userclicked'>
+	// 				<div className ='bloc-button-friendslist'>
+	// 					<div className={`profil-friendslist ${userData.online[index]}`}/>
+	// 					<div className={`amies ${activeIndex === index ? 'active' : ''}`} onClick={() => activateTabFriendsList(index)}>
+	// 						{user}
+	// 					</div>
+	// 				</div>
+	// 				{activeIndex === index && <FriendsListTabComponent user={user}/>}
+	// 			</div>
+	// 		))}
+	// 	</div>
+	// )
 }
 
 export default FriendsListComponent;
