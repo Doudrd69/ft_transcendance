@@ -41,6 +41,8 @@ export default function Home() {
 			recipientLogin: sessionStorage.getItem("currentUserLogin"),
 		}
 
+		console.log("DTO in FRValidation -> ", acceptedFR);
+
 		const response = await fetch('http://localhost:3001/users/acceptFriendRequest', {
 			method: 'POST',
 			headers: {
@@ -134,28 +136,6 @@ export default function Home() {
 		}
 	}, [userSocket]);
 
-	useEffect(() => {
-		socket.on('friendRequest', (friendRequestDto: FriendRequestDto) => {
-			if (sessionStorage.getItem("currentUserLogin") === friendRequestDto.recipient)
-				console.log("You received a friend request from ", friendRequestDto.initiator);
-		});
-
-		return () => {
-			socket.off('friendRequest');
-		}
-	}, [socket]);
-
-	// Socket use-effect
-	useEffect(() => {
-		socket.on('friendRequest', (friendRequestDto: FriendRequestDto) => {
-			if (sessionStorage.getItem("currentUserLogin") === friendRequestDto.recipient)
-				console.log("You received a friend request from ", friendRequestDto.initiator);
-		});
-
-		return () => {
-			socket.off('friendRequest');
-		}
-	}, [socket]);
 
 	useEffect(() => {
 
@@ -180,14 +160,6 @@ export default function Home() {
 		}
 	})
 
-	// Login use-effect
-	// useEffect(() => {
-	// 	if (code && showLogin) {
-	// 		handleAccessToken(code).then(result => {
-	// 			setShowLogin(false);
-	// 		})
-	// 	}
-	// }, [showLogin]);
 	useEffect(() => {
 
 		gameSocket.on('connect', () => {
@@ -217,22 +189,6 @@ export default function Home() {
 		if (sessionStorage.getItem("currentUserLogin") != null)
 			setShowLogin(false);
 	});
-
-    useEffect(() => {
-		gameSocket.on('connect', () => {
-			console.log('Youpi une connexion!');
-		})
-
-		gameSocket.on('disconnect', () => {
-			console.log('Disconnected from the server');
-		})
-
-		return () => {
-			console.log('Unregistering events...');
-			gameSocket.off('connect');
-			gameSocket.off('disconnect');
-		}
-	})
 
 	return (
 			<RootLayout>
