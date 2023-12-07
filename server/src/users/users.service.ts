@@ -66,6 +66,28 @@ export class UsersService {
 	// 	});
 	// }
 
+	// async createNewUser(username: string, password: string): Promise<User> {
+	// 	const userToCreate = await this.usersRepository.findOne({ where: { username } });
+	// 	if (!userToCreate) {
+	// 		const saltOrRounds = 10;
+	// 		if (this.passwordPolicy(password)) {
+	// 			password = await bcrypt.hash(password, saltOrRounds);
+	// 			const newUser = this.usersRepository.create({ username, password });
+	// 			return await this.usersRepository.save(newUser);
+	// 		}
+	// 		throw new Error('Password policy : 8 characters minimum');
+	// 	}
+	// 	throw new Error('User with this username already exists');
+	// }
+
+	// async deleteUser(username: string) {
+	// 	const userToDelete = await this.usersRepository.findOne({ where: { username } });
+	// 	if (userToDelete) {
+	// 		return await this.usersRepository.delete(username);
+	// 	}
+	// 	throw new NotFoundException();
+	// }
+
 	async createNew42User(userData) {
 		const new42User = new User();
 		new42User.login = userData.login;
@@ -84,6 +106,10 @@ export class UsersService {
 			throw new Error(error);
 		});
 	}
+
+	/**************************************************************/
+	/***				FRIENDSHIP MANAGEMENT					***/
+	/**************************************************************/
 
 	async createFriendship(friendRequestDto: FriendRequestDto) {
 
@@ -111,7 +137,7 @@ export class UsersService {
 		return ;
 	}
 	
-	async updateFriendship(friendRequestDto: FriendRequestDto, flag: boolean) {
+	async updateFriendship(friendRequestDto: FriendRequestDto, flag: boolean): Promise<Friendship> {
 
 		const initiator = await this.usersRepository.findOne({
 			where: {login: friendRequestDto.initiatorLogin},
@@ -134,7 +160,23 @@ export class UsersService {
 			console.log("Update -> ", friendshipToUpdate);
 			return friendshipToUpdate;
 		}
+		return ;
 	}
+
+	async acceptFriendship(friendRequestDto: FriendRequestDto) {
+
+		const newFriend = await this.updateFriendship(friendRequestDto, true);
+		if (newFriend) {
+			console.log(friendRequestDto.initiatorLogin, " is now in your friend list!");
+			return newFriend
+		}
+		console.log("Fatal error: could not add ", friendRequestDto.initiatorLogin, " to your friend list");
+		return ;
+	}
+
+	/**************************************************************/
+	/***					GETTERS						***/
+	/**************************************************************/
 		
 	findUserByLogin(loginToSearch: string) {
 		return this.usersRepository.findOne({ where: {login: loginToSearch}});
@@ -151,37 +193,15 @@ export class UsersService {
 			relations: ["initiatedFriendships", "initiatedFriendships.friend"],
 		});
 		if (user) {
-			const friendsname = user.initiatedFriendships.filter(friendship => !friendship.isAccepted).map((friendship) => friendship.friend.login);
-			console.log("Names -> ", friendsname);
-			const pendingFriendRequests = user.initiatedFriendships.filter(friendship => !friendship.isAccepted);
-			console.log("Pending -> ", pendingFriendRequests);
+			// const friendsname = user.initiatedFriendships.filter(friendship => !friendship.isAccepted).map((friendship) => friendship.friend.login);
+			// console.log("Names -> ", friendsname);
+			// const pendingFriendRequests = user.initiatedFriendships.filter(friendship => !friendship.isAccepted);
+			// console.log("Pending -> ", pendingFriendRequests);
 			const friends = user.initiatedFriendships.filter(friendship => friendship.isAccepted);
-			console.log("Friends --> ", friends);
+			// console.log("Friends --> ", friends);
 			return friends;
 		}
 		return ;
 	}
 
-
-		// async createNewUser(username: string, password: string): Promise<User> {
-		// 	const userToCreate = await this.usersRepository.findOne({ where: { username } });
-		// 	if (!userToCreate) {
-		// 		const saltOrRounds = 10;
-		// 		if (this.passwordPolicy(password)) {
-		// 			password = await bcrypt.hash(password, saltOrRounds);
-		// 			const newUser = this.usersRepository.create({ username, password });
-		// 			return await this.usersRepository.save(newUser);
-		// 		}
-		// 		throw new Error('Password policy : 8 characters minimum');
-		// 	}
-		// 	throw new Error('User with this username already exists');
-		// }
-	
-		// async deleteUser(username: string) {
-		// 	const userToDelete = await this.usersRepository.findOne({ where: { username } });
-		// 	if (userToDelete) {
-		// 		return await this.usersRepository.delete(username);
-		// 	}
-		// 	throw new NotFoundException();
-		// }
-	}
+}

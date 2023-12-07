@@ -53,6 +53,13 @@ export class UsersController {
 		return this.usersService.updateFriendship(friendRequestDto, flag);
 	}
 
+
+	@HttpCode(HttpStatus.OK)
+	@Post('acceptFriendRequest')
+	acceptFriendship(@Body() friendRequestDto: FriendRequestDto) {
+		return this.usersService.acceptFriendship(friendRequestDto);
+	}
+
 	@Get('getFriends/:username')
 	getFriendsList(@Param('username') username: string): Promise<Friendship[]> {
 		return this.usersService.getFriendships(username);
