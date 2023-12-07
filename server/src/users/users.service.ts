@@ -111,7 +111,9 @@ export class UsersService {
 	/***				FRIENDSHIP MANAGEMENT					***/
 	/**************************************************************/
 
-	async createFriendship(friendRequestDto: FriendRequestDto) {
+	async createFriendship(friendRequestDto: FriendRequestDto): Promise<Friendship> {
+
+		console.log("DTO received in createFrienship : ", friendRequestDto);
 
 		const initiator = await this.usersRepository.findOne({
 			where: {login: friendRequestDto.initiatorLogin},
@@ -124,21 +126,26 @@ export class UsersService {
 		});
 
 		if (initiator && friend) {
-			console.log("Initiator -> ", initiator.initiatedFriendships);
-			console.log("Friend    -> ", friend.initiatedFriendships);
-
-			let newFriendship = new Friendship();
-			newFriendship.initiator = initiator;
-			newFriendship.friend = friend;
-			await this.friendshipRepository.save(newFriendship);
-			return newFriendship;
+			
+			// Only works one way, need to check the reverse (initiator <-> friend)
+			const friendshipAlreadyExists = await this.friendshipRepository.findOne({
+				where: {initiator: initiator, friend: friend},
+			});
+			
+			if (!friendshipAlreadyExists) {			
+	
+				let newFriendship = new Friendship();
+				newFriendship.initiator = initiator;
+				newFriendship.friend = friend;
+				return await this.friendshipRepository.save(newFriendship);
+			}
 		}
-
 		return ;
 	}
 	
 	async updateFriendship(friendRequestDto: FriendRequestDto, flag: boolean): Promise<Friendship> {
 
+		console.log("DTO received in updateFR --> ", friendRequestDto);
 		const initiator = await this.usersRepository.findOne({
 			where: {login: friendRequestDto.initiatorLogin},
 			relations: ["initiatedFriendships", "acceptedFriendships"],
@@ -151,23 +158,33 @@ export class UsersService {
 
 		if (initiator && friend) {
 
-			const friendshipToUpdate = await this.friendshipRepository.findOne({
+			let friendshipToUpdate = new Friendship();
+			friendshipToUpdate = await this.friendshipRepository.findOne({
 				where: {initiator: initiator, friend: friend},
 			});
 
 			friendshipToUpdate.isAccepted = flag;
-			await this.friendshipRepository.save(friendshipToUpdate);
-			console.log("Update -> ", friendshipToUpdate);
+    		await this.friendshipRepository.save(friendshipToUpdate);
+
+			initiator.acceptedFriendships.push(friendshipToUpdate);
+			friend.acceptedFriendships.push(friendshipToUpdate);
+			await this.usersRepository.save(initiator);
+			await this.usersRepository.save(friend);
+
+			console.log(initiator.login, " friend list : ", initiator.acceptedFriendships);
+			console.log(friend.login, " friend list : ", friend.acceptedFriendships);
+
 			return friendshipToUpdate;
 		}
 		return ;
 	}
 
-	async acceptFriendship(friendRequestDto: FriendRequestDto) {
+	async acceptFriendship(friendRequestDto: FriendRequestDto): Promise<Friendship> {
 
+		console.log("DTO received in acceptedFrinship--> ", friendRequestDto);
 		const newFriend = await this.updateFriendship(friendRequestDto, true);
 		if (newFriend) {
-			console.log(friendRequestDto.initiatorLogin, " is now in your friend list!");
+			console.log("Updated friendship : ", newFriend);
 			return newFriend
 		}
 		console.log("Fatal error: could not add ", friendRequestDto.initiatorLogin, " to your friend list");
@@ -188,17 +205,16 @@ export class UsersService {
 
 	async getFriendships(username: string): Promise<Friendship[]> {
 
-		const user = await this.usersRepository.findOne({
+		console.log(username, " friend list loading...");
+		let user = new User();
+		user = await this.usersRepository.findOne({
 			where: {login: username},
-			relations: ["initiatedFriendships", "initiatedFriendships.friend"],
+			relations: ["acceptedFriendships", "acceptedFriendships.friend"],
 		});
+
 		if (user) {
-			// const friendsname = user.initiatedFriendships.filter(friendship => !friendship.isAccepted).map((friendship) => friendship.friend.login);
-			// console.log("Names -> ", friendsname);
-			// const pendingFriendRequests = user.initiatedFriendships.filter(friendship => !friendship.isAccepted);
-			// console.log("Pending -> ", pendingFriendRequests);
-			const friends = user.initiatedFriendships.filter(friendship => friendship.isAccepted);
-			// console.log("Friends --> ", friends);
+			const friends = await user.acceptedFriendships.filter((friendship: Friendship) => friendship.isAccepted);
+			console.log(user.login, "F List --> ", friends);
 			return friends;
 		}
 		return ;

@@ -4,6 +4,7 @@ import FriendsListTabComponent from './friendsListTab/FriendsListTab';
 
 interface FriendShip {
 	id: number;
+	isAccepted: true;
 	friend: any;
 }
 
@@ -31,11 +32,12 @@ const FriendsListComponent: React.FC = () => {
 			method: 'GET',
 		});
 
+		// erreur : celui qui a accepte n'a pas le user dans sa list
 		if (response.ok) {
 			const data = await response.json();
-			// console.log("FriendList : ", data);
-			setFriendList((prevFriendList: FriendShip[]) => [...prevFriendList, ...data]);
-			// console.log("FF -> ", friendList);
+			console.log("DATA checck ==> ", data);
+			// setFriendList((prevFriendList: FriendShip[]) => [...prevFriendList, ...data]);
+			setFriendList([...data]);
 		}
 		else {
 			console.log("Fatal error: no friend list");
@@ -56,7 +58,7 @@ const FriendsListComponent: React.FC = () => {
 	};
 
 	useEffect(() => {
-		// console.log("FriendList in useEffect: ", friendList);
+		console.log("FriendList in useEffect: ", friendList);
 	  }, [friendList]);
 
 	useEffect(() => {
@@ -66,15 +68,15 @@ const FriendsListComponent: React.FC = () => {
 
 	return (
 		<div className="bloc-friendslist">
-		  {friendList.map((friendList, index) => (
-			<div className='tab-and-userclicked' key={index}>
+		  {userData.discussion.map((friend: FriendShip, id: number) => (
+			<div className='tab-and-userclicked' key={id}>
 			  <div className ='bloc-button-friendslist'>
-				<div className={`profil-friendslist ${userData.online[index]}`}/>
-				<div className={`amies ${activeIndex === index ? 'active' : ''}`} onClick={() => activateTabFriendsList(index)}>
-				  {friendList.friend.login} {/* Assuming 'name' is the property you want to display */}
+				<div className={`profil-friendslist ${userData.online[id]}`}/>
+				<div className={`amies ${activeIndex === id? 'active' : ''}`} onClick={() => activateTabFriendsList(id)}>
+					{friend.friend.login}
 				</div>
 			  </div>
-			  {/* {activeIndex === index && <FriendsListTabComponent user={friendList} />} */}
+			  {activeIndex === id && <FriendsListTabComponent user={friend.friend.login} />}
 			</div>
 		  ))}
 		</div>
