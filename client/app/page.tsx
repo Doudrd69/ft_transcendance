@@ -27,8 +27,6 @@ export default function Home() {
 	const gameSocket = io('http://localhost:3001/game')
 
 
-	// const socket: Socket = io('http://localhost:3000');
-
 	const [showLogin, setShowLogin] = useState(true);
 	const [show2FAForm, setShow2FAForm] = useState(false);
 
@@ -41,6 +39,8 @@ export default function Home() {
 			initiatorLogin: initiatorLogin,
 			recipientLogin: sessionStorage.getItem("currentUserLogin"),
 		}
+
+		console.log("DTO in FRValidation -> ", acceptedFR);
 
 		const response = await fetch('http://localhost:3001/users/acceptFriendRequest', {
 			method: 'POST',
