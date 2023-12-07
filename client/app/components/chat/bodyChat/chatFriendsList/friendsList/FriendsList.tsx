@@ -1,10 +1,18 @@
 import './FriendsList.css'
-import React, {useState} from 'react'
+import React, { useState, useEffect } from 'react'
 import FriendsListTabComponent from './friendsListTab/FriendsListTab';
 
+interface FriendShip {
+	id: number;
+	friend: any;
+}
+
 const FriendsListComponent: React.FC = () => {
+
 	const [showTabFriendsList, setTabFriendsList] = useState(false);
 	const [activeIndex, setActiveIndex] = useState<number | null>(null);
+	const [friendList, setFriendList] = useState<FriendShip[]>([]);
+	const username = sessionStorage.getItem("currentUserLogin");
 
 	const disableTabFriendsList = () =>setTabFriendsList(false);
 	const activateTabFriendsList = (index: number) => {
@@ -17,16 +25,26 @@ const FriendsListComponent: React.FC = () => {
 		}
 	  };
 
+	const loadFriendList = async () => {
+
+		const response = await fetch(`http://localhost:3001/users/getFriends/${username}`, {
+			method: 'GET',
+		});
+
+		if (response.ok) {
+			const data = await response.json();
+			console.log("FriendList : ", data);
+			// setFriendList((prevFriends: FriendShip[]) => [...prevFriends, ...data]);
+			setFriendList((prevFriendList: FriendShip[]) => [...prevFriendList, ...data]);
+			console.log("FF -> ", friendList);
+		}
+		else {
+			console.log("Fatal error: no friend list");
+		}
+	}
+	
 	const userData = {
-		discussion: [
-		  "Frederic Monachon",
-		  "Eowyn Percetcheveux",
-		  "Edouard Brodeur",
-		  "Zoe Roffi",
-		  "Jean du Jardinage",
-		  "Xavier Ni elle ni moi",
-		  "WiNi Monachon"
-		],
+		discussion: friendList,
 		online:[
 			"on",
 			"off",
@@ -37,21 +55,46 @@ const FriendsListComponent: React.FC = () => {
 			"on",
 		]
 	};
+
+	useEffect(() => {
+		console.log("FriendList in useEffect: ", friendList);
+	  }, [friendList]);
+
+	useEffect(() => {
+		console.log("Loading friend list...");
+		loadFriendList();
+	}, []);
+
 	return (
 		<div className="bloc-friendslist">
-			{userData.discussion.map((user, index) => (
-				<div className='tab-and-userclicked'>
-					<div className ='bloc-button-friendslist'>
-						<div className={`profil-friendslist ${userData.online[index]}`}/>
-						<div className={`amies ${activeIndex === index ? 'active' : ''}`} onClick={() => activateTabFriendsList(index)}>
-							{user}
-						</div>
-					</div>
-					{activeIndex === index && <FriendsListTabComponent user={user}/>}
+		  {friendList.map((friendList, index) => (
+			<div className='tab-and-userclicked' key={index}>
+			  <div className ='bloc-button-friendslist'>
+				<div className={`profil-friendslist ${userData.online[index]}`}/>
+				<div className={`amies ${activeIndex === index ? 'active' : ''}`} onClick={() => activateTabFriendsList(index)}>
+				  {friendList.friend.login} {/* Assuming 'name' is the property you want to display */}
 				</div>
-			))}
+			  </div>
+			  {activeIndex === index && <FriendsListTabComponent user={friendList} />}
+			</div>
+		  ))}
 		</div>
 	)
+	// return (
+	// 	<div className="bloc-friendslist">
+	// 		{userData.discussion.map((user, index) => (
+	// 			<div className='tab-and-userclicked'>
+	// 				<div className ='bloc-button-friendslist'>
+	// 					<div className={`profil-friendslist ${userData.online[index]}`}/>
+	// 					<div className={`amies ${activeIndex === index ? 'active' : ''}`} onClick={() => activateTabFriendsList(index)}>
+	// 						{user}
+	// 					</div>
+	// 				</div>
+	// 				{activeIndex === index && <FriendsListTabComponent user={user}/>}
+	// 			</div>
+	// 		))}
+	// 	</div>
+	// )
 }
 
 export default FriendsListComponent;

@@ -2,6 +2,7 @@ import { Controller, Post, HttpCode, HttpStatus, Body, Get, UploadedFile, UseInt
 import { UsersService } from './users.service';
 import { FriendRequestDto } from './dto/FriendRequestDto.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { Friendship } from './entities/friendship.entity';
 
 @Controller('users')
 export class UsersController {
@@ -50,5 +51,10 @@ export class UsersController {
 	@Post('friendRequestResponse')
 	updateFriendship(@Body() friendRequestDto: FriendRequestDto, flag: boolean) {
 		return this.usersService.updateFriendship(friendRequestDto, flag);
+	}
+
+	@Get('getFriends/:username')
+	getFriendsList(@Param('username') username: string): Promise<Friendship[]> {
+		return this.usersService.getFriendships(username);
 	}
 }
