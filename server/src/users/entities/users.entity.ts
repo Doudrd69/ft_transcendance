@@ -36,7 +36,9 @@ export class User {
   @Column({ default: false })
   isActive: boolean;
 
-  @ManyToMany(type => Conversation)
+  @ManyToMany(type => Conversation, {
+    eager: true,
+  })
   @JoinTable({
 	  name: "user_to_group",
 	  joinColumn: {
@@ -50,9 +52,13 @@ export class User {
   })
   groups: GroupMember[];
 
-  @OneToMany(() => Friendship, (friendship) => friendship.initiator)
+  @OneToMany(() => Friendship, (friendship) => friendship.initiator, {
+    eager: true,
+  })
   initiatedFriendships: Friendship[];
 
-  @OneToMany(() => Friendship, (friendship) => friendship.friend)
+  @OneToMany(() => Friendship, (friendship) => friendship.friend, {
+    eager: true,
+  })
   acceptedFriendships: Friendship[];
 }

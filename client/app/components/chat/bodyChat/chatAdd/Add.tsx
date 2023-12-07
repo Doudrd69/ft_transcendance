@@ -50,6 +50,7 @@ const AddComponent = (socket: {socket: Socket}) => {
 			recipientLogin: formValues[index],
 		}
 
+		console.log("FR DTO --> ", friendRequestDto);
 		const response = await fetch('http://localhost:3001/users/addfriend', {
 			method: 'POST',
 			headers: {
