@@ -23,7 +23,7 @@ const FriendsListComponent: React.FC = () => {
 		  // Sinon, activez le bouton cliqué et désactivez les autres
 		  setActiveIndex(index);
 		}
-	  };
+	};
 
 	const loadFriendList = async () => {
 
@@ -33,10 +33,9 @@ const FriendsListComponent: React.FC = () => {
 
 		if (response.ok) {
 			const data = await response.json();
-			console.log("FriendList : ", data);
-			// setFriendList((prevFriends: FriendShip[]) => [...prevFriends, ...data]);
+			// console.log("FriendList : ", data);
 			setFriendList((prevFriendList: FriendShip[]) => [...prevFriendList, ...data]);
-			console.log("FF -> ", friendList);
+			// console.log("FF -> ", friendList);
 		}
 		else {
 			console.log("Fatal error: no friend list");
@@ -57,7 +56,7 @@ const FriendsListComponent: React.FC = () => {
 	};
 
 	useEffect(() => {
-		console.log("FriendList in useEffect: ", friendList);
+		// console.log("FriendList in useEffect: ", friendList);
 	  }, [friendList]);
 
 	useEffect(() => {
@@ -75,26 +74,11 @@ const FriendsListComponent: React.FC = () => {
 				  {friendList.friend.login} {/* Assuming 'name' is the property you want to display */}
 				</div>
 			  </div>
-			  {activeIndex === index && <FriendsListTabComponent user={friendList} />}
+			  {/* {activeIndex === index && <FriendsListTabComponent user={friendList} />} */}
 			</div>
 		  ))}
 		</div>
 	)
-	// return (
-	// 	<div className="bloc-friendslist">
-	// 		{userData.discussion.map((user, index) => (
-	// 			<div className='tab-and-userclicked'>
-	// 				<div className ='bloc-button-friendslist'>
-	// 					<div className={`profil-friendslist ${userData.online[index]}`}/>
-	// 					<div className={`amies ${activeIndex === index ? 'active' : ''}`} onClick={() => activateTabFriendsList(index)}>
-	// 						{user}
-	// 					</div>
-	// 				</div>
-	// 				{activeIndex === index && <FriendsListTabComponent user={user}/>}
-	// 			</div>
-	// 		))}
-	// 	</div>
-	// )
 }
 
 export default FriendsListComponent;
