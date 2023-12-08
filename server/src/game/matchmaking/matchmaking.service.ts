@@ -17,38 +17,38 @@ export class LobbyService {
     async getUserByLogin(loginToSearch: string): Promise<User> {
 		return await this.playersRepository.findOne({ where: {login: loginToSearch}});
 	}
-    async createLobby(lobbyName, player: User): Promise<Lobby> {
+    async createLobby(lobbyName, playerName: string): Promise<Lobby> {
         console.log("-- Create Lobby --");
         console.log("Lobby ID: ", lobbyName);
-        console.log("User ID: ", player.login);
+        console.log("User ID: ", playerName);
         const newLobby = this.lobbyRepository.create({name : lobbyName});
-        this.getUserByLogin(player.login).then(result => {
+        this.getUserByLogin(playerName).then(result => {
             newLobby.lobbyTable.push(result);
         }).catch(error => {
             console.log("Error in first promise: ", error);
         })
         this.lobbyRepository.save(newLobby);
-        console.log(`The player: ${player.login}, create lobby: ${newLobby.name}.`);
+        console.log(`The player: ${playerName}, create lobby: ${newLobby.name}.`);
         return ;
     }
-    async checkLobbyAlreadyExist(player: User): Promise<Lobby> {
+    async checkLobbyAlreadyExist(playerName: string): Promise<Lobby> {
     
         const allLobbies = await this.lobbyRepository.find({ relations: ['lobbyTable'] });
         
         for (const lobby of allLobbies) {
             if (lobby.lobbyTable.length < 2) {
-                this.getUserByLogin(player.login).then(result => {
+                this.getUserByLogin(playerName).then(result => {
                     lobby.lobbyTable.push(result);
                 }).catch(error => {
                     console.log("Error in first promise: ", error);
                 })
                 await this.lobbyRepository.save(lobby);
-                console.log(`The player: ${player.login}, join lobby: ${lobby.name}.`);
+                console.log(`The player: ${playerName}, join lobby: ${lobby.name}.`);
                 return ;
             }
         }
 
-        await this.createLobby(player.login + "'s Lobby", player);
+        await this.createLobby(playerName + "'s Lobby", playerName);
         return ;
     }
 

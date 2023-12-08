@@ -9,10 +9,10 @@ export class GameController {
                 private LobbyService: LobbyService) {}
 
   @Post('join')
-  joinLobby(@Body() player: User) {
-    console.log("player name :", player.login);
-    this.LobbyService.checkLobbyAlreadyExist(player);
-    return { message: 'Joueur rejoint avec succès', playerName: player.login };
+  joinLobby(@Body() playerName: string) {
+    console.log("player name :", playerName);
+    this.LobbyService.checkLobbyAlreadyExist(playerName);
+    return { message: 'Joueur rejoint avec succès', playerName };
   }
 }
 

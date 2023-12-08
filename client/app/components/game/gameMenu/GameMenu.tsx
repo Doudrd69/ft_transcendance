@@ -15,7 +15,7 @@ const Menu: React.FC = () => {
 			headers: {
 				'Content-Type': 'application/json',
 			},
-			body: JSON.stringify(player),
+			body: JSON.stringify(sessionStorage.getItem("currentUserLogin")),
 		});
     
 		if (response.ok) {
