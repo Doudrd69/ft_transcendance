@@ -51,10 +51,13 @@ export class LobbyService {
         await this.createLobby(player.login + "'s Lobby", player);
         return ;
     }
+
+    async deleteEmptyLobby() 
+    {
+        return ;
+    }
 }
 
 /**
- * Pour check le lobby
- * regarder tout les lobbys et regarder leurs tailles
- * pour creer un lobby
+ * mtn il faut que je supprime le lobby des que le joueur qui l'a cree part
  */
