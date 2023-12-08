@@ -19,9 +19,11 @@ const AddComponent = (socket: {socket: Socket}) => {
 
 		const conversationDto = {
 			name: formValues[index],
+			is_channel: true,
 			username: sessionStorage.getItem("currentUserLogin"),
 			is_channel: true,
 		}
+		console.log(conversationDto);
 
 		const response = await fetch('http://localhost:3001/chat/newConversation', {
 			method: 'POST',

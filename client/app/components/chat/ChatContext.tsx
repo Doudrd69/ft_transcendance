@@ -91,7 +91,7 @@ export const setCurrentConversation = (payload: string | null): Action => ({
 export const useChat = () => {
   const context = useContext(ChatContext);
   if (context === undefined) {
-    throw new Error('useChat doit être utilisé dans un ChatProvider');
+	throw new Error('useChat doit être utilisé dans un ChatProvider');
   }
   return context;
 };
