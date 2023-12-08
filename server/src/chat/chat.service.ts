@@ -38,7 +38,6 @@ export class ChatService {
 		return messages;
 	}
 
-<<<<<<< HEAD
 	private async getAllConversations(userName: string): Promise<GroupMember[]> {
 
 		// login != username, penser a changer ca
@@ -46,26 +45,6 @@ export class ChatService {
 		userToFind = await this.usersRepository.findOne({
 			where: { login: userName },
 			relations: ["groups"],
-=======
-	createConversation(conversationName: string, username: string): Promise<Conversation> {
-		console.log("-- createConversation --");
-		console.log("Conversation to be created: ", conversationName);
-		// verification
-		const newConversation = this.conversationRepository.create({ name: conversationName });
-		// Creer un groupe en parallele, avec le createur de la conversation
-		// attention username != login
-		this.usersRepository.find({ where: {login: username} }).then(result => {
-			this.createGroupMember(newConversation, result[0]).then(result => {
-				console.log("Group successfully created");
-				return ;
-			}).catch(error => {
-				console.log("Error during group creation :", error);
-			});
-			console.log("== Groupe was created, we can save conversation ==");
-			return this.conversationRepository.save(newConversation);
-		}).catch(error => {
-			console.log("Error during conversation creation :", error);
->>>>>>> aefff37 (Reworked friendship (isse with dto transmission) + trying to implement notifications)
 		});
 		if (userToFind) {
 			console.log("==> Looking for ", userToFind.login, " conversations...");

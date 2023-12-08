@@ -17,11 +17,19 @@ const AddComponent = (socket: {socket: Socket}) => {
 
 		e.preventDefault();
 
+<<<<<<< HEAD
+=======
+		console.log("Conversation to create :", formValues[index]);
+		
+		console.log(formValues[index]);
+>>>>>>> cef68db (channel variable + front channel + dautre truc je me souviens plus)
 		const conversationDto = {
 			name: formValues[index],
+			is_channel: true,
 			username: sessionStorage.getItem("currentUserLogin"),
 			is_channel: true,
 		}
+		console.log(conversationDto);
 
 		const response = await fetch('http://localhost:3001/chat/newConversation', {
 			method: 'POST',
