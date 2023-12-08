@@ -3,21 +3,24 @@ import './Body.css';
 import React from 'react';
 import { useChat } from '../ChatContext';
 import { Socket } from 'socket.io-client'
-import FriendsListComponent from './chatFriendsList/ChatFriendsList'
-import ChatListComponent from './chatUser/chatList/ChatList';
 import AddComponent from './chatAdd/Add';
-import ChannelListComponent from './chatChannel/channelList/ChannelList';
+import ChatUserComponent from './chatUser/ChatUser';
+import ChatChannelComponent from './chatChannel/ChatChannel';
+import ChatFriendsListComponent from './chatFriendsList/ChatFriendsList';
 
 const BodyComponent = (socket: {socket: Socket}) => {
 
-	const { state } = useChat();
-	const {showFriendsList, showChatList, showAdd, showChannelList} = state;
+	const { state, dispatch } = useChat();
+
+	const renderComponent = (component: React.ReactNode, condition: boolean) =>
+	  condition ? component : null;
+	  
 	return (
 		<div className="powerlifter">
-			{showFriendsList && <FriendsListComponent/>}
-			{showChatList && <ChatListComponent/>}
-			{showChannelList && <ChannelListComponent/>}
-			{showAdd && <AddComponent socket={socket.socket}/>}
+			{/* {renderComponent(<ChatUserComponent socket={socket.socket} />, state.showChat || state.showChatList)} */}
+			{renderComponent(<ChatChannelComponent socket={socket.socket}/>, state.showChannel || state.showChannelList)}
+			{renderComponent(<ChatFriendsListComponent/>, state.showFriendsList)}
+			{renderComponent(<AddComponent socket={socket.socket}/>, state.showAdd)}
 		</div>
 	)
 };
