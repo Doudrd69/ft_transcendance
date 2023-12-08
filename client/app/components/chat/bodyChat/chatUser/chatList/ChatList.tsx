@@ -5,6 +5,7 @@ import {useChat} from '../../../ChatContext';
 interface Conversation {
 	id: number,
 	name: string;
+	is_channel:boolean;
 }
 
 const ChatListComponent: React.FC = () => {
@@ -43,26 +44,27 @@ const ChatListComponent: React.FC = () => {
 			"on",
 		]
 	}
+	console.log("conversations ============================================== ");
+	console.log(conversations);
 
 	useEffect(() => {
-		console.log("Loading conversations...");
+		console.log("Loading converssations...");
 		loadDiscussions();
 	}, []);
-
 	return (
 		<div className="bloc-discussion-list">
-		{userData.discussion.map((conversations, index) => (
-		  <div key={index} className="bloc-button-discussion-list">
-			<div className={`profil-discussion-list ${userData.online[index]}`} />
-			<button
-			  className="discussion-list"
-			  onClick={() => dispatch({ type: 'TOGGLE', payload: 'showChat' })}
-			>
-			  {conversations.name}
-			</button>
-		  </div>
-		))}
-	  </div>
+			{/* boucle sur la liste des convs*/}
+			{userData.discussion.map((conversation, index) => (
+				!conversation.is_channel && (
+						<div key={index} className="bloc-button-discussion-list">
+							<div className={`profil-discussion-list ${userData.online[index]}`} />
+								<button className="discussion-list" onClick={() => dispatch({ type: 'TOGGLE', payload: 'showChat'})}>
+									<span>{conversation.name}</span>
+								</button>
+						</div>
+				)
+			))}
+		</div>
 	)
 };
 export default ChatListComponent;

@@ -1,60 +1,44 @@
-.bloc-channel-list{
-	/* scroll-behavior: auto; */
-	overflow: scroll;
+.bloc-channel-list {
 	display: flex;
-	flex-direction: column;
-}
-.channel-list{
-	background-color: var(--fourth);
-	height: 100%;
-	border : none;
-	color: aliceblue;
-	font-size: 20px; /* Exemple de taille de police */
-	font-family: Arial, sans-serif;
-	border-radius: 10px;
-		align-items: center;
-	flex:1;
-}
-
-.bloc-button-channel-list{
-	display: flex;
-	align-items: center;;
-	border-radius: 10px;
-	margin: 10px;
-
-}
-
-.channel-list:hover{
-	background-color: var(--fifth);
-}
-
-/*avatar du profil*/
-.on-off {
-	width: 20px;
-	height: 20px;
-	border-radius: 50%;
-	margin-right: 8px;
-	display: inline-block;
-	margin: 15px;
-	border-color: var(--second);
+	flex-wrap: wrap;
+	max-height: 100%;
+	overflow-y: auto; /* Activer le défilement vertical si nécessaire */
   }
-
-.profil-channel-list.on{
-	background-color: green;
-	box-shadow: 0 0 10px green;
-}
-
-.profil-channel-list.off{
-	background-color: red;
-	box-shadow: 0 0 10px red;
-}
-.profil-channel-list{
-	width: 40px;
-	height: 40px;
-	border-radius: 50%;
-	margin: 0px 10px; /* Espacement entre le logo et le nom */
-	background-image: url('picture1.png');
-	background-size: cover; /* Ajuste la taille de l'image pour remplir le cercle */
-	background-repeat: no-repeat;
-	background-position: center center;
+  
+.button-channel-list {
+	  background-color: var(--fourth);
+	  border: none;
+	  flex-basis: calc(50% - 20px); /* Chaque élément occupe 50% de la largeur - marges */
+	  margin: 10px; /* Espacement externe pour un aspect agréable */
+	  padding: 10px; /* Espacement interne pour un aspect agréable */
+	  color: aliceblue;
+	  font-size: 20px;
+	  font-family: Arial, sans-serif;
+	  border-radius: 10px;
+	  display: flex;
+	  align-items: center;
+	  justify-content: center;
+	  flex-direction: column;
+	  box-sizing: border-box;
+	  aspect-ratio: 1 / 1;
+	  position: relative;
+	}
+	.button-channel-list span {
+		max-height: 50px;
+		overflow: hidden;
+		text-overflow: ellipsis; 
+		white-space: nowrap;
+		position: absolute;
+		top: 50%;
+		left: 0;
+		right: 0;
+		transform: translateY(-50%);
+  }
+  
+  .button-channel-list:hover {
+	background-color: var(--fifth);
+  }
+  
+.button-channel-list:hover{
+	background-color: var(--fifth);
 }

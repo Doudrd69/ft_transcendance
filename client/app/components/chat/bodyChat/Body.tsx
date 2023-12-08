@@ -14,7 +14,6 @@ const BodyComponent = (socket: {socket: Socket}) => {
 
 	const renderComponent = (component: React.ReactNode, condition: boolean) =>
 	  condition ? component : null;
-
 	return (
 		<div className="powerlifter">
 			{/* {renderComponent(<ChatUserComponent socket={socket.socket} />, state.showChat || state.showChatList)} */}
