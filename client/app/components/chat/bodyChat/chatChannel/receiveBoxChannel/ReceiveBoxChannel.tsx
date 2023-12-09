@@ -81,19 +81,20 @@ const ReceiveBoxChannelComponent = (socket: {socket: Socket}) => {
 	}, [messages]);
 
 	return (
-		<div ref={messagesContainerRef} className="bloc-discussion-chat">
+
+		<div ref={messagesContainerRef} className="bloc-channel-chat">
 			{messages.map((message: Message) => (
 				<>
 					<div className={`message-container ${isMyMessage(message) ? 'my-message' : 'other-message'}`}>
-						<p className="discussion-chat-content">{message.content}</p>
-						<p className="discussion-chat-date">{formatDateTime(message.post_datetime)}</p>
+						<p className="channel-chat-content">{message.content}</p>
+						<p className="channel-chat-date">{formatDateTime(message.post_datetime)}</p>
 					</div>
 				</>
-				))}
+			))}
 		</div>
-		// <div className="bloc-receive-channel-chat">
-		// 	<p className="receive-channel-chat">coucou comment vas tu ? quelles sont tes perfs en sbd ?</p>
-		// 	<p className="receive-channel-chat">70kg au banc pousse 120kg au soulevé de mort et 90 au squat et toi ?</p>
+		// <div className="bloc-receive-chat">
+		// 	<p className="receive-chat">coucou comment vas tu ? quelles sont tes perfs en sbd ?</p>
+		// 	<p className="receive-chat">70kg au banc pousse 120kg au soulevé de mort et 90 au squat et toi ?</p>
 		// </div>
 	)
 };

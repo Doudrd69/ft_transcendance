@@ -18,12 +18,12 @@ const HeaderChatComponent: React.FC = () => {
     	condition ? component : null;
 	return (
 		<div className="bloc-btn">
-		{renderComponent(<BackComponent />, state.showChat)}
-		{renderComponent(<IdDiscussionComponent />, state.showChat)}
-		{renderComponent(<ChatButtonComponent />, !state.showChat)}
-		{renderComponent(<ChannelButtonComponent />, !state.showChat)}
-		{renderComponent(<FriendsListButtonComponent />, !state.showChat)}
-		{renderComponent(<AddComponent />, !state.showChat)}
+			{renderComponent(<BackComponent />, state.showChat || state.showChannel)}
+			{renderComponent(<IdDiscussionComponent />, state.showChat || state.showChannel)}
+			{renderComponent(<ChatButtonComponent />, !state.showChat && !state.showChannel)}
+			{renderComponent(<ChannelButtonComponent />, !state.showChat && !state.showChannel)}
+			{renderComponent(<FriendsListButtonComponent />, !state.showChat && !state.showChannel)}
+			{renderComponent(<AddComponent />, !state.showChat && !state.showChannel)}
 		</div>
 	)
 };

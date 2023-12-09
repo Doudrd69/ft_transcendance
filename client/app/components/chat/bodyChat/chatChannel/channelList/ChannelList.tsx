@@ -38,14 +38,14 @@ const ChannelListComponent: React.FC = () => {
     console.log("Loading converssations...");
     loadDiscussions();
   }, []);
-
+console.log('coucouc');
   return (
     <div className="bloc-channel-list">
       {/* boucle sur la liste des convs*/}
       {userData.discussion.map((conversation, index) => (
         conversation.is_channel && (
           <button key={index} className="button-channel-list" onClick={() => {
-            dispatch({ type: 'TOGGLE', payload: 'showChat' });
+            dispatch({ type: 'TOGGLE', payload: 'showChannel' });
             dispatch({ type: 'SET_CURRENT_CONVERSATION', payload: conversation.name });
           }}>
             <span>{conversation.name}</span>
