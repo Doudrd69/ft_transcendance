@@ -12,11 +12,10 @@ const ChatUserComponent = (socket: {socket: Socket} ) => {
 
   const renderComponent = (component: React.ReactNode, condition: boolean) =>
 	condition ? component : null;
-	console.log('État initial :', state); // Ajoutez cette ligne pour afficher l'état initial dans la console
-
 
   return (
 	<div className="chat-user">
+
 		{renderComponent(<ChatListComponent/>, state.showChatList)}
 		{renderComponent(<ReceiveBoxComponent socket={socket.socket} />, state.showChat)}
 		{renderComponent(<SendBoxComponent socket={socket.socket}/>, state.showChat)}

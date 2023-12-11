@@ -11,7 +11,7 @@ const ChatButtonComponent: React.FC = () => {
       className={`main-button-chat ${state.showChatList ? 'clicked' : ''}`}
       onClick={() => dispatch({ type: 'TOGGLE', payload: 'showChatList' })}
     >
-      <img src='./images/chat.png' alt="logo" />
+	USER
     </button>
   );
 };

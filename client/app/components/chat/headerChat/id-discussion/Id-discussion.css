@@ -1,6 +1,8 @@
 .id {
 	/* border: 3px solid #333; */
 	/* border:none; */
+	overflow: hidden;
+	text-overflow: ellipsis; 
 	text-align: center;
 	align-items: center;
 	justify-content: center;

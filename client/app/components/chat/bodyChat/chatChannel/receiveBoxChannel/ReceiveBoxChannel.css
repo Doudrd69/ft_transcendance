@@ -1,5 +1,5 @@
-.bloc-receive-channel-chat{
-	/* scroll-behavior: auto; */
+.bloc-channel-chat{
+	scroll-behavior: auto;
 	box-sizing: border-box;
 	background-color:var(--fourth) ;
 	/* border: 3px solid #333; */
@@ -10,6 +10,62 @@
 	overflow: scroll;
 	color: var(--first);
 }
-.receive-channel-chat{
+.receive-chat{
 	margin: 10px;
+	width: fit-content;
+}
+  
+.my-message {
+	/* Your styling for messages sent by you */
+	background-color:cornflowerblue; /* Change this to your desired style */
+	border-radius: 15px 15px 5px 15px;
+	margin-left: auto;
+	
+}
+  
+.other-message {
+	/* Your styling for messages sent by others */
+	background-color: slategray; /* Change this to your desired style */
+	border-radius: 15px 15px 15px 5px;
+	margin-right: auto;
+	width: fit-content;
+}
+  
+.channel-chat-content {
+	font-family: 'Courier New', Courier, monospace;
+	padding: 2%;
+}
+  
+.channel-chat-content{
+	font-family: 'Courier New', Courier, monospace;
+	margin: 10px;
+	width: fit-content;
+}
+  
+.my-message {
+	/* Your styling for messages sent by you */
+	background-color:cornflowerblue; /* Change this to your desired style */
+	border-radius: 15px 15px 5px 15px;
+	margin-left: auto;
+	
+}
+  
+.other-message {
+	/* Your styling for messages sent by others */
+	background-color: slategray; /* Change this to your desired style */
+	border-radius: 15px 15px 15px 5px;
+	margin-right: auto;
+	width: fit-content;
+}
+  
+.channel-chat-content {
+	font-family: 'Courier New', Courier, monospace;
+	padding: 2%;
+}
+  
+.channel-chat-date {
+	font-family: 'Courier New', Courier, monospace;
+	font-size: small;
+	margin: 10px;
+	width: fit-content;
 }
