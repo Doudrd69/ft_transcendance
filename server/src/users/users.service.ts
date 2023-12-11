@@ -66,19 +66,20 @@ export class UsersService {
 	// 	});
 	// }
 
-	// async createNewUser(username: string, password: string): Promise<User> {
-	// 	const userToCreate = await this.usersRepository.findOne({ where: { username } });
-	// 	if (!userToCreate) {
-	// 		const saltOrRounds = 10;
-	// 		if (this.passwordPolicy(password)) {
-	// 			password = await bcrypt.hash(password, saltOrRounds);
-	// 			const newUser = this.usersRepository.create({ username, password });
-	// 			return await this.usersRepository.save(newUser);
-	// 		}
-	// 		throw new Error('Password policy : 8 characters minimum');
-	// 	}
-	// 	throw new Error('User with this username already exists');
-	// }
+	async createNewUser(username: string): Promise<User> {
+		const userToCreate = await this.usersRepository.findOne({ where: {username: username } });
+		if (!userToCreate) {
+			// const saltOrRounds = 10;
+			// password = await bcrypt.hash(password, saltOrRounds);
+			const newUser = new User();
+			newUser.login = username;
+			newUser.firstname = username;
+			newUser.username = username;
+			newUser.officialProfileImage = "";
+			return await this.usersRepository.save(newUser);
+		}
+		throw new Error('User with this username already exists');
+	}
 
 	// async deleteUser(username: string) {
 	// 	const userToDelete = await this.usersRepository.findOne({ where: { username } });
@@ -160,12 +161,6 @@ export class UsersService {
 
 		if (initiator && friend) {
 
-			console.log(initiator.login, " Init --> ", initiator.initiatedFriendships);
-			console.log(friend.login, " Init --> ", friend.initiatedFriendships);
-
-			console.log(initiator.login, " Acpt --> ", initiator.acceptedFriendships);
-			console.log(friend.login, " Acpt --> ", friend.acceptedFriendships);
-
 			let friendshipToUpdate = new Friendship();
 			friendshipToUpdate = await this.friendshipRepository.findOne({
 				where: {initiator: initiator, friend: friend},
@@ -173,7 +168,6 @@ export class UsersService {
 
 			friendshipToUpdate.isAccepted = flag;
 			await this.friendshipRepository.save(friendshipToUpdate);
-			console.log("Updated frienship : ", friendshipToUpdate);
 
 			// Reload initiator and friend entities
   			const initiator2 = await this.usersRepository.findOne({
@@ -199,7 +193,6 @@ export class UsersService {
 
 	async acceptFriendship(friendRequestDto: FriendRequestDto): Promise<Friendship> {
 
-		console.log("DTO received in acceptedFriendship--> ", friendRequestDto);
 		const newFriendship = await this.updateFriendship(friendRequestDto, true);
 		if (newFriendship) {
 			console.log("Updated friendship : ", newFriendship);
@@ -234,7 +227,6 @@ export class UsersService {
 			let initiatedfriends = await user.initiatedFriendships.filter((friendship: Friendship) => friendship.isAccepted);
 			let acceptedfriends = await user.acceptedFriendships.filter((friendship: Friendship) => friendship.isAccepted);
 			const friends = [...initiatedfriends, ...acceptedfriends];
-			console.log(user.login, "F List --> ", friends);
 			return friends;
 		}
 		return ;

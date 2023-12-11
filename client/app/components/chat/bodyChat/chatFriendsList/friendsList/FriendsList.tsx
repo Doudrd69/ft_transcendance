@@ -6,7 +6,8 @@ import FriendsListTabComponent from './friendsListTab/FriendsListTab';
 interface FriendShip {
 	id: number;
 	isAccepted: true;
-	friend: any;
+	friend?: any;
+	initiator?: any
 }
 
 const FriendsListComponent: React.FC = () => {
@@ -35,7 +36,6 @@ const FriendsListComponent: React.FC = () => {
 
 		if (response.ok) {
 			const data = await response.json();
-			console.log("Friend List received from API : ", data);
 			setFriendList([...data]);
 		}
 		else {

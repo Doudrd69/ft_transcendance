@@ -23,9 +23,7 @@ const ChatListComponent: React.FC = () => {
 
 		if (response.ok) {
 			const userData = await response.json();
-			console.log("DM (groups) : ", userData);
 			setConversations((prevConversations: Conversation[]) => [...prevConversations, ...userData]);
-			console.log(conversations);
 		}
 		else {
 			console.log("Fatal error");
@@ -44,8 +42,6 @@ const ChatListComponent: React.FC = () => {
 			"on",
 		]
 	}
-	console.log("conversations ============================================== ");
-	console.log(conversations);
 
 	useEffect(() => {
 		console.log("Loading converssations...");
@@ -53,7 +49,6 @@ const ChatListComponent: React.FC = () => {
 	}, []);
 	return (
 		<div className="bloc-discussion-list">
-			{/* boucle sur la liste des convs*/}
 			{userData.discussion.map((conversation, index) => (
 				!conversation.is_channel && (
 						<div key={index} className="bloc-button-discussion-list">
