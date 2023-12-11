@@ -12,7 +12,6 @@ const ChatChannelComponent = (socket: {socket: Socket} ) => {
 
   const renderComponent = (component: React.ReactNode, condition: boolean) =>
     condition ? component : null;
-
   return (
     <div className="chat-channel">
 		{renderComponent(<ChannelListComponent/>, state.showChannelList)}
