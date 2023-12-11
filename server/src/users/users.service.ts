@@ -163,12 +163,6 @@ export class UsersService {
 
 		if (initiator && friend) {
 
-			console.log(initiator.login, " Init --> ", initiator.initiatedFriendships);
-			console.log(friend.login, " Init --> ", friend.initiatedFriendships);
-
-			console.log(initiator.login, " Acpt --> ", initiator.acceptedFriendships);
-			console.log(friend.login, " Acpt --> ", friend.acceptedFriendships);
-
 			let friendshipToUpdate = new Friendship();
 			friendshipToUpdate = await this.friendshipRepository.findOne({
 				where: {initiator: initiator, friend: friend},

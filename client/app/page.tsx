@@ -40,8 +40,6 @@ export default function Home() {
 			recipientLogin: sessionStorage.getItem("currentUserLogin"),
 		}
 
-		console.log("DTO in FRValidation -> ", acceptedFriendRequestDto);
-
 		const response = await fetch('http://localhost:3001/users/acceptFriendRequest', {
 			method: 'POST',
 			headers: {
