@@ -34,7 +34,6 @@ const FriendsListComponent: React.FC = () => {
 			method: 'GET',
 		});
 
-		// erreur : celui qui a accepte n'a pas le user dans sa list
 		if (response.ok) {
 			const data = await response.json();
 			setFriendList([...data]);
