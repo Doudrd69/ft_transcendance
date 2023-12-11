@@ -6,7 +6,8 @@ import FriendsListTabComponent from './friendsListTab/FriendsListTab';
 interface FriendShip {
 	id: number;
 	isAccepted: true;
-	friend: any;
+	friend?: any;
+	initiator?: any
 }
 
 const FriendsListComponent: React.FC = () => {

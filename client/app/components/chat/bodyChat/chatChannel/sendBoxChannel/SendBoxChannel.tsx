@@ -14,20 +14,18 @@ const SendBoxChannelComponent = (socket: {socket: Socket}) => {
 	};
 	
 	const messageDto = {
-		from: sessionStorage.getItem("currentUserLogin"), // when 42log is true
-		// from: "ebrodeur",	// when 42log is false
+		from: sessionStorage.getItem("currentUserLogin"),
 		content: messageValue,
 		post_datetime: new Date(),
 		conversationName: state.currentConversation,
 	}
-	console.log(messageDto);
+
 	const handleMessage = async (e: React.FormEvent) => {
 
 		e.preventDefault();
 
 		if (socketInUse.connected) {
 				socketInUse.emit('message', messageDto, () => {
-					console.log("!! SOCKET EMIT on message !!");
 				});
 			socketInUse.off('message');
 

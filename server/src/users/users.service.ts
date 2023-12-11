@@ -66,19 +66,20 @@ export class UsersService {
 	// 	});
 	// }
 
-	// async createNewUser(username: string, password: string): Promise<User> {
-	// 	const userToCreate = await this.usersRepository.findOne({ where: { username } });
-	// 	if (!userToCreate) {
-	// 		const saltOrRounds = 10;
-	// 		if (this.passwordPolicy(password)) {
-	// 			password = await bcrypt.hash(password, saltOrRounds);
-	// 			const newUser = this.usersRepository.create({ username, password });
-	// 			return await this.usersRepository.save(newUser);
-	// 		}
-	// 		throw new Error('Password policy : 8 characters minimum');
-	// 	}
-	// 	throw new Error('User with this username already exists');
-	// }
+	async createNewUser(username: string): Promise<User> {
+		const userToCreate = await this.usersRepository.findOne({ where: {username: username } });
+		if (!userToCreate) {
+			// const saltOrRounds = 10;
+			// password = await bcrypt.hash(password, saltOrRounds);
+			const newUser = new User();
+			newUser.login = username;
+			newUser.firstname = username;
+			newUser.username = username;
+			newUser.officialProfileImage = "";
+			return await this.usersRepository.save(newUser);
+		}
+		throw new Error('User with this username already exists');
+	}
 
 	// async deleteUser(username: string) {
 	// 	const userToDelete = await this.usersRepository.findOne({ where: { username } });

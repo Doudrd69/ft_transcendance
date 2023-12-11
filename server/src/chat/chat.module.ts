@@ -5,7 +5,6 @@ import { ChatService } from './chat.service'
 import { Message } from './entities/message.entity';
 import { Conversation } from './entities/conversation.entity';
 import { User } from '../users/entities/users.entity'
-import { GeneralGateway } from 'src/gateway/gateway';
 import { Friendship } from 'src/users/entities/friendship.entity';
 import { UsersService } from 'src/users/users.service';
 import { GroupMember } from './entities/group_member.entity';
