@@ -36,7 +36,6 @@ const FriendsListComponent: React.FC = () => {
 
 		if (response.ok) {
 			const data = await response.json();
-			console.log("Friend List received from API : ", data);
 			setFriendList([...data]);
 		}
 		else {

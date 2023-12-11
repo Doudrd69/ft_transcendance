@@ -41,8 +41,6 @@ export default function Home() {
 			recipientLogin: sessionStorage.getItem("currentUserLogin"),
 		}
 
-		console.log("DTO in FRValidation -> ", acceptedFriendRequestDto);
-
 		const response = await fetch('http://localhost:3001/users/acceptFriendRequest', {
 			method: 'POST',
 			headers: {
@@ -80,7 +78,6 @@ export default function Home() {
 			const payload = JSON.parse(atob(jwtArray[1]));
 			console.log(payload.sub);
 			console.log(payload.login);
-			console.log(payload.tfa_enabled);
 			sessionStorage.setItem("currentUserID", payload.sub);
 			sessionStorage.setItem("currentUserLogin", payload.login);
 			if (payload.tfa_enabled) {
@@ -126,7 +123,6 @@ export default function Home() {
 	// Friend request use-effect
 	useEffect(() => {
 		socket.on('friendRequest', (friendRequestDto: FriendRequestDto) => {
-			console.log("DTO received from gateway -> ", friendRequestDto);
 			// mouais a revoir
 			if (sessionStorage.getItem("currentUserLogin") === friendRequestDto.recipient) {
 				notifyFriendRequest(friendRequestDto.initiator);
