@@ -112,7 +112,7 @@ export class UsersService {
 	/***				FRIENDSHIP MANAGEMENT					***/
 	/**************************************************************/
 
-	async createFriendship(friendRequestDto: FriendRequestDto): Promise<Friendship> {
+	async createFriendship(friendRequestDto: FriendRequestDto): Promise<Friendship | null> {
 
 		console.log("DTO received in createFrienship : ", friendRequestDto);
 
@@ -141,8 +141,10 @@ export class UsersService {
 				newFriendship.friend = recipient;
 				return await this.friendshipRepository.save(newFriendship);
 			}
+			// if the frienship already exists between the users, don't do anything
+			return null;
 		}
-		return ;
+		throw Error("Fatal error");
 	}
 	
 	async updateFriendship(friendRequestDto: FriendRequestDto, flag: boolean): Promise<Friendship> {

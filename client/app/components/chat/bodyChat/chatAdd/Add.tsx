@@ -58,8 +58,12 @@ const AddComponent = (socket: {socket: Socket}) => {
 		});
 		
 		if (response.ok) {
-			const data = await response.json();
-			if (socketInUse.connected && data) {
+			const data = await response.text();
+			const parsedData = data ? JSON.parse(data) : null;
+		
+			console.log("From back --> ", parsedData);
+
+			if (socketInUse.connected && parsedData) {
 				socketInUse.emit('addFriend', friendRequestDto, () => {
 					console.log("FriendRequest sent to gateway");
 				});

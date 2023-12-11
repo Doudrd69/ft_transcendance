@@ -84,9 +84,9 @@ const ReceiveBoxChannelComponent = (socket: {socket: Socket}) => {
 
 	return (
 		<div ref={messagesContainerRef} className="bloc-channel-chat">
-			{messages.map((message: Message) => (
+			{messages.map((message: Message, id: number) => (
 				<>
-					<div className={`message-container ${isMyMessage(message) ? 'my-message' : 'other-message'}`}>
+					<div key={id} className={`message-container ${isMyMessage(message) ? 'my-message' : 'other-message'}`}>
 						<p className="channel-chat-content">{message.content}</p>
 						<p className="channel-chat-date">{formatDateTime(message.post_datetime)}</p>
 					</div>
