@@ -146,6 +146,7 @@ export default function Home() {
 		}
 	}, [socket]);
 
+	// Socket use-effect
 	useEffect(() => {
 
 		userSocket.on('connect', () => {
@@ -173,6 +174,14 @@ export default function Home() {
 		}
 	})
 
+	// Login use-effect
+	// useEffect(() => {
+	// 	if (code && showLogin) {
+	// 		handleAccessToken(code).then(result => {
+	// 			setShowLogin(false);
+	// 		})
+	// 	}
+	// }, [showLogin]);
 	useEffect(() => {
 
 		gameSocket.on('connect', () => {
