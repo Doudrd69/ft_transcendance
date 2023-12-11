@@ -9,6 +9,7 @@ interface Conversation {
 }
 
 const ChannelListComponent: React.FC = () => {
+
   const { state, dispatch } = useChat();
 
   const [conversations, setConversations] = useState<Conversation[]>([]);
@@ -26,6 +27,7 @@ const ChannelListComponent: React.FC = () => {
 	  console.log(conversations);
 	} else {
 	  console.log("Fatal error");
+
 	}
   };
   const userData = {
