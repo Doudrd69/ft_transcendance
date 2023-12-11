@@ -136,6 +136,7 @@ export default function Home() {
 		}
 	}, [userSocket]);
 
+	// Socket use-effect
 	useEffect(() => {
 
 		userSocket.on('connect', () => {
