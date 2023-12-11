@@ -19,7 +19,7 @@ const SendBoxChannelComponent = (socket: {socket: Socket}) => {
 		post_datetime: new Date(),
 		conversationName: state.currentConversation,
 	}
-
+	console.log(messageDto);
 	const handleMessage = async (e: React.FormEvent) => {
 
 		e.preventDefault();
