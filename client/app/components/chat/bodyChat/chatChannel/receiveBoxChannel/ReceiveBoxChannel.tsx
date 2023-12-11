@@ -13,8 +13,7 @@ interface Message {
 const ReceiveBoxChannelComponent = (socket: {socket: Socket}) => {
 
 	const { state } = useChat();
-
-	const conversationName = state.currentConversation;
+	// const conversationName = state.currentConversation;
 	const socketInUse = socket.socket;
 	const [messages, setMessages] = useState<Message[]>([]);
 	const messagesContainerRef = useRef<HTMLDivElement>(null);
@@ -48,7 +47,7 @@ const ReceiveBoxChannelComponent = (socket: {socket: Socket}) => {
 	const getMessage = async () => {
 		
 		try {
-			const response = await fetch (`http://localhost:3001/chat/getMessages/${conversationName}`, {
+			const response = await fetch (`http://localhost:3001/chat/getMessages/${state.currentConversation}`, {
 				method: 'GET',
 			});
 			

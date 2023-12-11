@@ -1,6 +1,7 @@
 import './ReceiveBox.css'
 import React, { useState , useEffect, useRef } from 'react';
 import { Socket } from 'socket.io-client'
+import { useChat } from '../../../ChatContext';
 
 interface Message {
 	from: string;
@@ -11,7 +12,8 @@ interface Message {
 
 const ReceiveBoxComponent = (socket: {socket: Socket}) => {
 
-	const conversationName = "test2";
+	const { state } = useChat();
+	// const conversationName = state.currentConversation;
 	const socketInUse = socket.socket;
 	const [messages, setMessages] = useState<Message[]>([]);
 	const messagesContainerRef = useRef<HTMLDivElement>(null);
@@ -45,7 +47,7 @@ const ReceiveBoxComponent = (socket: {socket: Socket}) => {
 	const getMessage = async () => {
 		
 		try {
-			const response = await fetch (`http://localhost:3001/chat/getMessages/${conversationName}`, {
+			const response = await fetch (`http://localhost:3001/chat/getMessages/${state.currentConversation}`, {
 				method: 'GET',
 			});
 			

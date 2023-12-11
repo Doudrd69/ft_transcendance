@@ -22,9 +22,7 @@ const ChannelListComponent: React.FC = () => {
 
 	if (response.ok) {
 	  const userData = await response.json();
-	  console.log("DM (groups) : ", userData);
 	  setConversations((prevConversations: Conversation[]) => [...prevConversations, ...userData]);
-	  console.log(conversations);
 	} else {
 	  console.log("Fatal error");
 
