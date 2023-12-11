@@ -22,7 +22,6 @@ const AddComponent = (socket: {socket: Socket}) => {
 			username: sessionStorage.getItem("currentUserLogin"),
 			is_channel: true,
 		}
-		console.log(conversationDto);
 
 		const response = await fetch('http://localhost:3001/chat/newConversation', {
 			method: 'POST',
@@ -50,7 +49,6 @@ const AddComponent = (socket: {socket: Socket}) => {
 			recipientLogin: formValues[index],
 		}
 
-		console.log("FR DTO --> ", friendRequestDto);
 		const response = await fetch('http://localhost:3001/users/addfriend', {
 			method: 'POST',
 			headers: {

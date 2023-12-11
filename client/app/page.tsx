@@ -34,24 +34,21 @@ export default function Home() {
 	const searchParams = useSearchParams();
 	const code = searchParams.get('code');
 
-
-	// ca lance une notif de username en meme temps mdr
-	// Si deny est ce que je supprime de la bdd?
 	const friendRequestValidation = async (initiatorLogin: string) => {
 
-		const acceptedFR = {
+		const acceptedFriendRequestDto = {
 			initiatorLogin: initiatorLogin,
 			recipientLogin: sessionStorage.getItem("currentUserLogin"),
 		}
 
-		console.log("DTO in FRValidation -> ", acceptedFR);
+		console.log("DTO in FRValidation -> ", acceptedFriendRequestDto);
 
 		const response = await fetch('http://localhost:3001/users/acceptFriendRequest', {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
 			},
-			body: JSON.stringify(acceptedFR),
+			body: JSON.stringify(acceptedFriendRequestDto),
 		});
 
 		if (response.ok) {
@@ -65,7 +62,7 @@ export default function Home() {
 
 	const Msg = ({ closeToast, toastProps, initiatorLogin }: any) => (
 		<div>
-		  You received a friend request from {initiatorLogin}
+		  You received a friend request from  {initiatorLogin}
 		  <button onClick={() => friendRequestValidation(initiatorLogin)}>Accept</button>
 		  <button onClick={closeToast}>Deny</button>
 		</div>
@@ -129,10 +126,9 @@ export default function Home() {
 
 	useEffect(() => {
 		socket.on('friendRequest', (friendRequestDto: FriendRequestDto) => {
-			// mouais
 			console.log("DTO received from gateway -> ", friendRequestDto);
+			// mouais a revoir
 			if (sessionStorage.getItem("currentUserLogin") === friendRequestDto.recipient) {
-				console.log("You received a friend request from ", friendRequestDto.initiator);
 				notifyFriendRequest(friendRequestDto.initiator);
 			}
 		});
