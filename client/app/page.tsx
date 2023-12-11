@@ -119,7 +119,7 @@ export default function Home() {
 		setShow2FAForm(false);
 	}
 
-
+	// Friend request use-effect
 	useEffect(() => {
 		socket.on('friendRequest', (friendRequestDto: FriendRequestDto) => {
 			console.log("DTO received from gateway -> ", friendRequestDto);
@@ -134,6 +134,7 @@ export default function Home() {
 		}
 	}, [socket]);
 
+	// Socket use-effect
 	useEffect(() => {
 
 		socket.on('connect', () => {
@@ -157,13 +158,18 @@ export default function Home() {
 		}
 	})
 
+	// Login use-effect
+	// useEffect(() => {
+	// 	if (code && showLogin) {
+	// 		handleAccessToken(code).then(result => {
+	// 			setShowLogin(false);
+	// 		})
+	// 	}
+	// }, [showLogin]);
 	useEffect(() => {
-		if (code && showLogin) {
-			handleAccessToken(code).then(result => {
-				setShowLogin(false);
-			})
-		}
-	}, [showLogin]);
+		if (sessionStorage.getItem("currentUserLogin") != null)
+			setShowLogin(false);
+	});
 
 	return (
 			<RootLayout>

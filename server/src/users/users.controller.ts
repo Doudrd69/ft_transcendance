@@ -8,11 +8,12 @@ import { Friendship } from './entities/friendship.entity';
 export class UsersController {
 	constructor(private usersService: UsersService) {}
 
-	// @HttpCode(HttpStatus.OK)
-	// @Post('signup')
-	// createNewUser(@Body() signUpDto: Record<string, string>) {
-	// 	return this.usersService.createNewUser(signUpDto.username, signUpDto.password);
-	// }
+	@HttpCode(HttpStatus.OK)
+	@Post('signup')
+	createNewUser(@Body() requestBody: { username: string }) {
+		const { username } = requestBody;
+		return this.usersService.createNewUser(username);
+	}
 
 	// @HttpCode(HttpStatus.OK)
 	// @Post('delete')
