@@ -59,7 +59,8 @@ const AddComponent = (socket: {socket: Socket}) => {
 		});
 		
 		if (response.ok) {
-			if (socketInUse.connected) {
+			const data = await response.json();
+			if (socketInUse.connected && data) {
 				socketInUse.emit('addFriend', friendRequestDto, () => {
 					console.log("FriendRequest sent to gateway");
 				});

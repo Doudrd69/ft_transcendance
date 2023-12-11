@@ -2,6 +2,7 @@ import './FriendsList.css'
 import React, { useState, useEffect } from 'react'
 import FriendsListTabComponent from './friendsListTab/FriendsListTab';
 
+
 interface FriendShip {
 	id: number;
 	isAccepted: true;
@@ -32,11 +33,9 @@ const FriendsListComponent: React.FC = () => {
 			method: 'GET',
 		});
 
-		// erreur : celui qui a accepte n'a pas le user dans sa list
 		if (response.ok) {
 			const data = await response.json();
-			console.log("DATA checck ==> ", data);
-			// setFriendList((prevFriendList: FriendShip[]) => [...prevFriendList, ...data]);
+			console.log("Friend List received from API : ", data);
 			setFriendList([...data]);
 		}
 		else {
@@ -57,9 +56,9 @@ const FriendsListComponent: React.FC = () => {
 		]
 	};
 
-	useEffect(() => {
-		console.log("FriendList in useEffect: ", friendList);
-	  }, [friendList]);
+	// useEffect(() => {
+	// 	userData.discussion = friendList;
+	// }, [friendList]);
 
 	useEffect(() => {
 		console.log("Loading friend list...");
@@ -68,19 +67,22 @@ const FriendsListComponent: React.FC = () => {
 
 	return (
 		<div className="bloc-friendslist">
-		  {userData.discussion.map((friend: FriendShip, id: number) => (
-			<div className='tab-and-userclicked' key={id}>
-			  <div className ='bloc-button-friendslist'>
-				<div className={`profil-friendslist ${userData.online[id]}`}/>
-				<div className={`amies ${activeIndex === id? 'active' : ''}`} onClick={() => activateTabFriendsList(id)}>
-					{friend.friend.login}
+		  {friendList.map((friend: FriendShip, id: number) => (
+			<div className="tab-and-userclicked" key={id}>
+			  <div className="bloc-button-friendslist">
+				<div className={`profil-friendslist ${friend ? 'on' : 'off'}`} />
+				<div
+				  className={`amies ${activeIndex === id ? 'active' : ''}`}
+				  onClick={() => activateTabFriendsList(id)}
+				>
+				  {friend.friend ? friend.friend.login : friend.initiator ? friend.initiator.login : 'Unknown User'}
 				</div>
 			  </div>
-			  {activeIndex === id && <FriendsListTabComponent user={friend.friend.login} />}
+			  {activeIndex === id && <FriendsListTabComponent user={friend.friend ? friend.friend.login : friend.initiator ? friend.initiator.login : 'Unknown User'} />}
 			</div>
 		  ))}
 		</div>
-	)
+	) 
 }
 
 export default FriendsListComponent;
