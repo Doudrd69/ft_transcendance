@@ -1,9 +1,11 @@
 import './SendBoxChannel.css'
 import React, { useState } from 'react';
 import { Socket } from 'socket.io-client'
+import { useChat } from '../../../ChatContext'
 
 const SendBoxChannelComponent = (socket: {socket: Socket}) => {
 
+	const { state } = useChat();
 	const socketInUse = socket.socket;
 	const [messageValue, setMessageValue] = useState('');
 
@@ -16,9 +18,9 @@ const SendBoxChannelComponent = (socket: {socket: Socket}) => {
 		// from: "ebrodeur",	// when 42log is false
 		content: messageValue,
 		post_datetime: new Date(),
-		conversationName: "test2",
+		conversationName: state.currentConversation,
 	}
-
+	console.log(messageDto);
 	const handleMessage = async (e: React.FormEvent) => {
 
 		e.preventDefault();

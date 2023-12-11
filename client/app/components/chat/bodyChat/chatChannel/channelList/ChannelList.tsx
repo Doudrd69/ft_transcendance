@@ -15,44 +15,43 @@ const ChannelListComponent: React.FC = () => {
   const user = sessionStorage.getItem("currentUserLogin");
 
   const loadDiscussions = async () => {
-    const response = await fetch(`http://localhost:3001/chat/getConversations/${user}`, {
-      method: 'GET',
-    });
+	const response = await fetch(`http://localhost:3001/chat/getConversations/${user}`, {
+	  method: 'GET',
+	});
 
-    if (response.ok) {
-      const userData = await response.json();
-      console.log("DM (groups) : ", userData);
-      setConversations((prevConversations: Conversation[]) => [...prevConversations, ...userData]);
-      console.log(conversations);
-    } else {
-      console.log("Fatal error");
-    }
+	if (response.ok) {
+	  const userData = await response.json();
+	  console.log("DM (groups) : ", userData);
+	  setConversations((prevConversations: Conversation[]) => [...prevConversations, ...userData]);
+	  console.log(conversations);
+	} else {
+	  console.log("Fatal error");
+	}
   };
-
   const userData = {
-    discussion: conversations,
-    online: ["on", "off", "on", "on", "off", "on", "on"],
+	discussion: conversations,
+	online: ["on", "off", "on", "on", "off", "on", "on"],
   };
 
   useEffect(() => {
-    console.log("Loading converssations...");
-    loadDiscussions();
-  }, []);
-console.log('coucouc');
+	console.log("Loading converssations...");
+	loadDiscussions();
+	}, []);
+
   return (
-    <div className="bloc-channel-list">
-      {/* boucle sur la liste des convs*/}
-      {userData.discussion.map((conversation, index) => (
-        conversation.is_channel && (
-          <button key={index} className="button-channel-list" onClick={() => {
-            dispatch({ type: 'TOGGLE', payload: 'showChannel' });
-            dispatch({ type: 'SET_CURRENT_CONVERSATION', payload: conversation.name });
-          }}>
-            <span>{conversation.name}</span>
-          </button>
-        )
-      ))}
-    </div>
+	<div className="bloc-channel-list">
+	  {/* boucle sur la liste des convs*/}
+	  {userData.discussion.map((conversation, index) => (
+		conversation.is_channel && (
+		  <button key={index} className="button-channel-list" onClick={() => {
+			dispatch({ type: 'TOGGLE', payload: 'showChannel' });
+			dispatch({ type: 'SET_CURRENT_CONVERSATION', payload: conversation.name });
+		  }}>
+			<span>{conversation.name}</span>
+		  </button>
+		)
+	  ))}
+	</div>
   );
 };
 

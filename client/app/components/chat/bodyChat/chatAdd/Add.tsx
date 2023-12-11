@@ -22,8 +22,8 @@ const AddComponent = (socket: {socket: Socket}) => {
 		console.log(formValues[index]);
 		const conversationDto = {
 			name: formValues[index],
-			is_channel: true,
 			username: sessionStorage.getItem("currentUserLogin"),
+			is_channel: true,
 		}
 		console.log(conversationDto);
 
