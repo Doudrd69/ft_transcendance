@@ -42,8 +42,6 @@ const ChatListComponent: React.FC = () => {
 			"on",
 		]
 	}
-	console.log("conversations ============================================== ");
-	console.log(conversations);
 
 	useEffect(() => {
 		console.log("Loading converssations...");
