@@ -25,7 +25,6 @@ const AddComponent = (socket: {socket: Socket}) => {
 >>>>>>> cef68db (channel variable + front channel + dautre truc je me souviens plus)
 		const conversationDto = {
 			name: formValues[index],
-			is_channel: true,
 			username: sessionStorage.getItem("currentUserLogin"),
 			is_channel: true,
 		}
