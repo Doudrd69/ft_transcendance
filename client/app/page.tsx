@@ -67,7 +67,7 @@ export default function Home() {
 	)
 
 	const notifyFriendRequest = (initiatorLogin: string) => { 
-		toast(<Msg initiatorLogin={initiatorLogin}/>);
+		toast.info(<Msg initiatorLogin={initiatorLogin}/>);
 	};
 
 
