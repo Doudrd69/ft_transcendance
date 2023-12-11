@@ -2,8 +2,10 @@ import './FriendsList.css'
 import React, { useState, useEffect } from 'react'
 import FriendsListTabComponent from './friendsListTab/FriendsListTab';
 
+
 interface FriendShip {
 	id: number;
+	isAccepted: true;
 	friend: any;
 }
 
@@ -33,9 +35,8 @@ const FriendsListComponent: React.FC = () => {
 
 		if (response.ok) {
 			const data = await response.json();
-			// console.log("FriendList : ", data);
-			setFriendList((prevFriendList: FriendShip[]) => [...prevFriendList, ...data]);
-			// console.log("FF -> ", friendList);
+			console.log("Friend List received from API : ", data);
+			setFriendList([...data]);
 		}
 		else {
 			console.log("Fatal error: no friend list");
@@ -55,9 +56,9 @@ const FriendsListComponent: React.FC = () => {
 		]
 	};
 
-	useEffect(() => {
-		// console.log("FriendList in useEffect: ", friendList);
-	  }, [friendList]);
+	// useEffect(() => {
+	// 	userData.discussion = friendList;
+	// }, [friendList]);
 
 	useEffect(() => {
 		console.log("Loading friend list...");
@@ -66,19 +67,22 @@ const FriendsListComponent: React.FC = () => {
 
 	return (
 		<div className="bloc-friendslist">
-		  {friendList.map((friendList, index) => (
-			<div className='tab-and-userclicked' key={index}>
-			  <div className ='bloc-button-friendslist'>
-				<div className={`profil-friendslist ${userData.online[index]}`}/>
-				<div className={`amies ${activeIndex === index ? 'active' : ''}`} onClick={() => activateTabFriendsList(index)}>
-				  {friendList.friend.login} {/* Assuming 'name' is the property you want to display */}
+		  {friendList.map((friend: FriendShip, id: number) => (
+			<div className="tab-and-userclicked" key={id}>
+			  <div className="bloc-button-friendslist">
+				<div className={`profil-friendslist ${friend ? 'on' : 'off'}`} />
+				<div
+				  className={`amies ${activeIndex === id ? 'active' : ''}`}
+				  onClick={() => activateTabFriendsList(id)}
+				>
+				  {friend.friend ? friend.friend.login : friend.initiator ? friend.initiator.login : 'Unknown User'}
 				</div>
 			  </div>
-			  {/* {activeIndex === index && <FriendsListTabComponent user={friendList} />} */}
+			  {activeIndex === id && <FriendsListTabComponent user={friend.friend ? friend.friend.login : friend.initiator ? friend.initiator.login : 'Unknown User'} />}
 			</div>
 		  ))}
 		</div>
-	)
+	) 
 }
 
 export default FriendsListComponent;

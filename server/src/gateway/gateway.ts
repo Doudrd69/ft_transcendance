@@ -34,7 +34,7 @@ export class GeneralGateway implements OnModuleInit {
 
   @SubscribeMessage('addFriend')
   handleFriendRequest(@MessageBody() dto: any) {
-    console.log("Friend request initiated by ", dto.initiatorLogin);
+    console.log("DTO in gateway: ", dto);
     this.server.emit('friendRequest', {
       initiator: dto.initiatorLogin,
       recipient: dto.recipientLogin,

@@ -129,7 +129,7 @@ const HeaderComponent: React.FC = () => {
 				<form onSubmit={changeUsername}>
 					<input type="text" placeholder="Username..." value={username} onChange={handleUsernameInput}></input>
 					<button type="submit">Change username</button>
-					<ToastContainer />
+					{/* <ToastContainer /> */}
 				</form>
 
 			</div>

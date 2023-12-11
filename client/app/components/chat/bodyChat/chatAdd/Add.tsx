@@ -48,12 +48,12 @@ const AddComponent = (socket: {socket: Socket}) => {
 
 		e.preventDefault();
 
-		console.log("Friend to add :", formValues[index]);
 		const friendRequestDto = {
-			initiatorLogin: sessionStorage.getItem("currentUserLogin"), // à remplacer
+			initiatorLogin: sessionStorage.getItem("currentUserLogin"),
 			recipientLogin: formValues[index],
 		}
 
+		console.log("FR DTO --> ", friendRequestDto);
 		const response = await fetch('http://localhost:3001/users/addfriend', {
 			method: 'POST',
 			headers: {
@@ -63,10 +63,10 @@ const AddComponent = (socket: {socket: Socket}) => {
 		});
 		
 		if (response.ok) {
-			console.log("Friend request successfully created");
-			if (socketInUse.connected) {
+			const data = await response.json();
+			if (socketInUse.connected && data) {
 				socketInUse.emit('addFriend', friendRequestDto, () => {
-					console.log("FriendRequest sent to General gateway");
+					console.log("FriendRequest sent to gateway");
 				});
 			}
 		}
