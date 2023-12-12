@@ -9,7 +9,6 @@ import { MessageDto } from './dto/message.dto';
 import { ConversationDto } from './dto/conversation.dto';
 import { GroupDto } from './dto/group.dto';
 
-import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class ChatService {
@@ -22,7 +21,6 @@ export class ChatService {
 		private groupMemberRepository: Repository<GroupMember>,
 		@InjectRepository(User)
 		private usersRepository: Repository<User>,
-		private usersService: UsersService,
 	) {}
 
 	private async getAllMessages(conversationName: string): Promise<Message[]> {

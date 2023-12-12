@@ -7,6 +7,7 @@ import { Friendship } from './entities/friendship.entity'
 import { speakeasy } from 'speakeasy'
 import { QRCode } from 'qrcode'
 import { FriendRequestDto } from './dto/FriendRequestDto.dto';
+import { ChatService } from '../chat/chat.service';
 
 @Injectable()
 export class UsersService {
@@ -15,7 +16,22 @@ export class UsersService {
 		private usersRepository: Repository<User>,
 		@InjectRepository(Friendship)
 		private friendshipRepository: Repository<Friendship>,
+		private chatService: ChatService,
 	) {}
+
+	private async createConversationForInitiator(initiatorUsername: string, friendUsername: string)  {
+
+		const conversationDto = {
+			name: friendUsername,
+			username: initiatorUsername,
+			is_channel: false,
+		}
+		
+		const conversation = await this.chatService.createConversation(conversationDto);
+		if (!conversation)
+			console.error("Fatal error");
+		return ;
+	}
 
 	/**************************************************************/
 	/***							2FA							***/
@@ -146,8 +162,6 @@ export class UsersService {
 	
 	async updateFriendship(friendRequestDto: FriendRequestDto, flag: boolean): Promise<Friendship> {
 
-		console.log("==== UPDATING FRIENDSHIP TO ", flag, " ====");
-
 		const initiator = await this.usersRepository.findOne({
 			where: {login: friendRequestDto.initiatorLogin},
 			relations: ["initiatedFriendships", "acceptedFriendships"],
@@ -168,22 +182,8 @@ export class UsersService {
 			friendshipToUpdate.isAccepted = flag;
 			await this.friendshipRepository.save(friendshipToUpdate);
 
-			// // Reload initiator and friend entities
-  			// const initiator2 = await this.usersRepository.findOne({
-			// 	where: { login: friendRequestDto.initiatorLogin },
-			// 	relations: ["initiatedFriendships", "acceptedFriendships"],
-  			// });
-
-  			// const friend2 = await this.usersRepository.findOne({
-			// 	where: { login: friendRequestDto.recipientLogin },
-			// 	relations: ["initiatedFriendships", "acceptedFriendships"],
-  			// });
-
-			// console.log(initiator2.login, " Init after updt --> ", initiator2.initiatedFriendships);
-			// console.log(friend2.login, " Init after updt --> ", friend2.initiatedFriendships);
-
-			// console.log(initiator2.login, " Accepted after updt --> ", initiator2.acceptedFriendships);
-			// console.log(friend2.login, " Accepted after updt --> ", friend2.acceptedFriendships);
+			if (flag)
+				this.createConversationForInitiator(initiator.username, friend.username);
 
 			return friendshipToUpdate;
 		}
