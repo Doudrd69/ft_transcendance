@@ -91,6 +91,7 @@ export class ChatService {
 			where: { login: conversationDto.username},
 			relations: ['groups'],
 		});
+
 		if (user) {
 
 			const conv = new Conversation();
