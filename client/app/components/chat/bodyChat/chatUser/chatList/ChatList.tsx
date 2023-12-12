@@ -17,6 +17,7 @@ const ChatListComponent: React.FC = () => {
 
 	const loadDiscussions = async () => {
 
+		// comme ce sont les dm, je peux juste recuperer un array de string du nom des amis
 		const response = await fetch(`http://localhost:3001/chat/getConversations/${user}`, {
 			method: 'GET',
 		});

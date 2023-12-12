@@ -47,6 +47,7 @@ const ReceiveBoxChannelComponent = (socket: {socket: Socket}) => {
 	const getMessage = async () => {
 		
 		try {
+			// proteger la requete dans le controller
 			const response = await fetch (`http://localhost:3001/chat/getMessages/${state.currentConversation}`, {
 				method: 'GET',
 			});

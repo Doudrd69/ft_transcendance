@@ -15,6 +15,7 @@ const ReceiveBoxComponent = (socket: {socket: Socket}) => {
 	const { state } = useChat();
 	// const conversationName = state.currentConversation;
 	const socketInUse = socket.socket;
+	const [recipient, setRecipient] = useState('');
 	const [messages, setMessages] = useState<Message[]>([]);
 	const messagesContainerRef = useRef<HTMLDivElement>(null);
 	
@@ -43,14 +44,19 @@ const ReceiveBoxComponent = (socket: {socket: Socket}) => {
 		return formattedDate;
 	  };
 
+	// Pour les dm pb car la conv a pas le meme nom pour les users
 	// This function will retreive all the messages from the conversation and set the messages array for display
 	const getMessage = async () => {
-		
+
 		try {
-			const response = await fetch (`http://localhost:3001/chat/getMessages/${state.currentConversation}`, {
+			// proteger la requete dans le controller
+			// recuperer le currentUser car le nom de la conv = nom de l'ami
+			// On recupere le groupe qui correspond a la conv
+			// comme ca j'ai le nom de la conv
+			const response = await fetch (`http://localhost:3001/chat/getMessages/${recipient}`, {
 				method: 'GET',
 			});
-			
+
 			if (response.ok) {
 				const messageList = await response.json();
 				setMessages((prevMessages: Message[]) => [...prevMessages, ...messageList]);
@@ -63,18 +69,20 @@ const ReceiveBoxComponent = (socket: {socket: Socket}) => {
 	// Here we retreive the last sent message and we "insert" it in the messages array
 	useEffect(() => {
 		socketInUse.on('onMessage', (message: Message) => {
-			if (message)
+			if (message) {
 				setMessages((prevMessages: Message[]) => [...prevMessages, message]);
+				setRecipient(message.from);
+			}
 		});
 		
-		return () => {
+		return () => {	// const conversationName = state.currentConversation;
 			socketInUse.off('onMessage')
 		}
 	}, [socketInUse]);
 	
 	// Loading the conversation (retrieving all messages on component rendering)
 	useEffect(() => {
-		console.log("Loading conversation...");
+		console.log("Loading DM conversation...");
 		getMessage();
 	}, []);
 

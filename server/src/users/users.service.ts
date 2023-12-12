@@ -22,7 +22,7 @@ export class UsersService {
 	private async createConversationForInitiator(initiatorUsername: string, friendUsername: string)  {
 
 		const conversationDto = {
-			name: friendUsername,
+			name: initiatorUsername,
 			username: initiatorUsername,
 			is_channel: false,
 		}
