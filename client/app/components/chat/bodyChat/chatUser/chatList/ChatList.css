@@ -1,15 +1,16 @@
-.bloc-discussion-list{
-	/* scroll-behavior: auto; */
+/*.bloc-discussion-list{
+	scroll-behavior: auto;
 	overflow: scroll;
 	display: flex;
 	flex-direction: column;
 }
+
 .discussion-list{
 	background-color: var(--fourth);
 	height: 100%;
 	border : none;
 	color: aliceblue;
-	font-size: 20px; /* Exemple de taille de police */
+	font-size: 20px;
 	font-family: Arial, sans-serif;
 	border-radius: 10px;
 	align-items: center;
@@ -28,7 +29,6 @@
 	background-color: var(--fifth);
 }
 
-/*avatar du profil*/
 .on-off {
 	width: 20px;
 	height: 20px;
@@ -52,9 +52,55 @@
 	width: 40px;
 	height: 40px;
 	border-radius: 50%;
-	margin: 0px 10px; /* Espacement entre le logo et le nom */
+	margin: 0px 10px;
 	background-image: url('picture1.png');
-	background-size: cover; /* Ajuste la taille de l'image pour remplir le cercle */
+	background-size: cover;
 	background-repeat: no-repeat;
 	background-position: center center;
+}*/
+
+.bloc-discussion-list {
+	display: flex;
+	flex-wrap: wrap;
+	max-height: 100%;
+	overflow-y: auto;
+}
+  
+.button-discussion-list {
+	  background-color: var(--fourth);
+	  border: none;
+	  flex-basis: calc(50% - 20px);
+	  margin: 10px;
+	  padding: 10px;
+	  color: aliceblue;
+	  font-size: 20px;
+	  font-family: Arial, sans-serif;
+	  border-radius: 10px;
+	  display: flex;
+	  align-items: center;
+	  justify-content: center;
+	  flex-direction: column;
+	  box-sizing: border-box;
+	  aspect-ratio: 1 / 1;
+	  position: relative;
+}
+/*
+.button-discussion-list span {
+		max-height: 50px;
+		overflow: hidden;
+		text-overflow: ellipsis; 
+		white-space: nowrap;
+		position: absolute;
+		top: 50%;
+		left: 0;
+		right: 0;
+		transform: translateY(-50%);
+}
+*/
+.button-discussion-list:hover {
+	background-color: var(--fifth);
+}
+  
+.button-discussion-list:hover{
+	background-color: var(--fifth);
 }

@@ -65,4 +65,9 @@ export class UsersController {
 	getFriendsList(@Param('username') username: string): Promise<Friendship[]> {
 		return this.usersService.getFriendships(username);
 	}
+
+	@Get('getPendingFriends/:username')
+	getPendingFriendsList(@Param('username') username: string): Promise<Friendship[]> {
+		return this.usersService.getPendingFriendships(username);
+	}
 }

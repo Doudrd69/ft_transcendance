@@ -46,6 +46,7 @@ export class ChatService {
 			where: { login: userName },
 			relations: ["groups"],
 		});
+
 		if (userToFind) {
 			console.log("==> Looking for ", userToFind.login, " conversations...");
 			if (userToFind.groups && Array.isArray(userToFind.groups)) {
@@ -91,6 +92,7 @@ export class ChatService {
 			where: { login: conversationDto.username},
 			relations: ['groups'],
 		});
+
 		if (user) {
 
 			const conv = new Conversation();
@@ -99,7 +101,6 @@ export class ChatService {
 			await this.conversationRepository.save(conv);
 
 			const group = await this.createGroup(conv);
-			console.log("---> ", user.groups);
 
 			if (Array.isArray(user.groups)) {
 				user.groups.push(group);

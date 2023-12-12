@@ -44,19 +44,23 @@ const ChatListComponent: React.FC = () => {
 	}
 
 	useEffect(() => {
-		console.log("Loading converssations...");
+		console.log("Loading DMs...");
 		loadDiscussions();
 	}, []);
+
 	return (
 		<div className="bloc-discussion-list">
 			{userData.discussion.map((conversation, index) => (
 				!conversation.is_channel && (
-						<div key={index} className="bloc-button-discussion-list">
-							<div className={`profil-discussion-list ${userData.online[index]}`} />
-								<button className="discussion-list" onClick={() => dispatch({ type: 'TOGGLE', payload: 'showChat'})}>
-									<span>{conversation.name}</span>
-								</button>
-						</div>
+					<div key={index} className="bloc-button-discussion-list">
+						<div className={`profil-discussion-list ${userData.online[index]}`} />
+							<button key={index} className="button-discussion-list" onClick={() => {
+								dispatch({ type: 'TOGGLE', payload: 'showChat' });
+								dispatch({ type: 'SET_CURRENT_CONVERSATION', payload: conversation.name });
+		  					}}>
+								<span>{conversation.name}</span>
+							</button>
+					</div>
 				)
 			))}
 		</div>

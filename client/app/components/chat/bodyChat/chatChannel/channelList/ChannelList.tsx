@@ -34,13 +34,12 @@ const ChannelListComponent: React.FC = () => {
   };
 
   useEffect(() => {
-	console.log("Loading converssations...");
+	console.log("Loading conversations...");
 	loadDiscussions();
 	}, []);
 
   return (
 	<div className="bloc-channel-list">
-	  {/* boucle sur la liste des convs*/}
 	  {userData.discussion.map((conversation, index) => (
 		conversation.is_channel && (
 		  <button key={index} className="button-channel-list" onClick={() => {

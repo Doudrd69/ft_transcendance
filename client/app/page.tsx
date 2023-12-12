@@ -47,6 +47,27 @@ export default function Home() {
 
 		if (response.ok) {
 			console.log("User added to your friend list!");
+
+			const conversationDto = {
+				name: initiatorLogin,
+				username: sessionStorage.getItem("currentUserLogin"),
+				is_channel: false,
+			}
+
+			const conversationCreationResponse = await fetch('http://localhost:3001/chat/newConversation', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify(conversationDto),
+			});
+
+			if (conversationCreationResponse.ok) {
+				console.log("Conversation successfully created!");
+			}
+			else {
+				console.log("Fatal error");
+			}
 			//faire ici un call toast pour mettre une notif?
 		}
 		else {

@@ -7,7 +7,6 @@ import { Friendship } from './entities/friendship.entity'
 import { speakeasy } from 'speakeasy'
 import { QRCode } from 'qrcode'
 import { FriendRequestDto } from './dto/FriendRequestDto.dto';
-import { Conversation } from 'src/chat/entities/conversation.entity';
 
 @Injectable()
 export class UsersService {
@@ -169,22 +168,22 @@ export class UsersService {
 			friendshipToUpdate.isAccepted = flag;
 			await this.friendshipRepository.save(friendshipToUpdate);
 
-			// Reload initiator and friend entities
-  			const initiator2 = await this.usersRepository.findOne({
-    			where: { login: friendRequestDto.initiatorLogin },
-    			relations: ["initiatedFriendships", "acceptedFriendships"],
-  			});
+			// // Reload initiator and friend entities
+  			// const initiator2 = await this.usersRepository.findOne({
+			// 	where: { login: friendRequestDto.initiatorLogin },
+			// 	relations: ["initiatedFriendships", "acceptedFriendships"],
+  			// });
 
-  			const friend2 = await this.usersRepository.findOne({
-    			where: { login: friendRequestDto.recipientLogin },
-    			relations: ["initiatedFriendships", "acceptedFriendships"],
-  			});
+  			// const friend2 = await this.usersRepository.findOne({
+			// 	where: { login: friendRequestDto.recipientLogin },
+			// 	relations: ["initiatedFriendships", "acceptedFriendships"],
+  			// });
 
-			console.log(initiator2.login, " Init after updt --> ", initiator2.initiatedFriendships);
-			console.log(friend2.login, " Init after updt --> ", friend2.initiatedFriendships);
+			// console.log(initiator2.login, " Init after updt --> ", initiator2.initiatedFriendships);
+			// console.log(friend2.login, " Init after updt --> ", friend2.initiatedFriendships);
 
-			console.log(initiator2.login, " Accepted after updt --> ", initiator2.acceptedFriendships);
-			console.log(friend2.login, " Accepted after updt --> ", friend2.acceptedFriendships);
+			// console.log(initiator2.login, " Accepted after updt --> ", initiator2.acceptedFriendships);
+			// console.log(friend2.login, " Accepted after updt --> ", friend2.acceptedFriendships);
 
 			return friendshipToUpdate;
 		}
@@ -226,6 +225,24 @@ export class UsersService {
 		if (user) {
 			let initiatedfriends = await user.initiatedFriendships.filter((friendship: Friendship) => friendship.isAccepted);
 			let acceptedfriends = await user.acceptedFriendships.filter((friendship: Friendship) => friendship.isAccepted);
+			const friends = [...initiatedfriends, ...acceptedfriends];
+			return friends;
+		}
+		return ;
+	}
+
+	async getPendingFriendships(username: string): Promise<Friendship[]> {
+
+		console.log(username, " pending friendships loading...");
+		let user = new User();
+		user = await this.usersRepository.findOne({
+			where: {login: username},
+			relations: ["initiatedFriendships.friend", "acceptedFriendships.initiator"],
+		});
+
+		if (user) {
+			let initiatedfriends = await user.initiatedFriendships.filter((friendship: Friendship) => !friendship.isAccepted);
+			let acceptedfriends = await user.acceptedFriendships.filter((friendship: Friendship) => !friendship.isAccepted);
 			const friends = [...initiatedfriends, ...acceptedfriends];
 			return friends;
 		}
