@@ -17,12 +17,6 @@ const AddComponent = (socket: {socket: Socket}) => {
 
 		e.preventDefault();
 
-<<<<<<< HEAD
-=======
-		console.log("Conversation to create :", formValues[index]);
-		
-		console.log(formValues[index]);
->>>>>>> cef68db (channel variable + front channel + dautre truc je me souviens plus)
 		const conversationDto = {
 			name: formValues[index],
 			username: sessionStorage.getItem("currentUserLogin"),
