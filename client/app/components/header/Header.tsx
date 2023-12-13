@@ -106,12 +106,7 @@ const HeaderComponent: React.FC = () => {
 
 		if (response.ok) {
 			console.log("Username successfully updated!");
-<<<<<<< HEAD
 			notify(1);
-=======
-			setNotification(1);
-			notify();
->>>>>>> 4265ee7 (Reworked friendship (isse with dto transmission) + trying to implement notifications)
 		}
 		else {
 			console.error("Username cannot be changed");
@@ -134,11 +129,7 @@ const HeaderComponent: React.FC = () => {
 				<form onSubmit={changeUsername}>
 					<input type="text" placeholder="Username..." value={username} onChange={handleUsernameInput}></input>
 					<button type="submit">Change username</button>
-<<<<<<< HEAD
 					{/* <ToastContainer /> */}
-=======
-					<ToastContainer />
->>>>>>> 4265ee7 (Reworked friendship (isse with dto transmission) + trying to implement notifications)
 				</form>
 
 			</div>
