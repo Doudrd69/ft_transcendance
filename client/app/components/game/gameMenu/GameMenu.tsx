@@ -10,22 +10,29 @@ const Menu: React.FC = () => {
   const {showGameMatchmaking, showGameSettings, handleGameSettings, handleGameMatchmaking} = useGame();
   
   const handleStartClick = async () => {
+    const currentUserLogin = sessionStorage.getItem("currentUserLogin");
+
+    if (currentUserLogin !== null) {
     const response = await fetch('http://localhost:3001/game/join', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-			},
-			body: JSON.stringify(sessionStorage.getItem("currentUserLogin")),
-		});
-    
-		if (response.ok) {
-			console.log('Player successfully join the lobby :', response.statusText );
-		}
-		else {
-			console.log("Player can't join the lobby");
-		}
-		return false;
-  };
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ playerName: currentUserLogin }), // Sending an object with playerName property
+    });
+
+    if (response.ok) {
+      console.log('Player successfully joined the lobby:', response.statusText);
+    } else {
+      console.log(response.statusText);
+      console.log("Player can't join the lobby");
+    }
+  } else {
+    console.log('currentUserLogin is null');
+  }
+
+  return false;
+};
 
   return (
     <div className="background-game">

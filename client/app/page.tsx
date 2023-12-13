@@ -26,7 +26,6 @@ export default function Home() {
 	const userSocket = io('http://localhost:3001/user')
 	const gameSocket = io('http://localhost:3001/game')
 
-	// const socket: Socket = io('http://localhost:3000');
 
 	const [showLogin, setShowLogin] = useState(true);
 	const [show2FAForm, setShow2FAForm] = useState(false);
@@ -122,7 +121,7 @@ export default function Home() {
 
 	// Friend request use-effect
 	useEffect(() => {
-		socket.on('friendRequest', (friendRequestDto: FriendRequestDto) => {
+		userSocket.on('friendRequest', (friendRequestDto: FriendRequestDto) => {
 			// mouais a revoir
 			if (sessionStorage.getItem("currentUserLogin") === friendRequestDto.recipient) {
 				notifyFriendRequest(friendRequestDto.initiator);
@@ -130,26 +129,20 @@ export default function Home() {
 		});
 
 		return () => {
-			socket.off('friendRequest');
+			userSocket.off('friendRequest');
 		}
-	}, [socket]);
-
-	// Socket use-effect
-	useEffect(() => {
-		socket.on('friendRequest', (friendRequestDto: FriendRequestDto) => {
-			if (sessionStorage.getItem("currentUserLogin") === friendRequestDto.recipient)
-				console.log("You received a friend request from ", friendRequestDto.initiator);
-		});
-
-		return () => {
-			socket.off('friendRequest');
-		}
-	}, [socket]);
+	}, [userSocket]);
 
 	useEffect(() => {
 
 		userSocket.on('connect', () => {
-			console.log('Youpi une connexion!');
+			console.log('Client is connecting... ');
+			if (socket.connected)
+				console.log("Client connected: ", userSocket.id);
+		})
+
+		userSocket.on('disconnect', () => {
+			console.log('Disconnected from the server');
 		})
 
 		userSocket.on('disconnect', () => {
@@ -192,29 +185,6 @@ export default function Home() {
 		if (sessionStorage.getItem("currentUserLogin") != null)
 			setShowLogin(false);
 	});
-    useEffect(() => {
-		gameSocket.on('connect', () => {
-			console.log('Youpi une connexion!');
-		})
-
-		gameSocket.on('disconnect', () => {
-			console.log('Disconnected from the server');
-		})
-
-		return () => {
-			console.log('Unregistering events...');
-			gameSocket.off('connect');
-			gameSocket.off('disconnect');
-		}
-	})
-
-	useEffect(() => {
-		if (code && showLogin) {
-			handleAccessToken(code).then(result => {
-				setShowLogin(false);
-			})
-		}
-	}, [showLogin]);
 
 	return (
 			<RootLayout>

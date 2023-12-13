@@ -19,4 +19,4 @@ export class GameController {
 
 /*soit utiliser un guard soit utiliser un decorateur getUSer
 regarder postman app
-*/
+*/  

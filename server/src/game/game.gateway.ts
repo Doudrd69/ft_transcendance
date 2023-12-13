@@ -33,8 +33,6 @@ export class GameGateway {
   handleJoinLobby(client: Socket, data: string): string {
     console.log("JOINMATCHMAKING");
     return (data); // a changer
-    // Traitez ici la logique pour ajouter le joueur à la file d'attente (similaire à votre implémentation précédente)
   }
 
-  // Ajoutez d'autres méthodes pour gérer les événements Socket.io liés au matchmaking
-}
+}   

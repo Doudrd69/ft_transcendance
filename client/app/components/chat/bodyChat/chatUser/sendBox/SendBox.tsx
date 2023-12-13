@@ -34,8 +34,8 @@ const SendBoxComponent = (socket: {socket: Socket}) => {
 			console.log("Socket not connected");
 		}
 
-		if (socketInUSe.connected) {
-			socketInUSe.emit('message', messageDto, () => {
+		if (socketInUse.connected) {
+			socketInUse.emit('message', messageDto, () => {
 				console.log("Message Sent!");
 			});
 		}

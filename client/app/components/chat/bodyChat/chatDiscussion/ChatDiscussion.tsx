@@ -1,7 +1,7 @@
 import './ReceiveBox.css'
 import React, { useState , useEffect, useRef } from 'react';
 import { Socket } from 'socket.io-client'
-import { useChat } from '../../../ChatContext';
+import { useChat } from '../../ChatContext';
 
 interface Message {
 	from: string;
