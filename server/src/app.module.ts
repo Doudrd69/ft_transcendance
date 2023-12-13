@@ -12,7 +12,6 @@ import { UsersModule } from './users/users.module';
 import { ChatModule } from './chat/chat.module';
 import { GatewayModule } from './gateway/gateway.module';
 import { GameGateway } from './game/game.gateway';
-import { AppService } from './app.service';
 import { GameModule } from './game/game.module';
 
 //We set the synchronize option to true, which means that TypeORM will automatically
