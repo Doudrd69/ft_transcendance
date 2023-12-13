@@ -12,6 +12,7 @@ import { UsersModule } from './users/users.module';
 import { ChatModule } from './chat/chat.module';
 import { GatewayModule } from './gateway/gateway.module';
 import { GameGateway } from './game/game.gateway';
+import { GameModule } from './game/game.module';
 //generate database tables based on the entities. However, this option should be used
 //with caution in production because it can cause data loss and conflicts.
 
