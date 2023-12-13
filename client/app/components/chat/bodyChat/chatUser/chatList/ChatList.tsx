@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import {useChat} from '../../../ChatContext';
 
 interface Conversation {
-	id: number,
+	id: string,
 	name: string;
 	is_channel:boolean;
 }
@@ -17,7 +17,6 @@ const ChatListComponent: React.FC = () => {
 
 	const loadDiscussions = async () => {
 
-		// comme ce sont les dm, je peux juste recuperer un array de string du nom des amis
 		const response = await fetch(`http://localhost:3001/chat/getConversations/${user}`, {
 			method: 'GET',
 		});
@@ -33,15 +32,7 @@ const ChatListComponent: React.FC = () => {
 
 	const userData = {
 		discussion: conversations,
-		online:[
-			"on",
-			"off",
-			"on",
-			"on",
-			"off",
-			"on",
-			"on",
-		]
+		online:["on", "off", "on", "on", "off", "on", "on"],
 	}
 
 	useEffect(() => {
@@ -58,6 +49,7 @@ const ChatListComponent: React.FC = () => {
 							<button key={index} className="button-discussion-list" onClick={() => {
 								dispatch({ type: 'TOGGLE', payload: 'showChat' });
 								dispatch({ type: 'SET_CURRENT_CONVERSATION', payload: conversation.name });
+								dispatch({ type: 'SET_CURRENT_CONVERSATION_ID', payload: conversation.id });
 		  					}}>
 								<span>{conversation.name}</span>
 							</button>

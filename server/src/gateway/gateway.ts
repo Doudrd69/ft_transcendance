@@ -28,7 +28,7 @@ export class GeneralGateway implements OnModuleInit {
       from: dto.from,
       content: dto.content,
       post_datetime: dto.post_datetime,
-      conversationName: dto.conversationName,
+      conversationID: dto.conversationID,
     });
   }
 

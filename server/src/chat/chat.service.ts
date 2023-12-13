@@ -23,10 +23,9 @@ export class ChatService {
 		private usersRepository: Repository<User>,
 	) {}
 
-	private async getAllMessages(conversationName: string): Promise<Message[]> {
+	private async getAllMessages(conversationID: number): Promise<Message[]> {
 
-		console.log("Searching for: ", conversationName, " conversation");
-		const conversation = await this.conversationRepository.find({ where: {name: conversationName} });
+		const conversation = await this.conversationRepository.find({ where: {id: conversationID} });
 		if (!conversation) {
 			console.error("Conversation  not found");
 			return [];
@@ -69,19 +68,18 @@ export class ChatService {
 	async addUserToConversation(username: string, conversationName: string) {
 
 		// login != username, penser a changer ca
-		const conversation = await this.conversationRepository.findOne({ where: {name: conversationName} });
-		if (conversation) {
+		// pb ici car il va me return la premiere avec le meme nom sans avoir si le user est dedans
+		let user = new User();
+		user = await this.usersRepository.findOne({
+			where: {login: username},
+			relations: ['groups'],
+		});
 
-			const userToAdd = await this.usersRepository.findOne({
-				where: { login: username},
-				relations: ['groups'],
-			});
+		const groups = user.groups;
+		const conversation = groups.map((group: GroupMember) => group.conversation).filter((conversation: Conversation) => conversation.name == conversationName);
+		console.log(conversation);
 
-			if (userToAdd) {
-				const newGroup = await this.createGroup(conversation);
-				userToAdd.groups.push(newGroup);
-			}
-		}
+		return ;
 	}
 
 	async createConversation(conversationDto: ConversationDto): Promise<Conversation> {
@@ -110,9 +108,10 @@ export class ChatService {
 	}
 
 	async createMessage(messageDto: MessageDto) {
-		console.log("-- createMessage --");
+
 		let conversation = new Conversation();
-		conversation = await this.conversationRepository.findOne({ where: {name: messageDto.conversationName } }); 
+		console.log("CONV ID to find : ", messageDto.conversationID);
+		conversation = await this.conversationRepository.findOne({ where: {id: messageDto.conversationID} }); 
 		if (conversation) {
 			const newMessage = new Message();
 			newMessage.from = messageDto.from;
@@ -130,9 +129,10 @@ export class ChatService {
 		return this.messageRepository.findOne({ where: {id: idToFind} });
 	}
 
-	async getMessages(conversationName: string): Promise<Message[]> {
+	async getMessages(conversationID: any): Promise<Message[]> {
 
-		const allMessages = await this.getAllMessages(conversationName);
+		console.log("ID retreived --> ", conversationID);
+		const allMessages = await this.getAllMessages(conversationID);
 		if (!allMessages) {
 			console.error("Fatal error: messsages not found");
 			return [];

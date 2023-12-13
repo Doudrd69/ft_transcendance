@@ -34,9 +34,9 @@ export class ChatController {
 		return this.chatService.getMessageById(id);
 	}
 
-	@Get('getMessages/:conversationName')
-	getMessagesFromConversation(@Param('conversationName') conversationName: string): Promise<Message[]> {
-		return this.chatService.getMessages(conversationName);
+	@Get('getMessages/:conversationID')
+	getMessagesFromConversation(@Param('conversationID') conversationID: number): Promise<Message[]> {
+		return this.chatService.getMessages(conversationID);
 	}
 
 	@Get('getConversations/:userName')

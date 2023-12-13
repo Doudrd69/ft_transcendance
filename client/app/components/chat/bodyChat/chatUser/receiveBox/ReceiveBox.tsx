@@ -13,9 +13,7 @@ interface Message {
 const ReceiveBoxComponent = (socket: {socket: Socket}) => {
 
 	const { state } = useChat();
-	// const conversationName = state.currentConversation;
 	const socketInUse = socket.socket;
-	const [recipient, setRecipient] = useState('');
 	const [messages, setMessages] = useState<Message[]>([]);
 	const messagesContainerRef = useRef<HTMLDivElement>(null);
 	
@@ -44,16 +42,12 @@ const ReceiveBoxComponent = (socket: {socket: Socket}) => {
 		return formattedDate;
 	  };
 
-	// Pour les dm pb car la conv a pas le meme nom pour les users
 	// This function will retreive all the messages from the conversation and set the messages array for display
 	const getMessage = async () => {
 
 		try {
 			// proteger la requete dans le controller
-			// recuperer le currentUser car le nom de la conv = nom de l'ami
-			// On recupere le groupe qui correspond a la conv
-			// comme ca j'ai le nom de la conv
-			const response = await fetch (`http://localhost:3001/chat/getMessages/${recipient}`, {
+			const response = await fetch (`http://localhost:3001/chat/getMessages/${state.currentConversationID}`, {
 				method: 'GET',
 			});
 
@@ -71,7 +65,6 @@ const ReceiveBoxComponent = (socket: {socket: Socket}) => {
 		socketInUse.on('onMessage', (message: Message) => {
 			if (message) {
 				setMessages((prevMessages: Message[]) => [...prevMessages, message]);
-				setRecipient(message.from);
 			}
 		});
 		
