@@ -65,7 +65,7 @@ export class ChatService {
 		return await this.groupMemberRepository.save(group);
 	}
 
-	async addUserToConversation(userName: string, conversationID: number) {
+	async addUserToConversation(userName: string, conversationID: number): Promise<boolean> {
 
 		// login != username, penser a changer ca
 		const user = await this.usersRepository.findOne({
@@ -82,9 +82,10 @@ export class ChatService {
 
 			user.groups.push(newGroup);
 			await this.usersRepository.save(user);
+			return true;
 		}
 
-		return ;
+		return false;
 	}
 
 	async createConversation(conversationDto: ConversationDto): Promise<Conversation> {
@@ -129,13 +130,17 @@ export class ChatService {
 		return;
 	}
 
+
+	/**************************************************************/
+	/***						GETTERS							***/
+	/**************************************************************/
+
 	getMessageById(idToFind: number) {
 		return this.messageRepository.findOne({ where: {id: idToFind} });
 	}
 
 	async getMessages(conversationID: any): Promise<Message[]> {
 
-		console.log("ID retreived --> ", conversationID);
 		const allMessages = await this.getAllMessages(conversationID);
 		if (!allMessages) {
 			console.error("Fatal error: messsages not found");

@@ -44,8 +44,6 @@ const ReceiveBoxChannelComponent = (socket: {socket: Socket}) => {
 
 	// This function will retreive all the messages from the conversation and set the messages array for display
 	const getMessage = async () => {
-
-		console.log(state.currentConversationID);
 		
 		try {
 			// proteger la requete dans le controller

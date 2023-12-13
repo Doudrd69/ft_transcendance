@@ -21,15 +21,24 @@ export class UsersService {
 
 	private async createConversationForInitiator(initiatorUsername: string, friendUsername: string)  {
 
+		// La conversion doit avoir le nom de l'ami
+
+		// creer la conversation + un group pour l'initiator
 		const conversationDto = {
 			name: initiatorUsername,
 			username: initiatorUsername,
 			is_channel: false,
 		}
 		
+		// La conversation est creee et l'initiator y est relie
 		const conversation = await this.chatService.createConversation(conversationDto);
 		if (!conversation)
 			console.error("Fatal error");
+		
+		// const status = await this.chatService.addUserToConversation(friendUsername, conversation.id);
+		// if (!status)
+		// 	console.error("Fatal error");
+
 		return ;
 	}
 
@@ -143,8 +152,6 @@ export class UsersService {
 
 		if (initiator && recipient) {
 			
-			// Check if the frienships already exists in DB
-			// Only works one way, need to check the reverse (initiator <-> friend)
 			const friendshipAlreadyExists = await this.friendshipRepository.findOne({
 				where: {initiator: initiator, friend: recipient},
 			});
@@ -154,7 +161,8 @@ export class UsersService {
 				let newFriendship = new Friendship();
 				newFriendship.initiator = initiator;
 				newFriendship.friend = recipient;
-				return await this.friendshipRepository.save(newFriendship);
+				await this.friendshipRepository.save(newFriendship);
+				return newFriendship;
 			}
 		}
 		return ;
@@ -168,7 +176,7 @@ export class UsersService {
 		});
 
 		const friend = await this.usersRepository.findOne({
-			where: {login: friendRequestDto.recipientLogin},
+			where: {id: friendRequestDto.recipientID},
 			relations: ["initiatedFriendships", "acceptedFriendships"],
 		});
 
@@ -182,9 +190,6 @@ export class UsersService {
 			friendshipToUpdate.isAccepted = flag;
 			await this.friendshipRepository.save(friendshipToUpdate);
 
-			if (flag)
-				this.createConversationForInitiator(initiator.username, friend.username);
-
 			return friendshipToUpdate;
 		}
 		return ;
@@ -197,17 +202,13 @@ export class UsersService {
 			console.log("Updated friendship : ", newFriendship);
 			return newFriendship
 		}
-		console.log("Fatal error: could not add ", friendRequestDto.initiatorLogin, " to your friend list");
+		console.log("Fatal error");
 		return ;
 	}
 
 	/**************************************************************/
 	/***					GETTERS						***/
 	/**************************************************************/
-		
-	findUserByLogin(loginToSearch: string) {
-		return this.usersRepository.findOne({ where: {login: loginToSearch}});
-	}
 
 	getUserByLogin(loginToSearch: string): Promise<User> {
 		return this.usersRepository.findOne({ where: {login: loginToSearch}});

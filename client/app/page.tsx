@@ -16,8 +16,9 @@ import 'react-toastify/dist/ReactToastify.css';
 import { totalmem } from 'os';
 
 interface FriendRequestDto {
-	initiator: string;
-	recipient: string;
+	recipientID: number,
+	recipientLogin: string;
+	initiatorLogin: string;
 }
 
 export default function Home() {
@@ -30,61 +31,34 @@ export default function Home() {
 	const searchParams = useSearchParams();
 	const code = searchParams.get('code');
 
-	const friendRequestValidation = async (initiatorLogin: string) => {
-
-		const acceptedFriendRequestDto = {
-			initiatorLogin: initiatorLogin,
-			recipientLogin: sessionStorage.getItem("currentUserLogin"),
-		}
+	const friendRequestValidation = async (friendRequestDto: FriendRequestDto) => {
 
 		const response = await fetch('http://localhost:3001/users/acceptFriendRequest', {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
 			},
-			body: JSON.stringify(acceptedFriendRequestDto),
+			body: JSON.stringify(friendRequestDto),
 		});
 
 		if (response.ok) {
 			console.log("User added to your friend list!");
-
-			const conversationDto = {
-				name: initiatorLogin,
-				username: sessionStorage.getItem("currentUserLogin"),
-				is_channel: false,
-			}
-
-			const conversationCreationResponse = await fetch('http://localhost:3001/chat/newConversation', {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-				body: JSON.stringify(conversationDto),
-			});
-
-			if (conversationCreationResponse.ok) {
-				console.log("Conversation successfully created!");
-			}
-			else {
-				console.log("Fatal error");
-			}
-			//faire ici un call toast pour mettre une notif?
 		}
 		else {
 			console.error("Fatal error: friend request failed");
 		}
 	};
 
-	const Msg = ({ closeToast, toastProps, initiatorLogin }: any) => (
+	const Msg = ({ closeToast, toastProps, friendRequestDto }: any) => (
 		<div>
-		  You received a friend request from  {initiatorLogin}
-		  <button onClick={() => friendRequestValidation(initiatorLogin)}>Accept</button>
+		  You received a friend request from  {friendRequestDto.initiatorLogin}
+		  <button onClick={() => friendRequestValidation(friendRequestDto)}>Accept</button>
 		  <button onClick={closeToast}>Deny</button>
 		</div>
 	)
 
-	const notifyFriendRequest = (initiatorLogin: string) => { 
-		toast(<Msg initiatorLogin={initiatorLogin}/>);
+	const notifyFriendRequest = (friendRequestDto: FriendRequestDto) => { 
+		toast(<Msg friendRequestDto={friendRequestDto}/>);
 	};
 
 
@@ -140,9 +114,10 @@ export default function Home() {
 	// Friend request use-effect
 	useEffect(() => {
 		socket.on('friendRequest', (friendRequestDto: FriendRequestDto) => {
-			// mouais a revoir
-			if (sessionStorage.getItem("currentUserLogin") === friendRequestDto.recipient) {
-				notifyFriendRequest(friendRequestDto.initiator);
+			// mouais a revoir je peux envoyer comme il faut grace a un TO dans le gateway
+			if (sessionStorage.getItem("currentUserLogin") === friendRequestDto.recipientLogin) {
+				console.log("FR RECEIVED ====");
+				notifyFriendRequest(friendRequestDto);
 			}
 		});
 
@@ -183,6 +158,7 @@ export default function Home() {
 	// 		})
 	// 	}
 	// }, [showLogin]);
+
 	useEffect(() => {
 		if (sessionStorage.getItem("currentUserLogin") != null)
 			setShowLogin(false);

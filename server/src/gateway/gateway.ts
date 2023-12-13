@@ -45,10 +45,14 @@ export class GeneralGateway implements OnModuleInit {
 
   @SubscribeMessage('addFriend')
   handleFriendRequest(@MessageBody() dto: any) {
-    console.log("DTO in gateway: ", dto);
     this.server.emit('friendRequest', {
-      initiator: dto.initiatorLogin,
-      recipient: dto.recipientLogin,
+      recipientID: dto.recipientID,
+      recipientLogin: dto.recipientLogin,
+      initiatorLogin: dto.initiatorLogin,
     });
   }
 }
+
+// postgres       | 2023-12-13 17:02:22.964 UTC [68] ERROR:  insert or update on table "user_to_group" violates foreign key constraint "FK_f0cafc8d737034145e69aeb2042"
+// postgres       | 2023-12-13 17:02:22.964 UTC [68] DETAIL:  Key (group)=(5) is not present in table "conversation".
+// postgres       | 2023-12-13 17:02:22.964 UTC [68] STATEMENT:  INSERT INTO "user_to_group"("user", "group") VALUES ($1, $2)

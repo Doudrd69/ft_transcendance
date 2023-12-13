@@ -70,9 +70,19 @@ const AddComponent = (socket: {socket: Socket}) => {
 		});
 		
 		if (response.ok) {
+			console.log("AAHHAHAHAHAHHAHA");
 			const data = await response.json();
+
+			// Add initiatorID
+			const socketFriendRequestDto = {
+				recipientID: data.friend.id,
+				recipientLogin: data.friend.login,
+				initiatorLogin: sessionStorage.getItem("currentUserLogin"),
+			}
+
+			console.log("dojfscngofenincdnvjknfkjr");
 			if (socketInUse.connected && data) {
-				socketInUse.emit('addFriend', friendRequestDto, () => {
+				socketInUse.emit('addFriend', socketFriendRequestDto, () => {
 					console.log("FriendRequest sent to gateway");
 				});
 			}
