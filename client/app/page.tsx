@@ -26,7 +26,6 @@ export default function Home() {
 	const userSocket = io('http://localhost:3001/user')
 	const gameSocket = io('http://localhost:3001/game')
 
-	// const socket: Socket = io('http://localhost:3000');
 
 	const [showLogin, setShowLogin] = useState(false);
 	const [show2FAForm, setShow2FAForm] = useState(false);
