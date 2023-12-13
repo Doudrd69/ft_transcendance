@@ -32,6 +32,18 @@ const AddComponent = (socket: {socket: Socket}) => {
 		});
 
 		if (response.ok) {
+			const data = await response.json();
+			const roomDto = {
+				id: data.id,
+				socket: socketInUse,
+			}
+			console.log(roomDto);
+			// if (socketInUse.connected) {
+			// 	socketInUse.emit('joinRoom', roomDto, () => {
+			// 		console.log("Message Sent!");
+			// 	});
+			// 	socketInUse.off('message');
+			// }
 			console.log("Conversation successfully created");
 		}
 		else {

@@ -65,19 +65,24 @@ export class ChatService {
 		return await this.groupMemberRepository.save(group);
 	}
 
-	async addUserToConversation(username: string, conversationName: string) {
+	async addUserToConversation(userName: string, conversationID: number) {
 
 		// login != username, penser a changer ca
-		// pb ici car il va me return la premiere avec le meme nom sans avoir si le user est dedans
-		let user = new User();
-		user = await this.usersRepository.findOne({
-			where: {login: username},
+		const user = await this.usersRepository.findOne({
+			where: {login: userName},
 			relations: ['groups'],
 		});
 
-		const groups = user.groups;
-		const conversation = groups.map((group: GroupMember) => group.conversation).filter((conversation: Conversation) => conversation.name == conversationName);
-		console.log(conversation);
+		const conversation = await this.conversationRepository.findOne({
+			where: {id: conversationID},
+		});
+
+		if (user && conversation) {
+			const newGroup = await this.createGroup(conversation);
+
+			user.groups.push(newGroup);
+			await this.usersRepository.save(user);
+		}
 
 		return ;
 	}
@@ -109,8 +114,7 @@ export class ChatService {
 
 	async createMessage(messageDto: MessageDto) {
 
-		let conversation = new Conversation();
-		console.log("CONV ID to find : ", messageDto.conversationID);
+		let conversation = new Conversation(); 
 		conversation = await this.conversationRepository.findOne({ where: {id: messageDto.conversationID} }); 
 		if (conversation) {
 			const newMessage = new Message();
