@@ -16,8 +16,8 @@ import { LobbyService } from './matchmaking/matchmaking.service';
       TypeOrmModule.forFeature([User]),
       TypeOrmModule.forFeature([Friendship]),
   ],
-  controllers: [GameController, UsersController],
-  providers: [GameGateway, GameService, UsersService, LobbyService],
-  exports: [GameService, UsersService],
+  controllers: [GameController],
+  providers: [GameGateway, GameService, LobbyService],
+  exports: [GameService],
 })
 export class GameModule {}

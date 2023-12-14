@@ -13,7 +13,6 @@ export class LobbyService {
             private playersRepository: Repository<User>,
       ) {}
 
-
     async getUserByLogin(loginToSearch: string): Promise<User> {
 		return await this.playersRepository.findOne({ where: {login: loginToSearch}});
 	}

@@ -113,10 +113,9 @@ export default function Home() {
 		setShow2FAForm(false);
 	}
 
-	// Friend request use-effect
 	useEffect(() => {
-		socket.on('friendRequest', (friendRequestDto: FriendRequestDto) => {
-			// mouais a revoir
+		userSocket.on('friendRequest', (friendRequestDto: FriendRequestDto) => {
+			// mouais a revoir avec un to.emit dans le gateway
 			if (sessionStorage.getItem("currentUserLogin") === friendRequestDto.recipientLogin) {
 				notifyFriendRequest(friendRequestDto);
 			}
@@ -127,7 +126,6 @@ export default function Home() {
 		}
 	}, [userSocket]);
 
-	// Socket use-effect
 	useEffect(() => {
 
 		userSocket.on('connect', () => {
@@ -184,13 +182,13 @@ export default function Home() {
 				{showLogin ? (<Authentificationcomponent />) :
 					show2FAForm ? (<TFAComponent on2FADone={handle2FADone} />) :
 					(
-					  <div className="container">
-                        <ToastContainer />
-						<Chat socket={userSocket}/>
-						<GameProvider>
-						  <Game />
-						</GameProvider>
-					  </div>
+						<div className="container">
+							<ToastContainer />
+							<Chat socket={userSocket}/>
+							<GameProvider>
+								<Game />
+							</GameProvider>
+						</div>
 					)
 				}
 			</RootLayout>

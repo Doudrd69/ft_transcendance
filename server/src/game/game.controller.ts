@@ -1,5 +1,4 @@
 import { Controller, Get, Post, Body, Param, Patch, Delete, BadRequestException, Logger, Request} from '@nestjs/common';
-import { User } from '../users/entities/users.entity';
 import { GameService } from './game.service';
 import { LobbyService } from './matchmaking/matchmaking.service';
 
