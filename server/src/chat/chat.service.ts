@@ -57,7 +57,7 @@ export class ChatService {
 		return [];
 	}
 
-	private async createGroup(conversation: Conversation): Promise<GroupMember> {
+	async createGroup(conversation: Conversation): Promise<GroupMember> {
 		
 		const group = new GroupMember();
 		group.joined_datetime = new Date();
@@ -80,8 +80,10 @@ export class ChatService {
 		if (user && conversation) {
 			const newGroup = await this.createGroup(conversation);
 
-			user.groups.push(newGroup);
-			await this.usersRepository.save(user);
+			if (Array.isArray(user.groups)) {
+				user.groups.push(newGroup);
+				await this.usersRepository.save(user);
+			}
 			return true;
 		}
 

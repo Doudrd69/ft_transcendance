@@ -19,27 +19,28 @@ export class UsersService {
 		private chatService: ChatService,
 	) {}
 
-	private async createConversationForInitiator(initiatorUsername: string, friendUsername: string)  {
+	private async createConversationForFriends(initiator: User, friend: User): Promise<boolean>  {
 
-		// La conversion doit avoir le nom de l'ami
-
-		// creer la conversation + un group pour l'initiator
-		const conversationDto = {
-			name: initiatorUsername,
-			username: initiatorUsername,
+		const initiatorConvDto = {
+			name: initiator.login,
+			username: initiator.login,
 			is_channel: false,
 		}
-		
-		// La conversation est creee et l'initiator y est relie
-		const conversation = await this.chatService.createConversation(conversationDto);
-		if (!conversation)
-			console.error("Fatal error");
-		
-		// const status = await this.chatService.addUserToConversation(friendUsername, conversation.id);
-		// if (!status)
-		// 	console.error("Fatal error");
 
-		return ;
+		try {
+			const conversation = await this.chatService.createConversation(initiatorConvDto);
+			if (conversation) {
+				const group = await this.chatService.createGroup(conversation);
+				friend.groups.push(group);
+				await this.usersRepository.save(friend);
+				console.log("GRoup created and push for FRIEND user");
+				return true;
+			}
+			return false;
+		} catch (error) {
+			console.error(error);
+			return false;
+		}
 	}
 
 	/**************************************************************/
@@ -138,8 +139,6 @@ export class UsersService {
 
 	async createFriendship(friendRequestDto: FriendRequestDto): Promise<Friendship> {
 
-		console.log("DTO received in createFrienship : ", friendRequestDto);
-
 		const initiator = await this.usersRepository.findOne({
 			where: {login: friendRequestDto.initiatorLogin},
 			relations: ["initiatedFriendships"],
@@ -177,18 +176,23 @@ export class UsersService {
 
 		const friend = await this.usersRepository.findOne({
 			where: {id: friendRequestDto.recipientID},
-			relations: ["initiatedFriendships", "acceptedFriendships"],
+			relations: ["initiatedFriendships", "acceptedFriendships", "groups"],
 		});
 
 		if (initiator && friend) {
 
-			let friendshipToUpdate = new Friendship();
-			friendshipToUpdate = await this.friendshipRepository.findOne({
+			const friendshipToUpdate = await this.friendshipRepository.findOne({
 				where: {initiator: initiator, friend: friend},
 			});
 
 			friendshipToUpdate.isAccepted = flag;
 			await this.friendshipRepository.save(friendshipToUpdate);
+
+			if (flag) {
+				const status = await this.createConversationForFriends(initiator, friend);
+				if (!status)
+					console.log("Fatal error");
+			}
 
 			return friendshipToUpdate;
 		}
