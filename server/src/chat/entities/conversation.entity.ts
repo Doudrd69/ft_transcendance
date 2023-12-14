@@ -12,9 +12,8 @@ export class Conversation {
 	name: string;
 	
 	@Column({ default: false })
-    is_channel: boolean;
+	is_channel: boolean;
 
 	@OneToMany(() => Message, (message) => message.conversation)
 	messages: Message[];
-  
 }

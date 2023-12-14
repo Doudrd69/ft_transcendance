@@ -46,7 +46,7 @@ export class AuthService {
 				'socket': 1,
 			}
 
-			const result = await this.usersService.findUserByLogin(userInformation.login);
+			const result = await this.usersService.getUserByLogin(userInformation.login);
 			if (result) {
 				console.log("User exists in our DB");
 				return result;

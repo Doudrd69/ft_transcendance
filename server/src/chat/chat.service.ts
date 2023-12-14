@@ -9,7 +9,6 @@ import { MessageDto } from './dto/message.dto';
 import { ConversationDto } from './dto/conversation.dto';
 import { GroupDto } from './dto/group.dto';
 
-import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class ChatService {
@@ -22,13 +21,11 @@ export class ChatService {
 		private groupMemberRepository: Repository<GroupMember>,
 		@InjectRepository(User)
 		private usersRepository: Repository<User>,
-		private usersService: UsersService,
 	) {}
 
-	private async getAllMessages(conversationName: string): Promise<Message[]> {
+	private async getAllMessages(conversationID: number): Promise<Message[]> {
 
-		console.log("Searching for: ", conversationName, " conversation");
-		const conversation = await this.conversationRepository.find({ where: {name: conversationName} });
+		const conversation = await this.conversationRepository.find({ where: {id: conversationID} });
 		if (!conversation) {
 			console.error("Conversation  not found");
 			return [];
@@ -46,6 +43,7 @@ export class ChatService {
 			where: { login: userName },
 			relations: ["groups"],
 		});
+
 		if (userToFind) {
 			console.log("==> Looking for ", userToFind.login, " conversations...");
 			if (userToFind.groups && Array.isArray(userToFind.groups)) {
@@ -59,7 +57,7 @@ export class ChatService {
 		return [];
 	}
 
-	private async createGroup(conversation: Conversation): Promise<GroupMember> {
+	async createGroup(conversation: Conversation): Promise<GroupMember> {
 		
 		const group = new GroupMember();
 		group.joined_datetime = new Date();
@@ -67,22 +65,52 @@ export class ChatService {
 		return await this.groupMemberRepository.save(group);
 	}
 
-	async addUserToConversation(username: string, conversationName: string) {
+	async addUserToConversation(userName: string, conversationID: number): Promise<boolean> {
 
 		// login != username, penser a changer ca
-		const conversation = await this.conversationRepository.findOne({ where: {name: conversationName} });
-		if (conversation) {
+		const user = await this.usersRepository.findOne({
+			where: {login: userName},
+			relations: ['groups'],
+		});
 
-			const userToAdd = await this.usersRepository.findOne({
-				where: { login: username},
-				relations: ['groups'],
-			});
+		const conversation = await this.conversationRepository.findOne({
+			where: {id: conversationID},
+		});
 
-			if (userToAdd) {
-				const newGroup = await this.createGroup(conversation);
-				userToAdd.groups.push(newGroup);
+		if (user && conversation) {
+			const newGroup = await this.createGroup(conversation);
+
+			if (Array.isArray(user.groups)) {
+				user.groups.push(newGroup);
+				await this.usersRepository.save(user);
 			}
+			return true;
 		}
+
+		return false;
+	}
+
+	async createFriendsConversation(initiator: User, friend: User): Promise<boolean> {
+
+		const roomName = initiator.login + friend.login;
+		const room = new Conversation();
+		room.name = roomName;
+		room.is_channel = false;
+		await this.conversationRepository.save(room);
+
+		const roomGroup = await this.createGroup(room);
+
+		if (roomGroup) {
+			// console.log("Before adding groups:", initiator.groups, friend.groups);
+			initiator.groups.push(roomGroup);
+			friend.groups.push(roomGroup);
+			// console.log("After adding groups:", initiator.groups, friend.groups);
+			await this.usersRepository.save([initiator, friend]);
+	
+			return true;
+		}
+
+		return false;
 	}
 
 	async createConversation(conversationDto: ConversationDto): Promise<Conversation> {
@@ -100,7 +128,6 @@ export class ChatService {
 			await this.conversationRepository.save(conv);
 
 			const group = await this.createGroup(conv);
-			console.log("---> ", user.groups);
 
 			if (Array.isArray(user.groups)) {
 				user.groups.push(group);
@@ -112,9 +139,9 @@ export class ChatService {
 	}
 
 	async createMessage(messageDto: MessageDto) {
-		console.log("-- createMessage --");
-		let conversation = new Conversation();
-		conversation = await this.conversationRepository.findOne({ where: {name: messageDto.conversationName } }); 
+
+		let conversation = new Conversation(); 
+		conversation = await this.conversationRepository.findOne({ where: {id: messageDto.conversationID} }); 
 		if (conversation) {
 			const newMessage = new Message();
 			newMessage.from = messageDto.from;
@@ -128,13 +155,18 @@ export class ChatService {
 		return;
 	}
 
+
+	/**************************************************************/
+	/***						GETTERS							***/
+	/**************************************************************/
+
 	getMessageById(idToFind: number) {
 		return this.messageRepository.findOne({ where: {id: idToFind} });
 	}
 
-	async getMessages(conversationName: string): Promise<Message[]> {
+	async getMessages(conversationID: any): Promise<Message[]> {
 
-		const allMessages = await this.getAllMessages(conversationName);
+		const allMessages = await this.getAllMessages(conversationID);
 		if (!allMessages) {
 			console.error("Fatal error: messsages not found");
 			return [];

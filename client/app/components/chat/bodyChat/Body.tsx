@@ -17,7 +17,7 @@ const BodyComponent = (socket: {socket: Socket}) => {
 
 	return (
 		<div className="powerlifter">
-			{/* {renderComponent(<ChatUserComponent socket={socket.socket} />, state.showChat || state.showChatList)} */}
+			{renderComponent(<ChatUserComponent socket={socket.socket} />, state.showChat || state.showChatList)}
 			{renderComponent(<ChatChannelComponent socket={socket.socket}/>, state.showChannel || state.showChannelList)}
 			{renderComponent(<ChatFriendsListComponent/>, state.showFriendsList)}
 			{renderComponent(<AddComponent socket={socket.socket}/>, state.showAdd)}

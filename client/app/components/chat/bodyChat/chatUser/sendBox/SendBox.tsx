@@ -17,7 +17,7 @@ const SendBoxComponent = (socket: {socket: Socket}) => {
 		from: sessionStorage.getItem("currentUserLogin"),
 		content: messageValue,
 		post_datetime: new Date(),
-		conversationName: state.currentConversation,
+		conversationID: state.currentConversationID,
 	}
 
 	const handleMessage = async (e: React.FormEvent) => {

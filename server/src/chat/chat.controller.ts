@@ -3,7 +3,6 @@ import { ChatService } from './chat.service';
 import { GroupDto } from './dto/group.dto';
 import { MessageDto } from './dto/message.dto';
 import { ConversationDto } from './dto/conversation.dto';
-import { User } from '../users/entities/users.entity'
 import { Conversation } from './entities/conversation.entity';
 import { Message } from './entities/message.entity';
 import { GroupMember } from './entities/group_member.entity';
@@ -35,9 +34,9 @@ export class ChatController {
 		return this.chatService.getMessageById(id);
 	}
 
-	@Get('getMessages/:conversationName')
-	getMessagesFromConversation(@Param('conversationName') conversationName: string): Promise<Message[]> {
-		return this.chatService.getMessages(conversationName);
+	@Get('getMessages/:conversationID')
+	getMessagesFromConversation(@Param('conversationID') conversationID: number): Promise<Message[]> {
+		return this.chatService.getMessages(conversationID);
 	}
 
 	@Get('getConversations/:userName')

@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import {useChat} from '../../../ChatContext';
 
 interface Conversation {
-	id: number,
+	id: string,
 	name: string;
 	is_channel:boolean;
 }
@@ -32,31 +32,28 @@ const ChatListComponent: React.FC = () => {
 
 	const userData = {
 		discussion: conversations,
-		online:[
-			"on",
-			"off",
-			"on",
-			"on",
-			"off",
-			"on",
-			"on",
-		]
+		online:["on", "off", "on", "on", "off", "on", "on"],
 	}
 
 	useEffect(() => {
-		console.log("Loading converssations...");
+		console.log("Loading DMs...");
 		loadDiscussions();
 	}, []);
+
 	return (
 		<div className="bloc-discussion-list">
 			{userData.discussion.map((conversation, index) => (
 				!conversation.is_channel && (
-						<div key={index} className="bloc-button-discussion-list">
-							<div className={`profil-discussion-list ${userData.online[index]}`} />
-								<button className="discussion-list" onClick={() => dispatch({ type: 'TOGGLE', payload: 'showChat'})}>
-									<span>{conversation.name}</span>
-								</button>
-						</div>
+					<div key={index} className="bloc-button-discussion-list">
+						<div className={`profil-discussion-list ${userData.online[index]}`} />
+							<button key={index} className="button-discussion-list" onClick={() => {
+								dispatch({ type: 'TOGGLE', payload: 'showChat' });
+								dispatch({ type: 'SET_CURRENT_CONVERSATION', payload: conversation.name });
+								dispatch({ type: 'SET_CURRENT_CONVERSATION_ID', payload: conversation.id });
+		  					}}>
+								<span>{conversation.name}</span>
+							</button>
+					</div>
 				)
 			))}
 		</div>

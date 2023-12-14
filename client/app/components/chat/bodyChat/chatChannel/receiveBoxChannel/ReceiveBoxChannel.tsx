@@ -7,13 +7,12 @@ interface Message {
 	from: string;
 	content: string;
 	post_datetime: string;
-	conversationName: string;
+	conversationID: number;
 }
 
 const ReceiveBoxChannelComponent = (socket: {socket: Socket}) => {
 
 	const { state } = useChat();
-	// const conversationName = state.currentConversation;
 	const socketInUse = socket.socket;
 	const [messages, setMessages] = useState<Message[]>([]);
 	const messagesContainerRef = useRef<HTMLDivElement>(null);
@@ -47,7 +46,8 @@ const ReceiveBoxChannelComponent = (socket: {socket: Socket}) => {
 	const getMessage = async () => {
 		
 		try {
-			const response = await fetch (`http://localhost:3001/chat/getMessages/${state.currentConversation}`, {
+			// proteger la requete dans le controller
+			const response = await fetch (`http://localhost:3001/chat/getMessages/${state.currentConversationID}`, {
 				method: 'GET',
 			});
 			
