@@ -90,6 +90,29 @@ export class ChatService {
 		return false;
 	}
 
+	async createFriendsConversation(initiator: User, friend: User): Promise<boolean> {
+
+		const roomName = initiator.login + friend.login;
+		const room = new Conversation();
+		room.name = roomName;
+		room.is_channel = false;
+		await this.conversationRepository.save(room);
+
+		const roomGroup = await this.createGroup(room);
+
+		if (roomGroup) {
+			// console.log("Before adding groups:", initiator.groups, friend.groups);
+			initiator.groups.push(roomGroup);
+			friend.groups.push(roomGroup);
+			// console.log("After adding groups:", initiator.groups, friend.groups);
+			await this.usersRepository.save([initiator, friend]);
+	
+			return true;
+		}
+
+		return false;
+	}
+
 	async createConversation(conversationDto: ConversationDto): Promise<Conversation> {
 
 		const user = await this.usersRepository.findOne({

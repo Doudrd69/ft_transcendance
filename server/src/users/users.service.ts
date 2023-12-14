@@ -19,30 +19,6 @@ export class UsersService {
 		private chatService: ChatService,
 	) {}
 
-	private async createConversationForFriends(initiator: User, friend: User): Promise<boolean>  {
-
-		const initiatorConvDto = {
-			name: initiator.login,
-			username: initiator.login,
-			is_channel: false,
-		}
-
-		try {
-			const conversation = await this.chatService.createConversation(initiatorConvDto);
-			if (conversation) {
-				const group = await this.chatService.createGroup(conversation);
-				friend.groups.push(group);
-				await this.usersRepository.save(friend);
-				console.log("GRoup created and push for FRIEND user");
-				return true;
-			}
-			return false;
-		} catch (error) {
-			console.error(error);
-			return false;
-		}
-	}
-
 	/**************************************************************/
 	/***							2FA							***/
 	/**************************************************************/
@@ -171,7 +147,7 @@ export class UsersService {
 
 		const initiator = await this.usersRepository.findOne({
 			where: {login: friendRequestDto.initiatorLogin},
-			relations: ["initiatedFriendships", "acceptedFriendships"],
+			relations: ["initiatedFriendships", "acceptedFriendships", "groups"],
 		});
 
 		const friend = await this.usersRepository.findOne({
@@ -189,13 +165,13 @@ export class UsersService {
 			await this.friendshipRepository.save(friendshipToUpdate);
 
 			if (flag) {
-				const status = await this.createConversationForFriends(initiator, friend);
-				if (!status)
-					console.log("Fatal error");
+				const status = this.chatService.createFriendsConversation(initiator, friend);
+				console.log(status);
 			}
 
 			return friendshipToUpdate;
 		}
+		console.error("Fatal error: could not find user");
 		return ;
 	}
 
