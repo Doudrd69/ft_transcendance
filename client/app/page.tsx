@@ -114,10 +114,13 @@ export default function Home() {
 		setShow2FAForm(false);
 	}
 
-	// Friend request use-effect
 	useEffect(() => {
 		userSocket.on('friendRequest', (friendRequestDto: FriendRequestDto) => {
+<<<<<<< HEAD
 			// mouais a revoir
+=======
+			// mouais a revoir avec un to.emit dans le gateway
+>>>>>>> f92631a (fix module error + tabs)
 			if (sessionStorage.getItem("currentUserLogin") === friendRequestDto.recipientLogin) {
 				notifyFriendRequest(friendRequestDto);
 			}
@@ -128,7 +131,6 @@ export default function Home() {
 		}
 	}, [userSocket]);
 
-	// Socket use-effect
 	useEffect(() => {
 
 		userSocket.on('connect', () => {
