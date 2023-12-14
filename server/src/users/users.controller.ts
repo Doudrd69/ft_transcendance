@@ -44,7 +44,7 @@ export class UsersController {
 
 	@HttpCode(HttpStatus.OK)
 	@Post('addfriend')
-	createFriendship(@Body() friendRequestDto: FriendRequestDto): Promise<Friendship> {
+	createFriendship(@Body() friendRequestDto: FriendRequestDto): Promise<Friendship | null> {
 		return this.usersService.createFriendship(friendRequestDto);
 	}
 

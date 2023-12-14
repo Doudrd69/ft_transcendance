@@ -70,7 +70,6 @@ const AddComponent = (socket: {socket: Socket}) => {
 		});
 		
 		if (response.ok) {
-			console.log("AAHHAHAHAHAHHAHA");
 			const data = await response.json();
 
 			// Add initiatorID
@@ -80,7 +79,6 @@ const AddComponent = (socket: {socket: Socket}) => {
 				initiatorLogin: sessionStorage.getItem("currentUserLogin"),
 			}
 
-			console.log("dojfscngofenincdnvjknfkjr");
 			if (socketInUse.connected && data) {
 				socketInUse.emit('addFriend', socketFriendRequestDto, () => {
 					console.log("FriendRequest sent to gateway");

@@ -113,7 +113,7 @@ export class UsersService {
 	/***				FRIENDSHIP MANAGEMENT					***/
 	/**************************************************************/
 
-	async createFriendship(friendRequestDto: FriendRequestDto): Promise<Friendship> {
+	async createFriendship(friendRequestDto: FriendRequestDto): Promise<Friendship | null> {
 
 		const initiator = await this.usersRepository.findOne({
 			where: {login: friendRequestDto.initiatorLogin},
@@ -139,8 +139,10 @@ export class UsersService {
 				await this.friendshipRepository.save(newFriendship);
 				return newFriendship;
 			}
+			// if the frienship already exists between the users, don't do anything
+			return null;
 		}
-		return ;
+		throw Error("Fatal error");
 	}
 	
 	async updateFriendship(friendRequestDto: FriendRequestDto, flag: boolean): Promise<Friendship> {
