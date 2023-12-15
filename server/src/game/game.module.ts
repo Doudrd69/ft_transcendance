@@ -1,4 +1,6 @@
 import { Module } from '@nestjs/common';
+import { GameController } from './game.controller';
+import { GameService } from './game.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersService } from 'src/users/users.service';
 import { UsersController } from 'src/users/users.controller';
@@ -9,8 +11,6 @@ import { ChatService } from 'src/chat/chat.service';
 import { Conversation } from 'src/chat/entities/conversation.entity';
 import { Game } from './entities/games.entity';
 import { GameGateway } from 'src/game_gateway/game.gateway';
-import { GameController } from './game.controller';
-import { GameService } from './game.service';
 
 @Module({
   imports: [

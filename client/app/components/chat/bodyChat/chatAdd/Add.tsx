@@ -35,6 +35,9 @@ const AddComponent = (socket: {socket: Socket}) => {
 			const data = await response.json();
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 0d88287 (Reworked game directory architecture and files)
 
 =======
 			const roomDto = {
@@ -52,6 +55,19 @@ const AddComponent = (socket: {socket: Socket}) => {
 				});
 				socketInUse.off('joinRoom');
 			}
+=======
+			const roomDto = {
+				roomName: data.name,
+				userID: 1,
+			}
+			console.log(roomDto);
+			if (socketInUse.connected) {
+				socketInUse.emit('joinRoom', roomDto, () => {
+					console.log("Room creation loading...");
+				});
+				socketInUse.off('joinRoom');
+			}
+>>>>>>> 011b9f5 (Reworked game directory architecture and files)
 			console.log("Conversation successfully created");
 		}
 		else {

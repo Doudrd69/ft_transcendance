@@ -63,10 +63,13 @@ const ReceiveBoxChannelComponent = (socket: {socket: Socket}) => {
 	// Here we retreive the last sent message and we "insert" it in the messages array
 	useEffect(() => {
 
+<<<<<<< HEAD
 		socketInUse.on('userJoinedRoom', () => {
 			console.log("Notif from server");
 		});
 
+=======
+>>>>>>> 011b9f5 (Reworked game directory architecture and files)
 		socketInUse.on('onMessage', (message: Message) => {
 			if (message)
 				setMessages((prevMessages: Message[]) => [...prevMessages, message]);
@@ -74,7 +77,11 @@ const ReceiveBoxChannelComponent = (socket: {socket: Socket}) => {
 
 		return () => {
 			socketInUse.off('onMessage')
+<<<<<<< HEAD
 			socketInUse.off('userJoinedRoom');
+=======
+			socketInUse.off('roomMessage')
+>>>>>>> 011b9f5 (Reworked game directory architecture and files)
 		}
 	}, [socketInUse]);
 	

@@ -159,6 +159,7 @@ export default function Home() {
 		}
 	}, [userSocket]);
 
+	// Connection - Deconnection useEffect for socket
 	useEffect(() => {
 
 		userSocket.on('connect', () => {
