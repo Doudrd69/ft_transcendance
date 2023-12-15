@@ -137,33 +137,32 @@ export default function Home() {
 		}
 	}, [userSocket]);
 
-	// useEffect(() => {
+	useEffect(() => {
 
-	// 	userSocket.on('connect', () => {
-	// 		console.log('Client is connecting... ');
-	// 		if (userSocket.connected)
-	// 			console.log("Client connected: ", userSocket.id);
-	// 	})
+		userSocket.on('connect', () => {
+			if (userSocket.connected)
+				console.log("UserSocket new connection : ", userSocket.id);
+		})
 
-	// 	userSocket.on('disconnect', () => {
-	// 		console.log('Disconnected from the server');
-	// 	})
+		userSocket.on('disconnect', () => {
+			console.log('UserSocker disconnected from the server : ', userSocket.id);
+		})
 
-	// 	return () => {
-	// 		console.log('Unregistering events...');
-	// 		userSocket.off('connect');
-	// 		userSocket.off('disconnect');
-	// 	}
-	// })
+		return () => {
+			console.log('Unregistering events...');
+			userSocket.off('connect');
+			userSocket.off('disconnect');
+		}
+	})
 
 	useEffect(() => {
 
 		gameSocket.on('connect', () => {
-			console.log('Youpi une connexion!');
+			console.log('GameSocket new connection : ', gameSocket.id);
 		})
 
 		gameSocket.on('disconnect', () => {
-			console.log('Disconnected from the server');
+			console.log('GameSocket disconnected from the server : ', gameSocket.id);
 		})
 
 		return () => {

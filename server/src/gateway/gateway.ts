@@ -17,12 +17,12 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	private connectedUsers: { [userId: string]: Socket } = {};
 
 	handleConnection(client: Socket) {
-		console.log(`Client connected: ${client.id}`);
+		console.log(`GeneralGtw client connected : ${client.id}`);
 		this.connectedUsers[client.id] = client;
 	}
 
 	handleDisconnect(client: Socket) {
-		console.log(`Client disconnected: ${client.id}`);
+		console.log(`GeneralGtw client disconnected : ${client.id}`);
 		delete this.connectedUsers[client.id];
 	}
 
