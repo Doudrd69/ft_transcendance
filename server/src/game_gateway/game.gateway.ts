@@ -17,15 +17,19 @@ export class GameGateway {
   MatchmakingService: MatchmakingService;
   GameService: GameService;
 
+  private connectedUsers: { [userId: string]: Socket } = {};
+
 
   handleConnection(@ConnectedSocket() client: Socket) {
     console.log(`GameGtw client connected : ${client.id}`);
-    // this.connectedUsers[client.id] = client;
+    this.connectedUsers[client.id] = client;
+    client.join(`user_game_${client.id}`);
   }
 
   handleDisconnect(@ConnectedSocket() client: Socket) {
     console.log(`GameGtw client disconnected : ${client.id}`);
-    // delete this.connectedUsers[client.id];
+    delete this.connectedUsers[client.id];
+    client.leave(`user_game${client.id}`);
   }
 
   @SubscribeMessage('Game')
