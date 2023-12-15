@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common';
-import { GameGateway } from './game.gateway';
 import { GameController } from './game.controller';
 import { GameService } from './game.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -11,6 +10,7 @@ import { MatchmakingService } from './matchmaking/matchmaking.service';
 import { ChatService } from 'src/chat/chat.service';
 import { Conversation } from 'src/chat/entities/conversation.entity';
 import { Game } from './entities/games.entity';
+import { GameGateway } from 'src/game_gateway/game.gateway';
 
 @Module({
   imports: [

@@ -182,7 +182,7 @@ export class UsersService {
 		const newFriendship = await this.updateFriendship(friendRequestDto, true);
 		if (newFriendship) {
 			console.log("Updated friendship : ", newFriendship);
-			return newFriendship
+			return newFriendship;
 		}
 		console.log("Fatal error");
 		return ;

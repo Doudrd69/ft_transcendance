@@ -9,6 +9,7 @@ import { GameService } from './game.service';
     origin: ['http://localhost:3000']
   },
 })
+
 export class GameGateway {
   @WebSocketServer()
   server: Server;
