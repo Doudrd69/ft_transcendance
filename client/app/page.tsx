@@ -134,21 +134,12 @@ export default function Home() {
 		setShow2FAForm(false);
 	}
 
-<<<<<<< HEAD
 	// Multi-purpose useEffect for socket handling
 	useEffect(() => {
 		
 		userSocket.on('friendRequest', (friendRequestDto: FriendRequestDto) => {
 			// notifyFriendRequest(friendRequestDto);
 			toast(<FriendRequestReceived friendRequestDto={friendRequestDto}/>);
-=======
-	useEffect(() => {
-		userSocket.on('friendRequest', (friendRequestDto: FriendRequestDto) => {
-			// mouais a revoir avec un to.emit dans le gateway
-			if (sessionStorage.getItem("currentUserLogin") === friendRequestDto.recipientLogin) {
-				notifyFriendRequest(friendRequestDto);
-			}
->>>>>>> f92631a (fix module error + tabs)
 		});
 
 		userSocket.on('friendRequestAcceptedNotif', (friendRequestDto: FriendRequestDto) => {
@@ -168,10 +159,7 @@ export default function Home() {
 		}
 	}, [userSocket]);
 
-<<<<<<< HEAD
 	// Connection - Deconnection useEffect for socket
-=======
->>>>>>> f92631a (fix module error + tabs)
 	useEffect(() => {
 
 		userSocket.on('connect', () => {
@@ -225,7 +213,6 @@ export default function Home() {
 	// 	if (sessionStorage.getItem("currentUserLogin") != null)
 	// 		setShowLogin(false);
 	// });
-
 
 	return (
 			<RootLayout>
