@@ -5,23 +5,30 @@ import {useGame } from '../GameContext'
 import React, { useState } from 'react';
 import { Socket } from 'socket.io-client'
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 
 const Menu = (socket: {socket: Socket}) => {
 
   const gameSocket = socket.socket;
 =======
+=======
+>>>>>>> c2cf251 (Create Queue with PlayerPairs and create Game, Try to fix socket in front, have to test some of new feature)
 import Home from '@/app/page';
 
 
 const Menu: React.FC = () => {
+<<<<<<< HEAD
 >>>>>>> 534a200 (Create Queue with PlayerPairs and create Game, Try to fix socket in front, have to test some of new feature)
+=======
+>>>>>>> c2cf251 (Create Queue with PlayerPairs and create Game, Try to fix socket in front, have to test some of new feature)
   const {showGameMatchmaking, showGameSettings, handleGameSettings, handleGameMatchmaking} = useGame();
   
   const handleStartClick = async () => {
     const currentUserLogin = sessionStorage.getItem("currentUserLogin");
 
     if (gameSocket.connected) {
+<<<<<<< HEAD
 <<<<<<< HEAD
         console.log("GameSocket connected");
       gameSocket.emit('create-lobby', currentUserLogin );
@@ -31,6 +38,8 @@ const Menu: React.FC = () => {
 			console.log("Socket not connected");
 		}
 =======
+=======
+>>>>>>> c2cf251 (Create Queue with PlayerPairs and create Game, Try to fix socket in front, have to test some of new feature)
       gameSocket.emit('create-lobby', currentUserLogin );
       gameSocket.off('message');
     }
@@ -56,7 +65,10 @@ const Menu: React.FC = () => {
   } else {
     console.log('currentUserLogin is null');
   }
+<<<<<<< HEAD
 >>>>>>> 534a200 (Create Queue with PlayerPairs and create Game, Try to fix socket in front, have to test some of new feature)
+=======
+>>>>>>> c2cf251 (Create Queue with PlayerPairs and create Game, Try to fix socket in front, have to test some of new feature)
 };
 
   return (
