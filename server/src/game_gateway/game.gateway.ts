@@ -18,11 +18,11 @@ export class GameGateway {
   }
 
   handleConnection(@ConnectedSocket() client: Socket) {
-    console.log(`Game connected mama: ${client.id}`);
+    console.log(`GameGtw client connected : ${client.id}`);
   }
 
   handleDisconnect(@ConnectedSocket() client: Socket) {
-    console.log(`Game disconnected mama: ${client.id}`);
+    console.log(`GameGtw client disconnected : ${client.id}`);
   }
 
   @SubscribeMessage('Game')
