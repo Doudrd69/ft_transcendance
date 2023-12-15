@@ -56,7 +56,7 @@ export default function Home() {
 	const Msg = ({ closeToast, toastProps, friendRequestDto }: any) => (
 		<div>
 		  You received a friend request from  {friendRequestDto.initiatorLogin}
-		  <button onClick={() => friendRequestValidation(friendRequestDto)}>Accept</button>
+		  <button style={{ padding: '10px '}} onClick={() => friendRequestValidation(friendRequestDto)}>Accept</button>
 		  <button onClick={closeToast}>Deny</button>
 		</div>
 	)
@@ -145,7 +145,7 @@ export default function Home() {
 		})
 
 		userSocket.on('disconnect', () => {
-			console.log('UserSocker disconnected from the server : ', userSocket.id);
+			console.log('UserSocket disconnected from the server : ', userSocket.id);
 		})
 
 		return () => {

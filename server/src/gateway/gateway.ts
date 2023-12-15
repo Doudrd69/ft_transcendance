@@ -1,5 +1,4 @@
 import { WebSocketGateway, WebSocketServer, SubscribeMessage, MessageBody, OnGatewayConnection, OnGatewayDisconnect } from '@nestjs/websockets';
-// import { OnModuleInit } from '@nestjs/common'
 import { Server, Socket } from 'socket.io'
 
 @WebSocketGateway({
@@ -19,18 +18,20 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	handleConnection(client: Socket) {
 		console.log(`GeneralGtw client connected : ${client.id}`);
 		this.connectedUsers[client.id] = client;
+		client.join(`user_${client.id}`);
 	}
 
 	handleDisconnect(client: Socket) {
 		console.log(`GeneralGtw client disconnected : ${client.id}`);
 		delete this.connectedUsers[client.id];
+		client.leave(`user_game${client.id}`);
 	}
 
 	@SubscribeMessage('joinRoom')
 	async addUserToRoom(@MessageBody() dto: { roomName: string, userId: number }) {
 		const { roomName, userId } = dto;
 
-		// Vérifier si l'utilisateur est déjà dans une salle et le quitter
+		// Vérifier si l'utilisateur est déjà dans une salle et le quitte
 		const currentRoom = Object.keys(this.connectedUsers[userId]?.rooms || {})[1];
 		if (currentRoom) {
 			this.connectedUsers[userId]?.leave(currentRoom);
