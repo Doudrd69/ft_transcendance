@@ -5,4 +5,3 @@ import { GeneralGateway } from './gateway';
     providers: [GeneralGateway],
 })
 export class GatewayModule {}
-

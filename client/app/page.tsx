@@ -114,6 +114,11 @@ export default function Home() {
 	}
 
 	useEffect(() => {
+
+		userSocket.on('roomMessage', (message: string) => {
+			console.log("Room handler: ", message);
+		});
+		
 		userSocket.on('friendRequest', (friendRequestDto: FriendRequestDto) => {
 			// mouais a revoir avec un to.emit dans le gateway
 			if (sessionStorage.getItem("currentUserLogin") === friendRequestDto.recipientLogin) {
@@ -123,27 +128,28 @@ export default function Home() {
 
 		return () => {
 			userSocket.off('friendRequest');
+			userSocket.off('roomMessage');
 		}
 	}, [userSocket]);
 
-	useEffect(() => {
+	// useEffect(() => {
 
-		userSocket.on('connect', () => {
-			console.log('Client is connecting... ');
-			if (userSocket.connected)
-				console.log("Client connected: ", userSocket.id);
-		})
+	// 	userSocket.on('connect', () => {
+	// 		console.log('Client is connecting... ');
+	// 		if (userSocket.connected)
+	// 			console.log("Client connected: ", userSocket.id);
+	// 	})
 
-		userSocket.on('disconnect', () => {
-			console.log('Disconnected from the server');
-		})
+	// 	userSocket.on('disconnect', () => {
+	// 		console.log('Disconnected from the server');
+	// 	})
 
-		return () => {
-			console.log('Unregistering events...');
-			userSocket.off('connect');
-			userSocket.off('disconnect');
-		}
-	})
+	// 	return () => {
+	// 		console.log('Unregistering events...');
+	// 		userSocket.off('connect');
+	// 		userSocket.off('disconnect');
+	// 	}
+	// })
 
 	useEffect(() => {
 

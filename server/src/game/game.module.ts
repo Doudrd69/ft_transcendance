@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common';
-import { GameGateway } from './game.gateway';
 import { GameController } from './game.controller';
 import { GameService } from './game.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -17,7 +16,7 @@ import { LobbyService } from './matchmaking/matchmaking.service';
       TypeOrmModule.forFeature([Friendship]),
   ],
   controllers: [GameController],
-  providers: [GameGateway, GameService, LobbyService],
+  providers: [GameService, LobbyService],
   exports: [GameService],
 })
 export class GameModule {}

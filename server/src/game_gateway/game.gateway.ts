@@ -7,6 +7,7 @@ import { Server, Socket } from 'socket.io';
     origin: ['http://localhost:3000']
   },
 })
+
 export class GameGateway {
   @WebSocketServer()
   server: Server;
@@ -34,5 +35,4 @@ export class GameGateway {
     console.log("JOINMATCHMAKING");
     return (data); // a changer
   }
-
-}   
+}
