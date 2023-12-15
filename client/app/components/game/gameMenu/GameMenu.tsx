@@ -3,14 +3,23 @@ import MatchMaking from './gameStart/GameStart'
 import Settings from './gameSettings/gameSettings'
 import {useGame } from '../GameContext'
 import React, { useState } from 'react';
+import { Socket } from 'socket.io-client'
+import Home from '@/app/page';
 
 
 const Menu: React.FC = () => {
-
   const {showGameMatchmaking, showGameSettings, handleGameSettings, handleGameMatchmaking} = useGame();
   
   const handleStartClick = async () => {
     const currentUserLogin = sessionStorage.getItem("currentUserLogin");
+
+    if (gameSocket.connected) {
+      gameSocket.emit('create-lobby', currentUserLogin );
+      gameSocket.off('message');
+    }
+    else {
+			console.log("Socket not connected");
+		}
 
     if (currentUserLogin !== null) {
     const response = await fetch('http://localhost:3001/game/join', {
@@ -30,8 +39,6 @@ const Menu: React.FC = () => {
   } else {
     console.log('currentUserLogin is null');
   }
-
-  return false;
 };
 
   return (

@@ -115,7 +115,7 @@ export default function Home() {
 
 	// Friend request use-effect
 	useEffect(() => {
-		socket.on('friendRequest', (friendRequestDto: FriendRequestDto) => {
+		userSocket.on('friendRequest', (friendRequestDto: FriendRequestDto) => {
 			// mouais a revoir
 			if (sessionStorage.getItem("currentUserLogin") === friendRequestDto.recipientLogin) {
 				notifyFriendRequest(friendRequestDto);

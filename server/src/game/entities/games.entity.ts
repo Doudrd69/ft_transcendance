@@ -7,16 +7,10 @@ export class Game
   	id: number;
 
 	@Column()
-	player1: string;
+	players: string[];
 
 	@Column()
-	player2: string;
-
-	@Column()
-	score1: number;
-
-	@Column()
-	score2: number;
+	scores: number[];
 
 	@Column()
 	duration: number;

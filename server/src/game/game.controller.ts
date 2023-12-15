@@ -14,6 +14,13 @@ export class GameController {
     this.LobbyService.checkLobbyAlreadyExist(playerName);
     return { message: 'Joueur rejoint avec succès', playerName };
   }
+
+  @Post('leave')
+  leaveLobby(@Body() playerName: string) {
+    console.log('$playerName leave the Lobby');
+    this.LobbyService.leaveLobby(playerName);
+    return { message: 'Joueur rejoint avec succès', playerName };
+  }
 }
 
 

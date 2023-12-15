@@ -1,5 +1,7 @@
 import { WebSocketGateway, WebSocketServer, SubscribeMessage, OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect, ConnectedSocket, MessageBody } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
+import { MatchmakingService } from './matchmaking/matchmaking.service';
+import { GameService } from './game.service';
 
 @WebSocketGateway({
   namespace: 'game',
@@ -10,7 +12,9 @@ import { Server, Socket } from 'socket.io';
 export class GameGateway {
   @WebSocketServer()
   server: Server;
-  
+  MatchmakingService: MatchmakingService;
+  GameService: GameService;
+
 
   afterInit(server: Server) {
     console.log('GameNamespace initialized');
@@ -29,10 +33,25 @@ export class GameGateway {
     this.server.emit('message', data); // Diffuse à tous les clients dans le namespace 'game'
   }
 
-  @SubscribeMessage('joinLobby')
-  handleJoinLobby(client: Socket, data: string): string {
+  @SubscribeMessage('join-matchmaking')
+  handleJoinMatchmaking(client: Socket, playerId: string): string {
+    this.MatchmakingService.join(playerId)
     console.log("JOINMATCHMAKING");
-    return (data); // a changer
+    const enoughPlayers = this.MatchmakingService.checkPlayersPairs();
+    if (enoughPlayers) {
+      const pairs = this.MatchmakingService.getPlayersPairs();
+      this.server.emit("players-pairs-found");
+    }
+    return (playerId);
   }
 
-}   
+  @SubscribeMessage('players-pairs-found')
+  handleJoinGame(client: Socket, pairs: Array<Array<string>>) {
+    // Créer une nouvelle partie pour chaque paire de joueurs
+    for (const pair of pairs) {
+      const gameId = await this.GameService.createGame(pair[0], pair[1]);
+    }
+    console.log("JOINGAME");
+    return (pairs);
+  }
+}
