@@ -31,7 +31,7 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	async addUserToRoom(@MessageBody() dto: { roomName: string, userId: number }) {
 		const { roomName, userId } = dto;
 
-		// Vérifier si l'utilisateur est déjà dans une salle et le quitte
+		// Vérifier si l'utilisateur est déjà dans une salle et le quittel
 		const currentRoom = Object.keys(this.connectedUsers[userId]?.rooms || {})[1];
 		if (currentRoom) {
 			this.connectedUsers[userId]?.leave(currentRoom);
@@ -48,7 +48,6 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 
 	@SubscribeMessage('message')
 	handleMessage(@MessageBody() dto: any) {
-		console.log("Sender is: ", dto.from);
 		// this.server.to('user').emit(...)...
 		this.server.emit('onMessage', {
 			from: dto.from,

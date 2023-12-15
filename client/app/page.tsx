@@ -132,6 +132,7 @@ export default function Home() {
 		}
 	}, [userSocket]);
 
+	// Connection - Deconnection useEffect for socket
 	useEffect(() => {
 
 		userSocket.on('connect', () => {
@@ -150,6 +151,7 @@ export default function Home() {
 		}
 	})
 
+	// Game socket handler
 	useEffect(() => {
 
 		gameSocket.on('connect', () => {
@@ -167,7 +169,7 @@ export default function Home() {
 		}
 	})
 
-	// Login use-effect
+	// Login form use-effect
 	// useEffect(() => {
 	// 	if (code && showLogin) {
 	// 		handleAccessToken(code).then(result => {
@@ -176,6 +178,7 @@ export default function Home() {
 	// 	}
 	// }, [showLogin]);
 
+	// Testing purpose
 	useEffect(() => {
 		if (sessionStorage.getItem("currentUserLogin") != null)
 			setShowLogin(false);
