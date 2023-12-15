@@ -23,10 +23,14 @@ interface FriendRequestDto {
 
 export default function Home() {
 	
-	const socket = io('http://localhost:3001');
-	const userSocket = io('http://localhost:3001/user')
-	const gameSocket = io('http://localhost:3001/game')
-
+	// const socket = io('http://localhost:3001');
+	// Pour le soucis de connexion :
+	// Faire join tous les sockets la meme room
+	// se debrouiller pour avoir un effet useEffect(() => {}, [])
+	useEffect(() => {
+		const userSocket = io('http://localhost:3001/user');
+	}, []);
+	// const gameSocket = io('http://localhost:3001/game')
 
 	const [showLogin, setShowLogin] = useState(true);
 	const [show2FAForm, setShow2FAForm] = useState(false);
@@ -76,6 +80,10 @@ export default function Home() {
 			if (payload.tfa_enabled) {
 				setShow2FAForm(true);
 			}
+			// emit vers addRoom pour creer une room avec le login du user
+			// if (userSocket.connected) {
+			// 	userSocket.emit('joinRoom', {roomName: sessionStorage.getItem("currentUserLogin"), userID: userSocket.id});
+			// }
 		}
 	}
 
@@ -93,7 +101,6 @@ export default function Home() {
 			if (response.ok) {
 
 				console.log("-- Fetch to API successed --");
-
 				const token = await response.json();
 				sessionStorage.setItem("jwt", token.access_token);
 				const jwt = sessionStorage.getItem("jwt");
@@ -113,61 +120,61 @@ export default function Home() {
 		setShow2FAForm(false);
 	}
 
-	useEffect(() => {
+	// useEffect(() => {
 
-		userSocket.on('roomMessage', (message: string) => {
-			console.log("Room handler: ", message);
-		});
+	// 	userSocket.on('roomMessage', (message: string) => {
+	// 		console.log(message);
+	// 	});
 		
-		userSocket.on('friendRequest', (friendRequestDto: FriendRequestDto) => {
-			// mouais a revoir avec un to.emit dans le gateway
-			if (sessionStorage.getItem("currentUserLogin") === friendRequestDto.recipientLogin) {
-				notifyFriendRequest(friendRequestDto);
-			}
-		});
+	// 	userSocket.on('friendRequest', (friendRequestDto: FriendRequestDto) => {
+	// 		// mouais a revoir avec un to.emit dans le gateway
+	// 		if (sessionStorage.getItem("currentUserLogin") === friendRequestDto.recipientLogin) {
+	// 			notifyFriendRequest(friendRequestDto);
+	// 		}
+	// 	});
 
-		return () => {
-			userSocket.off('friendRequest');
-			userSocket.off('roomMessage');
-		}
-	}, [userSocket]);
+	// 	return () => {
+	// 		userSocket.off('friendRequest');
+	// 		userSocket.off('roomMessage');
+	// 	}
+	// }, [userSocket]);
 
 	// Connection - Deconnection useEffect for socket
-	useEffect(() => {
+	// useEffect(() => {
 
-		userSocket.on('connect', () => {
-			if (userSocket.connected)
-				console.log("UserSocket new connection : ", userSocket.id);
-		})
+		// userSocket.on('connect', () => {
+		// 	if (userSocket.connected)
+		// 		console.log("UserSocket new connection : ", userSocket.id);
+		// })
 
-		userSocket.on('disconnect', () => {
-			console.log('UserSocket disconnected from the server : ', userSocket.id);
-		})
+		// userSocket.on('disconnect', () => {
+		// 	console.log('UserSocket disconnected from the server : ', userSocket.id);
+		// })
 
-		return () => {
-			console.log('Unregistering events...');
-			userSocket.off('connect');
-			userSocket.off('disconnect');
-		}
-	})
+		// return () => {
+			// console.log('Unregistering events...');
+			// userSocket.off('connect');
+			// userSocket.off('disconnect');
+		// }
+	// })
 
 	// Game socket handler
-	useEffect(() => {
+	// useEffect(() => {
 
-		gameSocket.on('connect', () => {
-			console.log('GameSocket new connection : ', gameSocket.id);
-		})
+	// 	gameSocket.on('connect', () => {
+	// 		console.log('GameSocket new connection : ', gameSocket.id);
+	// 	})
 
-		gameSocket.on('disconnect', () => {
-			console.log('GameSocket disconnected from the server : ', gameSocket.id);
-		})
+	// 	gameSocket.on('disconnect', () => {
+	// 		console.log('GameSocket disconnected from the server : ', gameSocket.id);
+	// 	})
 
-		return () => {
-			console.log('Unregistering events...');
-			gameSocket.off('connect');
-			gameSocket.off('disconnect');
-		}
-	})
+	// 	return () => {
+	// 		console.log('Unregistering events...');
+	// 		gameSocket.off('connect');
+	// 		gameSocket.off('disconnect');
+	// 	}
+	// })
 
 	// Login form use-effect
 	// useEffect(() => {
@@ -188,8 +195,8 @@ export default function Home() {
 			<RootLayout>
 				<Header/>
 				{showLogin ? (<Authentificationcomponent />) :
-					show2FAForm ? (<TFAComponent on2FADone={handle2FADone} />) :
-					(
+					// show2FAForm ? (<TFAComponent on2FADone={handle2FADone} />) :
+					// (
 						<div className="container">
 							<ToastContainer />
 							<Chat socket={userSocket}/>
@@ -197,7 +204,7 @@ export default function Home() {
 								<Game />
 							</GameProvider>
 						</div>
-					)
+					// )
 				}
 			</RootLayout>
 	)
