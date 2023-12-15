@@ -55,7 +55,7 @@ export default function Home() {
 	const Msg = ({ closeToast, toastProps, friendRequestDto }: any) => (
 		<div>
 		  You received a friend request from  {friendRequestDto.initiatorLogin}
-		  <button onClick={() => friendRequestValidation(friendRequestDto)}>Accept</button>
+		  <button style={{ padding: '10px '}} onClick={() => friendRequestValidation(friendRequestDto)}>Accept</button>
 		  <button onClick={closeToast}>Deny</button>
 		</div>
 	)
@@ -114,6 +114,11 @@ export default function Home() {
 	}
 
 	useEffect(() => {
+
+		userSocket.on('roomMessage', (message: string) => {
+			console.log("Room handler: ", message);
+		});
+		
 		userSocket.on('friendRequest', (friendRequestDto: FriendRequestDto) => {
 			// mouais a revoir avec un to.emit dans le gateway
 			if (sessionStorage.getItem("currentUserLogin") === friendRequestDto.recipientLogin) {
@@ -123,19 +128,20 @@ export default function Home() {
 
 		return () => {
 			userSocket.off('friendRequest');
+			userSocket.off('roomMessage');
 		}
 	}, [userSocket]);
 
+	// Connection - Deconnection useEffect for socket
 	useEffect(() => {
 
 		userSocket.on('connect', () => {
-			console.log('Client is connecting... ');
 			if (userSocket.connected)
-				console.log("Client connected: ", userSocket.id);
+				console.log("UserSocket new connection : ", userSocket.id);
 		})
 
 		userSocket.on('disconnect', () => {
-			console.log('Disconnected from the server');
+			console.log('UserSocket disconnected from the server : ', userSocket.id);
 		})
 
 		return () => {
@@ -145,14 +151,15 @@ export default function Home() {
 		}
 	})
 
+	// Game socket handler
 	useEffect(() => {
 
 		gameSocket.on('connect', () => {
-			console.log('Youpi une connexion!');
+			console.log('GameSocket new connection : ', gameSocket.id);
 		})
 
 		gameSocket.on('disconnect', () => {
-			console.log('Disconnected from the server');
+			console.log('GameSocket disconnected from the server : ', gameSocket.id);
 		})
 
 		return () => {
@@ -162,7 +169,7 @@ export default function Home() {
 		}
 	})
 
-	// Login use-effect
+	// Login form use-effect
 	// useEffect(() => {
 	// 	if (code && showLogin) {
 	// 		handleAccessToken(code).then(result => {
@@ -171,6 +178,7 @@ export default function Home() {
 	// 	}
 	// }, [showLogin]);
 
+	// Testing purpose
 	useEffect(() => {
 		if (sessionStorage.getItem("currentUserLogin") != null)
 			setShowLogin(false);

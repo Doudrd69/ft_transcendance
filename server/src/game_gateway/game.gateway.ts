@@ -7,22 +7,29 @@ import { Server, Socket } from 'socket.io';
     origin: ['http://localhost:3000']
   },
 })
+
 export class GameGateway {
+
   @WebSocketServer()
   server: Server;
-  
+
+  private connectedUsers: { [userId: string]: Socket } = {};
 
   afterInit(server: Server) {
     console.log('GameNamespace initialized');
   }
 
-  handleConnection(@ConnectedSocket() client: Socket) {
-    console.log(`Game connected mama: ${client.id}`);
-  }
+  // handleConnection(@ConnectedSocket() client: Socket) {
+  //   console.log(`GameGtw client connected : ${client.id}`);
+  //   this.connectedUsers[client.id] = client;
+  //   client.join(`user_game_${client.id}`);
+  // }
 
-  handleDisconnect(@ConnectedSocket() client: Socket) {
-    console.log(`Game disconnected mama: ${client.id}`);
-  }
+  // handleDisconnect(@ConnectedSocket() client: Socket) {
+  //   console.log(`GameGtw client disconnected : ${client.id}`);
+  //   delete this.connectedUsers[client.id];
+  //   client.leave(`user_game${client.id}`);
+  // }
 
   @SubscribeMessage('Game')
   handleGame(@ConnectedSocket() client: Socket, data: string): void {
@@ -34,5 +41,4 @@ export class GameGateway {
     console.log("JOINMATCHMAKING");
     return (data); // a changer
   }
-
-}   
+}

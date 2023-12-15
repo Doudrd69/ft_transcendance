@@ -12,6 +12,7 @@ import { UsersModule } from './users/users.module';
 import { ChatModule } from './chat/chat.module';
 import { GatewayModule } from './gateway/gateway.module';
 import { GameModule } from './game/game.module';
+import { GameGatewayModule } from './game_gateway/gameGateway.module';
 
 //We set the synchronize option to true, which means that TypeORM will automatically
 //generate database tables based on the entities. However, this option should be used
@@ -23,11 +24,6 @@ const dbPass = process.env.POSTGRES_PASSWORD;
 const dbUsername = process.env.DB_USERNAME;
 const dbName = process.env.DB_NAME;
 const dbHost = process.env.HOSTNAME;
-
-if (!dbPass || !dbUsername || !dbName || !dbHost) {
-  throw new Error('One or more required environment variables are missing.');
-}
-
 
 if (!dbPass || !dbUsername || !dbName || !dbHost) {
   throw new Error('One or more required environment variables are missing.');
@@ -57,6 +53,8 @@ if (!dbPass || !dbUsername || !dbName || !dbHost) {
     ChatModule,
 
     GatewayModule,
+
+    GameGatewayModule,
 
     GameModule,
 
