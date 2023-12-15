@@ -1,12 +1,10 @@
 import { Module } from '@nestjs/common';
-import { GameController } from './game.controller';
-import { GameService } from './game.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { GameController } from './game.controller';
 import { Lobby } from './entities/lobby.entity';
-import { UsersService } from 'src/users/users.service';
-import { UsersController } from 'src/users/users.controller';
 import { User } from 'src/users/entities/users.entity';
 import { Friendship } from 'src/users/entities/friendship.entity';
+import { GameService } from './game.service';
 import { LobbyService } from './matchmaking/matchmaking.service';
 
 @Module({
