@@ -45,7 +45,6 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 
 		console.log("==== joinRoom Event ====");
 		console.log("Add ", client.id," to room : ", roomName);
-		const test = "coucou du server";
 
 		client.join(roomName);
 		this.server.to(roomName).emit('userJoinedRoom');
