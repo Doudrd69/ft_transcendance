@@ -213,13 +213,9 @@ export default function Home() {
 	// 	if (sessionStorage.getItem("currentUserLogin") != null)
 	// 		setShowLogin(false);
 	// });
-<<<<<<< HEAD
-=======
-
->>>>>>> 44fd61d (misere jpp)
 
 
-	return (
+    return (
 			<RootLayout>
 				<Header/>
 				{showLogin ? (<Authentificationcomponent />) :
