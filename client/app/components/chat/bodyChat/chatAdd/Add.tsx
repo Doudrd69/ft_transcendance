@@ -19,7 +19,7 @@ const AddComponent = (socket: {socket: Socket}) => {
 
 		const conversationDto = {
 			name: formValues[index],
-			username: sessionStorage.getItem("currentUserLogin"),
+			userID: sessionStorage.getItem("currentUserID"),
 			is_channel: true,
 		}
 
