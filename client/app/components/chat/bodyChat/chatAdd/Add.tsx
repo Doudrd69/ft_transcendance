@@ -33,41 +33,13 @@ const AddComponent = (socket: {socket: Socket}) => {
 
 		if (response.ok) {
 			const data = await response.json();
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 0d88287 (Reworked game directory architecture and files)
 
-=======
-			const roomDto = {
-				roomName: data.name,
-				userID: 1,
-			}
-			console.log("RoomDto : ", roomDto);
->>>>>>> 6a57fb4 (misere jpp)
-=======
-
->>>>>>> e59c4d4 (Now sockets are emitting into rooms for CHANNEL (Dms will work the same but its not done yet))
 			if (socketInUse.connected) {
 				await socketInUse.emit('joinRoom', data.name, () => {
 					console.log("Room creation loading...");
 				});
 				socketInUse.off('joinRoom');
 			}
-=======
-			const roomDto = {
-				roomName: data.name,
-				userID: 1,
-			}
-			console.log("RoomDto : ", roomDto);
-			if (socketInUse.connected) {
-				socketInUse.emit('joinRoom', roomDto, () => {
-					console.log("Room creation loading...");
-				});
-				socketInUse.off('joinRoom');
-			}
->>>>>>> 011b9f5 (Reworked game directory architecture and files)
 			console.log("Conversation successfully created");
 		}
 		else {
@@ -97,8 +69,6 @@ const AddComponent = (socket: {socket: Socket}) => {
 			const data = await response.json();
 
 			const socketFriendRequestDto = {
-				// socketInUse = initiator
-				client: socketInUse.id,
 				recipientID: data.friend.id,
 				recipientLogin: data.friend.login,
 				initiatorLogin: sessionStorage.getItem("currentUserLogin"),
