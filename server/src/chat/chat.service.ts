@@ -57,6 +57,31 @@ export class ChatService {
 		return [];
 	}
 
+	async quitConversation(conversationDto: ConversationDto) {
+
+		const conversationToRemove = await this.conversationRepository.findOne({ where: {name: conversationDto.name }});
+
+		const user = await this.usersRepository.findOne({
+			where: {id: conversationDto.userID},
+			relations: ['groups'],
+		});
+
+		const groupToRemove = user.groups.filter((group: GroupMember) => group.conversation == conversationToRemove);
+		const newArray = user.groups.filter((group: GroupMember) => group.conversation != conversationToRemove);
+		console.log(newArray);
+		await this.usersRepository.save(user);
+		console.log("Array without ", conversationToRemove.name, " --> ", user.groups);
+
+		await this.groupMemberRepository.remove(groupToRemove);
+	}
+
+	async eraseConversation(conversationDto: ConversationDto) {
+
+		const conversationToRemove = await this.conversationRepository.findOne({ where: {name: conversationDto.name }});
+		await this.conversationRepository.remove(conversationToRemove);
+		return ;
+	}
+
 	async createGroup(conversation: Conversation): Promise<GroupMember> {
 		
 		const group = new GroupMember();
@@ -116,7 +141,7 @@ export class ChatService {
 	async createConversation(conversationDto: ConversationDto): Promise<Conversation> {
 
 		const user = await this.usersRepository.findOne({
-			where: { login: conversationDto.userID},
+			where: { id: conversationDto.userID},
 			relations: ['groups'],
 		});
 
@@ -175,6 +200,7 @@ export class ChatService {
 		return allMessages;
 	}
 
+	// faire par ID
 	async getConversations(userName: string): Promise<GroupMember[]> {
 
 		const allConversations = await this.getAllConversations(userName);

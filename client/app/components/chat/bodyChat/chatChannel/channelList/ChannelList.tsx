@@ -8,6 +8,7 @@ interface Conversation {
   is_channel: boolean;
 }
 
+// Il faudrait rejoin la room de chaque conv apres une deco
 const ChannelListComponent: React.FC = () => {
 
   const { state, dispatch } = useChat();
@@ -22,12 +23,13 @@ const ChannelListComponent: React.FC = () => {
 	});
 
 	if (response.ok) {
-	  const userData = await response.json();
-	  setConversations((prevConversations: Conversation[]) => [...prevConversations, ...userData]);
+		const userData = await response.json();
+		setConversations((prevConversations: Conversation[]) => [...prevConversations, ...userData]);
 	} else {
 	  console.log("Fatal error");
 	}
   };
+
   const userData = {
 	discussion: conversations,
 	online: ["on", "off", "on", "on", "off", "on", "on"],
@@ -36,6 +38,7 @@ const ChannelListComponent: React.FC = () => {
   useEffect(() => {
 	console.log("Loading conversations...");
 	loadDiscussions();
+	// fonctions de relog des rooms?
 	}, []);
 
   return (

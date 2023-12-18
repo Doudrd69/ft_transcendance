@@ -165,6 +165,7 @@ export default function Home() {
 			const personnalRoom = sessionStorage.getItem("currentUserLogin");
 			console.log("UserSocket new connection : ", userSocket.id);
 			userSocket.emit('joinPersonnalRoom', personnalRoom);
+			// fonction de relog aux rooms?
 		})
 
 		userSocket.on('disconnect', () => {

@@ -1,6 +1,6 @@
 import { WebSocketGateway, WebSocketServer, SubscribeMessage, MessageBody, OnGatewayConnection, OnGatewayDisconnect, ConnectedSocket} from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io'
-import { OnModuleInit } from '@nestjs/common'
+import { GroupMember } from 'src/chat/entities/group_member.entity';
 
 @WebSocketGateway({
 	namespace: 'user',
@@ -37,6 +37,18 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		console.log("Client ", client.id, " has joined ", personnalRoom, " room");
 	}
 
+	// @SubscribeMessage('joinUsersRooms')
+	// handleUserJoinsRooms(
+	// 	@ConnectedSocket() client: Socket,
+	// 	@MessageBody() userID: number,
+	// ) {
+	// 	const conversations = this.chatService.getConversations(userID);
+	// 	conversations.forEach((group: GroupMember) => {
+	// 		const convName = group.conversation.name;
+	// 		client.join(convName);
+	// 	});
+	// }
+
 	@SubscribeMessage('joinRoom')
 	addUserToRoom(
 		@ConnectedSocket() client: Socket,
@@ -63,11 +75,13 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 
 	@SubscribeMessage('message')
 	handleMessage(@MessageBody() dto: any) {
+		console.log("okay many = ", dto.conversationName);
 		this.server.to(dto.conversationName).emit('onMessage', {
 			from: dto.from,
 			content: dto.content,
 			post_datetime: dto.post_datetime,
 			conversationID: dto.conversationID,
+			conversationName: dto.conversationName,
 		});
 	}
 
