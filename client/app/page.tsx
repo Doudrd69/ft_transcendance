@@ -130,24 +130,21 @@ export default function Home() {
 	}
 
 	// Multi-purpose useEffect for socket handling
-	// useEffect(() => {
+	useEffect(() => {
 
-	// 	userSocket.on('roomMessage', (message: string) => {
-	// 		console.log(message);
-	// 	});
+		// userSocket.on('roomMessage', (message: string) => {
+		// 	console.log(message);
+		// });
 		
-	// 	userSocket.on('friendRequest', (friendRequestDto: FriendRequestDto) => {
-	// 		// mouais a revoir avec un to.emit dans le gateway
-	// 		if (sessionStorage.getItem("currentUserLogin") === friendRequestDto.recipientLogin) {
-	// 			notifyFriendRequest(friendRequestDto);
-	// 		}
-	// 	});
+		userSocket.on('friendRequest', (friendRequestDto: FriendRequestDto) => {
+			notifyFriendRequest(friendRequestDto);
+		});
 
-	// 	return () => {
-	// 		userSocket.off('friendRequest');
-	// 		userSocket.off('roomMessage');
-	// 	}
-	// }, [userSocket]);
+		return () => {
+			userSocket.off('friendRequest');
+			userSocket.off('roomMessage');
+		}
+	}, [userSocket]);
 
 	// Connection - Deconnection useEffect for socket
 	useEffect(() => {
