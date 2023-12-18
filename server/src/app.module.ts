@@ -54,9 +54,9 @@ if (!dbPass || !dbUsername || !dbName || !dbHost) {
 
     GatewayModule,
 
-    GameGatewayModule,
+    // GameGatewayModule,
 
-    GameModule,
+    // GameModule,
 
   ],
   controllers: [AppController],
