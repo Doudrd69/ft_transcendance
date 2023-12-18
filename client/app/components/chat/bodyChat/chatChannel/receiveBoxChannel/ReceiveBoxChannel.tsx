@@ -63,14 +63,18 @@ const ReceiveBoxChannelComponent = (socket: {socket: Socket}) => {
 	// Here we retreive the last sent message and we "insert" it in the messages array
 	useEffect(() => {
 
+		socketInUse.on('userJoinedRoom', () => {
+			console.log("Notif from server");
+		});
+
 		socketInUse.on('onMessage', (message: Message) => {
 			if (message)
 				setMessages((prevMessages: Message[]) => [...prevMessages, message]);
 		});
-		
+
 		return () => {
 			socketInUse.off('onMessage')
-			socketInUse.off('roomMessage')
+			socketInUse.off('userJoinedRoom');
 		}
 	}, [socketInUse]);
 	

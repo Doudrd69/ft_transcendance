@@ -33,13 +33,9 @@ const AddComponent = (socket: {socket: Socket}) => {
 
 		if (response.ok) {
 			const data = await response.json();
-			const roomDto = {
-				roomName: data.name,
-				userID: 1,
-			}
-			console.log("RoomDto : ", roomDto);
+
 			if (socketInUse.connected) {
-				socketInUse.emit('joinRoom', roomDto, () => {
+				await socketInUse.emit('joinRoom', data.name, () => {
 					console.log("Room creation loading...");
 				});
 				socketInUse.off('joinRoom');
@@ -73,8 +69,6 @@ const AddComponent = (socket: {socket: Socket}) => {
 			const data = await response.json();
 
 			const socketFriendRequestDto = {
-				// socketInUse = initiator
-				client: socketInUse.id,
 				recipientID: data.friend.id,
 				recipientLogin: data.friend.login,
 				initiatorLogin: sessionStorage.getItem("currentUserLogin"),

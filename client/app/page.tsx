@@ -131,18 +131,19 @@ export default function Home() {
 
 	// Multi-purpose useEffect for socket handling
 	useEffect(() => {
-
-		// userSocket.on('roomMessage', (message: string) => {
-		// 	console.log(message);
-		// });
 		
 		userSocket.on('friendRequest', (friendRequestDto: FriendRequestDto) => {
 			notifyFriendRequest(friendRequestDto);
 		});
 
+		// userSocket.on('userJoinedRoom', (notification: string) => {
+		// 	console.log("User socket in main: ", userSocket.id);
+		// 	console.log("Notif from server: ", notification);
+		// });
+
 		return () => {
 			userSocket.off('friendRequest');
-			userSocket.off('roomMessage');
+			// userSocket.off('userJoinedRoom');
 		}
 	}, [userSocket]);
 
@@ -157,6 +158,8 @@ export default function Home() {
 
 		userSocket.on('disconnect', () => {
 			console.log('UserSocket disconnected from the server : ', userSocket.id);
+			// leavePersonnalRoom
+			// userSocket.emit('joinPersonnalRoom', personnalRoom);
 		})
 
 		return () => {
