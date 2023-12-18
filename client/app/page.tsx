@@ -22,17 +22,28 @@ interface FriendRequestDto {
 }
 
 export default function Home() {
-	
-	const socket = io('http://localhost:3001');
-	const userSocket = io('http://localhost:3001/user')
-	const gameSocket = io('http://localhost:3001/game')
 
+	const userSocket = io('http://localhost:3001/user', {
+		autoConnect: false,
+	});
+
+	const gameSocket = io('http://localhost:3001/game', {
+		autoConnect: false,
+	})
 
 	const [showLogin, setShowLogin] = useState(true);
 	const [show2FAForm, setShow2FAForm] = useState(false);
+	const [authValidated, setAuthValidated] = useState(false);
+
 
 	const searchParams = useSearchParams();
 	const code = searchParams.get('code');
+
+	// a voir
+	if (authValidated) {
+		userSocket.connect();
+		gameSocket.connect();
+	}
 
 	const friendRequestValidation = async (friendRequestDto: FriendRequestDto) => {
 
@@ -76,6 +87,10 @@ export default function Home() {
 			if (payload.tfa_enabled) {
 				setShow2FAForm(true);
 			}
+			// emit vers addRoom pour creer une room avec le login du user
+			// if (userSocket.connected) {
+			// 	userSocket.emit('joinRoom', {roomName: sessionStorage.getItem("currentUserLogin"), userID: userSocket.id});
+			// }
 		}
 	}
 
@@ -92,13 +107,14 @@ export default function Home() {
 
 			if (response.ok) {
 
-				console.log("-- Fetch to API successed --");
-
+				console.log("-- Access granted --");
 				const token = await response.json();
 				sessionStorage.setItem("jwt", token.access_token);
 				const jwt = sessionStorage.getItem("jwt");
-				if (jwt)
+				if (jwt) {
 					await setUserSession(jwt);
+					setAuthValidated(true);
+				}
 				return true;
 			}
 			else {
@@ -113,17 +129,15 @@ export default function Home() {
 		setShow2FAForm(false);
 	}
 
+	// Multi-purpose useEffect for socket handling
 	useEffect(() => {
 
-		userSocket.on('roomMessage', (message: string) => {
-			console.log("Room handler: ", message);
-		});
+		// userSocket.on('roomMessage', (message: string) => {
+		// 	console.log(message);
+		// });
 		
 		userSocket.on('friendRequest', (friendRequestDto: FriendRequestDto) => {
-			// mouais a revoir avec un to.emit dans le gateway
-			if (sessionStorage.getItem("currentUserLogin") === friendRequestDto.recipientLogin) {
-				notifyFriendRequest(friendRequestDto);
-			}
+			notifyFriendRequest(friendRequestDto);
 		});
 
 		return () => {
@@ -136,8 +150,9 @@ export default function Home() {
 	useEffect(() => {
 
 		userSocket.on('connect', () => {
-			if (userSocket.connected)
-				console.log("UserSocket new connection : ", userSocket.id);
+			const personnalRoom = sessionStorage.getItem("currentUserLogin");
+			console.log("UserSocket new connection : ", userSocket.id);
+			userSocket.emit('joinPersonnalRoom', personnalRoom);
 		})
 
 		userSocket.on('disconnect', () => {
@@ -149,7 +164,7 @@ export default function Home() {
 			userSocket.off('connect');
 			userSocket.off('disconnect');
 		}
-	})
+	}, [userSocket])
 
 	// Game socket handler
 	useEffect(() => {
@@ -167,22 +182,22 @@ export default function Home() {
 			gameSocket.off('connect');
 			gameSocket.off('disconnect');
 		}
-	})
+	}, [gameSocket])
 
 	// Login form use-effect
-	// useEffect(() => {
-	// 	if (code && showLogin) {
-	// 		handleAccessToken(code).then(result => {
-	// 			setShowLogin(false);
-	// 		})
-	// 	}
-	// }, [showLogin]);
-
-	// Testing purpose
 	useEffect(() => {
-		if (sessionStorage.getItem("currentUserLogin") != null)
-			setShowLogin(false);
-	});
+		if (code && showLogin) {
+			handleAccessToken(code).then(result => {
+				setShowLogin(false);
+			})
+		}
+	}, [showLogin]);
+
+	// For testing purpose : no 42 form on connection
+	// useEffect(() => {
+	// 	if (sessionStorage.getItem("currentUserLogin") != null)
+	// 		setShowLogin(false);
+	// });
 
 	return (
 			<RootLayout>
@@ -202,5 +217,3 @@ export default function Home() {
 			</RootLayout>
 	)
 }
-
-// https://www.delightfulengineering.com/blog/nest-websockets/basics

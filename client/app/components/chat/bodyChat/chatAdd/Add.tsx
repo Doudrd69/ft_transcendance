@@ -37,7 +37,7 @@ const AddComponent = (socket: {socket: Socket}) => {
 				roomName: data.name,
 				userID: 1,
 			}
-			console.log(roomDto);
+			console.log("RoomDto : ", roomDto);
 			if (socketInUse.connected) {
 				socketInUse.emit('joinRoom', roomDto, () => {
 					console.log("Room creation loading...");
@@ -72,8 +72,9 @@ const AddComponent = (socket: {socket: Socket}) => {
 		if (response.ok) {
 			const data = await response.json();
 
-			// Add initiatorID
 			const socketFriendRequestDto = {
+				// socketInUse = initiator
+				client: socketInUse.id,
 				recipientID: data.friend.id,
 				recipientLogin: data.friend.login,
 				initiatorLogin: sessionStorage.getItem("currentUserLogin"),
