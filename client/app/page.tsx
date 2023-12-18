@@ -35,7 +35,6 @@ export default function Home() {
 	const [show2FAForm, setShow2FAForm] = useState(false);
 	const [authValidated, setAuthValidated] = useState(false);
 
-
 	const searchParams = useSearchParams();
 	const code = searchParams.get('code');
 
@@ -57,13 +56,19 @@ export default function Home() {
 
 		if (response.ok) {
 			console.log("User added to your friend list!");
+			// join room for recipient
+			const roomName = friendRequestDto.initiatorLogin + friendRequestDto.recipientLogin;
+			if (userSocket.connected) {
+				userSocket.emit('friendRequestAccepted', friendRequestDto);
+				userSocket.emit('joinRoom', roomName);
+			}
 		}
 		else {
 			console.error("Fatal error: friend request failed");
 		}
 	};
 
-	const Msg = ({ closeToast, toastProps, friendRequestDto }: any) => (
+	const FriendRequestReceived = ({ closeToast, toastProps, friendRequestDto }: any) => (
 		<div>
 		  You received a friend request from  {friendRequestDto.initiatorLogin}
 		  <button style={{ padding: '10px '}} onClick={() => friendRequestValidation(friendRequestDto)}>Accept</button>
@@ -71,9 +76,12 @@ export default function Home() {
 		</div>
 	)
 
-	const notifyFriendRequest = (friendRequestDto: FriendRequestDto) => { 
-		toast(<Msg friendRequestDto={friendRequestDto}/>);
-	};
+	const FriendRequestAccepted = ({ closeToast, toastProps, friendRequestDto }: any) => (
+		<div>
+		  {friendRequestDto.recipientLogin} has accepted your friend request!
+		  <button onClick={closeToast}>Understand!</button>
+		</div>
+	)
 
 	const setUserSession = async (jwt: string) => {
 
@@ -87,10 +95,6 @@ export default function Home() {
 			if (payload.tfa_enabled) {
 				setShow2FAForm(true);
 			}
-			// emit vers addRoom pour creer une room avec le login du user
-			// if (userSocket.connected) {
-			// 	userSocket.emit('joinRoom', {roomName: sessionStorage.getItem("currentUserLogin"), userID: userSocket.id});
-			// }
 		}
 	}
 
@@ -113,6 +117,7 @@ export default function Home() {
 				const jwt = sessionStorage.getItem("jwt");
 				if (jwt) {
 					await setUserSession(jwt);
+					// Attention a la 2fa
 					setAuthValidated(true);
 				}
 				return true;
@@ -133,8 +138,15 @@ export default function Home() {
 	useEffect(() => {
 		
 		userSocket.on('friendRequest', (friendRequestDto: FriendRequestDto) => {
-			notifyFriendRequest(friendRequestDto);
+			// notifyFriendRequest(friendRequestDto);
+			toast(<FriendRequestReceived friendRequestDto={friendRequestDto}/>);
 		});
+
+		userSocket.on('friendRequestAcceptedNotif', (friendRequestDto: FriendRequestDto) => {
+			toast(<FriendRequestAccepted friendRequestDto={friendRequestDto}/>);
+			const roomName = friendRequestDto.initiatorLogin + friendRequestDto.recipientLogin;
+			userSocket.emit('joinRoom', roomName);
+		})
 
 		// userSocket.on('userJoinedRoom', (notification: string) => {
 		// 	console.log("User socket in main: ", userSocket.id);
