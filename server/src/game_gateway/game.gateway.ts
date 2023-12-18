@@ -18,21 +18,15 @@ export class GameGateway {
   GameService: GameService;
 
 
-  afterInit(server: Server) {
-    console.log('GameNamespace initialized');
+  handleConnection(@ConnectedSocket() client: Socket) {
+    console.log(`GameGtw client connected : ${client.id}`);
+    this.connectedUsers[client.id] = client;
   }
 
-  // handleConnection(@ConnectedSocket() client: Socket) {
-  //   console.log(`GameGtw client connected : ${client.id}`);
-  //   this.connectedUsers[client.id] = client;
-  //   client.join(`user_game_${client.id}`);
-  // }
-
-  // handleDisconnect(@ConnectedSocket() client: Socket) {
-  //   console.log(`GameGtw client disconnected : ${client.id}`);
-  //   delete this.connectedUsers[client.id];
-  //   client.leave(`user_game${client.id}`);
-  // }
+  handleDisconnect(@ConnectedSocket() client: Socket) {
+    console.log(`GameGtw client disconnected : ${client.id}`);
+    delete this.connectedUsers[client.id];
+  }
 
   @SubscribeMessage('Game')
   handleGame(@ConnectedSocket() client: Socket, data: string): void {
