@@ -22,21 +22,22 @@ interface FriendRequestDto {
 }
 
 export default function Home() {
-	
-	// const socket = io('http://localhost:3001');
-	// Pour le soucis de connexion :
-	// Faire join tous les sockets la meme room
-	// se debrouiller pour avoir un effet useEffect(() => {}, [])
-	useEffect(() => {
-		const userSocket = io('http://localhost:3001/user');
-	}, []);
+
+	const userSocket = io('http://localhost:3001/user', {
+		autoConnect: false,
+	});
 	// const gameSocket = io('http://localhost:3001/game')
 
 	const [showLogin, setShowLogin] = useState(true);
 	const [show2FAForm, setShow2FAForm] = useState(false);
+	const [authValidated, setAuthValidated] = useState(false);
+
 
 	const searchParams = useSearchParams();
 	const code = searchParams.get('code');
+
+	if (authValidated) // a voir mdr
+		userSocket.connect();
 
 	const friendRequestValidation = async (friendRequestDto: FriendRequestDto) => {
 
@@ -100,12 +101,14 @@ export default function Home() {
 
 			if (response.ok) {
 
-				console.log("-- Fetch to API successed --");
+				console.log("-- Access granted --");
 				const token = await response.json();
 				sessionStorage.setItem("jwt", token.access_token);
 				const jwt = sessionStorage.getItem("jwt");
-				if (jwt)
+				if (jwt) {
 					await setUserSession(jwt);
+					setAuthValidated(true);
+				}
 				return true;
 			}
 			else {
@@ -120,6 +123,7 @@ export default function Home() {
 		setShow2FAForm(false);
 	}
 
+	// Multi-purpose useEffect for socket handling
 	// useEffect(() => {
 
 	// 	userSocket.on('roomMessage', (message: string) => {
@@ -140,23 +144,24 @@ export default function Home() {
 	// }, [userSocket]);
 
 	// Connection - Deconnection useEffect for socket
-	// useEffect(() => {
+	useEffect(() => {
 
-		// userSocket.on('connect', () => {
-		// 	if (userSocket.connected)
-		// 		console.log("UserSocket new connection : ", userSocket.id);
-		// })
+		userSocket.on('connect', () => {
+			const personnalRoom = sessionStorage.getItem("currentUserLogin");
+			console.log("UserSocket new connection : ", userSocket.id);
+			userSocket.emit('joinPersonnalRoom', personnalRoom);
+		})
 
-		// userSocket.on('disconnect', () => {
-		// 	console.log('UserSocket disconnected from the server : ', userSocket.id);
-		// })
+		userSocket.on('disconnect', () => {
+			console.log('UserSocket disconnected from the server : ', userSocket.id);
+		})
 
-		// return () => {
-			// console.log('Unregistering events...');
-			// userSocket.off('connect');
-			// userSocket.off('disconnect');
-		// }
-	// })
+		return () => {
+			console.log('Unregistering events...');
+			userSocket.off('connect');
+			userSocket.off('disconnect');
+		}
+	}, [userSocket])
 
 	// Game socket handler
 	// useEffect(() => {
@@ -177,26 +182,26 @@ export default function Home() {
 	// })
 
 	// Login form use-effect
-	// useEffect(() => {
-	// 	if (code && showLogin) {
-	// 		handleAccessToken(code).then(result => {
-	// 			setShowLogin(false);
-	// 		})
-	// 	}
-	// }, [showLogin]);
-
-	// Testing purpose
 	useEffect(() => {
-		if (sessionStorage.getItem("currentUserLogin") != null)
-			setShowLogin(false);
-	});
+		if (code && showLogin) {
+			handleAccessToken(code).then(result => {
+				setShowLogin(false);
+			})
+		}
+	}, [showLogin]);
+
+	// For testing purpose : no 42 form on connection
+	// useEffect(() => {
+	// 	if (sessionStorage.getItem("currentUserLogin") != null)
+	// 		setShowLogin(false);
+	// });
 
 	return (
 			<RootLayout>
 				<Header/>
 				{showLogin ? (<Authentificationcomponent />) :
-					// show2FAForm ? (<TFAComponent on2FADone={handle2FADone} />) :
-					// (
+					show2FAForm ? (<TFAComponent on2FADone={handle2FADone} />) :
+					(
 						<div className="container">
 							<ToastContainer />
 							<Chat socket={userSocket}/>
@@ -204,10 +209,8 @@ export default function Home() {
 								<Game />
 							</GameProvider>
 						</div>
-					// )
+					)
 				}
 			</RootLayout>
 	)
 }
-
-// https://www.delightfulengineering.com/blog/nest-websockets/basics
