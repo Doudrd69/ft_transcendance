@@ -214,7 +214,6 @@ export default function Home() {
 	// 		setShowLogin(false);
 	// });
 
-
 	return (
 			<RootLayout>
 				<Header/>
@@ -231,5 +230,3 @@ export default function Home() {
 			</RootLayout>
 	)
 }
-
-// https://www.delightfulengineering.com/blog/nest-websockets/basics
