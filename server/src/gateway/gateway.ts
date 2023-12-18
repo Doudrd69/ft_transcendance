@@ -9,6 +9,8 @@ import { OnModuleInit } from '@nestjs/common'
 	},
 })
 
+// penser a creer un dossier pour les dto de la gateway
+
 export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	@WebSocketServer()
@@ -43,7 +45,6 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 
 		console.log("==== joinRoom Event ====");
 		console.log("Add ", client.id," to room : ", roomName);
-		const test = "coucou du server";
 
 		client.join(roomName);
 		this.server.to(roomName).emit('userJoinedRoom');
@@ -77,5 +78,14 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 			recipientLogin: dto.recipientLogin,
 			initiatorLogin: dto.initiatorLogin,
 		});
+	}
+
+	@SubscribeMessage('friendRequestAccepted')
+	handleAcceptedFriendRequest(@MessageBody() dto: any) {
+		this.server.to(dto.initiatorLogin).emit('friendRequestAcceptedNotif', {
+			recipientID: dto.recipientID,
+			recipientLogin: dto.recipientLogin,
+			initiatorLogin: dto.initiatorLogin,
+		})
 	}
 }
