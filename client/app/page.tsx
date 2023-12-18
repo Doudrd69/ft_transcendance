@@ -26,7 +26,10 @@ export default function Home() {
 	const userSocket = io('http://localhost:3001/user', {
 		autoConnect: false,
 	});
-	// const gameSocket = io('http://localhost:3001/game')
+
+	const gameSocket = io('http://localhost:3001/game', {
+		autoConnect: false,
+	})
 
 	const [showLogin, setShowLogin] = useState(true);
 	const [show2FAForm, setShow2FAForm] = useState(false);
@@ -36,8 +39,11 @@ export default function Home() {
 	const searchParams = useSearchParams();
 	const code = searchParams.get('code');
 
-	if (authValidated) // a voir mdr
+	// a voir
+	if (authValidated) {
 		userSocket.connect();
+		gameSocket.connect();
+	}
 
 	const friendRequestValidation = async (friendRequestDto: FriendRequestDto) => {
 
@@ -164,22 +170,22 @@ export default function Home() {
 	}, [userSocket])
 
 	// Game socket handler
-	// useEffect(() => {
+	useEffect(() => {
 
-	// 	gameSocket.on('connect', () => {
-	// 		console.log('GameSocket new connection : ', gameSocket.id);
-	// 	})
+		gameSocket.on('connect', () => {
+			console.log('GameSocket new connection : ', gameSocket.id);
+		})
 
-	// 	gameSocket.on('disconnect', () => {
-	// 		console.log('GameSocket disconnected from the server : ', gameSocket.id);
-	// 	})
+		gameSocket.on('disconnect', () => {
+			console.log('GameSocket disconnected from the server : ', gameSocket.id);
+		})
 
-	// 	return () => {
-	// 		console.log('Unregistering events...');
-	// 		gameSocket.off('connect');
-	// 		gameSocket.off('disconnect');
-	// 	}
-	// })
+		return () => {
+			console.log('Unregistering events...');
+			gameSocket.off('connect');
+			gameSocket.off('disconnect');
+		}
+	}, [gameSocket])
 
 	// Login form use-effect
 	useEffect(() => {
