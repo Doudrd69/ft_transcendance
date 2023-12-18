@@ -56,7 +56,6 @@ export default function Home() {
 
 		if (response.ok) {
 			console.log("User added to your friend list!");
-			// join room for recipient
 			const roomName = friendRequestDto.initiatorLogin + friendRequestDto.recipientLogin;
 			if (userSocket.connected) {
 				userSocket.emit('friendRequestAccepted', friendRequestDto);
@@ -155,7 +154,7 @@ export default function Home() {
 
 		return () => {
 			userSocket.off('friendRequest');
-			// userSocket.off('userJoinedRoom');
+			userSocket.off('friendRequestAcceptedNotif');
 		}
 	}, [userSocket]);
 
