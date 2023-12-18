@@ -116,7 +116,7 @@ export class ChatService {
 	async createConversation(conversationDto: ConversationDto): Promise<Conversation> {
 
 		const user = await this.usersRepository.findOne({
-			where: { login: conversationDto.username},
+			where: { login: conversationDto.userID},
 			relations: ['groups'],
 		});
 

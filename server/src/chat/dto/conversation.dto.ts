@@ -1,5 +1,5 @@
 export class ConversationDto {
     name: string;
-    username: string;
+    userID: number;
 	is_channel: boolean;
 }
