@@ -214,6 +214,7 @@ export default function Home() {
 	// 		setShowLogin(false);
 	// });
 
+
 	return (
 			<RootLayout>
 				<Header/>
