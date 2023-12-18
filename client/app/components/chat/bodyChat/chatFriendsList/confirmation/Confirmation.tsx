@@ -3,7 +3,7 @@ import React from 'react';
 
 interface ConfirmationComponentProps {
 	phrase: string;
-  }
+}
   
   const ConfirmationComponent: React.FC<ConfirmationComponentProps> = ({ phrase }) => {
 	return (
