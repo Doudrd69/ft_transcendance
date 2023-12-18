@@ -9,6 +9,8 @@ import { OnModuleInit } from '@nestjs/common'
 	},
 })
 
+// penser a creer un dossier pour les dto de la gateway
+
 export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	@WebSocketServer()
@@ -35,32 +37,33 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		console.log("Client ", client.id, " has joined ", personnalRoom, " room");
 	}
 
-	// @SubscribeMessage('joinRoom')
-	// async addUserToRoom(@MessageBody() dto: { roomName: string, userId: number }) {
+	@SubscribeMessage('joinRoom')
+	addUserToRoom(
+		@ConnectedSocket() client: Socket,
+		@MessageBody() roomName: string,
+	) {
 
-	// 	console.log("==== joinRoom Gateway ====");
-	// 	const { roomName, userId } = dto;
-	// 	console.log("ADD USER TO ROOM : ", dto);
+		console.log("==== joinRoom Event ====");
+		console.log("Add ", client.id," to room : ", roomName);
 
-	// 	// Vérifier si l'utilisateur est déjà dans une salle et la quitter si jamais
-	// 	const currentRoom = Object.keys(this.connectedUsers[userId]?.rooms || {})[1];
-	// 	if (currentRoom) {
-	// 		this.connectedUsers[userId]?.leave(currentRoom);
-	// 		console.log(`User left room: ${currentRoom}`);
-	// 	}
-
-	// 	// Rejoindre la nouvelle salle
-	// 	this.connectedUsers[userId]?.join(roomName);
-	// 	console.log(`User joined room: ${roomName}`);
-
-	// 	// Émettre un message pour confirmer l'entrée dans la salle
-	// 	this.server.to(roomName).emit('roomMessage', `Bienvenue dans la salle ${roomName}`);
-	// }
+		client.join(roomName);
+		this.server.to(roomName).emit('userJoinedRoom');
+		// // Vérifier si l'utilisateur est déjà dans une salle et la quitter si jamais
+		// const currentRoom = Object.keys(this.connectedUsers[userId]?.rooms || {})[1];
+		// if (currentRoom) {
+		// 	this.connectedUsers[userId]?.leave(currentRoom);
+		// 	console.log(`User left room: ${currentRoom}`);
+		// }
+		// // Rejoindre la nouvelle salle
+		// this.connectedUsers[userId]?.join(roomName);
+		// console.log(`User joined room: ${roomName}`);
+		// // Émettre un message pour confirmer l'entrée dans la salle
+		// this.server.to(roomName).emit('roomMessage', `Bienvenue dans la salle ${roomName}`);
+	}
 
 	@SubscribeMessage('message')
 	handleMessage(@MessageBody() dto: any) {
-		// this.server.to('user').emit(...)...
-		this.server.emit('onMessage', {
+		this.server.to(dto.conversationName).emit('onMessage', {
 			from: dto.from,
 			content: dto.content,
 			post_datetime: dto.post_datetime,
@@ -70,11 +73,19 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 
 	@SubscribeMessage('addFriend')
 	handleFriendRequest(@MessageBody() dto: any) {
-		console.log("ADDFRIEND DTO: ", dto);
 		this.server.to(dto.recipientLogin).emit('friendRequest', {
 			recipientID: dto.recipientID,
 			recipientLogin: dto.recipientLogin,
 			initiatorLogin: dto.initiatorLogin,
 		});
+	}
+
+	@SubscribeMessage('friendRequestAccepted')
+	handleAcceptedFriendRequest(@MessageBody() dto: any) {
+		this.server.to(dto.initiatorLogin).emit('friendRequestAcceptedNotif', {
+			recipientID: dto.recipientID,
+			recipientLogin: dto.recipientLogin,
+			initiatorLogin: dto.initiatorLogin,
+		})
 	}
 }
