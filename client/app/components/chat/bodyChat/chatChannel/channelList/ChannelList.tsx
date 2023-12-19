@@ -14,7 +14,7 @@ const ChannelListComponent: React.FC = () => {
   const { state, dispatch } = useChat();
 
   const [conversations, setConversations] = useState<Conversation[]>([]);
-  const user = sessionStorage.getItem("currentUserLogin");
+  const user = sessionStorage.getItem("currentUserID");
 
   const loadDiscussions = async () => {
 
@@ -38,7 +38,6 @@ const ChannelListComponent: React.FC = () => {
   useEffect(() => {
 	console.log("Loading conversations...");
 	loadDiscussions();
-	// fonctions de relog des rooms?
 	}, []);
 
   return (
