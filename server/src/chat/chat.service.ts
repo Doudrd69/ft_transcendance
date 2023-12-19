@@ -46,10 +46,8 @@ export class ChatService {
 		});
 
 		if (userToFind) {
-			console.log("==> Looking for ", userToFind.login, " conversations...");
 			if (userToFind.groups && Array.isArray(userToFind.groups)) {
 				const conversations = userToFind.groups;
-				console.log("conversations --> ", conversations);
 				return conversations;
 			}
 			return [];

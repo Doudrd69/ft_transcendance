@@ -52,11 +52,11 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 
 			const conv = await this.chatService.getConversationArrayByID(ids);
 			conv.forEach(function (value) {
-				console.log("Client joined rooms ==> ", value.name);
 				client.join(value.name);
 			})
 		}
 	}
+	// faire la fonction inverse 
 
 	@SubscribeMessage('joinRoom')
 	addUserToRoom( @ConnectedSocket() client: Socket, @MessageBody() roomName: string ) {
