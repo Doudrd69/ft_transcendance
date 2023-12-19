@@ -12,14 +12,30 @@ export class GameService {
   ) {}
 
   async createGame(player1: string, player2: string) {
-    // Créer une nouvelle partie
+
     const game = new Game();
-    // game.players = [player1, player2];
+	console.log("New Game Create");
+    game.playerOne = player1;
+	game.playerTwo = player2;
+	game.scoreOne = 0;
+	game.scoreTwo = 0;
 
     // Enregistrer la partie dans le repository
-    // await this.gameRepository.save(game);
-
-    // Retourner l'ID de la partie
-    return game.id;
+    await this.gameRepository.save(game);
   }
 }
+
+/**
+ * async createGame(players: [string, string]) {
+
+    const game = new Game();
+	console.log("New Game Create");
+    game.playerOne = players[0];
+	game.playerTwo = players[1];
+
+    // Enregistrer la partie dans le repository
+    await this.gameRepository.save(game);
+
+    return game.id;
+  }
+ */

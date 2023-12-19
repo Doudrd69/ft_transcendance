@@ -17,7 +17,6 @@ import { GameService } from './game.service';
       TypeOrmModule.forFeature([User]),
       TypeOrmModule.forFeature([Friendship]),
       TypeOrmModule.forFeature([Game]),
-      // TypeOrmModule.forFeature([Conversation]),
   ],
   controllers: [GameController],
   providers: [GameGateway, GameService, MatchmakingService],

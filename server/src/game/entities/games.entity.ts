@@ -6,15 +6,15 @@ export class Game
 	@PrimaryGeneratedColumn()
   	id: number;
 
-	// @Column()
-	// players: string[];
-
-	// @Column()
-	// scores: number[];
+	@Column()
+	playerOne: string;
 
 	@Column()
-	duration: number;
-	
+	playerTwo: string;
+
 	@Column()
-	startTime: Date;
+	scoreOne: number;
+
+	@Column()
+	scoreTwo: number;
 }

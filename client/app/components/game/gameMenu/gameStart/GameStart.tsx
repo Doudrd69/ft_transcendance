@@ -5,7 +5,23 @@ import { Socket } from 'socket.io-client'
 
 const MatchMaking = (socket: {socket: Socket}) => {
 
+	const gameSocket = socket.socket;
     const {showGameMenu, handleGameMenu} = useGame();
+
+	const handleStartClick = async () => {
+		const currentUserLogin = sessionStorage.getItem("currentUserLogin");
+	
+		if (gameSocket.connected) {
+			console.log("joueur leave")
+			gameSocket.emit('leave-matchmaking', currentUserLogin);
+			gameSocket.off('message');
+		}
+		else {
+			console.log("GameSocket pas connecté");
+		}
+	};
+	
+
     return (
         <div className="matchmakingClass">
             <div className="cs-loader">
@@ -18,7 +34,7 @@ const MatchMaking = (socket: {socket: Socket}) => {
                     <label>●</label>
                 </div>
             </div>
-                    <button className={`cancel-button ${showGameMenu ? 'clicked' : ''}`} onClick={handleGameMenu}>Cancel</button>
+                    <button className={`cancel-button ${showGameMenu ? 'clicked' : ''}`} onClick={() =>{ handleStartClick(); handleGameMenu(); }}>Cancel</button>
         </div>
     );
 };

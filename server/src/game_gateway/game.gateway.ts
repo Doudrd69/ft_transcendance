@@ -14,8 +14,13 @@ export class GameGateway {
 
   @WebSocketServer()
   server: Server;
-  MatchmakingService: MatchmakingService;
-  GameService: GameService;
+//   MatchmakingService: MatchmakingService;
+//   GameService: GameService;
+
+  constructor(
+	private readonly GameService: GameService,
+	private readonly MatchmakingService: MatchmakingService,
+	) {}
 
   private connectedUsers: { [userId: string]: Socket } = {};
 
@@ -38,24 +43,26 @@ export class GameGateway {
   }
 
   @SubscribeMessage('join-matchmaking')
-  handleJoinMatchmaking(client: Socket, playerId: string): string {
-    this.MatchmakingService.join(playerId)
-    console.log("JOINMATCHMAKING");
-    const enoughPlayers = this.MatchmakingService.checkPlayersPairs();
+  async handleJoinMatchmaking(client: Socket, playerLogin: string): Promise<String> {
+	console.log("JOINMATCHMAKING");
+    this.MatchmakingService.join(playerLogin);
+    const enoughPlayers = this.MatchmakingService.IsThereEnoughPairs();
     if (enoughPlayers) {
-      const pairs = this.MatchmakingService.getPlayersPairs();
-      this.server.emit("players-pairs-found");
+		const pairs = await this.MatchmakingService.getPlayersPairs();
+		for (const pair of pairs) {
+			this.GameService.createGame(pair[0], pair[1]);
+		}
     }
-    return (playerId);
-  }
-
-  @SubscribeMessage('players-pairs-found')
-  async handleJoinGame(client: Socket, pairs: Array<Array<string>>) {
-    // Créer une nouvelle partie pour chaque paire de joueurs
-    for (const pair of pairs) {
-      const gameId = await this.GameService.createGame(pair[0], pair[1]);
-    }
-    console.log("JOINGAME");
-    return (pairs);
-  }
+    return (playerLogin);
 }
+
+@SubscribeMessage('leave-matchmaking')
+handleLeaveMatchmaking(client: Socket, playerLogin: string): string {
+	console.log("leaveMATCHMAKING");
+    this.MatchmakingService.leave(playerLogin);
+    return (playerLogin);
+}
+}
+
+//let i = 0; i < pairs.length; i++
+// this.server.emit('players-pairs-found', pairs);
