@@ -14,6 +14,7 @@ import { io, Socket } from 'socket.io-client'
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { totalmem } from 'os';
+import GameHeader from './components/game/GameHeader';
 
 interface FriendRequestDto {
 	recipientID: number,
@@ -218,7 +219,7 @@ export default function Home() {
 			<RootLayout>
 				<Header/>
 				{showLogin ? (<Authentificationcomponent />) :
-					// show2FAForm ? (<TFAComponent on2FADone={handle2FADone} />) :
+					show2FAForm ? (<TFAComponent on2FADone={handle2FADone} />) :
 					(
 					  <div className="container">
                         <ToastContainer />
