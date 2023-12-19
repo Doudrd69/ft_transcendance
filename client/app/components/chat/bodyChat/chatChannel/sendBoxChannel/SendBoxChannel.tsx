@@ -28,11 +28,16 @@ const SendBoxChannelComponent = (socket: {socket: Socket}) => {
 		conversationName: state.currentConversation,
 	}
 
+	// petit soucis de socket : si je me reconnecte, le socket n'est pas dans dans la room du channel
+	// donc je recois plus les nouveaux messages
 	const handleMessage = async (e: React.FormEvent) => {
 		
 		e.preventDefault();
 
+		console.log("--> ", socketInUse.id);
+
 		if (socketInUse.connected) {
+			console.log("ahahahah jpp");
 			socketInUse.emit('message', messageEventDto, () => {
 				console.log("Message Sent!");
 			});

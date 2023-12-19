@@ -1,6 +1,8 @@
 import { WebSocketGateway, WebSocketServer, SubscribeMessage, MessageBody, OnGatewayConnection, OnGatewayDisconnect, ConnectedSocket} from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io'
-import { OnModuleInit } from '@nestjs/common'
+import { GroupMember } from 'src/chat/entities/group_member.entity';
+import { ChatService } from 'src/chat/chat.service';
+import { Conversation } from 'src/chat/entities/conversation.entity';
 
 @WebSocketGateway({
 	namespace: 'user',
@@ -12,6 +14,8 @@ import { OnModuleInit } from '@nestjs/common'
 // penser a creer un dossier pour les dto de la gateway
 
 export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect {
+
+	constructor( private chatService: ChatService ) {}
 
 	@WebSocketServer()
 	server: Server;
@@ -28,20 +32,34 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		delete this.connectedUsers[client.id];
 	}
 
+	// This event will create a room for the user, to join its current socket
 	@SubscribeMessage('joinPersonnalRoom')
-	handleUserPersonnalRoom(
-		@ConnectedSocket() client: Socket,
-		@MessageBody() personnalRoom: string,
-	) {
+	handleUserPersonnalRoom( @ConnectedSocket() client: Socket, @MessageBody() personnalRoom: string ) {
 		client.join(personnalRoom);
 		console.log("Client ", client.id, " has joined ", personnalRoom, " room");
 	}
 
+	// This event let a user to join back his conversations, because when he comes back after a deconnection,
+	// his socket will change, so we add it back to the rooms
+	@SubscribeMessage('rejoinRooms')
+	async handleUserJoinsRooms( @ConnectedSocket() client: Socket, @MessageBody() userID: number ) {
+		const conversations = await this.chatService.getConversations(userID);
+		if (conversations) {
+			let ids = <number[]>[];
+			conversations.forEach(function (value) {
+				ids.push(value.id);
+			});
+
+			const conv = await this.chatService.getConversationArrayByID(ids);
+			conv.forEach(function (value) {
+				console.log("Client joined rooms ==> ", value.name);
+				client.join(value.name);
+			})
+		}
+	}
+
 	@SubscribeMessage('joinRoom')
-	addUserToRoom(
-		@ConnectedSocket() client: Socket,
-		@MessageBody() roomName: string,
-	) {
+	addUserToRoom( @ConnectedSocket() client: Socket, @MessageBody() roomName: string ) {
 
 		console.log("==== joinRoom Event ====");
 		console.log("Add ", client.id," to room : ", roomName);
@@ -63,11 +81,13 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 
 	@SubscribeMessage('message')
 	handleMessage(@MessageBody() dto: any) {
+		console.log("okay many = ", dto.conversationName);
 		this.server.to(dto.conversationName).emit('onMessage', {
 			from: dto.from,
 			content: dto.content,
 			post_datetime: dto.post_datetime,
 			conversationID: dto.conversationID,
+			conversationName: dto.conversationName,
 		});
 	}
 
