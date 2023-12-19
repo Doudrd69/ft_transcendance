@@ -6,11 +6,11 @@ export class Game
 	@PrimaryGeneratedColumn()
   	id: number;
 
-	@Column()
-	players: string[];
+	// @Column()
+	// players: string[];
 
-	@Column()
-	scores: number[];
+	// @Column()
+	// scores: number[];
 
 	@Column()
 	duration: number;

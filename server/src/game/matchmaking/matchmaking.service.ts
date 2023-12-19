@@ -2,24 +2,17 @@ import { Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { User } from '../../users/entities/users.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Lobby } from '../entities/lobby.entity';
 
 @Injectable()
 export class MatchmakingService {
 
-    constructor(
-        @InjectRepository(Lobby)
-        private lobbyRepository: Repository<Lobby>,
-        @InjectRepository(User)
-        private playersRepository: Repository<User>,
-        private playersQueue: String[]
-      ) {
-      }
+    public playersQueue: string[];
 
 
-    async getUserByLogin(loginToSearch: string): Promise<User> {
-		return await this.playersRepository.findOne({ where: {login: loginToSearch}});
-	}
+
+    // async getUserByLogin(loginToSearch: string): Promise<User> {
+	// 	return await this.playersRepository.findOne({ where: {login: loginToSearch}});
+	// }
 
     async getPlayersPairs()  {
         // Créer des paires

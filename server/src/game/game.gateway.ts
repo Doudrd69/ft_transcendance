@@ -46,7 +46,7 @@ export class GameGateway {
   }
 
   @SubscribeMessage('players-pairs-found')
-  handleJoinGame(client: Socket, pairs: Array<Array<string>>) {
+  async handleJoinGame(client: Socket, pairs: Array<Array<string>>) {
     // Créer une nouvelle partie pour chaque paire de joueurs
     for (const pair of pairs) {
       const gameId = await this.GameService.createGame(pair[0], pair[1]);
