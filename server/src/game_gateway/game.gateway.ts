@@ -1,7 +1,7 @@
 import { WebSocketGateway, WebSocketServer, SubscribeMessage, OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect, ConnectedSocket, MessageBody } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { MatchmakingService } from './matchmaking/matchmaking.service';
-import { GameService } from './game.service';
+import { GameService } from 'src/game/game.service';
+import { MatchmakingService } from 'src/game/matchmaking/matchmaking.service';
 
 @WebSocketGateway({
   namespace: 'game',
