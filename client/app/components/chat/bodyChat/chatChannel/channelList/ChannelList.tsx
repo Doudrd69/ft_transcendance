@@ -8,12 +8,13 @@ interface Conversation {
   is_channel: boolean;
 }
 
+// Il faudrait rejoin la room de chaque conv apres une deco
 const ChannelListComponent: React.FC = () => {
 
   const { state, dispatch } = useChat();
 
   const [conversations, setConversations] = useState<Conversation[]>([]);
-  const user = sessionStorage.getItem("currentUserLogin");
+  const user = sessionStorage.getItem("currentUserID");
 
   const loadDiscussions = async () => {
 
@@ -22,12 +23,13 @@ const ChannelListComponent: React.FC = () => {
 	});
 
 	if (response.ok) {
-	  const userData = await response.json();
-	  setConversations((prevConversations: Conversation[]) => [...prevConversations, ...userData]);
+		const userData = await response.json();
+		setConversations((prevConversations: Conversation[]) => [...prevConversations, ...userData]);
 	} else {
 	  console.log("Fatal error");
 	}
   };
+
   const userData = {
 	discussion: conversations,
 	online: ["on", "off", "on", "on", "off", "on", "on"],

@@ -8,6 +8,7 @@ import { User } from '../users/entities/users.entity'
 import { MessageDto } from './dto/message.dto';
 import { ConversationDto } from './dto/conversation.dto';
 import { GroupDto } from './dto/group.dto';
+import { group } from 'console';
 
 
 @Injectable()
@@ -35,12 +36,12 @@ export class ChatService {
 		return messages;
 	}
 
-	private async getAllConversations(userName: string): Promise<GroupMember[]> {
+	private async getAllConversations(userID: number): Promise<GroupMember[]> {
 
 		// login != username, penser a changer ca
 		let userToFind = new User();
 		userToFind = await this.usersRepository.findOne({
-			where: { login: userName },
+			where: { id: userID },
 			relations: ["groups"],
 		});
 
@@ -55,6 +56,31 @@ export class ChatService {
 		}
 		console.error("Fatal error: user not found");
 		return [];
+	}
+
+	async quitConversation(conversationDto: ConversationDto) {
+
+		const conversationToRemove = await this.conversationRepository.findOne({ where: {name: conversationDto.name }});
+
+		const user = await this.usersRepository.findOne({
+			where: {id: conversationDto.userID},
+			relations: ['groups'],
+		});
+
+		const groupToRemove = user.groups.filter((group: GroupMember) => group.conversation == conversationToRemove);
+		const newArray = user.groups.filter((group: GroupMember) => group.conversation != conversationToRemove);
+		console.log(newArray);
+		await this.usersRepository.save(user);
+		console.log("Array without ", conversationToRemove.name, " --> ", user.groups);
+
+		await this.groupMemberRepository.remove(groupToRemove);
+	}
+
+	async eraseConversation(conversationDto: ConversationDto) {
+
+		const conversationToRemove = await this.conversationRepository.findOne({ where: {name: conversationDto.name }});
+		await this.conversationRepository.remove(conversationToRemove);
+		return ;
 	}
 
 	async createGroup(conversation: Conversation): Promise<GroupMember> {
@@ -164,6 +190,28 @@ export class ChatService {
 		return this.messageRepository.findOne({ where: {id: idToFind} });
 	}
 
+	async getConversationByID(id: number): Promise<Conversation> {
+
+		const conversation = await this.conversationRepository.findOne({ where: {id: id} });
+		if (conversation) {
+			return conversation;
+		}
+		console.log("Fatal error: conversation not found");
+		return ;
+	}
+
+	async getConversationArrayByID(IDs: number[]): Promise<Conversation[]> {
+
+		let conversations = <Conversation[]>[];
+
+		for (let i = 0; i < IDs.length; i++) {
+			const conversation = await this.getConversationByID(IDs[i]);
+			conversations.push(conversation);
+		}
+
+		return conversations;
+	}
+
 	async getMessages(conversationID: any): Promise<Message[]> {
 
 		const allMessages = await this.getAllMessages(conversationID);
@@ -175,9 +223,9 @@ export class ChatService {
 		return allMessages;
 	}
 
-	async getConversations(userName: string): Promise<GroupMember[]> {
+	async getConversations(userID: number): Promise<GroupMember[]> {
 
-		const allConversations = await this.getAllConversations(userName);
+		const allConversations = await this.getAllConversations(userID);
 		if (!allConversations) {
 			console.error("Fatal error: conversations not found");
 			return [];
