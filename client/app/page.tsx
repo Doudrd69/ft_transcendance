@@ -14,7 +14,6 @@ import { io, Socket } from 'socket.io-client'
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { totalmem } from 'os';
-import GameHeader from './components/game/GameHeader';
 
 interface FriendRequestDto {
 	recipientID: number,
@@ -23,7 +22,7 @@ interface FriendRequestDto {
 }
 
 export default function Home() {
-	
+
 	const userSocket = io('http://localhost:3001/user', {
 		autoConnect: false,
 	});

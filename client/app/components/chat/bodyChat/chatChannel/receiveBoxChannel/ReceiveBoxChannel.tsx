@@ -63,19 +63,10 @@ const ReceiveBoxChannelComponent = (socket: {socket: Socket}) => {
 	// Here we retreive the last sent message and we "insert" it in the messages array
 	useEffect(() => {
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> ffbd6d5 (Now sockets are emitting into rooms for CHANNEL (Dms will work the same but its not done yet))
 		socketInUse.on('userJoinedRoom', () => {
 			console.log("Notif from server");
 		});
 
-<<<<<<< HEAD
-=======
->>>>>>> 011b9f5 (Reworked game directory architecture and files)
-=======
->>>>>>> ffbd6d5 (Now sockets are emitting into rooms for CHANNEL (Dms will work the same but its not done yet))
 		socketInUse.on('onMessage', (message: Message) => {
 			if (message)
 				setMessages((prevMessages: Message[]) => [...prevMessages, message]);
@@ -83,15 +74,7 @@ const ReceiveBoxChannelComponent = (socket: {socket: Socket}) => {
 
 		return () => {
 			socketInUse.off('onMessage')
-<<<<<<< HEAD
-<<<<<<< HEAD
 			socketInUse.off('userJoinedRoom');
-=======
-			socketInUse.off('roomMessage')
->>>>>>> 011b9f5 (Reworked game directory architecture and files)
-=======
-			socketInUse.off('userJoinedRoom');
->>>>>>> ffbd6d5 (Now sockets are emitting into rooms for CHANNEL (Dms will work the same but its not done yet))
 		}
 	}, [socketInUse]);
 	
