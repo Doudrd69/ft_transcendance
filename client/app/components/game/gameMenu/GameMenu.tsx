@@ -4,41 +4,24 @@ import Settings from './gameSettings/gameSettings'
 import {useGame } from '../GameContext'
 import React, { useState } from 'react';
 import { Socket } from 'socket.io-client'
-import Home from '@/app/page';
 
 
-const Menu: React.FC = () => {
+const Menu = (socket: {socket: Socket}) => {
+
+  const gameSocket = socket.socket;
   const {showGameMatchmaking, showGameSettings, handleGameSettings, handleGameMatchmaking} = useGame();
   
   const handleStartClick = async () => {
     const currentUserLogin = sessionStorage.getItem("currentUserLogin");
 
     if (gameSocket.connected) {
+        console.log("GameSocket connected");
       gameSocket.emit('create-lobby', currentUserLogin );
       gameSocket.off('message');
     }
     else {
 			console.log("Socket not connected");
 		}
-
-    if (currentUserLogin !== null) {
-    const response = await fetch('http://localhost:3001/game/join', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ playerName: currentUserLogin }), // Sending an object with playerName property
-    });
-
-    if (response.ok) {
-      console.log('Player successfully joined the lobby:', response.statusText);
-    } else {
-      console.log(response.statusText);
-      console.log("Player can't join the lobby");
-    }
-  } else {
-    console.log('currentUserLogin is null');
-  }
 };
 
   return (
