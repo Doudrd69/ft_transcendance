@@ -213,19 +213,18 @@ export default function Home() {
 	// 		setShowLogin(false);
 	// });
 
-	return (
+
+    return (
 			<RootLayout>
 				<Header/>
 				{showLogin ? (<Authentificationcomponent />) :
-					show2FAForm ? (<TFAComponent on2FADone={handle2FADone} />) :
+					// show2FAForm ? (<TFAComponent on2FADone={handle2FADone} />) :
 					(
-						<div className="container">
-							<ToastContainer />
-							<Chat socket={userSocket}/>
-							<GameProvider>
-								<Game />
-							</GameProvider>
-						</div>
+					  <div className="container">
+                        <ToastContainer />
+						<Chat socket={userSocket}/>
+						<GameHeader socket={gameSocket}/>
+					  </div>
 					)
 				}
 			</RootLayout>

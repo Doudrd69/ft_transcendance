@@ -1,18 +1,11 @@
 import { Controller, Get, Post, Body, Param, Patch, Delete, BadRequestException, Logger, Request} from '@nestjs/common';
 import { GameService } from './game.service';
-import { LobbyService } from './matchmaking/matchmaking.service';
+import { MatchmakingService } from './matchmaking/matchmaking.service';
 
 @Controller('game')
 export class GameController {
   constructor(private GameService: GameService,
-                private LobbyService: LobbyService) {}
-
-  @Post('join')
-  joinLobby(@Body() playerName: string) {
-    console.log("player name :", playerName);
-    this.LobbyService.checkLobbyAlreadyExist(playerName);
-    return { message: 'Joueur rejoint avec succès', playerName };
-  }
+                private LobbyService: MatchmakingService) {}
 }
 
 

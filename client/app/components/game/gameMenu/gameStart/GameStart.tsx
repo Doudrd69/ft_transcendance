@@ -1,8 +1,9 @@
 import './GameStart.css'
 import React from 'react';
 import { useGame } from '../../GameContext';
+import { Socket } from 'socket.io-client'
 
-const MatchMaking: React.FC = () => {
+const MatchMaking = (socket: {socket: Socket}) => {
 
     const {showGameMenu, handleGameMenu} = useGame();
     return (
