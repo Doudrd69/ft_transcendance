@@ -20,12 +20,12 @@ export class GameGateway {
 
   handleConnection(@ConnectedSocket() client: Socket) {
     console.log(`GameGtw client connected : ${client.id}`);
-    this.connectedUsers[client.id] = client;
+    // this.connectedUsers[client.id] = client;
   }
 
   handleDisconnect(@ConnectedSocket() client: Socket) {
     console.log(`GameGtw client disconnected : ${client.id}`);
-    delete this.connectedUsers[client.id];
+    // delete this.connectedUsers[client.id];
   }
 
   @SubscribeMessage('Game')
