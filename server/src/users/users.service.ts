@@ -70,6 +70,7 @@ export class UsersService {
 	// 	});
 	// }
 
+	// Testing purpose - Maybe future implementation
 	async createNewUser(username: string): Promise<User> {
 		const userToCreate = await this.usersRepository.findOne({ where: {username: username } });
 		if (!userToCreate) {
@@ -93,7 +94,7 @@ export class UsersService {
 	// 	throw new NotFoundException();
 	// }
 
-	async createNew42User(userData) {
+	async createNew42User(userData): Promise<User> {
 		const new42User = new User();
 		new42User.login = userData.login;
 		new42User.firstname = userData.firstname;
@@ -120,11 +121,13 @@ export class UsersService {
 
 	async createFriendship(friendRequestDto: FriendRequestDto): Promise<Friendship | null> {
 
+		// recherche par login ou username?
 		const initiator = await this.usersRepository.findOne({
 			where: {login: friendRequestDto.initiatorLogin},
 			relations: ["initiatedFriendships"],
 		});
 
+		// recherche par login ou username?
 		const recipient = await this.usersRepository.findOne({
 			where: {login: friendRequestDto.recipientLogin},
 			relations: ["initiatedFriendships"],
@@ -152,6 +155,7 @@ export class UsersService {
 	
 	async updateFriendship(friendRequestDto: FriendRequestDto, flag: boolean): Promise<Friendship> {
 
+		// recherche par login ou username?
 		const initiator = await this.usersRepository.findOne({
 			where: {login: friendRequestDto.initiatorLogin},
 			relations: ["initiatedFriendships", "acceptedFriendships", "groups"],
@@ -209,6 +213,7 @@ export class UsersService {
 
 		console.log(username, " friend list loading...");
 		let user = new User();
+		// recherche par login ou username?
 		user = await this.usersRepository.findOne({
 			where: {login: username},
 			relations: ["initiatedFriendships.friend", "acceptedFriendships.initiator"],
@@ -227,6 +232,7 @@ export class UsersService {
 
 		console.log(username, " pending friendships loading...");
 		let user = new User();
+		// recherche par login ou username?
 		user = await this.usersRepository.findOne({
 			where: {login: username},
 			relations: ["initiatedFriendships.friend", "acceptedFriendships.initiator"],
