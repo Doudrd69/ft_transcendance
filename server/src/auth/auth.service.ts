@@ -33,6 +33,7 @@ export class AuthService {
 		const token_string = "Bearer " + access_token;
 
 		try {
+
 			const response = await fetch("https://api.intra.42.fr/v2/me", {
 				method: 'GET',
 				headers: {
@@ -45,17 +46,17 @@ export class AuthService {
 				'login': responseContent.login,
 				'firstname': responseContent.first_name,
 				'image': responseContent.image,
-				'socket': 1,
 			}
 
 			const result = await this.usersService.getUserByLogin(userInformation.login);
 			if (result) {
-				console.log("User exists in our DB");
+				console.log("User already exists in our DB");
 				return result;
 			}
 			else {
 				return this.usersService.createNew42User(userInformation);
 			}
+
 		} catch (error) {
 			throw new Error(error);
 		}
@@ -71,16 +72,19 @@ export class AuthService {
 		data.append('redirect_uri', redirectUri);
 
 		try {
+
 			const response = await fetch('https://api.intra.42.fr/oauth/token', {
 				method: 'POST',
 				body: data,
 			});
 			
 			if (response.ok) {
-				console.log("-- Request to API --");
+				console.log("-- Request to API done --");
 				const responseContent = await response.json();
+
 				const userData = await this.getUserInfo(responseContent);
 				if (userData) {
+					// payload for JWT
 					const payload = {
 						sub: userData.id,
 						login: userData.login,
@@ -91,7 +95,6 @@ export class AuthService {
 				}
 				else 
 				{
-					console.error("Cannot retrieve user information");
 					throw new Error("Cannot retrieve user information");
 				}
 			}
@@ -99,6 +102,7 @@ export class AuthService {
 				console.log(response.status);
 				throw new Error("Cannot extract data from fetch() response");
 			}
+
 		} catch (error) {
 			console.error("-- Request to API FAILED --");
 			throw error;

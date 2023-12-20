@@ -38,7 +38,6 @@ export class ChatService {
 
 	private async getAllConversations(userID: number): Promise<GroupMember[]> {
 
-		// login != username, penser a changer ca
 		let userToFind = new User();
 		userToFind = await this.usersRepository.findOne({
 			where: { id: userID },
@@ -89,11 +88,10 @@ export class ChatService {
 		return await this.groupMemberRepository.save(group);
 	}
 
-	async addUserToConversation(userName: string, conversationID: number): Promise<boolean> {
+	async addUserToConversation(userNameToAdd: string, conversationID: number): Promise<boolean> {
 
-		// login != username, penser a changer ca
 		const user = await this.usersRepository.findOne({
-			where: {login: userName},
+			where: {username: userNameToAdd},
 			relations: ['groups'],
 		});
 
