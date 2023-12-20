@@ -17,6 +17,7 @@ import {
 
 export class AuthenticatorCodeDto {
 
+    @IsNotEmpty()
     userID: number;
 
     @IsNotEmpty()

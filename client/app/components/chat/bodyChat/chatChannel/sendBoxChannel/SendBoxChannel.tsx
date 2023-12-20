@@ -28,23 +28,18 @@ const SendBoxChannelComponent = (socket: {socket: Socket}) => {
 		conversationName: state.currentConversation,
 	}
 
-	// petit soucis de socket : si je me reconnecte, le socket n'est pas dans dans la room du channel
-	// donc je recois plus les nouveaux messages
 	const handleMessage = async (e: React.FormEvent) => {
 		
 		e.preventDefault();
 
-		console.log("--> ", socketInUse.id);
-
 		if (socketInUse.connected) {
-			console.log("ahahahah jpp");
 			socketInUse.emit('message', messageEventDto, () => {
 				console.log("Message Sent!");
 			});
 			socketInUse.off('message');
 		}
 		else {
-			console.log("Socket not connected");
+			console.log("Client is not connected");
 		}
 
 		const response = await fetch('http://localhost:3001/chat/newMessage', {
@@ -59,7 +54,8 @@ const SendBoxChannelComponent = (socket: {socket: Socket}) => {
 			console.log("Message sent and created in DB");
 		}
 		else {
-			console.log("Message creation failed");
+			const error = await response.json();
+			console.log("Error: ", error.message[0]);
 		}
 	}
 

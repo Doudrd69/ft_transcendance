@@ -14,16 +14,20 @@ import {
 	IsDate,
 	Min,
 	Max,
+	Matches,
   } from 'class-validator';
 
 export class FriendRequestDto {
 
+	@IsNotEmpty()
+	@IsString()
 	initiatorLogin: string;
 
 	@IsNotEmpty()
 	@Length(6, 20)
 	@IsAscii()
 	@IsAlphanumeric()
+	@Matches(/^[^"';%()|<>\\]*$/)
 	recipientLogin: string;
 
 	recipientID?: number;
