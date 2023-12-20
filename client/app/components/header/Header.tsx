@@ -23,10 +23,16 @@ const HeaderComponent: React.FC = () => {
 				return ;
 
 			case 2:
-				toast("Authenticator code is verified");
+				toast.success("Authenticator code is verified");
 
 			case 3:
-				toast.warning(error);
+				toast.warn(error);
+
+			case 4:
+				toast.success("Two Factor Authentification is now enabled");
+
+			case 5:
+				toast.warn(error);
 		}
 	};
 
@@ -44,49 +50,53 @@ const HeaderComponent: React.FC = () => {
 
 		e.preventDefault();
 
-		const login = "ebrodeur";
+		const tfaDto = {
+			userID: sessionStorage.getItem("currentUserID"),
+		}
 
-		const response = await fetch('http://localhost:3001/auth/2fa', {
+		const response = await fetch('http://localhost:3001/auth/request2fa', {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
 			},
-			body: JSON.stringify({login}),
+			body: JSON.stringify(tfaDto),
 		});
 
 		if (response.ok) {
 			const qrcode = await response.json();
-			console.log("QRCODE ready for display");
-			console.log(qrcode.qrcodeURL);
-			// afficher le qrcode proprement
+			console.log("2FA QRCode => ", qrcode.qrcodeURL);
 		}
 		else {
-			console.log("QRCODE failed to display");
+			const error = await response.json();
+			console.log("Fatal error: ", error.message[0]);
 		}
 	}
 
-	// Function to check Authenticator Code
 	const checkAuthenticatorCode = async (e: React.FormEvent) => {
 		
 		e.preventDefault();
 
-		console.log("Code to verify = ", authenticatorCodeInput);
-		const code = authenticatorCodeInput;
+		const dto = {
+			userID: sessionStorage.getItem("currentUserID"),
+			code: authenticatorCodeInput,
+		}
 
-		const response = await fetch('http://localhost:3001/auth/checkCode', {
+		const response = await fetch('http://localhost:3001/auth/checkAuthenticatorCode', {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
 			},
-			body: JSON.stringify({code}),
+			body: JSON.stringify(dto),
 		});
 
 		if (response.ok) {
-			console.log("-- Code OK, 2FA ENABLED --");
+			notify(4);
 			sessionStorage.setItem("2faEnabled", "true");
 		}
 		else {
-			console.log("-- 2FA activation FAILED --");
+			const error = await response.json();
+			console.log("Fatal error: ", error.message[0]);
+			notify(5, error.message[0]);
 		}
 	}
 

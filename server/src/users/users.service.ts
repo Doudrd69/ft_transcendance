@@ -24,16 +24,18 @@ export class UsersService {
 	/***							2FA							***/
 	/**************************************************************/
 
-	register2FATempSecret(login: string, secret: string) {
-		this.getUserByLogin(login).then(userToUpdate => {
+	async register2FATempSecret(userID: number, secret: string) {
+
+		const userToUpdate = await this.usersRepository.findOne({ where: {id: userID} });
+		if (userToUpdate) {
 			userToUpdate.TFA_temp_secret = secret;
 			return this.usersRepository.save(userToUpdate);
-		}).catch(error => {
-			throw new Error(error);
-		});
+		}
+
+		return ;
 	}
 
-	save2FASecret(user: User, code: any, flag: boolean) {
+	save2FASecret(user: User, code: string, flag: boolean) {
 		// hash le code?
 		user.TFA_secret = code;
 		user.TFA_isEnabled = flag;
@@ -195,8 +197,12 @@ export class UsersService {
 	/***					GETTERS						***/
 	/**************************************************************/
 
-	getUserByLogin(loginToSearch: string): Promise<User> {
-		return this.usersRepository.findOne({ where: {login: loginToSearch}});
+	async getUserByID(userID: number): Promise<User> {
+		return await this.usersRepository.findOne({ where: {id: userID} });
+	}
+
+	async getUserByLogin(loginToSearch: string): Promise<User> {
+		return await this.usersRepository.findOne({ where: {login: loginToSearch}});
 	}
 
 	async getFriendships(username: string): Promise<Friendship[]> {

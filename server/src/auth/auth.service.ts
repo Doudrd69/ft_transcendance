@@ -3,6 +3,8 @@ import { UsersService } from '../users/users.service'
 import { User } from '../users/entities/users.entity'
 import { JwtService } from '@nestjs/jwt'
 import dotenv from 'dotenv';
+import { RequestTfaDto } from './dto/RequestTfaDto.dto';
+import { AuthenticatorCodeDto } from './dto/AuthenticatorCodeDto.dto';
 // import * as bcrypt from 'bcrypt';
 
 var speakeasy = require("speakeasy");
@@ -121,13 +123,13 @@ export class AuthService {
 	/***							2FA							***/
 	/**************************************************************/
 
-	async activate2FA(login: any) {
+	async activate2FA(requestTfaDto: RequestTfaDto) {
 
 		try {
 			const secret = speakeasy.generateSecret();
 
 			// We find the user activating 2FA and save the temporary secret
-			this.usersService.register2FATempSecret(login, secret.base32);
+			this.usersService.register2FATempSecret(requestTfaDto.userID, secret.base32);
 
 			// This function will return a QRCode URL we can use on client side
 			// to enable 2FA with an authenticator service
@@ -148,34 +150,33 @@ export class AuthService {
 			return { qrcodeURL };
 		}
 		catch (error) {
-			console.error("!! 2FA activation failed !!");
-			throw new Error("QRCode generation failed: " + error);
+			throw new Error("Fatal error: " + error);
 		}
 	}
 
-	// When the user has enabled 2FA we display a form and request a code
-	async verifyCode(code: any) {
-		const login = "ebrodeur";
+	async verifyCode(authenticatorCodeDto: AuthenticatorCodeDto) {
 
 		// We find the user whose need a check to retrieve its temporary secret
 		// and compare it with the code he has on its authenticator service
 		try {
-			this.usersService.getUserByLogin(login).then(user => {
+
+			const user = await this.usersService.getUserByID(authenticatorCodeDto.userID);
+			if (user) {
 				console.log("TFA_TEMP -> ", user.TFA_temp_secret);
-				console.log("CODE -> ", code);
+				console.log("CODE -> ", authenticatorCodeDto.code);
 				const base32secret = user.TFA_temp_secret;
 	
 				// This function will return true if the code given by the client is correct
 				var verified = speakeasy.totp.verify({
 					secret: base32secret,
 					encoding: 'base32',
-					token: code
+					token: authenticatorCodeDto.code,
 				});
 		
 				if (verified)
 				{
 					console.log("-- CODE VERIFIED --");
-					this.usersService.save2FASecret(user, code, true);
+					this.usersService.save2FASecret(user, authenticatorCodeDto.code, true);
 					return true;
 				}
 				else {
@@ -183,10 +184,8 @@ export class AuthService {
 					this.usersService.save2FASecret(user, "", false);
 					throw Error("Invalide code");
 				}
-			}).catch(error => {
-				console.error(error);
-				throw Error(error);
-			});
+			}
+
 		}
 		catch (error) {
 			console.error("!! Token verification failed !!");
