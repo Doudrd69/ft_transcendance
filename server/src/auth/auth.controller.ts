@@ -35,7 +35,7 @@ export class AuthController {
 		return this.authService.verifyCode(authenticatorCodeDto);
 	}
 
-
+	// class-validator
 	@Post('access')
 	getAccessToken(@Body() requestBody: {code: string}) {
 		const { code } = requestBody;
