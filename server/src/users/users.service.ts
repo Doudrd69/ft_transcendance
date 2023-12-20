@@ -8,6 +8,7 @@ import { speakeasy } from 'speakeasy'
 import { QRCode } from 'qrcode'
 import { FriendRequestDto } from './dto/FriendRequestDto.dto';
 import { ChatService } from '../chat/chat.service';
+import { UpdateUsernameDto } from './dto/UpdateUsernameDto.dto';
 
 @Injectable()
 export class UsersService {
@@ -23,16 +24,18 @@ export class UsersService {
 	/***							2FA							***/
 	/**************************************************************/
 
-	register2FATempSecret(login: string, secret: string) {
-		this.getUserByLogin(login).then(userToUpdate => {
+	async register2FATempSecret(userID: number, secret: string) {
+
+		const userToUpdate = await this.usersRepository.findOne({ where: {id: userID} });
+		if (userToUpdate) {
 			userToUpdate.TFA_temp_secret = secret;
 			return this.usersRepository.save(userToUpdate);
-		}).catch(error => {
-			throw new Error(error);
-		});
+		}
+
+		return ;
 	}
 
-	save2FASecret(user: User, code: any, flag: boolean) {
+	save2FASecret(user: User, code: string, flag: boolean) {
 		// hash le code?
 		user.TFA_secret = code;
 		user.TFA_isEnabled = flag;
@@ -99,14 +102,16 @@ export class UsersService {
 		return this.usersRepository.save(new42User);
 	}
 
-	updateUsername(login: string, newUsername: string) {
-		this.getUserByLogin(login).then(userToUpdate => {
-			userToUpdate.username = newUsername;
-			return this.usersRepository.save(userToUpdate);
-		}).catch(error => {
-			console.log("Cannot update username :", error);
-			throw new Error(error);
-		});
+	async updateUsername(updateUsernameDto: UpdateUsernameDto): Promise<User> {
+
+		const user = await this.usersRepository.findOne({ where: {id: updateUsernameDto.userID} });
+		if (user) {
+			user.username = updateUsernameDto.newUsername;
+			return await this.usersRepository.save(user);
+		}
+
+		console.error("Fatal error: user not found");
+		return;
 	}
 
 	/**************************************************************/
@@ -192,8 +197,12 @@ export class UsersService {
 	/***					GETTERS						***/
 	/**************************************************************/
 
-	getUserByLogin(loginToSearch: string): Promise<User> {
-		return this.usersRepository.findOne({ where: {login: loginToSearch}});
+	async getUserByID(userID: number): Promise<User> {
+		return await this.usersRepository.findOne({ where: {id: userID} });
+	}
+
+	async getUserByLogin(loginToSearch: string): Promise<User> {
+		return await this.usersRepository.findOne({ where: {login: loginToSearch}});
 	}
 
 	async getFriendships(username: string): Promise<Friendship[]> {

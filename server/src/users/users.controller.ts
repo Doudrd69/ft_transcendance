@@ -3,6 +3,9 @@ import { UsersService } from './users.service';
 import { FriendRequestDto } from './dto/FriendRequestDto.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Friendship } from './entities/friendship.entity';
+import { User } from './entities/users.entity';
+import { UpdateUsernameDto } from './dto/UpdateUsernameDto.dto';
+import { validate, validateOrReject } from 'class-validator'
 
 @Controller('users')
 export class UsersController {
@@ -36,10 +39,8 @@ export class UsersController {
 
 	@HttpCode(HttpStatus.OK)
 	@Post('updateUsername')
-	updateUsername(@Body() requestBody: {login: string, string: string}) {
-		const { login } = requestBody;
-		const { string } = requestBody;
-		return this.usersService.updateUsername(login, string);
+	updateUsername(@Body() updateUsernameDto: UpdateUsernameDto): Promise<User> {
+		return this.usersService.updateUsername(updateUsernameDto);
 	}
 
 	@HttpCode(HttpStatus.OK)

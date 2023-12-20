@@ -2,6 +2,7 @@ import './header.css'
 import React, { useState } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { validate, validateOrReject } from 'class-validator';
 
 const HeaderComponent: React.FC = () => {
 
@@ -10,7 +11,7 @@ const HeaderComponent: React.FC = () => {
 	const [username, setUsername] = useState('');
 	const [notification, setNotification] = useState(0);
 
-	const notify = (flag: number) => { 
+	const notify = (flag: number, error?: string) => { 
 		
 		switch (flag) {
 
@@ -22,7 +23,16 @@ const HeaderComponent: React.FC = () => {
 				return ;
 
 			case 2:
-				toast("Authenticator code is verified");
+				toast.success("Authenticator code is verified");
+
+			case 3:
+				toast.warn(error);
+
+			case 4:
+				toast.success("Two Factor Authentification is now enabled");
+
+			case 5:
+				toast.warn(error);
 		}
 	};
 
@@ -40,60 +50,63 @@ const HeaderComponent: React.FC = () => {
 
 		e.preventDefault();
 
-		const login = "ebrodeur";
+		const tfaDto = {
+			userID: sessionStorage.getItem("currentUserID"),
+		}
 
-		const response = await fetch('http://localhost:3001/auth/2fa', {
+		const response = await fetch('http://localhost:3001/auth/request2fa', {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
 			},
-			body: JSON.stringify({login}),
+			body: JSON.stringify(tfaDto),
 		});
 
 		if (response.ok) {
 			const qrcode = await response.json();
-			console.log("QRCODE ready for display");
-			console.log(qrcode.qrcodeURL);
-			// afficher le qrcode proprement
+			console.log("2FA QRCode => ", qrcode.qrcodeURL);
 		}
 		else {
-			console.log("QRCODE failed to display");
+			const error = await response.json();
+			console.log("Fatal error: ", error.message[0]);
 		}
 	}
 
-	// Function to check Authenticator Code
 	const checkAuthenticatorCode = async (e: React.FormEvent) => {
 		
 		e.preventDefault();
 
-		console.log("Code to verify = ", authenticatorCodeInput);
-		const code = authenticatorCodeInput;
+		const dto = {
+			userID: sessionStorage.getItem("currentUserID"),
+			code: authenticatorCodeInput,
+		}
 
-		const response = await fetch('http://localhost:3001/auth/checkCode', {
+		const response = await fetch('http://localhost:3001/auth/checkAuthenticatorCode', {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
 			},
-			body: JSON.stringify({code}),
+			body: JSON.stringify(dto),
 		});
 
 		if (response.ok) {
-			console.log("-- Code OK, 2FA ENABLED --");
+			notify(4);
 			sessionStorage.setItem("2faEnabled", "true");
 		}
 		else {
-			console.log("-- 2FA activation FAILED --");
+			const error = await response.json();
+			console.log("Fatal error: ", error.message[0]);
+			notify(5, error.message[0]);
 		}
 	}
 
-	// Function to change username
 	const changeUsername = async (e: React.FormEvent) => {
 
 		e.preventDefault();
-
-		const data = {
-			login: "ebrodeur",
-			string: username,
+		
+		const updateUsernameDto = {
+			userID: sessionStorage.getItem("currentUserID"),
+			newUsername: username,
 		};
 
 		const response = await fetch('http://localhost:3001/users/updateUsername', {
@@ -101,15 +114,18 @@ const HeaderComponent: React.FC = () => {
 			headers: {
 				'Content-Type': 'application/json',
 			},
-			body: JSON.stringify(data),
+			body: JSON.stringify(updateUsernameDto),
 		});
 
 		if (response.ok) {
-			console.log("Username successfully updated!");
+			const updatedUser = await response.json();
+			console.log("Updated user: ", updatedUser);
 			notify(1);
 		}
 		else {
-			console.error("Username cannot be changed");
+			const error = await response.json();
+			console.log("ERROR: ", error.message[0]);
+			notify(3, error.message[0]);
 		}
 	}
 

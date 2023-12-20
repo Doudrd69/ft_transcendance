@@ -18,7 +18,8 @@ RUN npm install	&& \
 	npm install dotenv && \
 	npm install socket.io && \
 	npm install @nestjs/websockets && \
-	npm install @nestjs/platform-socket.io
+	npm install @nestjs/platform-socket.io && \
+	npm install class-validator class-transformer
 
 COPY . .
 

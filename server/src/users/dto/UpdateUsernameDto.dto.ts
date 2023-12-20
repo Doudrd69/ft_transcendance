@@ -5,37 +5,26 @@ import {
 	IsString,
 	IsAlpha,
 	IsAlphanumeric,
-	IsInt,
 	Length,
 	IsNotEmpty,
 	IsEmail, // Checks if the string is an email: @IsEmail(options?: IsEmailOptions)
 	IsFQDN,
 	IsAscii,
-    IsBoolean,
 	IsDate,
 	Min,
 	Max,
 	Matches,
   } from 'class-validator';
 
-export class MessageDto {
+export class UpdateUsernameDto {
 
 	@IsNotEmpty()
-	@IsString()
-	from: string;
+	userID: number;
 
-	@IsNotEmpty()
-	@IsString()
+	@IsNotEmpty({ message: 'Please enter a new username'})
+	@Length(6, 20, { message: 'Username must be between 6 and 20 characters'})
 	@IsAscii()
 	@IsAlphanumeric()
 	@Matches(/^[^"';%()|<>\\]*$/)
-	@Length(1, 254)
-	content: string;
-
-	@IsNotEmpty()
-	// @IsDate()
-	post_datetime: Date;
-
-	@IsNotEmpty()
-	conversationID: number;
+	newUsername: string;
 }

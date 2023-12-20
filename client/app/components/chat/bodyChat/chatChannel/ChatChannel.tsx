@@ -15,7 +15,7 @@ const ChatChannelComponent = (socket: {socket: Socket} ) => {
 
   return (
     <div className="chat-channel">
-		{renderComponent(<ChannelListComponent socket={socket.sockets}/>, state.showChannelList)}
+		{renderComponent(<ChannelListComponent/>, state.showChannelList)}
 		{renderComponent(<ReceiveBoxChannelComponent socket={socket.socket} />, state.showChannel)}
 		{renderComponent(<SendBoxChannelComponent socket={socket.socket}/>, state.showChannel)}
     </div>

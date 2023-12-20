@@ -18,15 +18,17 @@ const TFAComponent: React.FC<TFAComponentProps>  = ({ on2FADone　}) => {
 		
 		e.preventDefault();
 
-		console.log("Code to verify = ", authenticatorCodeInput);
-		const code = authenticatorCodeInput;
+		const dto = {
+			userID: sessionStorage.getItem("currentUserID"),
+			code: authenticatorCodeInput,
+		}
 
-		const response = await fetch('http://localhost:3001/auth/checkCode', {
+		const response = await fetch('http://localhost:3001/auth/checkAuthenticatorCode', {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
 			},
-			body: JSON.stringify({code}),
+			body: JSON.stringify(dto),
 		});
 
 		if (response.ok) {

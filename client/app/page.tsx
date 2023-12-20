@@ -223,7 +223,7 @@ export default function Home() {
 					show2FAForm ? (<TFAComponent on2FADone={handle2FADone} />) :
 					(
 					  <div className="container">
-                        <ToastContainer />
+						<ToastContainer />
 						<Chat socket={userSocket}/>
 						<GameHeader socket={gameSocket}/>
 					  </div>
