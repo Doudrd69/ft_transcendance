@@ -160,10 +160,11 @@ export class ChatService {
 		return ;
 	}
 
-	async createMessage(messageDto: MessageDto) {
+	async createMessage(messageDto: MessageDto): Promise<Message> {
 
 		let conversation = new Conversation(); 
 		conversation = await this.conversationRepository.findOne({ where: {id: messageDto.conversationID} }); 
+		console.log("-----> ", conversation.id);
 		if (conversation) {
 			const newMessage = new Message();
 			newMessage.from = messageDto.from;
@@ -171,7 +172,7 @@ export class ChatService {
 			newMessage.post_datetime = messageDto.post_datetime;
 			newMessage.conversation = conversation;
 
-			return this.messageRepository.save(newMessage);
+			return await this.messageRepository.save(newMessage);
 		}
 		console.error("Fatal error: message could not be created");
 		return;
