@@ -54,7 +54,8 @@ const SendBoxComponent = (socket: {socket: Socket}) => {
 			console.log("Message sent and created in DB");
 		}
 		else {
-			console.log("Message creation failed");
+			const error = await response.json();
+			console.log("Error: ", error.message[0]);
 		}
 	}
 
