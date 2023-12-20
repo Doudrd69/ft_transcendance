@@ -44,6 +44,8 @@ const AddComponent = (socket: {socket: Socket}) => {
 		}
 		else {
 			console.log("Conversation creation failed");
+			const error = await response.json();
+			console.log("Error: ", error.message[0]);
 		}
 		return false;
 	}
@@ -81,7 +83,9 @@ const AddComponent = (socket: {socket: Socket}) => {
 			}
 		}
 		else {
-			console.log("Friend request creation failed");
+			console.log("Friend request failed");
+			const error = await response.json();
+			console.log("Error: ", error.message[0]);
 		}
 	}
 

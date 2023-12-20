@@ -100,7 +100,6 @@ const HeaderComponent: React.FC = () => {
 		}
 	}
 
-	// Function to change username
 	const changeUsername = async (e: React.FormEvent) => {
 
 		e.preventDefault();
