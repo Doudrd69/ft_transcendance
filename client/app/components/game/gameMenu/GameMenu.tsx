@@ -18,7 +18,7 @@ const {showGameMatchmaking, showGameSettings, handleGameSettings, handleGameMatc
     if (gameSocket.connected) {
 		console.log("GameSocket connecté")
 		gameSocket.emit('join-matchmaking', currentUserLogin);
-		gameSocket.on('joinGame')
+		// gameSocket.on('joinGame')
 	}
 	else {
 		console.log("GameSocket pas connecté");

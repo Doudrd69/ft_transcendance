@@ -19,7 +19,7 @@ export class ChatController {
 
 	@HttpCode(HttpStatus.OK)
 	@Post('newMessage')
-	createNewMessage(@Body() messageDto: MessageDto) {
+	createNewMessage(@Body() messageDto: MessageDto): Promise<Message> {
 		return this.chatService.createMessage(messageDto);
 	}
 
