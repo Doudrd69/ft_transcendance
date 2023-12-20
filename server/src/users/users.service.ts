@@ -8,6 +8,7 @@ import { speakeasy } from 'speakeasy'
 import { QRCode } from 'qrcode'
 import { FriendRequestDto } from './dto/FriendRequestDto.dto';
 import { ChatService } from '../chat/chat.service';
+import { UpdateUsernameDto } from './dto/UpdateUsernameDto.dto';
 
 @Injectable()
 export class UsersService {
@@ -99,14 +100,16 @@ export class UsersService {
 		return this.usersRepository.save(new42User);
 	}
 
-	updateUsername(login: string, newUsername: string) {
-		this.getUserByLogin(login).then(userToUpdate => {
-			userToUpdate.username = newUsername;
-			return this.usersRepository.save(userToUpdate);
-		}).catch(error => {
-			console.log("Cannot update username :", error);
-			throw new Error(error);
-		});
+	async updateUsername(updateUsernameDto: UpdateUsernameDto): Promise<User> {
+
+		const user = await this.usersRepository.findOne({ where: {id: updateUsernameDto.userID} });
+		if (user) {
+			user.username = updateUsernameDto.newUsername;
+			return await this.usersRepository.save(user);
+		}
+
+		console.error("Fatal error: user not found");
+		return;
 	}
 
 	/**************************************************************/

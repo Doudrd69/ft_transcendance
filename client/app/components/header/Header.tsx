@@ -2,6 +2,7 @@ import './header.css'
 import React, { useState } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { validate, validateOrReject } from 'class-validator';
 
 const HeaderComponent: React.FC = () => {
 
@@ -10,7 +11,7 @@ const HeaderComponent: React.FC = () => {
 	const [username, setUsername] = useState('');
 	const [notification, setNotification] = useState(0);
 
-	const notify = (flag: number) => { 
+	const notify = (flag: number, error?: string) => { 
 		
 		switch (flag) {
 
@@ -23,6 +24,9 @@ const HeaderComponent: React.FC = () => {
 
 			case 2:
 				toast("Authenticator code is verified");
+
+			case 3:
+				toast.warning(error);
 		}
 	};
 
@@ -90,10 +94,10 @@ const HeaderComponent: React.FC = () => {
 	const changeUsername = async (e: React.FormEvent) => {
 
 		e.preventDefault();
-
-		const data = {
-			login: "ebrodeur",
-			string: username,
+		
+		const updateUsernameDto = {
+			userID: sessionStorage.getItem("currentUserID"),
+			newUsername: username,
 		};
 
 		const response = await fetch('http://localhost:3001/users/updateUsername', {
@@ -101,15 +105,18 @@ const HeaderComponent: React.FC = () => {
 			headers: {
 				'Content-Type': 'application/json',
 			},
-			body: JSON.stringify(data),
+			body: JSON.stringify(updateUsernameDto),
 		});
 
 		if (response.ok) {
-			console.log("Username successfully updated!");
+			const updatedUser = await response.json();
+			console.log("Updated user: ", updatedUser);
 			notify(1);
 		}
 		else {
-			console.error("Username cannot be changed");
+			const error = await response.json();
+			console.log("ERROR: ", error.message[0]);
+			notify(3, error.message[0]);
 		}
 	}
 
