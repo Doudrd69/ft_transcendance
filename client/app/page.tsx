@@ -165,14 +165,15 @@ export default function Home() {
 		userSocket.on('connect', () => {
 			const personnalRoom = sessionStorage.getItem("currentUserLogin");
 			console.log("UserSocket new connection : ", userSocket.id);
-			userSocket.emit('joinPersonnalRoom', personnalRoom);
-			userSocket.emit('rejoinRooms', sessionStorage.getItem("currentUserIDs"));
+			userSocket.emit('joinPersonnalRoom', personnalRoom, sessionStorage.getItem("currentUserID"));
+			userSocket.emit('rejoinRooms', sessionStorage.getItem("currentUserID"));
 		})
 
 		userSocket.on('disconnect', () => {
 			console.log('UserSocket disconnected from the server : ', userSocket.id);
 			// leavePersonnalRoom
-			// userSocket.emit('joinPersonnalRoom', personnalRoom);
+			const personnalRoom = sessionStorage.getItem("currentUserLogin");
+			userSocket.emit('leavePersonnalRoom', personnalRoom, sessionStorage.getItem("currentUserID"));
 		})
 
 		return () => {
