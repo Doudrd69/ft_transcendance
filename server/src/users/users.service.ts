@@ -94,6 +94,15 @@ export class UsersService {
 	// 	throw new NotFoundException();
 	// }
 
+	async updateUserStatus(userID: number, flag: boolean) {
+
+		const user = await this.usersRepository.findOne({where: { id: userID }});
+		if (user) {
+			user.isActive = flag;
+			return await this.usersRepository.save(user);
+		}
+	}
+
 	async createNew42User(userData): Promise<User> {
 		const new42User = new User();
 		new42User.login = userData.login;
