@@ -15,7 +15,7 @@ export class User {
   @Column()
   firstname: string;
 
-  @Column({default: "guest"})
+  @Column({ default: "guest" })
   username: string;
 
   @Column()
@@ -24,13 +24,13 @@ export class User {
   @Column({ type: 'bytea', default: null, nullable: true })
   avatarImage: Buffer;
 
-  @Column({default: ""})
+  @Column({ default: "" })
   TFA_secret: string;
 
-  @Column({default: ""})
+  @Column({ default: "" })
   TFA_temp_secret: string;
 
-  @Column({default: false})
+  @Column({ default: false })
   TFA_isEnabled: boolean;
 
   @Column({ default: false })

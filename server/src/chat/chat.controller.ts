@@ -34,7 +34,12 @@ export class ChatController {
 	}
 
 	@Get('getConversations/:userID')
-	getConversationsFromUser(@Param('userID') userID: number): Promise <GroupMember[]> {
+	getConversationsFromUser(@Param('userID') userID: number): Promise<GroupMember[]> {
 		return this.chatService.getConversations(userID);
+	}
+
+	@Get('getConversationsWithStatus/:userID')
+	getConversationsRightsFromUser(@Param('userID') userID: number) {
+		return this.chatService.getConversationsWithStatus(userID);
 	}
 }
