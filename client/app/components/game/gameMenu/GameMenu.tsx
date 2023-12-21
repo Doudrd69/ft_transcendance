@@ -19,7 +19,7 @@ const Menu = (socket: { socket: Socket }) => {
         scoreOne: number;
         scoreTwo: number;
     }
-
+        
     const handleStartClick = async () => {
         const currentUserLogin = sessionStorage.getItem("currentUserLogin");
 
