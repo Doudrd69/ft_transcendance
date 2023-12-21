@@ -170,10 +170,10 @@ export default function Home() {
 		})
 
 		userSocket.on('disconnect', () => {
-			console.log('UserSocket disconnected from the server : ', userSocket.id);
-			// leavePersonnalRoom
 			const personnalRoom = sessionStorage.getItem("currentUserLogin");
+			console.log('UserSocket disconnected from the server : ', userSocket.id);
 			userSocket.emit('leavePersonnalRoom', personnalRoom, sessionStorage.getItem("currentUserID"));
+			userSocket.emit('leaveRooms', sessionStorage.getItem("currentUserID"));
 		})
 
 		return () => {
