@@ -71,7 +71,22 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 			})
 		}
 	}
-	// faire la fonction inverse 
+
+	@SubscribeMessage('leaveRooms')
+	async handleUserLeavesRooms( @ConnectedSocket() client: Socket, @MessageBody() userID: number ) {
+		const conversations = await this.chatService.getConversations(userID);
+		if (conversations) {
+			let ids = <number[]>[];
+			conversations.forEach(function (value) {
+				ids.push(value.id);
+			});
+
+			const conv = await this.chatService.getConversationArrayByID(ids);
+			conv.forEach(function (value) {
+				client.leave(value.name);
+			})
+		}
+	}
 
 	@SubscribeMessage('joinRoom')
 	addUserToRoom( @ConnectedSocket() client: Socket, @MessageBody() roomName: string ) {
