@@ -7,6 +7,9 @@ export class GroupMember {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @Column({ default: false })
+  isAdmin: boolean;
+
   @ManyToOne(() => Conversation)
   conversation: Conversation;
   
