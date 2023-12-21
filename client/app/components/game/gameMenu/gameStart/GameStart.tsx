@@ -6,7 +6,7 @@ import { Socket } from 'socket.io-client'
 const MatchMaking = (socket: {socket: Socket}) => {
 
 	const gameSocket = socket.socket;
-    const {showGameMenu, handleGameMenu} = useGame();
+    const { state, dispatch } = useGame();
 
 	const handleStartClick = async () => {
 		const currentUserLogin = sessionStorage.getItem("currentUserLogin");
@@ -34,7 +34,7 @@ const MatchMaking = (socket: {socket: Socket}) => {
                     <label>●</label>
                 </div>
             </div>
-                    <button className={`cancel-button ${showGameMenu ? 'clicked' : ''}`} onClick={() =>{ handleStartClick(); handleGameMenu(); }}>Cancel</button>
+                    <button className={`cancel-button ${state.showGameMenu ? 'clicked' : ''}`} onClick={() =>{ handleStartClick(); dispatch({ type: 'TOGGLE', payload: 'showGameMenu'})}}>Cancel</button>
         </div>
     );
 };

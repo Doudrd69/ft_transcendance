@@ -11,7 +11,7 @@ export class GameService {
         private gameRepository: Repository<Game>,
   ) {}
 
-  async createGame(player1: string, player2: string) {
+  async createGame(player1: string, player2: string): Promise<Game> {
 
     const game = new Game();
 	console.log("New Game Create");
@@ -22,6 +22,7 @@ export class GameService {
 
     // Enregistrer la partie dans le repository
     await this.gameRepository.save(game);
+    return(game);
   }
 }
 
