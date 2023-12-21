@@ -25,11 +25,13 @@ export class AuthController {
 	// }
 
 	// @HttpCode(HttpStatus.OK)
+	@UseGuards(AuthGuard)
 	@Post('request2fa')
 	activate2FA(@Body() requestTfaDto: RequestTfaDto) {
 		return this.authService.activate2FA(requestTfaDto);
 	}
 
+	@UseGuards(AuthGuard)
 	@Post('checkAuthenticatorCode')
 	verifyCode(@Body() authenticatorCodeDto: AuthenticatorCodeDto) {
 		return this.authService.verifyCode(authenticatorCodeDto);
