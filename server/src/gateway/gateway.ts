@@ -2,6 +2,7 @@ import { WebSocketGateway, WebSocketServer, SubscribeMessage, MessageBody, OnGat
 import { Server, Socket } from 'socket.io'
 import { GroupMember } from 'src/chat/entities/group_member.entity';
 import { ChatService } from 'src/chat/chat.service';
+import { UsersService } from 'src/users/users.service';
 import { Conversation } from 'src/chat/entities/conversation.entity';
 
 @WebSocketGateway({
@@ -15,7 +16,10 @@ import { Conversation } from 'src/chat/entities/conversation.entity';
 
 export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
-	constructor( private chatService: ChatService ) {}
+	constructor(
+		private chatService: ChatService,
+		private userService: UsersService,
+	) {}
 
 	@WebSocketServer()
 	server: Server;
@@ -25,18 +29,29 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	handleConnection(client: Socket) {
 		console.log(`---> GeneralGtw client connected    : ${client.id}`);
 		this.connectedUsers[client.id] = client;
+		// is Active update here?
 	}
-
+	
 	handleDisconnect(client: Socket) {
 		console.log(`===> GeneralGtw client disconnected : ${client.id}`);
 		delete this.connectedUsers[client.id];
+		// await this.userservice.updateUserStatus(userID, false);
 	}
 
 	// This event will create a room for the user, to join its current socket
 	@SubscribeMessage('joinPersonnalRoom')
-	handleUserPersonnalRoom( @ConnectedSocket() client: Socket, @MessageBody() personnalRoom: string ) {
+	handleUserPersonnalRoom( @ConnectedSocket() client: Socket, @MessageBody() personnalRoom: string, userID?: number ) {
 		client.join(personnalRoom);
 		console.log("Client ", client.id, " has joined ", personnalRoom, " room");
+		this.userService.updateUserStatus(userID, true);
+	}
+
+	// This event will create a room for the user, to join its current socket
+	@SubscribeMessage('leavePersonnalRoom')
+	handleUserLeavePersonnalRoom( @ConnectedSocket() client: Socket, @MessageBody() personnalRoom: string, userID?: number ) {
+		client.leave(personnalRoom);
+		console.log("Client ", client.id, " has left ", personnalRoom, " room");
+		this.userService.updateUserStatus(userID, false);
 	}
 
 	// This event let a user to join back his conversations, because when he comes back after a deconnection,
