@@ -27,9 +27,8 @@ const ChannelListComponent: React.FC = () => {
 			console.log("==> ", isAdmin);
 
 			setConversations((prevConversations: Conversation[]) => [...prevConversations, ...conversations]);
-			// console.log("Groups => ", conversations);
-
-		} else {
+		}
+		else {
 			console.log("Fatal error");
 		}
 	};
