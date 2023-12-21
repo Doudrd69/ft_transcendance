@@ -4,7 +4,7 @@ import { Entity, Column, PrimaryGeneratedColumn, ManyToMany, OneToMany } from 't
 export class Game
 {
 	@PrimaryGeneratedColumn()
-  	id: number;
+  	gameId: number;
 
 	@Column()
 	playerOne: string;

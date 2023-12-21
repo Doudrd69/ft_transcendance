@@ -4,24 +4,28 @@ import GameMenuComponent from './gameMenu/GameMenu';
 import MatchMakingComponent from './gameMenu/gameStart/GameStart'
 import SettingsComponent from './gameMenu/gameSettings/gameSettings'
 import {GameProvider, useGame } from './GameContext'
-import Pong from './gamePong/GamePong';
+import PongComponent from './gamePong/GamePong';
 import SettingsDisplay from './gameMenu/gameSettings/settingsDisplay/SettingsDisplay';
 import SettingsGame from './gameMenu/gameSettings/settingsGame/SettingsGame';
 import SettingsKeyboard from './gameMenu/gameSettings/settingsKeyboard/SettingsKeyboard';
 import { Socket } from 'socket.io-client'
 
 const GameComponent = (socket: {socket: Socket}) => {
-	const { showGameMatchmaking, showGameSettings, showGameMenu, showSettingsDisplay, showSettingsGame, showSettingsKeyboard} = useGame();
+
+	const { state, dispatch } = useGame();
+
+	const renderComponent = (component: React.ReactNode, condition: boolean) =>
+	  condition ? component : null;
 
 	return (
 	  		<div className="right-half">
-				{showGameMatchmaking && <MatchMakingComponent socket={socket.socket}/>}
-				{showGameMenu && <GameMenuComponent socket={socket.socket}/>}
-				{showGameSettings && <SettingsComponent></SettingsComponent>}
-				{showSettingsDisplay && <SettingsDisplay></SettingsDisplay>}
-				{showSettingsGame && <SettingsGame></SettingsGame>}
-				{showSettingsKeyboard && <SettingsKeyboard></SettingsKeyboard>}
-				{/* <Pong></Pong> */}
+				{renderComponent(<MatchMakingComponent socket={socket.socket} />, state.showGameMatchmaking)}
+				{renderComponent(<GameMenuComponent socket={socket.socket} />, state.showGameMenu)}
+				{renderComponent(<SettingsComponent/>, state.showGameSettings)}
+				{renderComponent(<SettingsDisplay/>, state.showSettingsDisplay)}
+				{renderComponent(<SettingsGame/>, state.showSettingsGame)}
+				{renderComponent(<SettingsKeyboard/>, state.showSettingsKeyboard)}
+				{renderComponent(<PongComponent/>, state.showGame)}
 	  		</div>
 	);
   };

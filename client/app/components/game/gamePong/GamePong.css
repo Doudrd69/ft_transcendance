@@ -33,7 +33,7 @@
     border-radius: 50%;
   }
   
-  .paddle {
+  .pongpaddle {
     position: absolute;
     width: 3%;
     height: 10%;
