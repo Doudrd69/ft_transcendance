@@ -27,6 +27,7 @@ const AddComponent = (socket: {socket: Socket}) => {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
+				'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
 			},
 			body: JSON.stringify(conversationDto),
 		});
@@ -63,6 +64,7 @@ const AddComponent = (socket: {socket: Socket}) => {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
+				'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
 			},
 			body: JSON.stringify(friendRequestDto),
 		});

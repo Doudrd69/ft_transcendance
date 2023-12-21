@@ -1,4 +1,4 @@
-import { Controller, Post, HttpCode, HttpStatus, Body, Get, UploadedFile, UseInterceptors, Param, Res } from '@nestjs/common';
+import { Controller, Post, HttpCode, HttpStatus, Body, Get, UploadedFile, UseInterceptors, Param, Res, UseGuards } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { FriendRequestDto } from './dto/FriendRequestDto.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -6,6 +6,7 @@ import { Friendship } from './entities/friendship.entity';
 import { User } from './entities/users.entity';
 import { UpdateUsernameDto } from './dto/UpdateUsernameDto.dto';
 import { validate, validateOrReject } from 'class-validator'
+import { AuthGuard } from 'src/auth/auth.guard';
 
 @Controller('users')
 export class UsersController {
@@ -37,12 +38,14 @@ export class UsersController {
 	// 	return this.usersService.getAvatarById(userId, res);
 	// }
 
+	@UseGuards(AuthGuard)
 	@HttpCode(HttpStatus.OK)
 	@Post('updateUsername')
 	updateUsername(@Body() updateUsernameDto: UpdateUsernameDto): Promise<User> {
 		return this.usersService.updateUsername(updateUsernameDto);
 	}
 
+	@UseGuards(AuthGuard)
 	@HttpCode(HttpStatus.OK)
 	@Post('addfriend')
 	createFriendship(@Body() friendRequestDto: FriendRequestDto): Promise<Friendship | null> {

@@ -24,15 +24,19 @@ const HeaderComponent: React.FC = () => {
 
 			case 2:
 				toast.success("Authenticator code is verified");
+				return ;
 
 			case 3:
 				toast.warn(error);
+				return ;
 
 			case 4:
 				toast.success("Two Factor Authentification is now enabled");
+				return ;
 
 			case 5:
 				toast.warn(error);
+				return ;
 		}
 	};
 
@@ -58,6 +62,7 @@ const HeaderComponent: React.FC = () => {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
+				'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
 			},
 			body: JSON.stringify(tfaDto),
 		});
@@ -68,7 +73,7 @@ const HeaderComponent: React.FC = () => {
 		}
 		else {
 			const error = await response.json();
-			console.log("Fatal error: ", error.message[0]);
+			console.log("Fatal error: ", error.message);
 		}
 	}
 
@@ -85,6 +90,7 @@ const HeaderComponent: React.FC = () => {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
+				'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
 			},
 			body: JSON.stringify(dto),
 		});
@@ -113,6 +119,7 @@ const HeaderComponent: React.FC = () => {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
+				'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
 			},
 			body: JSON.stringify(updateUsernameDto),
 		});

@@ -138,7 +138,6 @@ export default function Home() {
 	useEffect(() => {
 		
 		userSocket.on('friendRequest', (friendRequestDto: FriendRequestDto) => {
-			// notifyFriendRequest(friendRequestDto);
 			toast(<FriendRequestReceived friendRequestDto={friendRequestDto}/>);
 		});
 
