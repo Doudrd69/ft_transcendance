@@ -17,14 +17,17 @@ const ChatListComponent: React.FC = () => {
 
 	const loadDiscussions = async () => {
 
-		const response = await fetch(`http://localhost:3001/chat/getConversations/${user}`, {
+		const response = await fetch(`http://localhost:3001/chat/getConversationsWithStatus/${user}`, {
 			method: 'GET',
 		});
 
 		if (response.ok) {
-			const userData = await response.json();
-			setConversations((prevConversations: Conversation[]) => [...prevConversations, ...userData]);
-		}
+			const conversationsData = await response.json();
+			const { conversations, isAdmin } = conversationsData;
+			console.log("==> ", isAdmin);
+
+			setConversations((prevConversations: Conversation[]) => [...prevConversations, ...conversations]);
+		} 
 		else {
 			console.log("Fatal error");
 		}
