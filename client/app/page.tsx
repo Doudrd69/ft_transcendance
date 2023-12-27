@@ -51,6 +51,7 @@ export default function Home() {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
+				'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`
 			},
 			body: JSON.stringify(friendRequestDto),
 		});
@@ -101,6 +102,10 @@ export default function Home() {
 	const handleAccessToken = async (code: any): Promise<boolean> => {
 
 		try {
+
+			if (sessionStorage.getItem("jwt"))
+				return true;
+
 			const response = await fetch('http://localhost:3001/auth/access', {
 				method: 'POST',
 				headers: {

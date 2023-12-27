@@ -18,6 +18,7 @@ const FriendsListComponent: React.FC = () => {
 	const username = sessionStorage.getItem("currentUserLogin");
 
 	const disableTabFriendsList = () =>setTabFriendsList(false);
+
 	const activateTabFriendsList = (index: number) => {
 		if (activeIndex === index) {
 		  // Si le bouton actif est cliqué à nouveau, désactivez-le

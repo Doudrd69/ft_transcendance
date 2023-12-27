@@ -52,13 +52,14 @@ export class UsersController {
 		return this.usersService.createFriendship(friendRequestDto);
 	}
 
+	// guard
 	@HttpCode(HttpStatus.OK)
 	@Post('friendRequestResponse')
 	updateFriendship(@Body() friendRequestDto: FriendRequestDto, flag: boolean) {
 		return this.usersService.updateFriendship(friendRequestDto, flag);
 	}
 
-
+	//guard
 	@HttpCode(HttpStatus.OK)
 	@Post('acceptFriendRequest')
 	acceptFriendship(@Body() friendRequestDto: FriendRequestDto): Promise<Friendship> {
