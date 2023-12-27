@@ -131,8 +131,10 @@ const HeaderComponent: React.FC = () => {
 		}
 		else {
 			const error = await response.json();
-			console.log("ERROR: ", error.message[0]);
-			notify(3, error.message[0]);
+			if (error.message[0])
+				notify(3, error.message[0]);
+			else
+				notify(3, error.message);
 		}
 	}
 

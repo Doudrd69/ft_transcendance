@@ -50,7 +50,7 @@ export class AuthService {
 
 			const result = await this.usersService.getUserByLogin(userInformation.login);
 			if (result) {
-				console.log("User already exists in our DB");
+				console.log("User already exists in DB");
 				return result;
 			}
 			else {
@@ -77,9 +77,9 @@ export class AuthService {
 				method: 'POST',
 				body: data,
 			});
-			
+
 			if (response.ok) {
-				console.log("-- Request to API done --");
+				console.log("-- Request to API success --");
 				const responseContent = await response.json();
 
 				const userData = await this.getUserInfo(responseContent);
@@ -99,8 +99,7 @@ export class AuthService {
 				}
 			}
 			else {
-				console.log(response.status);
-				throw new Error("Cannot extract data from fetch() response");
+				throw new Error("Cannot extract data from fetch() response: " + response.status);
 			}
 
 		} catch (error) {
@@ -166,8 +165,8 @@ export class AuthService {
 
 			const user = await this.usersService.getUserByID(authenticatorCodeDto.userID);
 			if (user) {
-				console.log("TFA_TEMP -> ", user.TFA_temp_secret);
-				console.log("CODE -> ", authenticatorCodeDto.code);
+				// console.log("TFA_TEMP -> ", user.TFA_temp_secret);
+				// console.log("CODE -> ", authenticatorCodeDto.code);
 				const base32secret = user.TFA_temp_secret;
 	
 				// This function will return true if the code given by the client is correct

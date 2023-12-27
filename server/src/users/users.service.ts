@@ -220,7 +220,7 @@ export class UsersService {
 
 	async getFriendships(username: string): Promise<Friendship[]> {
 
-		console.log(username, " friend list loading...");
+		console.log(username, "friend list loading...");
 		let user = new User();
 		// recherche par login ou username?
 		user = await this.usersRepository.findOne({
@@ -234,7 +234,7 @@ export class UsersService {
 			const friends = [...initiatedfriends, ...acceptedfriends];
 			return friends;
 		}
-		return ;
+		return [];
 	}
 
 	async getPendingFriendships(username: string): Promise<Friendship[]> {
