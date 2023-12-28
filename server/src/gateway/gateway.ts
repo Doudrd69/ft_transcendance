@@ -1,4 +1,4 @@
-import { WebSocketGateway, WebSocketServer, SubscribeMessage, MessageBody, OnGatewayConnection, OnGatewayDisconnect, ConnectedSocket} from '@nestjs/websockets';
+import { WebSocketGateway, WebSocketServer, SubscribeMessage, MessageBody, OnGatewayConnection, OnGatewayDisconnect, ConnectedSocket } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io'
 import { GroupMember } from 'src/chat/entities/group_member.entity';
 import { ChatService } from 'src/chat/chat.service';
@@ -12,7 +12,7 @@ import { Conversation } from 'src/chat/entities/conversation.entity';
 	},
 })
 
-// penser a creer un dossier pour les dto de la gateway
+// creer un dossier pour les dto de la gateway ?
 
 export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
@@ -26,45 +26,14 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 
 	private connectedUsers: { [userId: string]: Socket } = {};
 
-	handleConnection(client: Socket) {
-		console.log(`---> GeneralGtw client connected    : ${client.id}`);
-		this.connectedUsers[client.id] = client;
-		// is Active update here?
-	}
-	
-	handleDisconnect(client: Socket) {
-		console.log(`===> GeneralGtw client disconnected : ${client.id}`);
-		delete this.connectedUsers[client.id];
-		// await this.userservice.updateUserStatus(userID, false);
-	}
-
-	// This event will create a room for the user, to join its current socket
-	@SubscribeMessage('joinPersonnalRoom')
-	handleUserPersonnalRoom( @ConnectedSocket() client: Socket, @MessageBody() personnalRoom: string, userID?: number ) {
-		client.join(personnalRoom);
-		console.log("Client ", client.id, " has joined ", personnalRoom, " room");
-		this.userService.updateUserStatus(userID, true);
-	}
-
-	// This event will create a room for the user, to join its current socket
-	@SubscribeMessage('leavePersonnalRoom')
-	handleUserLeavePersonnalRoom( @ConnectedSocket() client: Socket, @MessageBody() personnalRoom: string, userID?: number ) {
-		client.leave(personnalRoom);
-		console.log("Client ", client.id, " has left ", personnalRoom, " room");
-		this.userService.updateUserStatus(userID, false);
-	}
-
-	// This event let a user to join back his conversations, because when he comes back after a deconnection,
-	// his socket will change, so we add it back to the rooms
-	@SubscribeMessage('rejoinRooms')
-	async handleUserJoinsRooms( @ConnectedSocket() client: Socket, @MessageBody() userID: number ) {
+	private  async userRejoinsRooms(client: Socket, userID: number ) {
 		const conversations = await this.chatService.getConversations(userID);
 		if (conversations) {
 			let ids = <number[]>[];
 			conversations.forEach(function (value) {
 				ids.push(value.id);
 			});
-
+	
 			const conv = await this.chatService.getConversationArrayByID(ids);
 			conv.forEach(function (value) {
 				client.join(value.name);
@@ -72,8 +41,7 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		}
 	}
 
-	@SubscribeMessage('leaveRooms')
-	async handleUserLeavesRooms( @ConnectedSocket() client: Socket, @MessageBody() userID: number ) {
+	private async userLeavesRooms(client: Socket, userID: number ) {
 		const conversations = await this.chatService.getConversations(userID);
 		if (conversations) {
 			let ids = <number[]>[];
@@ -86,6 +54,33 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 				client.leave(value.name);
 			})
 		}
+	}
+
+	handleConnection(client: Socket) {
+
+		console.log(`---> GeneralGtw client connected    : ${client.id}`);
+		this.connectedUsers[client.id] = client;
+
+		client.on('joinPersonnalRoom', (personnalRoom: string, userID: number) => {
+			client.join(personnalRoom);
+			console.log("Client ", client.id, " has joined ", personnalRoom, " room");
+			this.userRejoinsRooms(client, userID);
+			this.userService.updateUserStatus(userID, true);
+
+			client.on('disconnect', () => {
+				console.log("===> Disconnecting user ", personnalRoom, " with ID ", userID);
+				client.leave(personnalRoom);
+				console.log("Client ", client.id, " has left ", personnalRoom, " room");
+				this.userLeavesRooms(client, userID);
+				this.userService.updateUserStatus(userID, false);
+			})
+
+		});
+	}
+	
+	handleDisconnect(client: Socket) {
+		console.log(`===> GeneralGtw client disconnected : ${client.id}`);
+		delete this.connectedUsers[client.id];
 	}
 
 	@SubscribeMessage('joinRoom')
@@ -111,7 +106,6 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 
 	@SubscribeMessage('message')
 	handleMessage(@MessageBody() dto: any) {
-		console.log("okay many = ", dto.conversationName);
 		this.server.to(dto.conversationName).emit('onMessage', {
 			from: dto.from,
 			content: dto.content,
