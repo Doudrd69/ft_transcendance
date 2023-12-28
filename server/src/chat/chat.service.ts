@@ -187,7 +187,6 @@ export class ChatService {
 
 		let conversation = new Conversation(); 
 		conversation = await this.conversationRepository.findOne({ where: {id: messageDto.conversationID} }); 
-		console.log("-----> ", conversation.id);
 		if (conversation) {
 			const newMessage = new Message();
 			newMessage.from = messageDto.from;
@@ -259,7 +258,6 @@ export class ChatService {
 		const allConversations = await this.getAllConversations(userID);
 		if (allConversations) {
 
-			console.log("TEST 1");
 			const conversationsRights = await this.getConversationsRights(allConversations);
 			if (conversationsRights) {
 

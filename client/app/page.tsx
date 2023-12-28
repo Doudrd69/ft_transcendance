@@ -165,26 +165,22 @@ export default function Home() {
 
 	// Connection - Deconnection useEffect for socket
 	useEffect(() => {
-
+		
 		userSocket.on('connect', () => {
-			const personnalRoom = sessionStorage.getItem("currentUserLogin");
 			console.log("UserSocket new connection : ", userSocket.id);
+			const personnalRoom = sessionStorage.getItem("currentUserLogin");
 			userSocket.emit('joinPersonnalRoom', personnalRoom, sessionStorage.getItem("currentUserID"));
-			userSocket.emit('rejoinRooms', sessionStorage.getItem("currentUserID"));
 		})
 
 		userSocket.on('disconnect', () => {
-			const personnalRoom = sessionStorage.getItem("currentUserLogin");
 			console.log('UserSocket disconnected from the server : ', userSocket.id);
-			userSocket.emit('leavePersonnalRoom', personnalRoom, sessionStorage.getItem("currentUserID"));
-			userSocket.emit('leaveRooms', sessionStorage.getItem("currentUserID"));
 		})
 
 		return () => {
-			console.log('Unregistering events...');
 			userSocket.off('connect');
 			userSocket.off('disconnect');
 		}
+
 	}, [userSocket])
 
 	// Game socket handler

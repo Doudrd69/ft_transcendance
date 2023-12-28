@@ -6,6 +6,7 @@ import FriendsListTabComponent from './friendsListTab/FriendsListTab';
 interface FriendShip {
 	id: number;
 	isAccepted: true;
+	isActive: boolean;
 	friend?: any;
 	initiator?: any
 }
@@ -43,23 +44,6 @@ const FriendsListComponent: React.FC = () => {
 			console.log("Fatal error: no friend list");
 		}
 	}
-	
-	const userData = {
-		discussion: friendList,
-		online:[
-			"on",
-			"off",
-			"on",
-			"on",
-			"off",
-			"on",
-			"on",
-		]
-	};
-
-	// useEffect(() => {
-	// 	userData.discussion = friendList;
-	// }, [friendList]);
 
 	useEffect(() => {
 		console.log("Loading friend list...");
@@ -71,7 +55,7 @@ const FriendsListComponent: React.FC = () => {
 		  {friendList.map((friend: FriendShip, id: number) => (
 			<div className="tab-and-userclicked" key={id}>
 			  <div className="bloc-button-friendslist">
-				<div className={`profil-friendslist ${friend ? 'on' : 'off'}`} />
+				<div className={`profil-friendslist ${friend.isActive ? 'on' : 'off'}`} />
 				<div
 				  className={`amies ${activeIndex === id ? 'active' : ''}`}
 				  onClick={() => activateTabFriendsList(id)}
