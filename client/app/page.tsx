@@ -152,18 +152,20 @@ export default function Home() {
 			userSocket.emit('joinRoom', roomName);
 		})
 
-		// userSocket.on('userJoinedRoom', (notification: string) => {
-		// 	console.log("User socket in main: ", userSocket.id);
-		// 	console.log("Notif from server: ", notification);
-		// });
+		userSocket.on('userJoinedRoom', (notification: string) => {
+			console.log("User socket in main: ", userSocket.id);
+			console.log("Notif from server: ", notification);
+			// on peut toast ici ou gerer autrement
+		});
 
 		return () => {
 			userSocket.off('friendRequest');
 			userSocket.off('friendRequestAcceptedNotif');
+			userSocket.off('userJoinedRoom');
 		}
 	}, [userSocket]);
 
-	// Connection - Deconnection useEffect for socket
+	// Connection - Deconnection useEffect
 	useEffect(() => {
 		
 		userSocket.on('connect', () => {
@@ -201,7 +203,7 @@ export default function Home() {
 		}
 	}, [gameSocket])
 
-	// Login form use-effect
+	// Login form useEffect
 	useEffect(() => {
 		if (code && showLogin) {
 			handleAccessToken(code).then(result => {

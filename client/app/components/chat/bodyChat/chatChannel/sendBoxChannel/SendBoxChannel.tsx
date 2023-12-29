@@ -50,7 +50,7 @@ const SendBoxChannelComponent = (socket: {socket: Socket}) => {
 			},
 			body: JSON.stringify(messageDto),
 		});
-				
+
 		if (response.ok) {
 			console.log("Message sent and created in DB");
 		}

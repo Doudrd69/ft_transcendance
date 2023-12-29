@@ -36,7 +36,7 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	
 			const conv = await this.chatService.getConversationArrayByID(ids);
 			conv.forEach(function (value) {
-				client.join(value.name);
+				client.join(value.name + value.id);
 			})
 		}
 	}
@@ -84,13 +84,13 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	}
 
 	@SubscribeMessage('joinRoom')
-	addUserToRoom( @ConnectedSocket() client: Socket, @MessageBody() roomName: string ) {
+	addUserToRoom( @ConnectedSocket() client: Socket, @MessageBody() data: { roomName: string, roomID: string }, ) {
 
+		const { roomName, roomID } = data;
 		console.log("==== joinRoom Event ====");
-		console.log("Add ", client.id," to room : ", roomName);
-
-		client.join(roomName);
-		this.server.to(roomName).emit('userJoinedRoom');
+		console.log("Add ", client.id," to room : ", roomName + roomID);
+		client.join(roomName + roomID);
+		this.server.to(roomName + roomID).emit('userJoinedRoom', `User has joined ${roomName}`);
 		// // Vérifier si l'utilisateur est déjà dans une salle et la quitter si jamais
 		// const currentRoom = Object.keys(this.connectedUsers[userId]?.rooms || {})[1];
 		// if (currentRoom) {
@@ -106,7 +106,7 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 
 	@SubscribeMessage('message')
 	handleMessage(@MessageBody() dto: any) {
-		this.server.to(dto.conversationName).emit('onMessage', {
+		this.server.to(dto.conversationName + dto.conversationID).emit('onMessage', {
 			from: dto.from,
 			content: dto.content,
 			post_datetime: dto.post_datetime,
