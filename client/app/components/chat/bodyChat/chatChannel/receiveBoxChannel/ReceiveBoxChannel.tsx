@@ -43,10 +43,9 @@ const ReceiveBoxChannelComponent = (socket: {socket: Socket}) => {
 	  };
 
 	// This function will retreive all the messages from the conversation and set the messages array for display
-	const getMessage = async () => {
+	const getMessages = async () => {
 		
 		try {
-			// proteger la requete dans le controller
 			const response = await fetch (`http://localhost:3001/chat/getMessages/${state.currentConversationID}`, {
 				method: 'GET',
 				headers: {
@@ -66,8 +65,8 @@ const ReceiveBoxChannelComponent = (socket: {socket: Socket}) => {
 	// Here we retreive the last sent message and we "insert" it in the messages array
 	useEffect(() => {
 
-		socketInUse.on('userJoinedRoom', () => {
-			console.log("Notif from server");
+		socketInUse.on('userJoinedRoom', (notification: string) => {
+			console.log("Channel event: ", notification);
 		});
 
 		socketInUse.on('onMessage', (message: Message) => {
@@ -84,7 +83,7 @@ const ReceiveBoxChannelComponent = (socket: {socket: Socket}) => {
 	// Loading the conversation (retrieving all messages on component rendering)
 	useEffect(() => {
 		console.log("Loading conversation...");
-		getMessage();
+		getMessages();
 	}, []);
 
 	useEffect(() => {

@@ -187,6 +187,7 @@ export class ChatService {
 
 		let conversation = new Conversation(); 
 		conversation = await this.conversationRepository.findOne({ where: {id: messageDto.conversationID} }); 
+		console.log("Joining message to ", conversation.name, " with ID ", conversation.id);
 		if (conversation) {
 			const newMessage = new Message();
 			newMessage.from = messageDto.from;
@@ -266,7 +267,7 @@ export class ChatService {
 					isAdmin: conversationsRights,
 				}
 
-				console.log("ARRAY -> ", conversationArray);
+				console.log("Conversations -> ", conversationArray);
 
 				return conversationArray;
 			}
@@ -275,5 +276,4 @@ export class ChatService {
 		console.error("Fatal error: conversations not found");
 		return [];
 	}
-
 }

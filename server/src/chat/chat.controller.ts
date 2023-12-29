@@ -11,7 +11,7 @@ import { AuthGuard } from 'src/auth/auth.guard';
 @Controller('chat')
 export class ChatController {
 	constructor(private chatService: ChatService) {}
-	
+
 	@UseGuards(AuthGuard)
 	@HttpCode(HttpStatus.OK)
 	@Post('newConversation')
