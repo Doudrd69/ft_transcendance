@@ -61,7 +61,7 @@ export default function Home() {
 			const roomName = friendRequestDto.initiatorLogin + friendRequestDto.recipientLogin;
 			if (userSocket.connected) {
 				userSocket.emit('friendRequestAccepted', friendRequestDto);
-				userSocket.emit('joinRoom', roomName);
+				userSocket.emit('joinFriendRoom', roomName);
 			}
 		}
 		else {
@@ -149,7 +149,7 @@ export default function Home() {
 		userSocket.on('friendRequestAcceptedNotif', (friendRequestDto: FriendRequestDto) => {
 			toast(<FriendRequestAccepted friendRequestDto={friendRequestDto}/>);
 			const roomName = friendRequestDto.initiatorLogin + friendRequestDto.recipientLogin;
-			userSocket.emit('joinRoom', roomName);
+			userSocket.emit('joinFriendRoom', roomName);
 		})
 
 		userSocket.on('userJoinedRoom', (notification: string) => {
@@ -217,7 +217,6 @@ export default function Home() {
 	// 	if (sessionStorage.getItem("currentUserLogin") != null)
 	// 		setShowLogin(false);
 	// });
-
 
     return (
 			<RootLayout>

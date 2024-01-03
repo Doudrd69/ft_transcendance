@@ -33,6 +33,7 @@ const SendBoxComponent = (socket: {socket: Socket}) => {
 		e.preventDefault();
 
 		if (socketInUse.connected) {
+			console.log(messageEventDto.conversationName, " with ID ", messageEventDto.conversationID);
 			socketInUse.emit('message', messageEventDto, () => {
 				console.log("Message sent!");
 			});

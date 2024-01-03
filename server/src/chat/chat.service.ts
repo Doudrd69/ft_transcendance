@@ -64,13 +64,13 @@ export class ChatService {
 			const groups = await this.groupMemberRepository.find({
 				where: {conversation: conversations},
 			});
-			console.log("User's groups: ", groups);
+			// console.log("User's groups: ", groups);
 	
 			let isAdminArray = [];
 			groups.forEach((element: GroupMember) => {
 				isAdminArray.push(element.isAdmin);
 			});
-			console.log("IsAdminArray: ", isAdminArray);
+			// console.log("IsAdminArray: ", isAdminArray);
 
 			return isAdminArray;
 		}
@@ -220,6 +220,16 @@ export class ChatService {
 		return ;
 	}
 
+	async getConversationByName(name: string): Promise<Conversation> {
+
+		const conversation = await this.conversationRepository.findOne({ where: {name: name} });
+		if (conversation) {
+			return conversation;
+		}
+		console.log("Fatal error: conversation not found");
+		return ;
+	}
+
 	async getConversationArrayByID(IDs: number[]): Promise<Conversation[]> {
 
 		let conversations = <Conversation[]>[];
@@ -267,7 +277,7 @@ export class ChatService {
 					isAdmin: conversationsRights,
 				}
 
-				console.log("Conversations -> ", conversationArray);
+				// console.log("Conversations -> ", conversationArray);
 
 				return conversationArray;
 			}
