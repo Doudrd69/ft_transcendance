@@ -4,6 +4,7 @@ import { GroupMember } from 'src/chat/entities/group_member.entity';
 import { ChatService } from 'src/chat/chat.service';
 import { UsersService } from 'src/users/users.service';
 import { Conversation } from 'src/chat/entities/conversation.entity';
+import { MessageDto } from 'src/chat/dto/message.dto';
 
 @WebSocketGateway({
 	namespace: 'user',
@@ -98,34 +99,31 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	}
 
 	@SubscribeMessage('joinRoom')
-	addUserToRoom( @ConnectedSocket() client: Socket, @MessageBody() data: { roomName: string, roomID: string }, ) {
+	addUserToRoom( @ConnectedSocket() client: Socket, @MessageBody() data: { roomName: string, roomID: string } ) {
 
 		const { roomName, roomID } = data;
 		console.log("==== joinRoom Event ====");
 		console.log("Add ", client.id," to room : ", roomName + roomID);
+
 		client.join(roomName + roomID);
 		this.server.to(roomName + roomID).emit('userJoinedRoom', `User has joined ${roomName}`);
-		// // Vérifier si l'utilisateur est déjà dans une salle et la quitter si jamais
-		// const currentRoom = Object.keys(this.connectedUsers[userId]?.rooms || {})[1];
-		// if (currentRoom) {
-		// 	this.connectedUsers[userId]?.leave(currentRoom);
-		// 	console.log(`User left room: ${currentRoom}`);
-		// }
-		// // Rejoindre la nouvelle salle
-		// this.connectedUsers[userId]?.join(roomName);
-		// console.log(`User joined room: ${roomName}`);
-		// // Émettre un message pour confirmer l'entrée dans la salle
-		// this.server.to(roomName).emit('roomMessage', `Bienvenue dans la salle ${roomName}`);
+		return ;
 	}
 
+	// conversationName is NaN
 	@SubscribeMessage('message')
-	handleMessage(@MessageBody() dto: any) {
-		this.server.to(dto.conversationName + dto.conversationID).emit('onMessage', {
+	handleMessage(@MessageBody() data: { dto: MessageDto, conversationName: string } ) {
+
+		const { dto, conversationName } = data;
+		console.log("Message sent to: ", conversationName + dto.conversationID);
+
+		// The room's name is not the conversation's name in DB
+		this.server.to(conversationName + dto.conversationID).emit('onMessage', {
 			from: dto.from,
 			content: dto.content,
 			post_datetime: dto.post_datetime,
 			conversationID: dto.conversationID,
-			conversationName: dto.conversationName,
+			conversationName: conversationName,
 		});
 	}
 

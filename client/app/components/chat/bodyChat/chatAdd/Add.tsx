@@ -36,10 +36,9 @@ const AddComponent = (socket: {socket: Socket}) => {
 			const data = await response.json();
 
 			if (socketInUse.connected) {
-				await socketInUse.emit('joinRoom', { roomName: data.name, roomID: data.id }, () => {
+				socketInUse.emit('joinRoom', { roomName: data.name, roomID: data.id }, () => {
 					console.log("Room creation loading...");
 				});
-				socketInUse.off('joinRoom');
 			}
 			console.log("Conversation successfully created");
 		}

@@ -20,27 +20,18 @@ const SendBoxComponent = (socket: {socket: Socket}) => {
 		conversationID: state.currentConversationID,
 	}
 
-	const messageEventDto = {
-		from: sessionStorage.getItem("currentUserLogin"),
-		content: messageValue,
-		post_datetime: new Date(),
-		conversationID: state.currentConversationID,
-		conversationName: state.currentConversation,
-	}
-
 	const handleMessage = async (e: React.FormEvent) => {
 
 		e.preventDefault();
 
 		if (socketInUse.connected) {
-			console.log(messageEventDto.conversationName, " with ID ", messageEventDto.conversationID);
-			socketInUse.emit('message', messageEventDto, () => {
+			// pb c'est que l'event va emit sur le nom + id
+			socketInUse.emit('message', { dto: messageDto, conversationName: state.currentConversation } , () => {
 				console.log("Message sent!");
 			});
-			socketInUse.off('message');
 		}
 		else {
-			console.log("Socket not connected");
+			console.log("Client is not connected");
 		}
 
 		const response = await fetch('http://localhost:3001/chat/newMessage', {
