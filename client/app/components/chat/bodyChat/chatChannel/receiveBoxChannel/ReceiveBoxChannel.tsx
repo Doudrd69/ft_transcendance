@@ -66,7 +66,7 @@ const ReceiveBoxChannelComponent = (socket: {socket: Socket}) => {
 	useEffect(() => {
 
 		socketInUse.on('userJoinedRoom', (notification: string) => {
-			console.log("Channel event: ", notification);
+			console.log("Channel log: ", notification);
 		});
 
 		socketInUse.on('onMessage', (message: Message) => {
@@ -75,8 +75,8 @@ const ReceiveBoxChannelComponent = (socket: {socket: Socket}) => {
 		});
 
 		return () => {
-			socketInUse.off('onMessage')
 			socketInUse.off('userJoinedRoom');
+			socketInUse.off('onMessage')
 		}
 	}, [socketInUse]);
 	
