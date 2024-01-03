@@ -10,6 +10,7 @@ import {
 	IsEmail, // Checks if the string is an email: @IsEmail(options?: IsEmailOptions)
 	IsFQDN,
 	IsAscii,
+	IsPositive,
 	IsDate,
 	Min,
 	Max,
@@ -19,6 +20,8 @@ import {
 export class UpdateUsernameDto {
 
 	@IsNotEmpty()
+	@IsPositive()
+	@Max(1000)
 	userID: number;
 
 	@IsNotEmpty({ message: 'Please enter a new username'})

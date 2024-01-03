@@ -5,6 +5,7 @@ import {
 	IsString,
 	IsAlpha,
 	IsAlphanumeric,
+	IsDecimal,
 	Length,
 	IsNotEmpty,
 	IsEmail, // Checks if the string is an email: @IsEmail(options?: IsEmailOptions)
@@ -21,7 +22,7 @@ export class AuthenticatorCodeDto {
     userID: number;
 
     @IsNotEmpty()
-    @IsAlphanumeric()
+    @IsDecimal()
     @Length(6)
     code: string;
 }

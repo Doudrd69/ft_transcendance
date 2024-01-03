@@ -83,6 +83,20 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		delete this.connectedUsers[client.id];
 	}
 
+	@SubscribeMessage('joinFriendRoom')
+	async addUserToFriendRoom( @ConnectedSocket() client: Socket, @MessageBody() roomName: string ) {
+
+		console.log("==== joinFriendRoom Event ====");
+		console.log("Add ", client.id," to room : ", roomName);
+		const conv = await this.chatService.getConversationByName(roomName);
+		if (conv) {
+			client.join(roomName + conv.id);
+			return ;
+		}
+		console.log("Fatal error: conversation not found");
+		return ;
+	}
+
 	@SubscribeMessage('joinRoom')
 	addUserToRoom( @ConnectedSocket() client: Socket, @MessageBody() data: { roomName: string, roomID: string }, ) {
 

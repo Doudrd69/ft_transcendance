@@ -11,7 +11,7 @@ const HeaderComponent: React.FC = () => {
 	const [username, setUsername] = useState('');
 	const [notification, setNotification] = useState(0);
 
-	const notify = (flag: number, error?: string) => { 
+	const notify = (flag: number, string?: string) => { 
 		
 		switch (flag) {
 
@@ -19,23 +19,11 @@ const HeaderComponent: React.FC = () => {
 				return ;
 			
 			case 1:
-				toast.success("Username has been updated");
+				toast.success(string);
 				return ;
 
 			case 2:
-				toast.success("Authenticator code is verified");
-				return ;
-
-			case 3:
-				toast.warn(error);
-				return ;
-
-			case 4:
-				toast.success("Two Factor Authentification is now enabled");
-				return ;
-
-			case 5:
-				toast.warn(error);
+				toast.warn(string);
 				return ;
 		}
 	};
@@ -96,25 +84,28 @@ const HeaderComponent: React.FC = () => {
 		});
 
 		if (response.ok) {
-			notify(4);
+			notify(1, "Two Factor Authentification is now enabled");
 			sessionStorage.setItem("2faEnabled", "true");
 		}
 		else {
 			const error = await response.json();
-			console.log("Fatal error: ", error.message[0]);
-			notify(5, error.message[0]);
+			if (Array.isArray(error.message))
+				notify(2, error.message[0]);
+			else
+				notify(2, error.message);
 		}
 	}
 
 	const changeUsername = async (e: React.FormEvent) => {
 
 		e.preventDefault();
-		
+
 		const updateUsernameDto = {
 			userID: sessionStorage.getItem("currentUserID"),
 			newUsername: username,
 		};
 
+		console.log(updateUsernameDto);
 		const response = await fetch('http://localhost:3001/users/updateUsername', {
 			method: 'POST',
 			headers: {
@@ -127,14 +118,14 @@ const HeaderComponent: React.FC = () => {
 		if (response.ok) {
 			const updatedUser = await response.json();
 			console.log("Updated user: ", updatedUser);
-			notify(1);
+			notify(1, "Username has been updated");
 		}
 		else {
 			const error = await response.json();
-			if (error.message[0])
-				notify(3, error.message[0]);
+			if (Array.isArray(error.message))
+				notify(2, error.message[0]);
 			else
-				notify(3, error.message);
+				notify(2, error.message);
 		}
 	}
 

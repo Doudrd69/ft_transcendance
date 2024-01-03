@@ -165,8 +165,7 @@ export class AuthService {
 
 			const user = await this.usersService.getUserByID(authenticatorCodeDto.userID);
 			if (user) {
-				// console.log("TFA_TEMP -> ", user.TFA_temp_secret);
-				// console.log("CODE -> ", authenticatorCodeDto.code);
+
 				const base32secret = user.TFA_temp_secret;
 	
 				// This function will return true if the code given by the client is correct
