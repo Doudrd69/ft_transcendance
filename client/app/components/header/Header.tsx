@@ -101,7 +101,7 @@ const HeaderComponent: React.FC = () => {
 		e.preventDefault();
 
 		const updateUsernameDto = {
-			userID: sessionStorage.getItem("currentUserID"),
+			userID: Number(sessionStorage.getItem("currentUserID")),
 			newUsername: username,
 		};
 

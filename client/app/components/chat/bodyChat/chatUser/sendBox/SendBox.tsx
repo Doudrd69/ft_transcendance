@@ -25,7 +25,6 @@ const SendBoxComponent = (socket: {socket: Socket}) => {
 		e.preventDefault();
 
 		if (socketInUse.connected) {
-			// pb c'est que l'event va emit sur le nom + id
 			socketInUse.emit('message', { dto: messageDto, conversationName: state.currentConversation } , () => {
 				console.log("Message sent!");
 			});

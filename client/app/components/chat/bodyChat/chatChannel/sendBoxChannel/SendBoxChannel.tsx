@@ -24,15 +24,7 @@ const SendBoxChannelComponent = (socket: {socket: Socket}) => {
 		
 		e.preventDefault();
 
-		if (socketInUse.connected) {
-			socketInUse.emit('message', { dto: messageDto, conversationName: state.currentConversation } , () => {
-				console.log("Message Sent!");
-			});
-		}
-		else {
-			console.log("Client is not connected");
-		}
-
+		
 		const response = await fetch('http://localhost:3001/chat/newMessage', {
 			method: 'POST',
 			headers: {
@@ -43,6 +35,14 @@ const SendBoxChannelComponent = (socket: {socket: Socket}) => {
 		});
 
 		if (response.ok) {
+			if (socketInUse.connected) {
+				socketInUse.emit('message', { dto: messageDto, conversationName: state.currentConversation } , () => {
+					console.log("Message Sent!");
+				});
+			}
+			else {
+				console.log("Client is not connected");
+			}
 			console.log("Message sent to ", state.currentConversation);
 		}
 		else {

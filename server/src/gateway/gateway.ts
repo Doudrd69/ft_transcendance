@@ -110,7 +110,6 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		return ;
 	}
 
-	// conversationName is NaN
 	@SubscribeMessage('message')
 	handleMessage(@MessageBody() data: { dto: MessageDto, conversationName: string } ) {
 
