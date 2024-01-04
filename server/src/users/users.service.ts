@@ -65,11 +65,10 @@ export class UsersService {
 		const user = await this.getUserByID(userId);
 	
 		if (!user || !user.avatarURL) {
-		//   throw new NotFoundException('Avatar not found');
-		return null;
+			console.log("Avatar not found");
+			return null;
 		}
 	
-		console.log("AVATAR ", user.avatarURL);
 		return user.avatarURL;
 	  }
 	  

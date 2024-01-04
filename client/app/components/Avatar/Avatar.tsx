@@ -10,30 +10,29 @@ const AvatarImageComponent: React.FC<AvatarImageProps> = ({ className }) => {
 const { state } = useGlobal();
 const [avatarURL, setAvatarURL] = useState<string | null>(null);
 
-useEffect(() => {
-	console.log('=============> dans le use', state.showUploadAvatar)
 	const fetchAvatar = async () => {
-	try {
-		const response = await fetch(`http://localhost:3001/users/getAvatar/${sessionStorage.getItem('currentUserID')}`,{
-			method: 'GET',
-		});
+		try {
+			const response = await fetch(`http://localhost:3001/users/getAvatar/${sessionStorage.getItem('currentUserID')}`,{
+				method: 'GET',
+			});
 
-		if (response.ok) {
-			const data = await response.json();
-			if (data) {
-				console.log(data);
-				setAvatarURL(data.avatarURL);
+			if (response.ok) {
+				const data = await response.json();
+				if (data) {
+					console.log(data);
+					setAvatarURL(data.avatarURL);
+				}
+			} else {
+				console.error('Error fetching Avatar URL:', response.statusText);
 			}
-		} else {
-		console.error('Error fetching Avatar URL:', response.statusText);
+		} catch (error) {
+			console.error('Error fetching Avatar URL:', error);
 		}
-	} catch (error) {
-		console.error('Error fetching Avatar URL:', error);
-	}
 	};
 
-	fetchAvatar();
-}, [state.showUploadAvatar]);
+	useEffect(() => {
+		fetchAvatar();
+	}, [state.showUploadAvatar]);
 
 return (
 		<img src={avatarURL || 'avatars/avatar.png'} className={className}/>

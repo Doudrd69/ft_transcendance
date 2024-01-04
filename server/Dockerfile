@@ -6,7 +6,6 @@ WORKDIR /srv/app/admin-server
 
 COPY package*.json ./
 
-
 RUN npm install	&& \
 	npm install @nestjs/jwt && \
 	npm install @types/node && \
@@ -27,10 +26,7 @@ RUN npm install	&& \
 	npm install jimp	&&\
 	npm install @nestjs/serve-static &&\
 	npm install @nestjs/platform-express
+
 COPY . .
-COPY script.sh .
-
-RUN sh script.sh
-
 
 CMD ["npm", "run", "start:dev"]
