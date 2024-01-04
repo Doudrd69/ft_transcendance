@@ -13,6 +13,10 @@ import { GameProvider } from './components/game/GameContext';
 import { io, Socket } from 'socket.io-client'
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { GlobalProvider, useGlobal } from './GlobalContext';
+import SettingsComponent from './components/settings/Settings';
+import BodyComponent from './components/body/Body';
+import SetComponent from './components/Avatar/SetAvatar';
 import { totalmem } from 'os';
 import GameHeader from './components/game/GameHeader';
 
@@ -101,39 +105,36 @@ export default function Home() {
 
 	const handleAccessToken = async (code: any): Promise<boolean> => {
 
-		try {
+		if (sessionStorage.getItem("jwt"))
+			return true;
 
-			if (sessionStorage.getItem("jwt"))
-				return true;
+		const response = await fetch('http://localhost:3001/auth/access', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify({code}),
+		});
 
-			const response = await fetch('http://localhost:3001/auth/access', {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-				body: JSON.stringify({code}),
-			});
+		if (response.ok) {
 
-			if (response.ok) {
-
-				console.log("-- Access granted --");
-				const token = await response.json();
-				sessionStorage.setItem("jwt", token.access_token);
-				const jwt = sessionStorage.getItem("jwt");
-				if (jwt) {
-					await setUserSession(jwt);
-					// Attention a la 2fa
-					setAuthValidated(true);
-				}
+			console.log("-- Access granted --");
+			const token = await response.json();
+			sessionStorage.setItem("jwt", token.access_token);
+			const jwt = sessionStorage.getItem("jwt");
+			if (jwt) {
+				await setUserSession(jwt);
+				// Attention a la 2fa
+				setAuthValidated(true);
 				return true;
 			}
-			else {
+			else
 				return false;
-			}
-			} catch (error) {
-			throw error;
 		}
+
+		return false;
 	}
+
 
 	const handle2FADone = () => {
 		setShow2FAForm(false);
@@ -217,20 +218,23 @@ export default function Home() {
 	// 	if (sessionStorage.getItem("currentUserLogin") != null)
 	// 		setShowLogin(false);
 	// });
-
-    return (
+	
+		return (
 			<RootLayout>
-				<Header/>
-				{showLogin ? (<Authentificationcomponent />) :
-					show2FAForm ? (<TFAComponent on2FADone={handle2FADone} />) :
-					(
-					  <div className="container">
-						<ToastContainer />
-						<Chat socket={userSocket}/>
-						<GameHeader socket={gameSocket}/>
-					  </div>
-					)
-				}
+				<GlobalProvider>
+					<ToastContainer />
+						{showLogin ? (
+						<Authentificationcomponent />
+						) : show2FAForm ? (
+						<TFAComponent on2FADone={handle2FADone} />
+						) : (
+							<>
+							{/* <SetComponent/> */}
+							<Header/>
+							<BodyComponent userSocket={userSocket} gameSocket={gameSocket}/>
+						</>
+						)}	
+				</GlobalProvider>
 			</RootLayout>
-	)
+		  );
 }

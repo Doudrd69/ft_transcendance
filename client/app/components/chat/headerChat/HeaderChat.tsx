@@ -1,8 +1,6 @@
 import './HeaderChat.css'
 import React from 'react';
 import FriendsListButtonComponent from './friendslistButton/FriendsListButton';
-// import channelListButtonComponent from './channellistButton/channelListButton';
-
 import AddComponent from './addButton/AddButton';
 import BackComponent from './backButton/BackButton';
 import IdDiscussionComponent from './id-discussion/Id-discussion';
@@ -23,7 +21,7 @@ const HeaderChatComponent: React.FC = () => {
 			{renderComponent(<ChatButtonComponent />, !state.showChat && !state.showChannel)}
 			{renderComponent(<ChannelButtonComponent />, !state.showChat && !state.showChannel)}
 			{renderComponent(<FriendsListButtonComponent />, !state.showChat && !state.showChannel)}
-			{renderComponent(<AddComponent />, !state.showChat && !state.showChannel)}
+			{/* {renderComponent(<AddComponent />, !state.showChat && !state.showChannel)} */}
 		</div>
 	)
 };

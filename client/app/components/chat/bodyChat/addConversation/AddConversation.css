@@ -1,0 +1,70 @@
+.blur-background {
+	position: fixed;
+	top: 0;
+	left: 0;
+	background-color: rgba(171, 171, 171, 0.1);
+	backdrop-filter: blur(30px);
+	height: 100vh;
+	width: 100vw;
+	z-index: 1;
+  }
+  
+  .bloc-add-conversation {
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	background-color: rgba(255, 255, 255, 0.8);
+	border-radius: 10px;
+	box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+	padding: 20px;
+	width: 300px;
+	z-index: 2; /* Assurez-vous que le bloc est au-dessus de la div flou */
+  }
+  .add__buttons {
+	display: flex;
+	justify-content: space-between;
+  }
+  
+  .add__header {
+	text-align: center;
+	margin-bottom: 15px;
+  }
+  
+  .add__form {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+  }
+  
+  .add__input {
+	margin-bottom: 10px;
+	padding: 8px;
+	border: 1px solid #ccc;
+	border-radius: 4px;
+  }
+  .add_button_cancel {
+	background-color: rgb(181, 138, 138);
+	color: white;
+	border: none;
+	padding: 10px;
+	border-radius: 4px;
+	cursor: pointer;
+	margin-left: 10px; 
+  }
+  .add_button_cancel:hover {
+	background-color: #a60000;
+  }
+  .add__button {
+	background-color: #9cc89e;
+	color: white;
+	border: none;
+	padding: 10px;
+	border-radius: 4px;
+	cursor: pointer;
+  }
+  
+  .add__button:hover {
+	background-color: #45a049;
+  }
+  

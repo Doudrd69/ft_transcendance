@@ -1,0 +1,23 @@
+.bloc-body-settings {
+	flex-direction: column;
+	height: 93%;
+	width: 100%;
+	text-align: center;
+	display: flex;
+	position: initial;
+	align-items: center;
+	background-color: antiquewhite;
+}
+
+.close-settings {
+	position: fixed;
+	top: 10px;
+	right: 10px;
+	cursor: pointer;
+	font-size: 20px;
+	color: #999;
+  }
+  
+  .close-settings:hover {
+	color: #333;
+  }

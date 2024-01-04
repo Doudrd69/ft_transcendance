@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException, Res } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm'
-import { Repository } from 'typeorm'
+import { Repository, UpdateResult } from 'typeorm'
 import * as bcrypt from 'bcrypt'
 import { User } from './entities/users.entity'
 import { Friendship } from './entities/friendship.entity'
@@ -47,28 +47,55 @@ export class UsersService {
 	/***					USER MANAGEMENT						***/
 	/**************************************************************/
 
-	// getAvatarById(userId: number, res: Response) {
-	// 	this.usersRepository.findOne({ where: {id: userId}}).then(
-	// 		user => {
-	// 			if (user.avatarImage) {
-	// 				res.setHeader('Content-Type', 'image/jpeg'); // Set appropriate content type
-	// 				return res.send(user.avatarImage);
-	// 			}
-	// 		}).catch(
-	// 			error => {
-	// 				return res.status(404).send('Avatar not found: ', error);
-	// 		}
-	// 	);
+	async uploadAvatarURL(avatarURL: string, userID: number): Promise<UpdateResult | undefined> {
+		try {
+		const user = await this.getUserByID(userID);
+
+		if (!user) {
+			console.error(`Utilisateur avec l'ID ${userID} non trouvé.`);
+			return undefined;
+		}
+			// Mettez à jour uniquement l'avatarURL
+			const updateResult = await this.usersRepository.update({ id: userID }, { avatarURL });
+
+			return updateResult;
+		} catch (error) {
+			console.error('Erreur lors de la mise à jour de l\'avatarURL :', error);
+			return undefined;
+		}
+	}
+
+	async getAvatar(userId: number): Promise<string | null> {
+		const user = await this.getUserByID(userId);
+	
+		if (!user || !user.avatarURL) {
+			console.log("Avatar not found");
+			return null;
+		}
+	
+		return user.avatarURL;
+	  }
+
+	// async deleteUserAvatar(data: Buffer, fileName:string , userID: number) {
+		
+	// 	const avatar = await this.avatarService.create(userID, data, fileName);
+	// 	if (!avatar)
+	// 		throw console.log("error");
+	// 	await this.usersRepository.update(userID, {avatarID : avatar.ID})
+	// 	return avatar;
 	// }
 
-	// uploadAvatar(avatar: any) {
-	// 	this.getUserByLogin("").then(userToUpdate => {
-	// 		userToUpdate.avatarImage = avatar.buffer;
-	// 		return this.usersRepository.save(userToUpdate);
-	// 	}).catch(error => {
-	// 		console.log("Error: cannot upload avatar image: ", error);
+	// async getUserAvatar(userID: number): Promise<Avatar> {
+	// 	const user = await this.usersRepository.findOne({
+	// 	  where: { id: userID },
 	// 	});
-	// }
+	  
+	// 	if (!user || !user.avatarID) {
+	// 	  throw new NotFoundException(`User or avatar not found for ID ${userID}`);
+	// 	}
+
+	// 	return this.avatarService.getAvatarByID(user.avatarID);
+	//   }
 
 	// Testing purpose - Maybe future implementation
 	async createNewUser(username: string): Promise<User> {
@@ -169,18 +196,18 @@ export class UsersService {
 			where: {login: friendRequestDto.initiatorLogin},
 			relations: ["initiatedFriendships", "acceptedFriendships", "groups"],
 		});
-
+	  
 		const friend = await this.usersRepository.findOne({
 			where: {id: friendRequestDto.recipientID},
 			relations: ["initiatedFriendships", "acceptedFriendships", "groups"],
 		});
-
+	  
 		if (initiator && friend) {
-
-			const friendshipToUpdate = await this.friendshipRepository.findOne({
-				where: {initiator: initiator, friend: friend},
-			});
-
+		  const friendshipToUpdate = await this.friendshipRepository.findOne({
+			where: { initiator: { id: initiator.id }, friend: { id: friend.id } },
+		  });
+	  
+		  if (friendshipToUpdate) {
 			friendshipToUpdate.isAccepted = flag;
 			await this.friendshipRepository.save(friendshipToUpdate);
 
@@ -190,6 +217,7 @@ export class UsersService {
 			}
 
 			return friendshipToUpdate;
+		  }
 		}
 		console.error("Fatal error: could not find user");
 		return ;

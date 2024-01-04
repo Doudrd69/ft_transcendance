@@ -18,6 +18,14 @@ RUN npm install	&& \
 	npm install dotenv && \
 	npm install socket.io && \
 	npm install @nestjs/websockets && \
+	npm install @nestjs/platform-socket.io &&\
+	npm install @types/express && \
+	npm install @nestjs/common	&&\
+	npm install @types/multer	&&\
+	npm install @types/image-type &&\
+	npm install jimp	&&\
+	npm install @nestjs/serve-static &&\
+	npm install @nestjs/platform-express
 	npm install @nestjs/platform-socket.io && \
 	npm install class-validator class-transformer
 

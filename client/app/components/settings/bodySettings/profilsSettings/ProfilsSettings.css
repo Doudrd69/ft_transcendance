@@ -1,0 +1,42 @@
+.bloc-profils-settings{
+	flex-direction: column;
+	width: 100%;
+	max-height: 100%;
+	text-align: center;
+}
+.profil-image{
+	height: 20vh;
+	width: auto;
+}
+.upload-image{
+	justify-content: center;
+	flex-direction: column;
+
+	/* border-bottom: 1px solid #333; */
+	display: flex;
+	width: 100%;
+	margin-top: 80px;
+	margin-bottom: 40px;
+	text-align: center;
+	align-items: center;
+	/* justify-content: space-between; */
+}
+.change-username{
+	justify-content: center;
+	flex-direction: row;
+	/* border-bottom: 1px solid #333; */
+	display: flex;
+	width: 100%;
+	margin-bottom: 40px;
+	text-align: center;
+	align-items: center;
+}
+
+.form-change-username{
+	width: 100%;
+}
+
+.button-modified-username
+{
+	margin-top: 10px;
+}

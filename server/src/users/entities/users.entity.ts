@@ -18,11 +18,11 @@ export class User {
   @Column({ default: "guest" })
   username: string;
 
+  @Column({ default: "/avatars/avatar.png" })
+  avatarURL: string;
+
   @Column()
   officialProfileImage: string;
-
-  @Column({ type: 'bytea', default: null, nullable: true })
-  avatarImage: Buffer;
 
   @Column({ default: "" })
   TFA_secret: string;

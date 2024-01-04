@@ -1,6 +1,8 @@
 import './ChannelList.css';
 import React, { useState, useEffect } from 'react';
 import { useChat } from '../../../ChatContext';
+import AddConversationComponent from '../../addConversation/AddConversation';
+import { Socket } from 'socket.io-client';
 
 interface Conversation {
   id: string;
@@ -48,19 +50,31 @@ const ChannelListComponent: React.FC = () => {
 
 	return (
 		<div className="bloc-channel-list">
-			{userData.discussion.map((conversation: Conversation, index: number) => (
+		<button
+			className={`button-channel-list-add ${state.showAddChannel ? 'green-border' : ''}`}
+			onClick={() => {
+			dispatch({ type: 'ACTIVATE', payload: 'showAddChannel' });
+			}}
+		>
+			+
+		</button>
+		{state.showAddChannel && <AddConversationComponent socket={socket} updateConversations={updateConversations} title="Add/Create Channel" isChannel={true}/>}
+		{userData.discussion.map((conversation, index) => (
 			conversation.is_channel && (
-			<button key={index} className="button-channel-list" onClick={() => {
-					dispatch({ type: 'TOGGLE', payload: 'showChannel' });
-					dispatch({ type: 'SET_CURRENT_CONVERSATION', payload: conversation.name });
-					dispatch({ type: 'SET_CURRENT_CONVERSATION_ID', payload: conversation.id });
-		  		}}>
+			<button
+				key={index}
+				className="button-channel-list"
+				onClick={() => {
+				dispatch({ type: 'TOGGLE', payload: 'showChannel' });
+				dispatch({ type: 'SET_CURRENT_CONVERSATION', payload: conversation.name });
+				}}
+			>
 				<span>{conversation.name}</span>
-		  	</button>
+			</button>
 			)
-	  	))}
+		))}
 		</div>
-  	);
+	);
 };
 
 export default ChannelListComponent;
