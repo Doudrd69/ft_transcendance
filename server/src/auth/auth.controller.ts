@@ -10,6 +10,8 @@ import {
 	} from '@nestjs/common';
 import { AuthGuard } from './auth.guard';
 import { AuthService } from './auth.service';
+import { RequestTfaDto } from './dto/RequestTfaDto.dto';
+import { AuthenticatorCodeDto } from './dto/AuthenticatorCodeDto.dto';
 	
 @Controller('auth')
 export class AuthController {
@@ -23,19 +25,19 @@ export class AuthController {
 	// }
 
 	// @HttpCode(HttpStatus.OK)
-	@Post('2fa')
-	activate2FA(@Body() requestBody: {login: string}) {
-		const { login } = requestBody;
-		return this.authService.activate2FA(login);
+	@UseGuards(AuthGuard)
+	@Post('request2fa')
+	activate2FA(@Body() requestTfaDto: RequestTfaDto) {
+		return this.authService.activate2FA(requestTfaDto);
 	}
 
-	@Post('checkCode')
-	verifyCode(@Body() requestBody: {code: string}) {
-		const { code } = requestBody;
-		return this.authService.verifyCode(code);
+	@UseGuards(AuthGuard)
+	@Post('checkAuthenticatorCode')
+	verifyCode(@Body() authenticatorCodeDto: AuthenticatorCodeDto) {
+		return this.authService.verifyCode(authenticatorCodeDto);
 	}
 
-
+	// class-validator
 	@Post('access')
 	getAccessToken(@Body() requestBody: {code: string}) {
 		const { code } = requestBody;

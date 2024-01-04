@@ -69,12 +69,12 @@
     text-overflow: ellipsis;
     position: absolute;
     margin-top: -2%;
-    left: 50%;
+    left: 80%;
     transform: translatex(-50%);
   }
 
   .menu-button-container {
-    margin-top: 25%; /* Ajoutez de l'espace entre le texte "PONG!!" et le bouton "Cancel" */
+    margin-top: 65%; /* Ajoutez de l'espace entre le texte "PONG!!" et le bouton "Cancel" */
     text-align: center;
   }
 
@@ -104,7 +104,7 @@
        }
  }
 
-  .settingsClass {
+.settingsClass {
     text-align: center;
     margin-top: 10%;
   }

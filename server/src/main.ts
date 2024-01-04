@@ -3,6 +3,7 @@ import { AppModule } from './app.module';
 import { IoAdapter } from '@nestjs/platform-socket.io'
 import { join } from 'path';
 import { NestExpressApplication } from '@nestjs/platform-express';
+import { ValidationPipe } from '@nestjs/common'
 
 const express = require('express');
 const cors = require('cors');
@@ -16,8 +17,9 @@ const corsOptions = {
 };
 
 async function bootstrap() {
-	const app = await NestFactory.create<NestExpressApplication>(AppModule);
-  	app.use(cors(corsOptions));
+  const app = await NestFactory.create(AppModule);
+  app.useGlobalPipes(new ValidationPipe());
+  app.use(cors(corsOptions));
 
   // const httpAdapter = app.getHttpAdapter();
   // app.useWebSocketAdapter(new IoAdapter(httpAdapter));

@@ -7,7 +7,8 @@ type ActionType =
   | 'DISABLE'
   | 'TOGGLE'
   | 'SET'
-  | 'SET_CURRENT_CONVERSATION';
+  | 'SET_CURRENT_CONVERSATION'
+  | 'SET_CURRENT_CONVERSATION_ID';
 
 // Définir l'interface de l'action
 interface Action {
@@ -31,7 +32,8 @@ interface ChatState {
 	showAddUser: boolean;
 	showListChannelAdd:boolean,
 	currentConversation: string | null;
-	[key: string]: boolean | string | null;
+	currentConversationID: number | null;
+	[key: string]: boolean | number | string | null;
 }
 
 // État initial
@@ -50,6 +52,7 @@ const initialState: ChatState = {
 	showConfirmation:false,
 	showListChannelAdd:false,
 	currentConversation: null,
+	currentConversationID: null,
 };
 
 // Réducteur
@@ -73,6 +76,8 @@ const chatReducer = (state: ChatState, action: Action): ChatState => {
 			}
 		case 'SET_CURRENT_CONVERSATION':
 				return { ...state, currentConversation: action.payload || null }; // Mettre à jour la conversation actuelle 
+		case 'SET_CURRENT_CONVERSATION_ID':
+				return { ...state, currentConversationID: action.payload ? parseInt(action.payload, 10) : null};
 	  default:
 		return state;
 	}
@@ -85,7 +90,7 @@ const ChatContext = createContext<{
 } | undefined>(undefined);
 
 // Fournisseur de contexte
-export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({children,}) => {
+export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({children}) => {
 	const [state, dispatch] = useReducer(chatReducer, initialState);
 	
 	return (
@@ -99,7 +104,12 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({children,
 export const setCurrentConversation = (payload: string | null): Action => ({
 	type: 'SET_CURRENT_CONVERSATION',
 	payload,
-  });
+});
+
+export const setCurrentConversationID = (payload: string | null): Action => ({
+	type: 'SET_CURRENT_CONVERSATION_ID',
+	payload,
+});
   
 // Hook personnalisé pour utiliser le contexte
 export const useChat = () => {

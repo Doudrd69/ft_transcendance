@@ -26,6 +26,8 @@ RUN npm install	&& \
 	npm install jimp	&&\
 	npm install @nestjs/serve-static &&\
 	npm install @nestjs/platform-express
+	npm install @nestjs/platform-socket.io && \
+	npm install class-validator class-transformer
 
 COPY . .
 

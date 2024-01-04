@@ -1,17 +1,14 @@
-import { Controller, Post, HttpCode, HttpStatus, Body, Get, Param} from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Patch, Delete, BadRequestException, Logger, Request} from '@nestjs/common';
 import { GameService } from './game.service';
-// import { gameData } from './entities/games.entity';
+import { MatchmakingService } from './matchmaking/matchmaking.service';
 
-
-@Controller('gameHistory')
-export class GameController
-{
-    // constructor(private gameHistoryService: GameService) {}
-
-    // @HttpCode(HttpStatus.OK)
-    // @Post('newGame')
-    // createNewGame(@Body() gameHistorydata: {gameData})
-    // {
-		// return this.gameService.createGame(gameData); 
-    // }
+@Controller('game')
+export class GameController {
+  constructor(private GameService: GameService,
+                private LobbyService: MatchmakingService) {}
 }
+
+
+/*soit utiliser un guard soit utiliser un decorateur getUSer
+regarder postman app
+*/  

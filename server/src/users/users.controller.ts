@@ -1,4 +1,4 @@
-import { Controller, Post, HttpCode, HttpStatus, Body, Get, UploadedFile, UseInterceptors, Param, Res } from '@nestjs/common';
+import { Controller, Post, HttpCode, HttpStatus, Body, Get, UploadedFile, UseInterceptors, Param, Res, UseGuards } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { FriendRequestDto } from './dto/FriendRequestDto.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -15,10 +15,10 @@ import { randomBytes } from 'crypto';
 import * as path from 'path';
 import { extname } from 'path';
 import Jimp from 'jimp';
-
-
-
-
+import { User } from './entities/users.entity';
+import { UpdateUsernameDto } from './dto/UpdateUsernameDto.dto';
+import { validate, validateOrReject } from 'class-validator'
+import { AuthGuard } from 'src/auth/auth.guard';
 
 @Controller('users')
 export class UsersController {
@@ -78,35 +78,41 @@ export class UsersController {
 		}
 	}
 
+	@UseGuards(AuthGuard)
 	@HttpCode(HttpStatus.OK)
 	@Post('updateUsername')
-	updateUsername(@Body() requestBody: {login: string, string: string}) {
-		const { login } = requestBody;
-		const { string } = requestBody;
-		return this.usersService.updateUsername(login, string);
+	updateUsername(@Body() updateUsernameDto: UpdateUsernameDto): Promise<User> {
+		return this.usersService.updateUsername(updateUsernameDto);
 	}
 
+	@UseGuards(AuthGuard)
 	@HttpCode(HttpStatus.OK)
 	@Post('addfriend')
-	createFriendship(@Body() friendRequestDto: FriendRequestDto) {
+	createFriendship(@Body() friendRequestDto: FriendRequestDto): Promise<Friendship | null> {
 		return this.usersService.createFriendship(friendRequestDto);
 	}
 
+	// guard
 	@HttpCode(HttpStatus.OK)
 	@Post('friendRequestResponse')
 	updateFriendship(@Body() friendRequestDto: FriendRequestDto, flag: boolean) {
 		return this.usersService.updateFriendship(friendRequestDto, flag);
 	}
 
-
+	//guard
 	@HttpCode(HttpStatus.OK)
 	@Post('acceptFriendRequest')
-	acceptFriendship(@Body() friendRequestDto: FriendRequestDto) {
+	acceptFriendship(@Body() friendRequestDto: FriendRequestDto): Promise<Friendship> {
 		return this.usersService.acceptFriendship(friendRequestDto);
 	}
 
 	@Get('getFriends/:username')
 	getFriendsList(@Param('username') username: string): Promise<Friendship[]> {
 		return this.usersService.getFriendships(username);
+	}
+
+	@Get('getPendingFriends/:username')
+	getPendingFriendsList(@Param('username') username: string): Promise<Friendship[]> {
+		return this.usersService.getPendingFriendships(username);
 	}
 }

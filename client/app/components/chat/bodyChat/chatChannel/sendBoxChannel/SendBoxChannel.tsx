@@ -14,48 +14,46 @@ const SendBoxChannelComponent = (socket: {socket: Socket}) => {
 	};
 	
 	const messageDto = {
-		from: sessionStorage.getItem("currentUserLogin"), // when 42log is true
-		// from: "ebrodeur",	// when 42log is false
+		from: sessionStorage.getItem("currentUserLogin"),
 		content: messageValue,
 		post_datetime: new Date(),
-		conversationName: state.currentConversation,
+		conversationID: state.currentConversationID,
 	}
-	console.log(messageDto);
-	const handleMessage = async (e: React.FormEvent) => {
 
+	const handleMessage = async (e: React.FormEvent) => {
+		
 		e.preventDefault();
 
-		if (socketInUse.connected) {
-				socketInUse.emit('message', messageDto, () => {
-					console.log("!! SOCKET EMIT on message !!");
-				});
-			socketInUse.off('message');
+		
+		const response = await fetch('http://localhost:3001/chat/newMessage', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
+			},
+			body: JSON.stringify(messageDto),
+		});
 
+		if (response.ok) {
 			if (socketInUse.connected) {
-				socketInUse.emit('message', messageDto, () => {
+				socketInUse.emit('message', { dto: messageDto, conversationName: state.currentConversation } , () => {
 					console.log("Message Sent!");
 				});
 			}
 			else {
-				console.log("Socket not connected");
+				console.log("Client is not connected");
 			}
-
-			const response = await fetch('http://localhost:3001/chat/newMessage', {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-				body: JSON.stringify(messageDto),
-			});
-				
-			if (response.ok) {
-				console.log("Message sent and created in DB");
-			}
-			else {
-				console.log("Message creation failed");
-			}
+			console.log("Message sent to ", state.currentConversation);
+		}
+		else {
+			const error = await response.json();
+			if (Array.isArray(error.message))
+				console.log("Error: ", error.message[0]);
+			else
+				console.log("Error: ", error.message);
 		}
 	}
+
 	return (
 				<form className="bloc-send-chat-channel" onSubmit={handleMessage}>
 					<input className="input-chat-channel" placeholder="message..." value={messageValue} onChange={handleMessageInput}></input>

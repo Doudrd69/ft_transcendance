@@ -17,174 +17,208 @@ import { GlobalProvider, useGlobal } from './GlobalContext';
 import SettingsComponent from './components/settings/Settings';
 import BodyComponent from './components/body/Body';
 import SetComponent from './components/Avatar/SetAvatar';
+import { totalmem } from 'os';
+import GameHeader from './components/game/GameHeader';
 
 interface FriendRequestDto {
-	initiator: string;
-	recipient: string;
+	recipientID: number,
+	recipientLogin: string;
+	initiatorLogin: string;
 }
 
-export default function Home()   {
-	const socket = io('http://localhost:3001');
+export default function Home() {
+
+	const userSocket = io('http://localhost:3001/user', {
+		autoConnect: false,
+	});
+
+	const gameSocket = io('http://localhost:3001/game', {
+		autoConnect: false,
+	})
+
 	const [showLogin, setShowLogin] = useState(true);
 	const [show2FAForm, setShow2FAForm] = useState(false);
-	
+	const [authValidated, setAuthValidated] = useState(false);
+
 	const searchParams = useSearchParams();
 	const code = searchParams.get('code');
-		// ca lance une notif de username en meme temps mdr
-		const test = async (initiator: string) => {
-			console.log("FriendRequest Accepted");
-	
-			const acceptedFR = {
-				initiatorName: initiator,
-				username: sessionStorage.getItem("currentUserLogin"),
-			}
-	
-			const response = await fetch('http://localhost:3001/users/acceptFriendRequest', {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-				body: JSON.stringify(acceptedFR),
-			});
-	
-			if (response.ok) {
-				console.log("User added to your friend list!");
-				//faire ici un call toast pour mettre une notif?
-			}
-			else {
-				console.error("Fatal error: friend request failed");
-			}
-		};
-	
-		const Msg = ({ closeToast, toastProps, name }: any) => (
-			<div>
-			  You received a friend request from {name}
-			  <button onClick={(e:any) => test(name)}>Accept</button>
-			  <button onClick={closeToast}>Deny</button>
-			</div>
-		)
-	
-		const notifyFriendRequest = (recipientUsername: string) => { 
-			toast(<Msg name={recipientUsername}/>);
-		};
-	
-		const setUserSession = async (jwt: string) => {
-	
-			const jwtArray = jwt?.split('.');
-			if (jwtArray.length != 0) {
-				const payload = JSON.parse(atob(jwtArray[1]));
-				console.log(payload.sub);
-				console.log(payload.login);
-				console.log(payload.tfa_enabled);
-				sessionStorage.setItem("currentUserID", payload.sub);
-				sessionStorage.setItem("currentUserLogin", payload.login);
-				sessionStorage.setItem("URLpps", payload.pp);
-				const pps = sessionStorage.getItem("URLpps");
-				if(pps)
-				{
-					try{
-	
-					const parsedData = JSON.parse(pps);
-					const smallImageURL = parsedData?.versions?.small;
-					if (smallImageURL) {
-						console.log(smallImageURL);
-						sessionStorage.setItem("smallpp", smallImageURL)
-						// Faites quelque chose avec l'URL de l'image small, comme l'afficher dans une balise img
-					} else {
-						console.error("Propriété 'versions.small' non trouvée dans les données JSON.");
-					}
-					} 
-					catch (error) {
-					console.error("Erreur lors de l'analyse JSON :", error);
-					}
-				}
-	
-				if (payload.tfa_enabled) {
-					setShow2FAForm(true);
-				}
-			}
-		}
-	
-		const handleAccessToken = async (code: any): Promise<boolean> => {
-	
-			try {
-				const response = await fetch('http://localhost:3001/auth/access', {
-					method: 'POST',
-					headers: {
-						'Content-Type': 'application/json',
-					},
-					body: JSON.stringify({code}),
-				});
-	
-				if (response.ok) {
-	
-					console.log("-- Fetch to API successed --");
-	
-					const token = await response.json();
-					sessionStorage.setItem("jwt", token.access_token);
-					const jwt = sessionStorage.getItem("jwt");
-					if (jwt)
-						await setUserSession(jwt);
-					return true;
-				}
-				else {
-					return false;
-				}
-				} catch (error) {
-				throw error;
-			}
-		}
-	
-		const handle2FADone = () => {
-			setShow2FAForm(false);
-		}
-	
-		useEffect(() => {
-			socket.on('friendRequest', (friendRequestDto: FriendRequestDto) => {
-				// mouais
-				if (sessionStorage.getItem("currentUserLogin") === friendRequestDto.recipient) {
-					console.log("You received a friend request from ", friendRequestDto.initiator);
-					notifyFriendRequest(friendRequestDto.initiator);
-				}
-			});
-	
-			return () => {
-				socket.off('friendRequest');
-			}
-		}, [socket]);
-	
-		useEffect(() => {
-	
-			socket.on('connect', () => {
-				console.log('Client is connecting... ');
-				if (socket.connected)
-					console.log("Client connected: ", socket.id);
-			})
-	
-			socket.on('disconnect', () => {
-				console.log('Disconnected from the server');
-			})
-	
-			socket.on('disconnect', () => {
-				console.log('Disconnected from the server');
-			})
-	
-			return () => {
-				console.log('Unregistering events...');
-				socket.off('connect');
-				socket.off('disconnect');
-			}
-		})
-	
-		useEffect(() => {
-			if (code && showLogin) {
-				handleAccessToken(code).then(result => {
-					setShowLogin(false);
-				})
-			}
-		}, [showLogin]);
-	
 
+	// a voir
+	if (authValidated) {
+		userSocket.connect();
+		gameSocket.connect();
+	}
+
+	const friendRequestValidation = async (friendRequestDto: FriendRequestDto) => {
+
+		const response = await fetch('http://localhost:3001/users/acceptFriendRequest', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`
+			},
+			body: JSON.stringify(friendRequestDto),
+		});
+
+		if (response.ok) {
+			console.log("User added to your friend list!");
+			const roomName = friendRequestDto.initiatorLogin + friendRequestDto.recipientLogin;
+			if (userSocket.connected) {
+				userSocket.emit('friendRequestAccepted', friendRequestDto);
+				userSocket.emit('joinFriendRoom', roomName);
+			}
+		}
+		else {
+			console.error("Fatal error: friend request failed");
+		}
+	};
+
+	const FriendRequestReceived = ({ closeToast, toastProps, friendRequestDto }: any) => (
+		<div>
+		  You received a friend request from  {friendRequestDto.initiatorLogin}
+		  <button style={{ padding: '10px '}} onClick={() => friendRequestValidation(friendRequestDto)}>Accept</button>
+		  <button onClick={closeToast}>Deny</button>
+		</div>
+	)
+
+	const FriendRequestAccepted = ({ closeToast, toastProps, friendRequestDto }: any) => (
+		<div>
+		  {friendRequestDto.recipientLogin} has accepted your friend request!
+		  <button onClick={closeToast}>Understand!</button>
+		</div>
+	)
+
+	const setUserSession = async (jwt: string) => {
+
+		const jwtArray = jwt?.split('.');
+		if (jwtArray.length != 0) {
+			const payload = JSON.parse(atob(jwtArray[1]));
+			console.log(payload.sub);
+			console.log(payload.login);
+			sessionStorage.setItem("currentUserID", payload.sub);
+			sessionStorage.setItem("currentUserLogin", payload.login);
+			if (payload.tfa_enabled) {
+				setShow2FAForm(true);
+			}
+		}
+	}
+
+	const handleAccessToken = async (code: any): Promise<boolean> => {
+
+		if (sessionStorage.getItem("jwt"))
+			return true;
+
+		const response = await fetch('http://localhost:3001/auth/access', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify({code}),
+		});
+
+		if (response.ok) {
+
+			console.log("-- Access granted --");
+			const token = await response.json();
+			sessionStorage.setItem("jwt", token.access_token);
+			const jwt = sessionStorage.getItem("jwt");
+			if (jwt) {
+				await setUserSession(jwt);
+				// Attention a la 2fa
+				setAuthValidated(true);
+				return true;
+			}
+			else
+				return false;
+		}
+
+		return false;
+	}
+
+
+	const handle2FADone = () => {
+		setShow2FAForm(false);
+	}
+
+	// Multi-purpose useEffect for socket handling
+	useEffect(() => {
+		
+		userSocket.on('friendRequest', (friendRequestDto: FriendRequestDto) => {
+			toast(<FriendRequestReceived friendRequestDto={friendRequestDto}/>);
+		});
+
+		userSocket.on('friendRequestAcceptedNotif', (friendRequestDto: FriendRequestDto) => {
+			toast(<FriendRequestAccepted friendRequestDto={friendRequestDto}/>);
+			const roomName = friendRequestDto.initiatorLogin + friendRequestDto.recipientLogin;
+			userSocket.emit('joinFriendRoom', roomName);
+		})
+
+		userSocket.on('userJoinedRoom', (notification: string) => {
+			console.log("User socket in main: ", userSocket.id);
+			console.log("Notif from server: ", notification);
+			// on peut toast ici ou gerer autrement
+		});
+
+		return () => {
+			userSocket.off('friendRequest');
+			userSocket.off('friendRequestAcceptedNotif');
+			userSocket.off('userJoinedRoom');
+		}
+	}, [userSocket]);
+
+	// Connection - Deconnection useEffect
+	useEffect(() => {
+		
+		userSocket.on('connect', () => {
+			console.log("UserSocket new connection : ", userSocket.id);
+			const personnalRoom = sessionStorage.getItem("currentUserLogin");
+			userSocket.emit('joinPersonnalRoom', personnalRoom, sessionStorage.getItem("currentUserID"));
+		})
+
+		userSocket.on('disconnect', () => {
+			console.log('UserSocket disconnected from the server : ', userSocket.id);
+		})
+
+		return () => {
+			userSocket.off('connect');
+			userSocket.off('disconnect');
+		}
+
+	}, [userSocket])
+
+	// Game socket handler
+	useEffect(() => {
+
+		gameSocket.on('connect', () => {
+			console.log('GameSocket new connection : ', gameSocket.id);
+		})
+
+		gameSocket.on('disconnect', () => {
+			console.log('GameSocket disconnected from the server : ', gameSocket.id);
+		})
+
+		return () => {
+			console.log('Unregistering events...');
+			gameSocket.off('connect');
+			gameSocket.off('disconnect');
+		}
+	}, [gameSocket])
+
+	// Login form useEffect
+	useEffect(() => {
+		if (code && showLogin) {
+			handleAccessToken(code).then(result => {
+				setShowLogin(false);
+			})
+		}
+	}, [showLogin]);
+
+	// For testing purpose : no 42 form on connection
+	// useEffect(() => {
+	// 	if (sessionStorage.getItem("currentUserLogin") != null)
+	// 		setShowLogin(false);
+	// });
+	
 		return (
 			<RootLayout>
 				<GlobalProvider>
@@ -197,7 +231,7 @@ export default function Home()   {
 							<>
 							{/* <SetComponent/> */}
 							<Header/>
-							<BodyComponent socket={socket} />
+							<BodyComponent userSocket={userSocket} gameSocket={gameSocket}/>
 						</>
 						)}	
 				</GlobalProvider>

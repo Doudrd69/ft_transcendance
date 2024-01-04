@@ -5,6 +5,7 @@ import { useChat } from '../../../ChatContext';
 import AddFriendComponent from '../../addConversation/AddFriends';
 import { Socket } from 'socket.io-client';
 
+
 interface FriendShip {
 	id: number;
 	isAccepted: true;
@@ -26,6 +27,7 @@ const FriendsListComponent: React.FC<FriendsListComponentProps> = ({socket}) => 
 
 
 	const disableTabFriendsList = () =>setTabFriendsList(false);
+
 	const activateTabFriendsList = (index: number) => {
 		if (activeIndex === index) {
 		  setActiveIndex(null);
@@ -41,32 +43,12 @@ const FriendsListComponent: React.FC<FriendsListComponentProps> = ({socket}) => 
 		
 		if (response.ok) {
 			const data = await response.json();
-			setFriendList((prevFriendList: FriendShip[]) => [...prevFriendList, ...data]);
+			setFriendList([...data]);
 		}
 		else {
 			console.log("Fatal error: no friend list");
 		}
 	}
-	useEffect(() => {
-		loadFriendList();
-	}, []);
-	
-	const userData = {
-		discussion: friendList,
-		online:[
-			"on",
-			"off",
-			"on",
-			"on",
-			"off",
-			"on",
-			"on",
-		]
-	};
-
-	useEffect(() => {
-		// console.log("FriendList in useEffect: ", friendList);
-	  }, [friendList]);
 
 	useEffect(() => {
 		console.log("Loading friend list...");
@@ -99,7 +81,7 @@ const FriendsListComponent: React.FC<FriendsListComponentProps> = ({socket}) => 
 			</div>
 		  ))}
 		</div>
-	)
+	) 
 }
 
 export default FriendsListComponent;

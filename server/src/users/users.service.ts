@@ -7,7 +7,8 @@ import { Friendship } from './entities/friendship.entity'
 import { speakeasy } from 'speakeasy'
 import { QRCode } from 'qrcode'
 import { FriendRequestDto } from './dto/FriendRequestDto.dto';
-import { Conversation } from 'src/chat/entities/conversation.entity';
+import { ChatService } from '../chat/chat.service';
+import { UpdateUsernameDto } from './dto/UpdateUsernameDto.dto';
 
 @Injectable()
 export class UsersService {
@@ -16,22 +17,25 @@ export class UsersService {
 		private usersRepository: Repository<User>,
 		@InjectRepository(Friendship)
 		private friendshipRepository: Repository<Friendship>,
+		private chatService: ChatService,
 	) {}
 
 	/**************************************************************/
 	/***							2FA							***/
 	/**************************************************************/
 
-	register2FATempSecret(login: string, secret: string) {
-		this.getUserByLogin(login).then(userToUpdate => {
+	async register2FATempSecret(userID: number, secret: string) {
+
+		const userToUpdate = await this.usersRepository.findOne({ where: {id: userID} });
+		if (userToUpdate) {
 			userToUpdate.TFA_temp_secret = secret;
 			return this.usersRepository.save(userToUpdate);
-		}).catch(error => {
-			throw new Error(error);
-		});
+		}
+
+		return ;
 	}
 
-	save2FASecret(user: User, code: any, flag: boolean) {
+	save2FASecret(user: User, code: string, flag: boolean) {
 		// hash le code?
 		user.TFA_secret = code;
 		user.TFA_isEnabled = flag;
@@ -71,16 +75,7 @@ export class UsersService {
 	
 		return user.avatarURL;
 	  }
-	  
-	updateUsername(login: string, newUsername: string) {
-		this.getUserByLogin(login).then(userToUpdate => {
-			userToUpdate.username = newUsername;
-			return this.usersRepository.save(userToUpdate);
-		}).catch(error => {
-			console.log("Cannot update username :", error);
-			throw new Error(error);
-		});
-	}
+
 	// async deleteUserAvatar(data: Buffer, fileName:string , userID: number) {
 		
 	// 	const avatar = await this.avatarService.create(userID, data, fileName);
@@ -102,19 +97,21 @@ export class UsersService {
 	// 	return this.avatarService.getAvatarByID(user.avatarID);
 	//   }
 
-	// async createNewUser(username: string, password: string): Promise<User> {
-	// 	const userToCreate = await this.usersRepository.findOne({ where: { username } });
-	// 	if (!userToCreate) {
-	// 		const saltOrRounds = 10;
-	// 		if (this.passwordPolicy(password)) {
-	// 			password = await bcrypt.hash(password, saltOrRounds);
-	// 			const newUser = this.usersRepository.create({ username, password });
-	// 			return await this.usersRepository.save(newUser);
-	// 		}
-	// 		throw new Error('Password policy : 8 characters minimum');
-	// 	}
-	// 	throw new Error('User with this username already exists');
-	// }
+	// Testing purpose - Maybe future implementation
+	async createNewUser(username: string): Promise<User> {
+		const userToCreate = await this.usersRepository.findOne({ where: {username: username } });
+		if (!userToCreate) {
+			// const saltOrRounds = 10;
+			// password = await bcrypt.hash(password, saltOrRounds);
+			const newUser = new User();
+			newUser.login = username;
+			newUser.firstname = username;
+			newUser.username = username;
+			newUser.officialProfileImage = "";
+			return await this.usersRepository.save(newUser);
+		}
+		throw new Error('User with this username already exists');
+	}
 
 	// async deleteUser(username: string) {
 	// 	const userToDelete = await this.usersRepository.findOne({ where: { username } });
@@ -124,7 +121,16 @@ export class UsersService {
 	// 	throw new NotFoundException();
 	// }
 
-	async createNew42User(userData) {
+	async updateUserStatus(userID: number, flag: boolean) {
+
+		const user = await this.usersRepository.findOne({where: { id: userID }});
+		if (user) {
+			user.isActive = flag;
+			return await this.usersRepository.save(user);
+		}
+	}
+
+	async createNew42User(userData): Promise<User> {
 		const new42User = new User();
 		new42User.login = userData.login;
 		new42User.firstname = userData.firstname;
@@ -133,46 +139,67 @@ export class UsersService {
 		return this.usersRepository.save(new42User);
 	}
 
+	async updateUsername(updateUsernameDto: UpdateUsernameDto): Promise<User> {
+
+		const user = await this.usersRepository.findOne({ where: {id: updateUsernameDto.userID} });
+		if (user) {
+			user.username = updateUsernameDto.newUsername;
+			return await this.usersRepository.save(user);
+		}
+
+		console.error("Fatal error: user not found");
+		return;
+	}
 
 	/**************************************************************/
 	/***				FRIENDSHIP MANAGEMENT					***/
 	/**************************************************************/
 
-	async createFriendship(friendRequestDto: FriendRequestDto) {
+	async createFriendship(friendRequestDto: FriendRequestDto): Promise<Friendship | null> {
 
+		// recherche par login ou username?
 		const initiator = await this.usersRepository.findOne({
 			where: {login: friendRequestDto.initiatorLogin},
 			relations: ["initiatedFriendships"],
 		});
 
-		const friend = await this.usersRepository.findOne({
+		// recherche par login ou username?
+		const recipient = await this.usersRepository.findOne({
 			where: {login: friendRequestDto.recipientLogin},
 			relations: ["initiatedFriendships"],
 		});
 
-		if (initiator && friend) {
-			console.log("Initiator -> ", initiator.initiatedFriendships);
-			console.log("Friend    -> ", friend.initiatedFriendships);
-
-			let newFriendship = new Friendship();
-			newFriendship.initiator = initiator;
-			newFriendship.friend = friend;
-			await this.friendshipRepository.save(newFriendship);
-			return newFriendship;
+		if (initiator && recipient) {
+			
+			const friendshipAlreadyExists = await this.friendshipRepository.findOne({
+				where: {initiator: initiator, friend: recipient},
+			});
+			
+			if (!friendshipAlreadyExists) {
+	
+				let newFriendship = new Friendship();
+				newFriendship.initiator = initiator;
+				newFriendship.friend = recipient;
+				await this.friendshipRepository.save(newFriendship);
+				return newFriendship;
+			}
+			// if the frienship already exists between the users, don't do anything
+			return null;
 		}
-
-		return ;
+		throw Error("Fatal error");
 	}
 	
 	async updateFriendship(friendRequestDto: FriendRequestDto, flag: boolean): Promise<Friendship> {
+
+		// recherche par login ou username?
 		const initiator = await this.usersRepository.findOne({
-		  where: { login: friendRequestDto.initiatorLogin },
-		  relations: ["initiatedFriendships", "acceptedFriendships"],
+			where: {login: friendRequestDto.initiatorLogin},
+			relations: ["initiatedFriendships", "acceptedFriendships", "groups"],
 		});
 	  
 		const friend = await this.usersRepository.findOne({
-		  where: { login: friendRequestDto.recipientLogin },
-		  relations: ["initiatedFriendships", "acceptedFriendships"],
+			where: {id: friendRequestDto.recipientID},
+			relations: ["initiatedFriendships", "acceptedFriendships", "groups"],
 		});
 	  
 		if (initiator && friend) {
@@ -183,52 +210,77 @@ export class UsersService {
 		  if (friendshipToUpdate) {
 			friendshipToUpdate.isAccepted = flag;
 			await this.friendshipRepository.save(friendshipToUpdate);
-			console.log("Update -> ", friendshipToUpdate);
+
+			if (flag) {
+				const status = this.chatService.createFriendsConversation(initiator, friend);
+				console.log(status);
+			}
+
 			return friendshipToUpdate;
 		  }
 		}
-	  
-		return null;
+		console.error("Fatal error: could not find user");
+		return ;
 	}
 
-	async acceptFriendship(friendRequestDto: FriendRequestDto) {
+	async acceptFriendship(friendRequestDto: FriendRequestDto): Promise<Friendship> {
 
-		const newFriend = await this.updateFriendship(friendRequestDto, true);
-		if (newFriend) {
-			console.log(friendRequestDto.initiatorLogin, " is now in your friend list!");
-			return newFriend
+		const newFriendship = await this.updateFriendship(friendRequestDto, true);
+		if (newFriendship) {
+			console.log("Updated friendship : ", newFriendship);
+			return newFriendship;
 		}
-		console.log("Fatal error: could not add ", friendRequestDto.initiatorLogin, " to your friend list");
+		console.log("Fatal error");
 		return ;
 	}
 
 	/**************************************************************/
 	/***					GETTERS						***/
 	/**************************************************************/
-		
-	findUserByLogin(loginToSearch: string) {
-		return this.usersRepository.findOne({ where: {login: loginToSearch}});
-	}
 
 	async getUserByID(userID: number): Promise<User> {
-		return await this.usersRepository.findOne({ where: {id: userID}});
+		return await this.usersRepository.findOne({ where: {id: userID} });
 	}
 
-	getUserByLogin(loginToSearch: string): Promise<User> {
-		return this.usersRepository.findOne({ where: {login: loginToSearch}});
+	async getUserByLogin(loginToSearch: string): Promise<User> {
+		return await this.usersRepository.findOne({ where: {login: loginToSearch}});
 	}
 
 	async getFriendships(username: string): Promise<Friendship[]> {
-		const user = await this.usersRepository.findOne({
-		  where: { login: username },
-		  relations: ["initiatedFriendships", "initiatedFriendships.friend"],
+
+		console.log(username, "friend list loading...");
+		let user = new User();
+		// recherche par login ou username?
+		user = await this.usersRepository.findOne({
+			where: {login: username},
+			relations: ["initiatedFriendships.friend", "acceptedFriendships.initiator"],
 		});
-	  
+
 		if (user) {
-		  const friends = user.initiatedFriendships.filter((friendship) => friendship.isAccepted);
-		  return friends;
+			let initiatedfriends = await user.initiatedFriendships.filter((friendship: Friendship) => friendship.isAccepted);
+			let acceptedfriends = await user.acceptedFriendships.filter((friendship: Friendship) => friendship.isAccepted);
+			const friends = [...initiatedfriends, ...acceptedfriends];
+			return friends;
 		}
-	  
 		return [];
-	  }
+	}
+
+	async getPendingFriendships(username: string): Promise<Friendship[]> {
+
+		console.log(username, " pending friendships loading...");
+		let user = new User();
+		// recherche par login ou username?
+		user = await this.usersRepository.findOne({
+			where: {login: username},
+			relations: ["initiatedFriendships.friend", "acceptedFriendships.initiator"],
+		});
+
+		if (user) {
+			let initiatedfriends = await user.initiatedFriendships.filter((friendship: Friendship) => !friendship.isAccepted);
+			let acceptedfriends = await user.acceptedFriendships.filter((friendship: Friendship) => !friendship.isAccepted);
+			const friends = [...initiatedfriends, ...acceptedfriends];
+			return friends;
+		}
+		return ;
+	}
 }

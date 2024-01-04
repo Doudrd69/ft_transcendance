@@ -9,7 +9,7 @@ interface ChannelListComponentProps {
   }
 
 interface Conversation {
-	id: number,
+	id: string,
 	name: string;
 	is_channel:boolean;
 }
@@ -18,7 +18,7 @@ const ChatListComponent: React.FC<ChannelListComponentProps> = ({ socket }) => {
 
 	const { state, dispatch } = useChat();
 	const [conversations, setConversations] = useState<Conversation[]>([]);
-	const user = sessionStorage.getItem("currentUserLogin");
+	const user = Number(sessionStorage.getItem("currentUserID"));
 
 	const updateConversations = async () => {
 		const response = await fetch(`http://localhost:3001/chat/getConversations/${user}`, {
@@ -38,16 +38,20 @@ const ChatListComponent: React.FC<ChannelListComponentProps> = ({ socket }) => {
 	
 	const loadDiscussions = async () => {
 
-		const response = await fetch(`http://localhost:3001/chat/getConversations/${user}`, {
+		const response = await fetch(`http://localhost:3001/chat/getConversationsWithStatus/${user}`, {
 			method: 'GET',
+			headers: {
+				'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
+			}
 		});
 
 		if (response.ok) {
-			const userData = await response.json();
-			console.log("DM (groups) : ", userData);
-			setConversations((prevConversations: Conversation[]) => [...prevConversations, ...userData]);
-			console.log(conversations);
-		}
+			const conversationsData = await response.json();
+			const { conversations, isAdmin } = conversationsData;
+			console.log("==> ", isAdmin);
+
+			setConversations((prevConversations: Conversation[]) => [...prevConversations, ...conversations]);
+		} 
 		else {
 			console.log("Fatal error");
 		}
@@ -55,21 +59,14 @@ const ChatListComponent: React.FC<ChannelListComponentProps> = ({ socket }) => {
 
 	const userData = {
 		discussion: conversations,
-		online:[
-			"on",
-			"off",
-			"on",
-			"on",
-			"off",
-			"on",
-			"on",
-		]
+		online:["on", "off", "on", "on", "off", "on", "on"],
 	}
 
 	useEffect(() => {
-		console.log("Loading converssations...");
+		console.log("Loading DMs...");
 		loadDiscussions();
 	}, []);
+
 	return (
 		<div className="bloc-discussion-list">
 			<button
@@ -83,12 +80,16 @@ const ChatListComponent: React.FC<ChannelListComponentProps> = ({ socket }) => {
 			{state.showAddUser && <AddConversationComponent socket={socket} updateConversations={updateConversations} title="Add/Create Conversation" isChannel={false}/>}
 			{userData.discussion.map((conversation, index) => (
 				!conversation.is_channel && (
-						<div key={index} className="bloc-button-discussion-list">
-							<div className={`profil-discussion-list ${userData.online[index]}`} />
-								<button className="discussion-list" onClick={() => dispatch({ type: 'TOGGLE', payload: 'showChat'})}>
-									<span>{conversation.name}</span>
-								</button>
-						</div>
+					<div key={index} className="bloc-button-discussion-list">
+						<div className={`profil-discussion-list ${userData.online[index]}`} />
+							<button key={index} className="button-discussion-list" onClick={() => {
+								dispatch({ type: 'TOGGLE', payload: 'showChat' });
+								dispatch({ type: 'SET_CURRENT_CONVERSATION', payload: conversation.name });
+								dispatch({ type: 'SET_CURRENT_CONVERSATION_ID', payload: conversation.id });
+		  					}}>
+								<span>{conversation.name}</span>
+							</button>
+					</div>
 				)
 			))}
 		</div>

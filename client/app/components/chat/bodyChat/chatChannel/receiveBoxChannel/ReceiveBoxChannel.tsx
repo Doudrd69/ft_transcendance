@@ -1,17 +1,18 @@
 import './ReceiveBoxChannel.css'
 import React, { useState , useEffect, useRef } from 'react';
 import { Socket } from 'socket.io-client'
+import { useChat } from '../../../ChatContext';
 
 interface Message {
 	from: string;
 	content: string;
 	post_datetime: string;
-	conversationName: string;
+	conversationID: number;
 }
 
 const ReceiveBoxChannelComponent = (socket: {socket: Socket}) => {
 
-	const conversationName = "test2";
+	const { state } = useChat();
 	const socketInUse = socket.socket;
 	const [messages, setMessages] = useState<Message[]>([]);
 	const messagesContainerRef = useRef<HTMLDivElement>(null);
@@ -42,11 +43,14 @@ const ReceiveBoxChannelComponent = (socket: {socket: Socket}) => {
 	  };
 
 	// This function will retreive all the messages from the conversation and set the messages array for display
-	const getMessage = async () => {
+	const getMessages = async () => {
 		
 		try {
-			const response = await fetch (`http://localhost:3001/chat/getMessages/${conversationName}`, {
+			const response = await fetch (`http://localhost:3001/chat/getMessages/${state.currentConversationID}`, {
 				method: 'GET',
+				headers: {
+					'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
+				}
 			});
 			
 			if (response.ok) {
@@ -60,12 +64,18 @@ const ReceiveBoxChannelComponent = (socket: {socket: Socket}) => {
 
 	// Here we retreive the last sent message and we "insert" it in the messages array
 	useEffect(() => {
+
+		socketInUse.on('userJoinedRoom', (notification: string) => {
+			console.log("Channel log: ", notification);
+		});
+
 		socketInUse.on('onMessage', (message: Message) => {
 			if (message)
 				setMessages((prevMessages: Message[]) => [...prevMessages, message]);
 		});
-		
+
 		return () => {
+			socketInUse.off('userJoinedRoom');
 			socketInUse.off('onMessage')
 		}
 	}, [socketInUse]);
@@ -73,7 +83,7 @@ const ReceiveBoxChannelComponent = (socket: {socket: Socket}) => {
 	// Loading the conversation (retrieving all messages on component rendering)
 	useEffect(() => {
 		console.log("Loading conversation...");
-		getMessage();
+		getMessages();
 	}, []);
 
 	useEffect(() => {
@@ -82,9 +92,9 @@ const ReceiveBoxChannelComponent = (socket: {socket: Socket}) => {
 
 	return (
 		<div ref={messagesContainerRef} className="bloc-channel-chat">
-			{messages.map((message: Message) => (
+			{messages.map((message: Message, id: number) => (
 				<>
-					<div className={`message-container ${isMyMessage(message) ? 'my-message' : 'other-message'}`}>
+					<div key={id} className={`message-container ${isMyMessage(message) ? 'my-message' : 'other-message'}`}>
 						<p className="channel-chat-content">{message.content}</p>
 						<p className="channel-chat-date">{formatDateTime(message.post_datetime)}</p>
 					</div>

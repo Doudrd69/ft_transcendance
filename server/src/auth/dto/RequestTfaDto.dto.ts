@@ -5,30 +5,21 @@ import {
 	IsString,
 	IsAlpha,
 	IsAlphanumeric,
-	IsInt,
 	Length,
 	IsNotEmpty,
+	IsPositive,
 	IsEmail, // Checks if the string is an email: @IsEmail(options?: IsEmailOptions)
 	IsFQDN,
 	IsAscii,
 	IsDate,
 	Min,
 	Max,
-	Matches,
   } from 'class-validator';
 
-export class FriendRequestDto {
+export class RequestTfaDto {
 
-	@IsNotEmpty()
-	@IsString()
-	initiatorLogin: string;
-
-	@IsNotEmpty()
-	@Length(6, 20)
-	@IsAscii()
-	@IsAlphanumeric()
-	@Matches(/^[^"';%()|<>\\]*$/)
-	recipientLogin: string;
-
-	recipientID?: number;
+    @IsNotEmpty()
+	@IsPositive()
+	@Max(1000)
+    userID: number;
 }

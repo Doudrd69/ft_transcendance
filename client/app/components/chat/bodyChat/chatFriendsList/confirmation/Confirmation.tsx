@@ -4,7 +4,7 @@ import { useChat } from '../../../ChatContext';
 
 interface ConfirmationComponentProps {
 	phrase: string;
-  }
+}
   
   const ConfirmationComponent: React.FC<ConfirmationComponentProps> = ({ phrase }) => {
 	const {state, dispatch} = useChat();

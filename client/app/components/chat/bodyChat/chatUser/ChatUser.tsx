@@ -15,7 +15,6 @@ const ChatUserComponent = (socket: {socket: Socket} ) => {
 
   return (
 	<div className="chat-user">
-
 		{renderComponent(<ChatListComponent socket={socket.socket}/>, state.showChatList)}
 		{renderComponent(<ReceiveBoxComponent socket={socket.socket} />, state.showChat)}
 		{renderComponent(<SendBoxComponent socket={socket.socket}/>, state.showChat)}

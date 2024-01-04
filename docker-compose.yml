@@ -48,8 +48,6 @@ services:
       - '3000:3000'
     volumes:
       - ./client/app:/srv/app/admin-client/app
-      # -./client:/app/
-      # - ./client/public:/srv/app/admin-client/public
     networks:
       - app-network
 

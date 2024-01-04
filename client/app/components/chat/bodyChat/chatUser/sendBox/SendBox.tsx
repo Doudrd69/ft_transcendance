@@ -1,9 +1,11 @@
 import './SendBox.css'
 import React, { useState } from 'react';
 import { Socket } from 'socket.io-client'
+import { useChat } from '../../../ChatContext';
 
 const SendBoxComponent = (socket: {socket: Socket}) => {
 
+	const { state } = useChat();
 	const socketInUse = socket.socket;
 	const [messageValue, setMessageValue] = useState('');
 
@@ -12,11 +14,10 @@ const SendBoxComponent = (socket: {socket: Socket}) => {
 	};
 	
 	const messageDto = {
-		from: sessionStorage.getItem("currentUserLogin"), // when 42log is true
-		// from: "ebrodeur",	// when 42log is false
+		from: sessionStorage.getItem("currentUserLogin"),
 		content: messageValue,
 		post_datetime: new Date(),
-		conversationName: "test2",
+		conversationID: state.currentConversationID,
 	}
 
 	const handleMessage = async (e: React.FormEvent) => {
@@ -24,34 +25,29 @@ const SendBoxComponent = (socket: {socket: Socket}) => {
 		e.preventDefault();
 
 		if (socketInUse.connected) {
-				socketInUse.emit('message', messageDto, () => {
-					console.log("!! SOCKET EMIT on message !!");
-				});
-			socketInUse.off('message');
+			socketInUse.emit('message', { dto: messageDto, conversationName: state.currentConversation } , () => {
+				console.log("Message sent!");
+			});
+		}
+		else {
+			console.log("Client is not connected");
+		}
 
-			if (socketInUse.connected) {
-				socketInUse.emit('message', messageDto, () => {
-					console.log("Message Sent!");
-				});
-			}
-			else {
-				console.log("Socket not connected");
-			}
-
-			const response = await fetch('http://localhost:3001/chat/newMessage', {
+		const response = await fetch('http://localhost:3001/chat/newMessage', {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
+					'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
 				},
 				body: JSON.stringify(messageDto),
-			});
+		});
 				
-			if (response.ok) {
-				console.log("Message sent and created in DB");
-			}
-			else {
-				console.log("Message creation failed");
-			}
+		if (response.ok) {
+			console.log("Message sent and created in DB");
+		}
+		else {
+			const error = await response.json();
+			console.log("Error: ", error.message[0]);
 		}
 	}
 

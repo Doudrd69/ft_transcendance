@@ -1,7 +1,7 @@
 import './GamePong.css';
 import React, { useState, useEffect } from 'react';
 
-const Pong: React.FC = () => {
+const PongComponent: React.FC = () => {
 
     const [ballX, setBallX] = useState<number>(50);
     const [ballY, setBallY] = useState<number>(50);
@@ -132,10 +132,10 @@ const updateBallPosition = () => {
                 </div>
             </div>
             <div className="ball" style={{ left: `${ballX}%`, top: `${ballY}%` }}></div>
-            <div className="paddle" style={{ top: `${paddleY}%`, left: '26%' }}></div>
-            <div className="paddle" style={{ right: 0, top: `${paddleY1}%` }}></div>
+            <div className="pongpaddle" style={{ top: `${paddleY}%`, left: '26%' }}></div>
+            <div className="pongpaddle" style={{ right: 0, top: `${paddleY1}%` }}></div>
         </div>
     );  
 };
 
-export default Pong;
+export default PongComponent;

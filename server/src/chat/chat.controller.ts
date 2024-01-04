@@ -1,33 +1,28 @@
-import { Controller, Post, HttpCode, HttpStatus, Body, Get, Param} from '@nestjs/common';
+import { Controller, Post, HttpCode, HttpStatus, Body, Get, Param, UseGuards } from '@nestjs/common';
 import { ChatService } from './chat.service';
 import { GroupDto } from './dto/group.dto';
 import { MessageDto } from './dto/message.dto';
 import { ConversationDto } from './dto/conversation.dto';
-import { User } from '../users/entities/users.entity'
 import { Conversation } from './entities/conversation.entity';
 import { Message } from './entities/message.entity';
 import { GroupMember } from './entities/group_member.entity';
-import { GeneralGateway } from 'src/gateway/gateway';
+import { AuthGuard } from 'src/auth/auth.guard';
 
 @Controller('chat')
 export class ChatController {
 	constructor(private chatService: ChatService) {}
-	
+
+	@UseGuards(AuthGuard)
 	@HttpCode(HttpStatus.OK)
 	@Post('newConversation')
 	createNewConversation(@Body() conversationDto: ConversationDto): Promise<Conversation> {
 		return this.chatService.createConversation(conversationDto);
 	}
 
-	// @HttpCode(HttpStatus.OK)
-	// @Post('newGroup')
-	// createNewGroupMember(@Body() groupDto: GroupDto): Promise<GroupMember> {
-	// 	return this.chatService.createGroupMember(groupDto);
-	// }
-
+	@UseGuards(AuthGuard)
 	@HttpCode(HttpStatus.OK)
 	@Post('newMessage')
-	createNewMessage(@Body() messageDto: MessageDto) {
+	createNewMessage(@Body() messageDto: MessageDto): Promise<Message> {
 		return this.chatService.createMessage(messageDto);
 	}
 
@@ -36,13 +31,21 @@ export class ChatController {
 		return this.chatService.getMessageById(id);
 	}
 
-	@Get('getMessages/:conversationName')
-	getMessagesFromConversation(@Param('conversationName') conversationName: string): Promise<Message[]> {
-		return this.chatService.getMessages(conversationName);
+	@UseGuards(AuthGuard)
+	@Get('getMessages/:conversationID')
+	getMessagesFromConversation(@Param('conversationID') conversationID: number): Promise<Message[]> {
+		return this.chatService.getMessages(conversationID);
 	}
 
-	@Get('getConversations/:userName')
-	getConversationsFromUser(@Param('userName') userName: string): Promise <GroupMember[]> {
-		return this.chatService.getConversations(userName);
+	@Get('getConversations/:userID')
+	getConversationsFromUser(@Param('userID') userID: number): Promise<GroupMember[]> {
+		return this.chatService.getConversations(userID);
+	}
+
+	// verifier que le number est bon
+	@UseGuards(AuthGuard)
+	@Get('getConversationsWithStatus/:userID')
+	getConversationsRightsFromUser(@Param('userID') userID: number) {
+		return this.chatService.getConversationsWithStatus(userID);
 	}
 }

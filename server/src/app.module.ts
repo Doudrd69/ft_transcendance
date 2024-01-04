@@ -13,7 +13,8 @@ import { ChatModule } from './chat/chat.module';
 import { GatewayModule } from './gateway/gateway.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
-
+import { GameModule } from './game/game.module';
+import { GameGatewayModule } from './game_gateway/gameGateway.module';
 
 //We set the synchronize option to true, which means that TypeORM will automatically
 //generate database tables based on the entities. However, this option should be used
@@ -60,7 +61,12 @@ if (!dbPass || !dbUsername || !dbName || !dbHost) {
 
     GatewayModule,
 
+    GameGatewayModule,
+
+    GameModule,
+
   ],
   controllers: [AppController],
+  providers: [AppService],
 })
 export class AppModule {}

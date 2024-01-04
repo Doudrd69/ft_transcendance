@@ -3,25 +3,29 @@ import React from 'react'
 import GameMenuComponent from './gameMenu/GameMenu';
 import MatchMakingComponent from './gameMenu/gameStart/GameStart'
 import SettingsComponent from './gameMenu/gameSettings/gameSettings'
-import {useGame } from './GameContext'
-import Pong from './gamePong/GamePong';
+import {GameProvider, useGame } from './GameContext'
+import PongComponent from './gamePong/GamePong';
 import SettingsDisplay from './gameMenu/gameSettings/settingsDisplay/SettingsDisplay';
 import SettingsGame from './gameMenu/gameSettings/settingsGame/SettingsGame';
 import SettingsKeyboard from './gameMenu/gameSettings/settingsKeyboard/SettingsKeyboard';
+import { Socket } from 'socket.io-client'
 
-const GameComponent: React.FC = () => {
-	const { showGameMatchmaking, showGameSettings, showGameMenu, showSettingsDisplay, showSettingsGame, showSettingsKeyboard} = useGame();
-	
+const GameComponent = (socket: {socket: Socket}) => {
+
+	const { state, dispatch } = useGame();
+
+	const renderComponent = (component: React.ReactNode, condition: boolean) =>
+	  condition ? component : null;
+
 	return (
 	  		<div className="right-half">
-				{/* {showGameMatchmaking && <MatchMakingComponent/>}
-				{showGameMenu && <GameMenuComponent/>}
-				{showGameSettings && <SettingsComponent></SettingsComponent>}
-				{showSettingsDisplay && <SettingsDisplay></SettingsDisplay>}
-				{showSettingsGame && <SettingsGame></SettingsGame>}
-				{showSettingsKeyboard && <SettingsKeyboard></SettingsKeyboard>} */}
-				{showGameSettings && <SettingsComponent></SettingsComponent>}
-				{/* <Pong></Pong> */}
+				{renderComponent(<MatchMakingComponent socket={socket.socket} />, state.showGameMatchmaking)}
+				{renderComponent(<GameMenuComponent socket={socket.socket} />, state.showGameMenu)}
+				{renderComponent(<SettingsComponent/>, state.showGameSettings)}
+				{renderComponent(<SettingsDisplay/>, state.showSettingsDisplay)}
+				{renderComponent(<SettingsGame/>, state.showSettingsGame)}
+				{renderComponent(<SettingsKeyboard/>, state.showSettingsKeyboard)}
+				{renderComponent(<PongComponent/>, state.showGame)}
 	  		</div>
 	);
   };

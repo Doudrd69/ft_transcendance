@@ -17,29 +17,38 @@ const AddComponent = (socket: {socket: Socket}) => {
 
 		e.preventDefault();
 
-		console.log("Conversation to create :", formValues[index]);
-		
-		console.log(formValues[index]);
 		const conversationDto = {
 			name: formValues[index],
-			username: sessionStorage.getItem("currentUserLogin"),
+			userID: Number(sessionStorage.getItem("currentUserID")),
 			is_channel: true,
 		}
-		console.log(conversationDto);
 
 		const response = await fetch('http://localhost:3001/chat/newConversation', {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
+				'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
 			},
 			body: JSON.stringify(conversationDto),
 		});
 
 		if (response.ok) {
+			const data = await response.json();
+
+			if (socketInUse.connected) {
+				socketInUse.emit('joinRoom', { roomName: data.name, roomID: data.id }, () => {
+					console.log("Room creation loading...");
+				});
+			}
 			console.log("Conversation successfully created");
 		}
 		else {
 			console.log("Conversation creation failed");
+			const error = await response.json();
+			if (Array.isArray(error.message))
+				console.log(error.message[0]);
+			else
+				console.log(error.message);
 		}
 		return false;
 	}
@@ -48,9 +57,8 @@ const AddComponent = (socket: {socket: Socket}) => {
 
 		e.preventDefault();
 
-		console.log("Friend to add :", formValues[index]);
 		const friendRequestDto = {
-			initiatorLogin: sessionStorage.getItem("currentUserLogin"), // à remplacer
+			initiatorLogin: sessionStorage.getItem("currentUserLogin"),
 			recipientLogin: formValues[index],
 		}
 
@@ -58,20 +66,33 @@ const AddComponent = (socket: {socket: Socket}) => {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
+				'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
 			},
 			body: JSON.stringify(friendRequestDto),
 		});
 		
 		if (response.ok) {
-			console.log("Friend request successfully created");
-			if (socketInUse.connected) {
-				socketInUse.emit('addFriend', friendRequestDto, () => {
-					console.log("FriendRequest sent to General gateway");
+			const data = await response.json();
+
+			const socketFriendRequestDto = {
+				recipientID: data.friend.id,
+				recipientLogin: data.friend.login,
+				initiatorLogin: sessionStorage.getItem("currentUserLogin"),
+			}
+
+			if (socketInUse.connected && data) {
+				socketInUse.emit('addFriend', socketFriendRequestDto, () => {
+					console.log("FriendRequest sent to gateway");
 				});
 			}
 		}
 		else {
-			console.log("Friend request creation failed");
+			console.log("Friend request failed");
+			const error = await response.json();
+			if (Array.isArray(error.message))
+				console.log(error.message[0]);
+			else
+				console.log(error.message);
 		}
 	}
 

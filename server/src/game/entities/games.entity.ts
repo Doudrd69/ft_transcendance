@@ -1,26 +1,20 @@
 import { Entity, Column, PrimaryGeneratedColumn, ManyToMany, OneToMany } from 'typeorm';
 
 @Entity()
-export class GameData
+export class Game
 {
 	@PrimaryGeneratedColumn()
-  	id: number;
+  	gameId: number;
 
 	@Column()
-	player1: string;
+	playerOne: string;
 
 	@Column()
-	player2: string;
+	playerTwo: string;
 
 	@Column()
-	score1: number;
+	scoreOne: number;
 
 	@Column()
-	score2: number;
-
-	@Column()
-	duration: number;
-	
-	@Column()
-	startTime: Date;
+	scoreTwo: number;
 }

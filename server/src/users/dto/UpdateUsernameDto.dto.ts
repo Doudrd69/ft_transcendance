@@ -5,30 +5,29 @@ import {
 	IsString,
 	IsAlpha,
 	IsAlphanumeric,
-	IsInt,
 	Length,
 	IsNotEmpty,
 	IsEmail, // Checks if the string is an email: @IsEmail(options?: IsEmailOptions)
 	IsFQDN,
 	IsAscii,
+	IsPositive,
 	IsDate,
 	Min,
 	Max,
 	Matches,
   } from 'class-validator';
 
-export class FriendRequestDto {
+export class UpdateUsernameDto {
 
 	@IsNotEmpty()
-	@IsString()
-	initiatorLogin: string;
+	@IsPositive()
+	@Max(1000)
+	userID: number;
 
-	@IsNotEmpty()
-	@Length(6, 20)
+	@IsNotEmpty({ message: 'Please enter a new username'})
+	@Length(6, 20, { message: 'Username must be between 6 and 20 characters'})
 	@IsAscii()
 	@IsAlphanumeric()
 	@Matches(/^[^"';%()|<>\\]*$/)
-	recipientLogin: string;
-
-	recipientID?: number;
+	newUsername: string;
 }
