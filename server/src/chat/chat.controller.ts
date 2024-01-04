@@ -42,6 +42,7 @@ export class ChatController {
 		return this.chatService.getConversations(userID);
 	}
 
+	// verifier que le number est bon
 	@UseGuards(AuthGuard)
 	@Get('getConversationsWithStatus/:userID')
 	getConversationsRightsFromUser(@Param('userID') userID: number) {

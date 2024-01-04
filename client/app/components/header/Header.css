@@ -1,0 +1,67 @@
+.header {
+    /* width: 100%; */
+    height: 10%;
+    background-color: var(--second);
+    color: #fff;
+    display: flex;
+    align-items: center;
+	justify-content: center;
+	text-align: center;
+}
+.button-settings{
+	height: 100%;
+	width: 100%;
+	background-color: transparent;
+	border: none; 
+}
+.button-profils{
+	height: 100%;
+	width: 100%;
+	background-color: transparent;
+	border: none; 
+}
+.bloc-pong,
+.bloc-profils,
+.bloc-settings {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	height: 100%;
+}
+
+.bloc-pong{
+	width: 80vw;
+	font-family: 'Arial', sans-serif;
+	font-size: 40px;
+	font-weight: 700;
+	
+}
+.bloc-profils{
+	width: 10vw;
+}
+.bloc-settings{
+	width: 10vw;
+}
+.profils {
+    width: 70%;
+    height: 70%; /* La hauteur est définie par aspect-ratio */
+    aspect-ratio: 1 / 1; /* Maintient la forme carrée */
+    object-fit: contain;
+	border-radius: 10px;
+}
+.settings{
+	height: 50%; /* Ajustez la hauteur selon vos besoins */
+	width: auto;
+	object-fit: contain;
+	
+}
+.button-settings:hover .settings {
+	transform: rotate(80deg) scale(1.2);;
+	transition: transform 0.3s ease; /* Ajoutez une transition pour une animation fluide */
+  }
+
+.button-profils:hover .profils {
+	transform: scale(1.2);
+	transition: transform 0.3s ease; /* Ajoutez une transition pour une animation fluide */
+}
+  

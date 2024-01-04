@@ -13,11 +13,11 @@ const ChannelListComponent: React.FC = () => {
 	const { state, dispatch } = useChat();
 
 	const [conversations, setConversations] = useState<Conversation[]>([]);
-	const user = sessionStorage.getItem("currentUserID");
+	const userID = Number(sessionStorage.getItem("currentUserID"));
 
 	const loadDiscussions = async () => {
 
-		const response = await fetch(`http://localhost:3001/chat/getConversationsWithStatus/${user}`, {
+		const response = await fetch(`http://localhost:3001/chat/getConversationsWithStatus/${userID}`, {
 			method: 'GET',
 			headers: {
 				'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,

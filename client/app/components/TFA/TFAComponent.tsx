@@ -19,7 +19,7 @@ const TFAComponent: React.FC<TFAComponentProps>  = ({ on2FADone　}) => {
 		e.preventDefault();
 
 		const dto = {
-			userID: sessionStorage.getItem("currentUserID"),
+			userID: Number(sessionStorage.getItem("currentUserID")),
 			code: authenticatorCodeInput,
 		}
 
