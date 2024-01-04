@@ -11,6 +11,7 @@ import {
 	IsEmail, // Checks if the string is an email: @IsEmail(options?: IsEmailOptions)
 	IsFQDN,
 	IsAscii,
+	IsPositive,
     IsBoolean,
 	IsDate,
 	Min,
@@ -29,6 +30,8 @@ export class ConversationDto {
     name: string;
 
     @IsNotEmpty()
+	@IsPositive()
+	@Max(1000)
     userID: number;
 
     @IsNotEmpty()

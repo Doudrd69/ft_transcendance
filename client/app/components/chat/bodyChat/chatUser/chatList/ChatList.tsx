@@ -13,7 +13,7 @@ const ChatListComponent: React.FC = () => {
 	const { state, dispatch } = useChat();
 
 	const [conversations, setConversations] = useState<Conversation[]>([]);
-	const user = sessionStorage.getItem("currentUserID");
+	const user = Number(sessionStorage.getItem("currentUserID"));
 
 	const loadDiscussions = async () => {
 

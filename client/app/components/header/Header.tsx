@@ -43,7 +43,7 @@ const HeaderComponent: React.FC = () => {
 		e.preventDefault();
 
 		const tfaDto = {
-			userID: sessionStorage.getItem("currentUserID"),
+			userID: Number(sessionStorage.getItem("currentUserID")),
 		}
 
 		const response = await fetch('http://localhost:3001/auth/request2fa', {
@@ -70,7 +70,7 @@ const HeaderComponent: React.FC = () => {
 		e.preventDefault();
 
 		const dto = {
-			userID: sessionStorage.getItem("currentUserID"),
+			userID: Number(sessionStorage.getItem("currentUserID")),
 			code: authenticatorCodeInput,
 		}
 
