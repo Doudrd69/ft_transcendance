@@ -29,7 +29,7 @@ interface FriendRequestDto {
 export default function Home() {
 
 	const userSocket = io('http://localhost:3001/user', {
-		autoConnect: false,
+		autoConnect: false,	
 	});
 
 	const gameSocket = io('http://localhost:3001/game', {

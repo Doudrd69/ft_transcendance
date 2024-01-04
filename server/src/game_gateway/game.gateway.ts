@@ -27,7 +27,7 @@ export class GameGateway {
     private connectedUsers: { [userId: string]: Socket } = {};
 
 
-    handleConnection(@ConnectedSocket() client: Socket) {
+    handleConnection(@ConnectedSocket() client: Socket, playerlogin: string) {
         console.log(`GameGtw client connected : ${client.id}`);
         this.connectedUsers[client.id] = client;
         // client.join(`user_game_${client.id}`);
@@ -39,6 +39,12 @@ export class GameGateway {
         // client.leave(`user_game${client.id}`);
     }
 
+    @SubscribeMessage('linkSocketWithUser')
+    handleLinkSocketWithUser(client: Socket, playerLogin: string)
+    {
+        this.GameService.linkSocketIDWithUser(client.id, playerLogin);
+    }
+
     @SubscribeMessage('Game')
     handleGame(@ConnectedSocket() client: Socket, data: string): void {
         this.server.emit('message', data); // Diffuse à tous les clients dans le namespace 'game'
@@ -47,19 +53,24 @@ export class GameGateway {
     @SubscribeMessage('join-matchmaking')
     async handleJoinMatchmaking(client: Socket, playerLogin: string): Promise<String> {
         console.log("JOINMATCHMAKING");
-        this.MatchmakingService.join(playerLogin);
+        this.MatchmakingService.join(client.id);
         const enoughPlayers = this.MatchmakingService.IsThereEnoughPairs();
         if (enoughPlayers) {
-            const pairs = await this.MatchmakingService.getPlayersPairs();
+            const pairs: [string, string][] = await this.MatchmakingService.getPlayersPairs();
             for (const pair of pairs) {
+                const socketIDs: [string, string] = [pair[0], pair[1]];
                 this.game = await this.GameService.createGame(pair[0], pair[1]);
-                this.server.emit('joinGame', {
-                    gameId: this.game.gameId,
-                    playerOne: this.game.playerOne,
-                    playerTwo: this.game.playerTwo,
-                    scoreOne: this.game.scoreOne,
-                    scoreTwo: this.game.scoreTwo,
-                });
+                // creer une methode qui remplis la variable UsersIDs par rapport aux pair pour l'emit 
+                // const socketIDs = await getPairIDs(pair[0], pair[0]);
+                this.MatchmakingService.leave(pair[0]);
+                this.MatchmakingService.leave(pair[1]);
+                this.server.to(socketIDs).emit('joinGame', {
+                        gameId: this.game.gameId,
+                        playerOneID: this.game.playerOneID,
+                        playerTwoID: this.game.playerTwoID,
+                        scoreOne: this.game.scoreOne,
+                        scoreTwo: this.game.scoreTwo,
+                    });
 
             }
         }
@@ -72,7 +83,23 @@ export class GameGateway {
         this.MatchmakingService.leave(playerLogin);
         return (playerLogin);
     }
+
+    @SubscribeMessage('move-paddle')
+    async handlePaddleMove(client: Socket, game: Game) {
+        if (client.id == game.playerOneID)
+        {
+            //move paddle left
+        }
+        if (client.id == game.playerTwoID)
+        {
+            //move paddle right
+        }
+    }
+
+    @SubscribeMessage('move-ball')
+    async handleBallMove(client: Socket, game: Game) {
+        // move the ball
+    }
 }
 
-//let i = 0; i < pairs.length; i++
-// this.server.emit('players-pairs-found', pairs);
+// apres emit juste aux deux joueurs, regarder pour le fetch et ensuite la creation des paddles et syncro de mouvement (commencer juste paddle)

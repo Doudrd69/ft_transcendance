@@ -25,7 +25,7 @@ const GameComponent = (socket: {socket: Socket}) => {
 				{renderComponent(<SettingsDisplay/>, state.showSettingsDisplay)}
 				{renderComponent(<SettingsGame/>, state.showSettingsGame)}
 				{renderComponent(<SettingsKeyboard/>, state.showSettingsKeyboard)}
-				{renderComponent(<PongComponent/>, state.showGame)}
+				{renderComponent(<PongComponent socket={socket.socket}/>, state.showGame)}
 	  		</div>
 	);
   };

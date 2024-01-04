@@ -14,22 +14,23 @@ const Menu = (socket: { socket: Socket }) => {
 
     interface Game {
         gameId: number;
-        playerOne: string;
-        playerTwo: string;
+        playerOneID: number;
+        playerTwoID: number;
         scoreOne: number;
         scoreTwo: number;
     }
         
     const handleStartClick = async () => {
-        const currentUserLogin = sessionStorage.getItem("currentUserLogin");
+        const currentUserID = sessionStorage.getItem("currentUserID");
 
         if (gameSocket.connected) {
             console.log("GameSocket connecté")
-            gameSocket.emit('join-matchmaking', currentUserLogin);
+            gameSocket.emit('linkSocketWithUser', sessionStorage.getItem("currentUserLogin"));
+            gameSocket.emit('join-matchmaking', currentUserID);
             await gameSocket.on('joinGame', (game: Game) => {
                 console.log("Join Game recieve !");
-                console.log(`${game.playerOne} enter in the Game`);
-                console.log(`${game.playerTwo} enter in the Game`);
+                console.log(`${game.playerOneID} enter in the Game`);
+                console.log(`${game.playerTwoID} enter in the Game`);
                 dispatch({
                     type: 'TOGGLE',
                     payload: 'showGame',
@@ -70,7 +71,7 @@ const Menu = (socket: { socket: Socket }) => {
                         <div className="transition"></div>
                         <div className="handle"></div>
                     </div>
-                </div>
+                </div> 
                 <div className="wiggly">
                     <div className="string"></div>
                     <div className="ball"></div>
