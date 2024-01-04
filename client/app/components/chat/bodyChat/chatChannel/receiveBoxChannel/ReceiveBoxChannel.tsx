@@ -10,10 +10,14 @@ interface Message {
 	conversationID: number;
 }
 
-const ReceiveBoxChannelComponent = (socket: {socket: Socket}) => {
+interface ReceiveBoxChannelComponentProps {
+	userSocket: Socket;
+}
+
+const ReceiveBoxChannelComponent: React.FC<ReceiveBoxChannelComponentProps> = ({ userSocket }) => {
 
 	const { state } = useChat();
-	const socketInUse = socket.socket;
+	const socketInUse = userSocket;
 	const [messages, setMessages] = useState<Message[]>([]);
 	const messagesContainerRef = useRef<HTMLDivElement>(null);
 	

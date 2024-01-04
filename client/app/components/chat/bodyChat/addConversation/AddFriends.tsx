@@ -4,12 +4,12 @@ import { useChat } from '../../ChatContext';
 import './AddConversation.css';
 
 interface AddFriendComponentProps {
-socket: Socket;
-updateFriends: () => void;
-title: string;
+	userSocket: Socket;
+	updateFriends: () => void;
+	title: string;
 }
 
-const AddFriendComponent: React.FC<AddFriendComponentProps> = ({ socket, updateFriends, title }) => {
+const AddFriendComponent: React.FC<AddFriendComponentProps> = ({ userSocket, updateFriends, title }) => {
 const [formValue, setFormValue] = useState('');
 const { state, dispatch } = useChat();
 
@@ -23,11 +23,12 @@ const handleFriendRequest = async (e: React.FormEvent) => {
 	};
 
 	const response = await fetch('http://localhost:3001/users/addfriend', {
-	method: 'POST',
-	headers: {
-		'Content-Type': 'application/json',
-	},
-	body: JSON.stringify(friendRequestDto),
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json',
+			'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
+		},
+		body: JSON.stringify(friendRequestDto),
 	});
 
 	if (response.ok) {
@@ -35,8 +36,8 @@ const handleFriendRequest = async (e: React.FormEvent) => {
 		dispatch({ type: 'DISABLE', payload: 'showAddUser' });
 		dispatch({ type: 'DISABLE', payload: 'showAddFriend' });
 	console.log("Friend request successfully created");
-	if (socket.connected) {
-		socket.emit('addFriend', friendRequestDto, () => {
+	if (userSocket.connected) {
+		userSocket.emit('addFriend', friendRequestDto, () => {
 		console.log("FriendRequest sent to General gateway");
 		});
 	}

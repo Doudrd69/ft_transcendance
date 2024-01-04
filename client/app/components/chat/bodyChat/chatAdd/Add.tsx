@@ -2,9 +2,13 @@ import './Add.css';
 import React, { useState } from 'react';
 import { Socket } from 'socket.io-client';
 
-const AddComponent = (socket: {socket: Socket}) => {
+interface BodyChatComponentProps {
+	userSocket: Socket;
+}
 
-	const socketInUse = socket.socket;
+const AddComponent: React.FC<BodyChatComponentProps> = ({ userSocket }) => {
+
+	const socketInUse = userSocket;
 	const [formValues, setFormValues] = useState<string[]>(['', '', '']); // Initialisez les valeurs par défaut
 
 	const handleFormInput = (value: string, index: number) => {

@@ -7,7 +7,12 @@ import SendBoxComponent from './sendBox/SendBox';
 import ChatListComponent from './chatList/ChatList';
 import { Socket } from 'socket.io-client'
 
-const ChatUserComponent = (socket: {socket: Socket} ) => {
+interface ChatUserComponentProps {
+	userSocket: Socket;
+}
+
+const ChatUserComponent: React.FC<ChatUserComponentProps> = ({ userSocket }) => {
+
   const { state, dispatch } = useChat();
 
   const renderComponent = (component: React.ReactNode, condition: boolean) =>
@@ -15,9 +20,9 @@ const ChatUserComponent = (socket: {socket: Socket} ) => {
 
   return (
 	<div className="chat-user">
-		{renderComponent(<ChatListComponent socket={socket.socket}/>, state.showChatList)}
-		{renderComponent(<ReceiveBoxComponent socket={socket.socket} />, state.showChat)}
-		{renderComponent(<SendBoxComponent socket={socket.socket}/>, state.showChat)}
+		{renderComponent(<ChatListComponent userSocket={userSocket}/>, state.showChatList)}
+		{renderComponent(<ReceiveBoxComponent userSocket={userSocket} />, state.showChat)}
+		{renderComponent(<SendBoxComponent userSocket={userSocket}/>, state.showChat)}
 	</div>
   );
 };

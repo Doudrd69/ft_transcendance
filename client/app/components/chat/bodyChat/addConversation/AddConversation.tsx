@@ -1,34 +1,36 @@
-	import React, { useState } from 'react';
-	import { Socket } from 'socket.io-client';
-	import { useChat } from '../../ChatContext';
-	import './AddConversation.css';
+import React, { useState } from 'react';
+import { Socket } from 'socket.io-client';
+import { useChat } from '../../ChatContext';
+import './AddConversation.css';
 
-	interface AddConversationComponentProps {
-		socket: Socket;
-		updateConversations: () => void;
-		title: string;
-		isChannel: boolean;
-	}
+interface AddConversationComponentProps {
+	loadDiscussions: () => void;
+	title: string;
+	isChannel: boolean;
+}
 
-	const AddConversationComponent: React.FC<AddConversationComponentProps> = ({ socket, updateConversations, title, isChannel }) => {
+const AddConversationComponent: React.FC<AddConversationComponentProps> = ({ loadDiscussions, title, isChannel }) => {
+
 	const [formValue, setFormValue] = useState('');
 	const { state, dispatch } = useChat();
 
 	const handleConversationCreation = async (e: React.FormEvent) => {
+
 		e.preventDefault();
 
-		// Vérifier que isChannel est défini
-		if (typeof isChannel === 'boolean') {
 		const conversationDto = {
 			name: formValue,
-			username: sessionStorage.getItem("currentUserLogin"),
+			userID: Number(sessionStorage.getItem("currentUserID")),
 			is_channel: isChannel,
-		};
+		}
+
+		console.log(conversationDto);
 
 		const response = await fetch('http://localhost:3001/chat/newConversation', {
 			method: 'POST',
 			headers: {
-			'Content-Type': 'application/json',
+				'Content-Type': 'application/json',
+				'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`
 			},
 			body: JSON.stringify(conversationDto),
 		});
@@ -38,13 +40,9 @@
 			dispatch({ type: 'DISABLE', payload: 'showAddChannel' });
 			dispatch({ type: 'DISABLE', payload: 'showAddUser' });
 			dispatch({ type: 'DISABLE', payload: 'showAddFriend' });
-			updateConversations(); // Appeler la fonction de mise à jour
+			loadDiscussions();
 		} else {
 			console.log("Conversation creation failed");
-		}
-			setFormValue('');
-		} else {
-		console.error("isChannel is not defined or not a boolean");
 		}
 	};
 

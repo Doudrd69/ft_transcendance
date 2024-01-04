@@ -4,15 +4,16 @@ import { useChat } from '../../ChatContext';
 import { Socket } from 'socket.io-client';
 
 interface ListMyChannelComponentProps {
-	socket: Socket; // Assurez-vous d'avoir la bonne importation pour le type Socket
-  }
+	userSocket: Socket; // Assurez-vous d'avoir la bonne importation pour le type Socket
+}
 
-  interface Conversation {
+interface Conversation {
 	id: number;
 	name: string;
 	is_channel: boolean;
-  }
-const ListMyChannelComponent: React.FC<ListMyChannelComponentProps> = ({ socket }) => {
+}
+
+const ListMyChannelComponent: React.FC<ListMyChannelComponentProps> = ({ userSocket }) => {
 const { state, dispatch } = useChat();
 const [conversations, setConversations] = useState<Conversation[]>([]);
 const user = sessionStorage.getItem("currentUserLogin");

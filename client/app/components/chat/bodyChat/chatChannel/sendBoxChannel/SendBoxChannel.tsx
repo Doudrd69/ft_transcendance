@@ -3,10 +3,14 @@ import React, { useState } from 'react';
 import { Socket } from 'socket.io-client'
 import { useChat } from '../../../ChatContext'
 
-const SendBoxChannelComponent = (socket: {socket: Socket}) => {
+interface SendBoxComponentProps {
+	userSocket: Socket;
+}
+
+const SendBoxChannelComponent: React.FC<SendBoxComponentProps> = ({ userSocket }) => {
 
 	const { state } = useChat();
-	const socketInUse = socket.socket;
+	const socketInUse = userSocket;
 	const [messageValue, setMessageValue] = useState('');
 
 	const handleMessageInput = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -43,7 +47,6 @@ const SendBoxChannelComponent = (socket: {socket: Socket}) => {
 			else {
 				console.log("Client is not connected");
 			}
-			console.log("Message sent to ", state.currentConversation);
 		}
 		else {
 			const error = await response.json();

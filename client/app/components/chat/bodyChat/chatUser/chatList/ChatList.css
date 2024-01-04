@@ -26,9 +26,9 @@
 }
 
 .button-discussion-list-add{
-	flex-grow: 1; /* Permet à l'élément de prendre autant d'espace que possible */
+	flex-grow: 1;
 	margin: 10px;
-	border: 5px solid var(--fourth); /* Remplacez var(--border-color) par votre couleur de bordure souhaitée */
+	border: 5px solid var(--fourth);
 	border-radius: 10px;
 	height: 40px;
 

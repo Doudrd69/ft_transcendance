@@ -244,6 +244,7 @@ export class ChatService {
 
 	async getMessages(conversationID: any): Promise<Message[]> {
 
+		console.log("Coucou : ", conversationID);
 		const allMessages = await this.getAllMessages(conversationID);
 		if (!allMessages) {
 			console.error("Fatal error: messsages not found");

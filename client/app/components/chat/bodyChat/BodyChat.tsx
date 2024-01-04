@@ -8,7 +8,11 @@ import ChatUserComponent from './chatUser/ChatUser';
 import ChatChannelComponent from './chatChannel/ChatChannel';
 import ChatFriendsListComponent from './chatFriendsList/ChatFriendsList';
 
-const BodyChatComponent = (socket: {socket: Socket}) => {
+interface BodyChatComponentProps {
+	userSocket: Socket;
+}
+
+const BodyChatComponent: React.FC<BodyChatComponentProps> = ({ userSocket }) => {
 
 	const { state, dispatch } = useChat();
 
@@ -17,10 +21,10 @@ const BodyChatComponent = (socket: {socket: Socket}) => {
 
 	return (
 		<div className="powerlifter">
-			{renderComponent(<ChatUserComponent socket={socket.socket} />, state.showChat || state.showChatList)}
-			{renderComponent(<ChatChannelComponent socket={socket.socket}/>, state.showChannel || state.showChannelList)}
-			{renderComponent(<ChatFriendsListComponent socket={socket.socket}/>, state.showFriendsList)}
-			{renderComponent(<AddComponent socket={socket.socket}/>, state.showAdd)}
+			{renderComponent(<ChatUserComponent userSocket={userSocket} />, state.showChat || state.showChatList)}
+			{renderComponent(<ChatChannelComponent userSocket={userSocket}/>, state.showChannel || state.showChannelList)}
+			{renderComponent(<ChatFriendsListComponent userSocket={userSocket}/>, state.showFriendsList)}
+			{renderComponent(<AddComponent userSocket={userSocket}/>, state.showAdd)}
 		</div>
 	)
 };

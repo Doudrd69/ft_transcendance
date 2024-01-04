@@ -58,7 +58,7 @@ const ChannelListComponent: React.FC = () => {
 		>
 			+
 		</button>
-		{state.showAddChannel && <AddConversationComponent socket={socket} updateConversations={updateConversations} title="Add/Create Channel" isChannel={true}/>}
+		{state.showAddChannel && <AddConversationComponent loadDiscussions={loadDiscussions} title="Add/Create Channel" isChannel={true}/>}
 		{userData.discussion.map((conversation, index) => (
 			conversation.is_channel && (
 			<button
@@ -67,6 +67,7 @@ const ChannelListComponent: React.FC = () => {
 				onClick={() => {
 				dispatch({ type: 'TOGGLE', payload: 'showChannel' });
 				dispatch({ type: 'SET_CURRENT_CONVERSATION', payload: conversation.name });
+				dispatch({ type: 'SET_CURRENT_CONVERSATION_ID', payload: conversation.id });
 				}}
 			>
 				<span>{conversation.name}</span>

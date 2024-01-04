@@ -5,12 +5,16 @@ import { ChatProvider } from './ChatContext';
 import { Socket } from 'socket.io-client'
 import BodyChatComponent from './bodyChat/BodyChat';
 
-const ChatComponent = (socket: {socket: Socket}) => {
+interface ChatComponentProps {
+	userSocket: Socket;
+}
+
+const ChatComponent: React.FC<ChatComponentProps> = ({ userSocket }) => {
 	return (
 		<ChatProvider>
 			<div className="left-half">
 					<HeaderChatComponent/>
-					<BodyChatComponent socket={socket.socket}/>
+					<BodyChatComponent userSocket={userSocket}/>
 			</div>
 		</ChatProvider>
 	)

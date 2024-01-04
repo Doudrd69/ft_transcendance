@@ -5,7 +5,7 @@ import AddConversationComponent from '../../addConversation/AddConversation';
 import { Socket } from 'socket.io-client';
 
 interface ChannelListComponentProps {
-	socket: Socket; // Assurez-vous d'avoir la bonne importation pour le type Socket
+	userSocket: Socket; // Assurez-vous d'avoir la bonne importation pour le type Socket
   }
 
 interface Conversation {
@@ -14,24 +14,26 @@ interface Conversation {
 	is_channel:boolean;
 }
 
-const ChatListComponent: React.FC<ChannelListComponentProps> = ({ socket }) => {
+const ChatListComponent: React.FC<ChannelListComponentProps> = ({ userSocket }) => {
 
 	const { state, dispatch } = useChat();
 	const [conversations, setConversations] = useState<Conversation[]>([]);
 	const user = Number(sessionStorage.getItem("currentUserID"));
 
 	const updateConversations = async () => {
+
 		const response = await fetch(`http://localhost:3001/chat/getConversations/${user}`, {
-		method: 'GET',
+			method: 'GET',
 		});
 	
 		if (response.ok) {
-		const userData = await response.json();
-		setConversations(userData);
-	} else {
-		console.log("Fatal error");
-	}
+			const userData = await response.json();
+			setConversations(userData);
+		} else {
+			console.log("Fatal error");
+		}
 	};
+
 	useEffect(() => {
 		updateConversations();
 	}, []);
@@ -77,7 +79,7 @@ const ChatListComponent: React.FC<ChannelListComponentProps> = ({ socket }) => {
 			>
 			+
 			</button>
-			{state.showAddUser && <AddConversationComponent socket={socket} updateConversations={updateConversations} title="Add/Create Conversation" isChannel={false}/>}
+			{state.showAddUser && <AddConversationComponent loadDiscussions={loadDiscussions} title="Add/Create Conversation" isChannel={false}/>}
 			{userData.discussion.map((conversation, index) => (
 				!conversation.is_channel && (
 					<div key={index} className="bloc-button-discussion-list">

@@ -6,11 +6,12 @@ import ListMyChannelComponent from '../../../listMyChannel/ListMyChannel';
 import { Socket } from 'socket.io-client';
 
 interface FriendsListTabComponentProps {
-	socket: Socket; 
+	userSocket: Socket; 
 	user : string;
   }
 
-const FriendsListTabComponent:  React.FC<FriendsListTabComponentProps> = ({ socket, user }) => {
+const FriendsListTabComponent:  React.FC<FriendsListTabComponentProps> = ({ userSocket, user }) => {
+
 	const {state, dispatch} = useChat();
 
 	const [confirmationText, setConfirmationText] = useState('');
@@ -35,7 +36,7 @@ const FriendsListTabComponent:  React.FC<FriendsListTabComponentProps> = ({ sock
 			<ConfirmationComponent phrase={confirmationText}/>
 			)}
 			{state.showListChannelAdd && (
-				<ListMyChannelComponent socket={socket}/>
+				<ListMyChannelComponent userSocket={userSocket}/>
 			)}
 		</>
 	);

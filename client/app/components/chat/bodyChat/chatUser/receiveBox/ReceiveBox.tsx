@@ -10,10 +10,14 @@ interface Message {
 	conversationName: string;
 }
 
-const ReceiveBoxComponent = (socket: {socket: Socket}) => {
+interface ReceiveBoxComponentProps {
+	userSocket: Socket;
+}
+
+const ReceiveBoxComponent: React.FC<ReceiveBoxComponentProps> = ({ userSocket }) => {
 
 	const { state } = useChat();
-	const socketInUse = socket.socket;
+	const socketInUse = userSocket;
 	const [messages, setMessages] = useState<Message[]>([]);
 	const messagesContainerRef = useRef<HTMLDivElement>(null);
 	
@@ -47,7 +51,7 @@ const ReceiveBoxComponent = (socket: {socket: Socket}) => {
 
 		try {
 			// proteger la requete dans le controller
-			const response = await fetch (`http://localhost:3001/chat/getMessages/${state.currentConversationID}`, {
+			const response = await fetch(`http://localhost:3001/chat/getMessages/${state.currentConversationID}`, {
 				method: 'GET',
 				headers: {
 					'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,

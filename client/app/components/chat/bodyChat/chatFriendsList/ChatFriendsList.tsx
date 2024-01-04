@@ -6,13 +6,13 @@ import FriendsListComponent from './friendsList/FriendsList';
 import { Socket } from 'socket.io-client'
 
 interface ChatFriendsListComponentProps {
-	socket: Socket;
+	userSocket: Socket;
 }
-const ChatFriendsListComponent:  React.FC<ChatFriendsListComponentProps> = ({socket}) => {
+const ChatFriendsListComponent:  React.FC<ChatFriendsListComponentProps> = ({ userSocket }) => {
 
   return (
 	<div className="chat-friends-list">
-		<FriendsListComponent socket={socket}/>
+		<FriendsListComponent userSocket={userSocket}/>
 	</div>
   );
 };

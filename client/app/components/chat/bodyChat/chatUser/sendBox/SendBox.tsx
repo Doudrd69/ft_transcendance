@@ -3,10 +3,14 @@ import React, { useState } from 'react';
 import { Socket } from 'socket.io-client'
 import { useChat } from '../../../ChatContext';
 
-const SendBoxComponent = (socket: {socket: Socket}) => {
+interface SendBoxComponentProps {
+	userSocket: Socket;
+}
+
+const SendBoxComponent: React.FC<SendBoxComponentProps> = ({ userSocket }) => {
 
 	const { state } = useChat();
-	const socketInUse = socket.socket;
+	const socketInUse = userSocket;
 	const [messageValue, setMessageValue] = useState('');
 
 	const handleMessageInput = (e: React.ChangeEvent<HTMLInputElement>) => {
