@@ -11,11 +11,14 @@ import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { ChatModule } from './chat/chat.module';
 import { GatewayModule } from './gateway/gateway.module';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
+
 
 //We set the synchronize option to true, which means that TypeORM will automatically
 //generate database tables based on the entities. However, this option should be used
 //with caution in production because it can cause data loss and conflicts.
-
+console.log('path', join(__dirname, 'avatars'));
 dotenv.config();
 
 const dbPass = process.env.POSTGRES_PASSWORD;
@@ -52,7 +55,10 @@ if (!dbPass || !dbUsername || !dbName || !dbHost) {
       synchronize: true,
       autoLoadEntities: true,
     }),
-
+	ServeStaticModule.forRoot({
+		rootPath: join(__dirname, 'users', 'avatars'),
+		serveRoot: '/avatars/', 
+	  }),
     AuthModule,
 
     UsersModule,

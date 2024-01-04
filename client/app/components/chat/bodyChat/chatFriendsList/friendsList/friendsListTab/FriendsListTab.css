@@ -14,7 +14,6 @@
 	margin: 10px;
 	border-radius: 10px;
 	background-image: url('tab.png');
-	background-size: cover; /* Ajuste la taille de l'image pour remplir le cercle */
 	background-repeat: no-repeat;
 	background-position: center center;
 	background-color:  white;
@@ -31,7 +30,6 @@
 	border-radius: 10px;
 
 	background-image: url('ping-pong.png');
-	background-size: cover; /* Ajuste la taille de l'image pour remplir le cercle */
 	background-repeat: no-repeat;
 	background-position: center center;
 	background-color: transparent;
@@ -48,7 +46,6 @@
 	border-radius: 10px;
 
 	background-image: url('ajouter-un-groupe.png');
-	background-size: cover; /* Ajuste la taille de l'image pour remplir le cercle */
 	background-repeat: no-repeat;
 	background-size: contain; /* Ajuste la taille de l'image pour contenir le bouton */
 	background-position: center center;
@@ -66,7 +63,6 @@
 	border-radius: 10px;
 	
 	background-image: url('interdit.png');
-	background-size: cover; /* Ajuste la taille de l'image pour remplir le cercle */
 	background-repeat: no-repeat;
 	background-position: center center;
 	background-color:  white;
@@ -83,7 +79,6 @@
 	border-radius: 10px;
 	
 	background-image: url('stats.png');
-	background-size: cover; /* Ajuste la taille de l'image pour remplir le cercle */
 	background-repeat: no-repeat;
 	background-position: center center;
 	background-color:  white;

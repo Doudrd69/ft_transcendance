@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException, Res } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm'
-import { Repository } from 'typeorm'
+import { Repository, UpdateResult } from 'typeorm'
 import * as bcrypt from 'bcrypt'
 import { User } from './entities/users.entity'
 import { Friendship } from './entities/friendship.entity'
@@ -43,28 +43,65 @@ export class UsersService {
 	/***					USER MANAGEMENT						***/
 	/**************************************************************/
 
-	// getAvatarById(userId: number, res: Response) {
-	// 	this.usersRepository.findOne({ where: {id: userId}}).then(
-	// 		user => {
-	// 			if (user.avatarImage) {
-	// 				res.setHeader('Content-Type', 'image/jpeg'); // Set appropriate content type
-	// 				return res.send(user.avatarImage);
-	// 			}
-	// 		}).catch(
-	// 			error => {
-	// 				return res.status(404).send('Avatar not found: ', error);
-	// 		}
-	// 	);
+	async uploadAvatarURL(avatarURL: string, userID: number): Promise<UpdateResult | undefined> {
+		try {
+		const user = await this.getUserByID(userID);
+
+		if (!user) {
+			console.error(`Utilisateur avec l'ID ${userID} non trouvé.`);
+			return undefined;
+		}
+			// Mettez à jour uniquement l'avatarURL
+			const updateResult = await this.usersRepository.update({ id: userID }, { avatarURL });
+
+			return updateResult;
+		} catch (error) {
+			console.error('Erreur lors de la mise à jour de l\'avatarURL :', error);
+			return undefined;
+		}
+	}
+
+	async getAvatar(userId: number): Promise<string | null> {
+		const user = await this.getUserByID(userId);
+	
+		if (!user || !user.avatarURL) {
+		//   throw new NotFoundException('Avatar not found');
+		return null;
+		}
+	
+		console.log("AVATAR ", user.avatarURL);
+		return user.avatarURL;
+	  }
+	  
+	updateUsername(login: string, newUsername: string) {
+		this.getUserByLogin(login).then(userToUpdate => {
+			userToUpdate.username = newUsername;
+			return this.usersRepository.save(userToUpdate);
+		}).catch(error => {
+			console.log("Cannot update username :", error);
+			throw new Error(error);
+		});
+	}
+	// async deleteUserAvatar(data: Buffer, fileName:string , userID: number) {
+		
+	// 	const avatar = await this.avatarService.create(userID, data, fileName);
+	// 	if (!avatar)
+	// 		throw console.log("error");
+	// 	await this.usersRepository.update(userID, {avatarID : avatar.ID})
+	// 	return avatar;
 	// }
 
-	// uploadAvatar(avatar: any) {
-	// 	this.getUserByLogin("").then(userToUpdate => {
-	// 		userToUpdate.avatarImage = avatar.buffer;
-	// 		return this.usersRepository.save(userToUpdate);
-	// 	}).catch(error => {
-	// 		console.log("Error: cannot upload avatar image: ", error);
+	// async getUserAvatar(userID: number): Promise<Avatar> {
+	// 	const user = await this.usersRepository.findOne({
+	// 	  where: { id: userID },
 	// 	});
-	// }
+	  
+	// 	if (!user || !user.avatarID) {
+	// 	  throw new NotFoundException(`User or avatar not found for ID ${userID}`);
+	// 	}
+
+	// 	return this.avatarService.getAvatarByID(user.avatarID);
+	//   }
 
 	// async createNewUser(username: string, password: string): Promise<User> {
 	// 	const userToCreate = await this.usersRepository.findOne({ where: { username } });
@@ -97,15 +134,6 @@ export class UsersService {
 		return this.usersRepository.save(new42User);
 	}
 
-	updateUsername(login: string, newUsername: string) {
-		this.getUserByLogin(login).then(userToUpdate => {
-			userToUpdate.username = newUsername;
-			return this.usersRepository.save(userToUpdate);
-		}).catch(error => {
-			console.log("Cannot update username :", error);
-			throw new Error(error);
-		});
-	}
 
 	/**************************************************************/
 	/***				FRIENDSHIP MANAGEMENT					***/
@@ -138,29 +166,30 @@ export class UsersService {
 	}
 	
 	async updateFriendship(friendRequestDto: FriendRequestDto, flag: boolean): Promise<Friendship> {
-
 		const initiator = await this.usersRepository.findOne({
-			where: {login: friendRequestDto.initiatorLogin},
-			relations: ["initiatedFriendships", "acceptedFriendships"],
+		  where: { login: friendRequestDto.initiatorLogin },
+		  relations: ["initiatedFriendships", "acceptedFriendships"],
 		});
-
+	  
 		const friend = await this.usersRepository.findOne({
-			where: {login: friendRequestDto.recipientLogin},
-			relations: ["initiatedFriendships", "acceptedFriendships"],
+		  where: { login: friendRequestDto.recipientLogin },
+		  relations: ["initiatedFriendships", "acceptedFriendships"],
 		});
-
+	  
 		if (initiator && friend) {
-
-			const friendshipToUpdate = await this.friendshipRepository.findOne({
-				where: {initiator: initiator, friend: friend},
-			});
-
+		  const friendshipToUpdate = await this.friendshipRepository.findOne({
+			where: { initiator: { id: initiator.id }, friend: { id: friend.id } },
+		  });
+	  
+		  if (friendshipToUpdate) {
 			friendshipToUpdate.isAccepted = flag;
 			await this.friendshipRepository.save(friendshipToUpdate);
 			console.log("Update -> ", friendshipToUpdate);
 			return friendshipToUpdate;
+		  }
 		}
-		return ;
+	  
+		return null;
 	}
 
 	async acceptFriendship(friendRequestDto: FriendRequestDto) {
@@ -182,26 +211,25 @@ export class UsersService {
 		return this.usersRepository.findOne({ where: {login: loginToSearch}});
 	}
 
+	async getUserByID(userID: number): Promise<User> {
+		return await this.usersRepository.findOne({ where: {id: userID}});
+	}
+
 	getUserByLogin(loginToSearch: string): Promise<User> {
 		return this.usersRepository.findOne({ where: {login: loginToSearch}});
 	}
 
 	async getFriendships(username: string): Promise<Friendship[]> {
-
 		const user = await this.usersRepository.findOne({
-			where: {login: username},
-			relations: ["initiatedFriendships", "initiatedFriendships.friend"],
+		  where: { login: username },
+		  relations: ["initiatedFriendships", "initiatedFriendships.friend"],
 		});
+	  
 		if (user) {
-			// const friendsname = user.initiatedFriendships.filter(friendship => !friendship.isAccepted).map((friendship) => friendship.friend.login);
-			// console.log("Names -> ", friendsname);
-			// const pendingFriendRequests = user.initiatedFriendships.filter(friendship => !friendship.isAccepted);
-			// console.log("Pending -> ", pendingFriendRequests);
-			const friends = user.initiatedFriendships.filter(friendship => friendship.isAccepted);
-			// console.log("Friends --> ", friends);
-			return friends;
+		  const friends = user.initiatedFriendships.filter((friendship) => friendship.isAccepted);
+		  return friends;
 		}
-		return ;
-	}
-
+	  
+		return [];
+	  }
 }

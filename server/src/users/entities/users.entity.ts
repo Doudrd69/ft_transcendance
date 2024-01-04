@@ -15,28 +15,30 @@ export class User {
   @Column()
   firstname: string;
 
-  @Column({default: "guest"})
+  @Column({ default: "guest" })
   username: string;
+
+  @Column({ default: "/avatars/avatar.png" })
+  avatarURL: string;
 
   @Column()
   officialProfileImage: string;
 
-  @Column({ type: 'bytea', default: null, nullable: true })
-  avatarImage: Buffer;
-
-  @Column({default: ""})
+  @Column({ default: "" })
   TFA_secret: string;
 
-  @Column({default: ""})
+  @Column({ default: "" })
   TFA_temp_secret: string;
 
-  @Column({default: false})
+  @Column({ default: false })
   TFA_isEnabled: boolean;
 
   @Column({ default: false })
   isActive: boolean;
 
-  @ManyToMany(type => Conversation)
+  @ManyToMany(type => Conversation, {
+    eager: true,
+  })
   @JoinTable({
 	  name: "user_to_group",
 	  joinColumn: {
@@ -50,9 +52,13 @@ export class User {
   })
   groups: GroupMember[];
 
-  @OneToMany(() => Friendship, (friendship) => friendship.initiator)
+  @OneToMany(() => Friendship, (friendship) => friendship.initiator, {
+    eager: true,
+  })
   initiatedFriendships: Friendship[];
 
-  @OneToMany(() => Friendship, (friendship) => friendship.friend)
+  @OneToMany(() => Friendship, (friendship) => friendship.friend, {
+    eager: true,
+  })
   acceptedFriendships: Friendship[];
 }

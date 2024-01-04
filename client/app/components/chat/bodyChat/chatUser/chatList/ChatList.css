@@ -24,6 +24,18 @@
 
 }
 
+.button-discussion-list-add{
+	flex-grow: 1; /* Permet à l'élément de prendre autant d'espace que possible */
+	margin: 10px;
+	border: 5px solid var(--fourth); /* Remplacez var(--border-color) par votre couleur de bordure souhaitée */
+	border-radius: 10px;
+	height: 40px;
+
+}
+
+.button-discussion-list-add:hover{
+	background-color: rgb(54, 190, 82);
+}
 .discussion-list:hover{
 	background-color: var(--fifth);
 }

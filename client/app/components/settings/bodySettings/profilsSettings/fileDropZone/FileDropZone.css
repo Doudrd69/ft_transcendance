@@ -1,0 +1,23 @@
+.file-drop-zone {
+	border: 2px dashed #ccc;
+	padding: 10px; /* Réduisez la taille de la zone de dépôt */
+	text-align: center;
+	background-color: #909090; /* Fond rouge */
+	display: relative;
+	align-items: center;
+	justify-content: center;
+	height: 30px;
+	width: 200px;
+	margin-top: 10px;
+	margin-bottom: 10px;
+  }
+  
+  .dragging {
+	border-color: #00cc00; /* Changez la couleur de la bordure en vert pendant le glissement */
+	background-color: #f0faff;
+  }
+  .drag-and-drop {
+	color: #ffffff; /* Texte blanc */
+	font-size: 14px; /* Réduisez la taille du texte */
+	z-index: 2; 
+  }

@@ -7,7 +7,17 @@
 	padding: 10px;
 	border-radius: 10px;
 }
-
+.blur-background {
+	position: fixed;
+	top: 0;
+	left: 0;
+	background-color: rgba(171, 171, 171, 0.1);
+	backdrop-filter: blur(30px);
+	height: 100vh;
+	width: 100vw;
+	z-index: 1;
+  }
+  
 .yes-no{
 	display: flex;
 	justify-content: space-between; 
@@ -17,22 +27,33 @@
 
 .yes{
 	border: none;
-	background-color: transparent;
+	border-radius: 4px;
+	color : white;
+	background-color: #9cc89e;
 	margin-left: 100px;
 	transition: transform 0.2s ease;
+	padding: 10px;
 }
 
 .yes:hover{
-	transform: scale(1.3);
+	background-color: #45a049;
+	transform: scale(1.1);
+
 }
 
 .no{
 	border: none;
-	background-color: transparent;
+	border-radius: 4px;
+	color : white;
+	background-color: rgb(181, 138, 138);
 	margin-right: 100px;
 	transition: transform 0.2s ease;
+	padding: 10px;
+
+
 }
 
 .no:hover{
-	transform: scale(1.3);
+	background-color: #a60000;
+	transform: scale(1.1);
 }

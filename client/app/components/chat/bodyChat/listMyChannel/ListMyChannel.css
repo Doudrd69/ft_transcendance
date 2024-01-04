@@ -1,0 +1,83 @@
+.bloc-add-channel-list {
+	display: flex;
+	flex-wrap: wrap;
+	max-width: 50vw;
+	max-height: 50vh;
+	overflow-y: auto;
+	align-items: center; 
+	justify-content: center;
+	 /* top: 50%;
+	left: 50%;
+	transform: translate(50%, 50%); */
+	background-color: var(--first);
+	border-radius: 10px; 
+  }
+  
+  .button-add-channel-list {
+	background-color: var(--fourth);
+	border: none;
+	flex-basis: calc(50% - 20px);
+	margin: 10px;
+	padding: 10px;
+	color: aliceblue;
+	font-size: 20px;
+	font-family: Arial, sans-serif;
+	border-radius: 10px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-direction: column;
+	box-sizing: border-box;
+	aspect-ratio: 1 / 1;
+	position: relative;
+  }
+  
+  .button-add-channel-list span {
+	max-height: 50px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	position: absolute;
+	top: 50%;
+	left: 0;
+	right: 0;
+	transform: translateY(-50%);
+  }
+  
+  .button-add-channel-list:hover {
+	background-color: var(--fifth);
+  }
+
+  .title-list-channel-component {
+	font-size: 28px;
+	color: #ffffff;
+	font-weight: bold;
+	margin-bottom: 20px;
+
+  }
+
+  .juste-pour-englober {
+	max-width: 50vw; /* Ajout pour occuper la moitié de la largeur de l'écran */
+	max-height: 50vh;
+	top: 50%;
+	left: 50%;
+	transform: translate(50%, 50%);
+	background-color: transparent;
+	border-radius: 10px;
+	align-items: center;
+	justify-content: center;
+	text-align: center;
+	}
+
+	.close-button {
+		position: absolute;
+		top: -10px; /* Ajustez la valeur en fonction de votre mise en page */
+		right: -10px; /* Ajustez la valeur en fonction de votre mise en page */
+		cursor: pointer;
+		font-size: 24px;
+		background: none;
+		border: none;
+		color: #fff;
+		outline: none;
+		padding: 0;
+	  }

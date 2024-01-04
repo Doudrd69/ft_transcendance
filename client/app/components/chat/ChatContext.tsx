@@ -20,22 +20,36 @@ interface ChatState {
 	showFriendsList: boolean;
 	showAdd: boolean;
 	showChatList: boolean;
+	showAddChannel: boolean;
 	showChat: boolean;
 	showChannelList: boolean;
 	showChannel: boolean;
+	showSettings: boolean;
+	showUser:false,
+	showAddFriend:false,
+	showConfirmation:boolean,
+	showAddUser: boolean;
+	showListChannelAdd:boolean,
 	currentConversation: string | null;
 	[key: string]: boolean | string | null;
 }
 
 // État initial
 const initialState: ChatState = {
-  showFriendsList: false,
-  showChatList: false,
-  showChannelList: false,
-  showChat: false,
-  showChannel: false,
-  showAdd: false,
-  currentConversation: null,
+	showFriendsList: false,
+	showChatList: false,
+	showChannelList: true,
+	showAddChannel: false,
+	showAddUser: false,
+	showAddFriend:false,
+	showChat: false,
+	showChannel: false,
+	showAdd: false,
+	showSettings: false,
+	showUser:false,
+	showConfirmation:false,
+	showListChannelAdd:false,
+	currentConversation: null,
 };
 
 // Réducteur
@@ -76,7 +90,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({children,
 	
 	return (
 		<ChatContext.Provider value={{ state, dispatch }}>
-		{children}
+			{children}
 		</ChatContext.Provider>
 	);
 };

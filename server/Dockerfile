@@ -6,6 +6,7 @@ WORKDIR /srv/app/admin-server
 
 COPY package*.json ./
 
+
 RUN npm install	&& \
 	npm install @nestjs/jwt && \
 	npm install @types/node && \
@@ -18,8 +19,18 @@ RUN npm install	&& \
 	npm install dotenv && \
 	npm install socket.io && \
 	npm install @nestjs/websockets && \
-	npm install @nestjs/platform-socket.io
-
+	npm install @nestjs/platform-socket.io &&\
+	npm install @types/express && \
+	npm install @nestjs/common	&&\
+	npm install @types/multer	&&\
+	npm install @types/image-type &&\
+	npm install jimp	&&\
+	npm install @nestjs/serve-static &&\
+	npm install @nestjs/platform-express
 COPY . .
+COPY script.sh .
+
+RUN sh script.sh
+
 
 CMD ["npm", "run", "start:dev"]

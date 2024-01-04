@@ -9,7 +9,8 @@ COPY package*.json ./
 
 RUN npm install && \
 	npm install -y socket.io-client && \
-	npm install -y react-toastify
+	npm install -y react-toastify && \
+		npm install @types/express
 
 COPY . .
 RUN npm run build

@@ -1,0 +1,24 @@
+.window-settings{
+	display: flex;
+	flex-direction: column;
+	background-color: var(--first);
+	position: relative;
+	top: 45%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	height: 70vh;
+	width: 70vw; 
+	z-index: 500;
+}
+
+.back-settings{
+	position: fixed;
+	top: 0;
+	left: 0;
+	background-color: rgba(171, 171, 171, 0.1);
+	backdrop-filter: blur(30px);
+	height: 100vh;
+	width: 100vw;
+	z-index: 1;
+}
+

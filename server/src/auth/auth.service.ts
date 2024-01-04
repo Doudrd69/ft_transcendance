@@ -83,6 +83,7 @@ export class AuthService {
 						sub: userData.id,
 						login: userData.login,
 						tfa_enabled: userData.TFA_isEnabled,
+						pp: userData.officialProfileImage,
 					};
 					const accessToken = await this.jwtService.signAsync(payload);
 					return { access_token: accessToken };

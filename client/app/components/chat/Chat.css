@@ -1,6 +1,5 @@
 .left-half {
 	background-color: var(--first);
-	border: 10px solid var(--fourth);
 	display: flex;
 	flex-direction: column;
 	justify-content: space-between;
