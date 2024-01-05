@@ -226,7 +226,7 @@ export class ChatService {
 		if (conversation) {
 			return conversation;
 		}
-		console.log("Fatal error: conversation not found");
+		console.log("Fatal error: conversation not found (getConversationByName)");
 		return ;
 	}
 

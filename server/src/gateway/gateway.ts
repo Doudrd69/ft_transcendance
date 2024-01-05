@@ -94,7 +94,7 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 			client.join(roomName + conv.id);
 			return ;
 		}
-		console.log("Fatal error: conversation not found");
+		console.log("Fatal error: conversation not found (joinFriendRoom)");
 		return ;
 	}
 
