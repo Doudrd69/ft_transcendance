@@ -26,13 +26,13 @@ export class MatchmakingService {
 	}
 		
 
-    async join(playerLogin: string) {
-		this.playersQueue.push(playerLogin);
+    async join(playerID: string) {
+		this.playersQueue.push(playerID);
 		console.log("player rejoin the queue");
     }
 
-	async leave(playerLogin: string) {
-        const index = this.playersQueue.findIndex(login => login === playerLogin);
+	async leave(playerID: string) {
+        const index = this.playersQueue.findIndex(id => id === playerID);
         if (index !== -1) {
             this.playersQueue.splice(index, 1);
             console.log("player leave the queue");
@@ -43,3 +43,6 @@ export class MatchmakingService {
         return (this.playersQueue.length >= 2);
     }
 }
+
+
+// trouver comment envoyer a seulement deux users pour lancer une partie

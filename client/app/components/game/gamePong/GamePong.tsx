@@ -1,7 +1,12 @@
 import './GamePong.css';
 import React, { useState, useEffect } from 'react';
+import { useGame } from '../GameContext'
+import { Socket } from 'socket.io-client'
 
-const PongComponent: React.FC = () => {
+const PongComponent = (socket: { socket: Socket }) => {
+    
+    const { state, dispatch } = useGame();
+    const gameSocket = socket.socket;
 
     const [ballX, setBallX] = useState<number>(50);
     const [ballY, setBallY] = useState<number>(50);

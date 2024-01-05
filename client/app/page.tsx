@@ -29,7 +29,7 @@ interface FriendRequestDto {
 export default function Home() {
 
 	const userSocket = io('http://localhost:3001/user', {
-		autoConnect: false,
+		autoConnect: false,	
 	});
 
 	const gameSocket = io('http://localhost:3001/game', {
@@ -191,6 +191,7 @@ export default function Home() {
 
 		gameSocket.on('connect', () => {
 			console.log('GameSocket new connection : ', gameSocket.id);
+			gameSocket.emit('linkSocketWithUser', sessionStorage.getItem("currentUserLogin"));
 		})
 
 		gameSocket.on('disconnect', () => {

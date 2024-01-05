@@ -7,10 +7,16 @@ export class Game
   	gameId: number;
 
 	@Column()
-	playerOne: string;
+	playerOneID: string;
 
 	@Column()
-	playerTwo: string;
+	playerTwoID: string;
+
+	@Column()
+	playerOneLogin: string;
+
+	@Column()
+	playerTwoLogin: string;
 
 	@Column()
 	scoreOne: number;
