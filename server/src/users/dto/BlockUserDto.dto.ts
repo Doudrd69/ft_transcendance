@@ -3,7 +3,7 @@ import {
     IsString
 } from 'class-validator';
 
-export class BlockUserDtoDto {
+export class BlockUserDto {
 
 	@IsNotEmpty()
 	@IsString()

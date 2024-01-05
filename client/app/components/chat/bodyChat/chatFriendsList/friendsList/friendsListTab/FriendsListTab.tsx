@@ -15,13 +15,17 @@ const FriendsListTabComponent:  React.FC<FriendsListTabComponentProps> = ({ user
 	const {state, dispatch} = useChat();
 	const [confirmationText, setConfirmationText] = useState('');
 	const [showConfirmation, setShowConfirmation] = useState(false);
-	const [funtionToExecute, setFunctionToExecute] = useState(() => {});
+	const [funtionToExecute, setFunctionToExecute] = useState<() => void>(() => {});
 	
 	const handleTabClick = (text: string, functionToExecute: any) => {
 		setConfirmationText(text);
 		setFunctionToExecute(() => functionToExecute);
 		dispatch({ type: 'ACTIVATE', payload: 'showConfirmation' });
 	};
+
+	const debugmdr = () => {
+		console.log("mdr");
+	}
 
 	const blockUser = async () => {
 
@@ -60,7 +64,7 @@ const FriendsListTabComponent:  React.FC<FriendsListTabComponentProps> = ({ user
 		<>
 			<div className="bloc-tab">
 				<button className='tab1'/>
-				<button className='tab2' onClick={() => handleTabClick(`Etes vous sur de vouloir défier ${user} ?`)} />
+				<button className='tab2' onClick={() => handleTabClick(`Etes vous sur de vouloir défier ${user} ?`, debugmdr)} />
 				<button className='tab3' onClick={() => dispatch({ type: 'ACTIVATE', payload: 'showListChannelAdd' })} />
 				<button className='tab4'/>
 				<button className='tab5' onClick={() => handleTabClick(`Etes vous sur de vouloir bloquer ${user} ?`, blockUser)}/>
