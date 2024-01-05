@@ -26,7 +26,7 @@ const FriendsListComponent: React.FC<FriendsListComponentProps> = ({ userSocket 
 	const {state, dispatch} = useChat();
 
 
-	const disableTabFriendsList = () =>setTabFriendsList(false);
+	const disableTabFriendsList = () => setTabFriendsList(false);
 
 	const activateTabFriendsList = (index: number) => {
 		if (activeIndex === index) {
