@@ -6,7 +6,7 @@ interface ConfirmationComponentProps {
 	phrase: string;
 }
   
-  const ConfirmationComponent: React.FC<ConfirmationComponentProps> = ({ phrase }) => {
+const ConfirmationComponent: React.FC<ConfirmationComponentProps> = ({ phrase }) => {
 	const {state, dispatch} = useChat();
 	return (
 	<div className='blur-background'>

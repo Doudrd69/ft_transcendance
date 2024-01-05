@@ -35,21 +35,32 @@ const AddFriendComponent: React.FC<AddFriendComponentProps> = ({ userSocket, upd
 		});
 
 		if (response.ok) {
+
+			const data = await response.json();
+
+			if (data.isAccepted) {
+				console.log("A friendrequest has already been sent to this user.");
+				return ;
+			}
+
+			if (!data) {
+				console.log("Request denied, please enter a valid username");
+				return ;
+			}
+
 			dispatch({ type: 'DISABLE', payload: 'showAddChannel' });
 			dispatch({ type: 'DISABLE', payload: 'showAddUser' });
 			dispatch({ type: 'DISABLE', payload: 'showAddFriend' });
+			
 			console.log("Friend request successfully created");
-
-			console.log("User is ", userSocket);
 			if (userSocket.connected) {
-				console.log("User is ready to sent data to gateway!");
 				userSocket.emit('addFriend', friendRequestDto, () => {
 					console.log("FriendRequest sent to General gateway");
 				});
 			}
 		}
 		else {
-			console.log("Fatal error");
+			console.log("Fatal error: friend request failed");
 		}
 	};
 
