@@ -159,10 +159,16 @@ export default function Home() {
 			// on peut toast ici ou gerer autrement
 		});
 
+		userSocket.on('userAddedToFriendRoom', (data: {convID: number, convName: string}) => {
+			const { convID, convName } = data;
+			userSocket.emit('joinRoom',  { roomName: convName, roomID: convID });
+		});
+
 		return () => {
 			userSocket.off('friendRequest');
 			userSocket.off('friendRequestAcceptedNotif');
 			userSocket.off('userJoinedRoom');
+			userSocket.off('userAddedToFriendRoom');
 		}
 	}, [userSocket]);
 

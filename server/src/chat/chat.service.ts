@@ -111,7 +111,7 @@ export class ChatService {
 		return await this.groupMemberRepository.save(group);
 	}
 
-	async addFriendToConversation(addUserToConversationDto: AddFriendToConversationDto): Promise<boolean> {
+	async addFriendToConversation(addUserToConversationDto: AddFriendToConversationDto): Promise<Conversation> {
 
 		console.log("== ADD FRIEND TO CONVERSATION ==");
 
@@ -134,14 +134,13 @@ export class ChatService {
 
 				userToAdd.groups.push(group);
 				await this.usersRepository.save(userToAdd);
-				return true;
+				return conversationToAdd;
 			}
 
-			return false;
+			return ;
 		}
 
-
-		return false;
+		return ;
 	}
 
 	async createFriendsConversation(initiator: User, friend: User): Promise<boolean> {

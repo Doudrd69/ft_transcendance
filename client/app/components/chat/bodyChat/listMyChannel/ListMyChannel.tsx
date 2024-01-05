@@ -56,6 +56,11 @@ const ListMyChannelComponent: React.FC<ListMyChannelComponentProps> = ({ userSoc
 		});
 
 		if (response.ok) {
+			const conversation = await response.json();
+
+			if (userSocket.connected) {
+				userSocket.emit('addUserToRoom', { convID: conversation.id, convName: conversation.name, friend: user } );
+			}
 			console.log("Friend has been successfully added!");
 		}
 		else {
