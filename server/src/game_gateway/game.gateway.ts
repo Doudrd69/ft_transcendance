@@ -62,8 +62,8 @@ export class GameGateway {
                 this.game = await this.GameService.createGame(pair[0], pair[1]);
                 // creer une methode qui remplis la variable UsersIDs par rapport aux pair pour l'emit 
                 // const socketIDs = await getPairIDs(pair[0], pair[0]);
-                this.MatchmakingService.leave(pair[0]);
-                this.MatchmakingService.leave(pair[1]);
+                this.MatchmakingService.leave(client.id);
+                // this.MatchmakingService.leave(pair[1]);
                 this.server.to(socketIDs).emit('joinGame', {
                         gameId: this.game.gameId,
                         playerOneID: this.game.playerOneID,

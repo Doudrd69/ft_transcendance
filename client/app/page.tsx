@@ -191,6 +191,7 @@ export default function Home() {
 
 		gameSocket.on('connect', () => {
 			console.log('GameSocket new connection : ', gameSocket.id);
+			gameSocket.emit('linkSocketWithUser', sessionStorage.getItem("currentUserLogin"));
 		})
 
 		gameSocket.on('disconnect', () => {

@@ -25,7 +25,7 @@ const Menu = (socket: { socket: Socket }) => {
 
         if (gameSocket.connected) {
             console.log("GameSocket connecté")
-            gameSocket.emit('linkSocketWithUser', sessionStorage.getItem("currentUserLogin"));
+            // gameSocket.emit('linkSocketWithUser', sessionStorage.getItem("currentUserLogin"));
             gameSocket.emit('join-matchmaking', currentUserID);
             await gameSocket.on('joinGame', (game: Game) => {
                 console.log("Join Game recieve !");
