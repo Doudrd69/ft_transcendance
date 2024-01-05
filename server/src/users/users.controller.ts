@@ -17,6 +17,7 @@ import { extname } from 'path';
 import Jimp from 'jimp';
 import { User } from './entities/users.entity';
 import { UpdateUsernameDto } from './dto/UpdateUsernameDto.dto';
+import { BlockUserDto } from './dto/BlockUserDto.dto';
 import { validate, validateOrReject } from 'class-validator'
 import { AuthGuard } from 'src/auth/auth.guard';
 
@@ -103,6 +104,13 @@ export class UsersController {
 	@Post('acceptFriendRequest')
 	acceptFriendship(@Body() friendRequestDto: FriendRequestDto): Promise<Friendship> {
 		return this.usersService.acceptFriendship(friendRequestDto);
+	}
+
+	@UseGuards(AuthGuard)
+	@HttpCode(HttpStatus.OK)
+	@Post('blockUser')
+	blockUser(@Body() blockUserDto: BlockUserDto): Promise<Friendship> {
+		return this.usersService.blockUser(blockUserDto);
 	}
 
 	@Get('getFriends/:username')

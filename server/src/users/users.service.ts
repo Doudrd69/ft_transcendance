@@ -11,6 +11,7 @@ import { FriendRequestDto } from './dto/FriendRequestDto.dto';
 import { ChatService } from '../chat/chat.service';
 import { UpdateUsernameDto } from './dto/UpdateUsernameDto.dto';
 import { existsSync, unlinkSync } from 'fs';
+import { BlockUserDto } from './dto/BlockUserDto.dto';
 
 @Injectable()
 export class UsersService {
@@ -252,6 +253,17 @@ export class UsersService {
 			return newFriendship;
 		}
 		console.log("Fatal error: could not update friendship status");
+		return ;
+	}
+
+	async blockUser(blockUserDto: BlockUserDto): Promise<Friendship> {
+
+		const friendshipToUpdate = await this.updateFriendship(blockUserDto, false);
+		if (friendshipToUpdate) {
+			return friendshipToUpdate;
+		}
+
+		console.log("Fatal error: could not update frienship status");
 		return ;
 	}
 
