@@ -84,16 +84,14 @@ export class GameGateway {
         return (playerLogin);
     }
 
-    @SubscribeMessage('move-paddle')
-    async handlePaddleMove(client: Socket, game: Game) {
+    @SubscribeMessage('move-paddle-left')
+    async handlePaddleLeftMove(client: Socket, game: Game): number {
         if (client.id == game.playerOneID)
-        {
+        {   
             //move paddle left
         }
-        if (client.id == game.playerTwoID)
-        {
-            //move paddle right
-        }
+        const PositionPaddle: number = 90;
+        return (PositionPaddle);
     }
 
     @SubscribeMessage('move-ball')
