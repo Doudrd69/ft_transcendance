@@ -9,6 +9,7 @@ import { MessageDto } from './dto/message.dto';
 import { ConversationDto } from './dto/conversation.dto';
 import { GroupDto } from './dto/group.dto';
 import { group } from 'console';
+import { AddFriendToConversationDto } from './dto/addFriendToConversationDto.dto';
 
 
 @Injectable()
@@ -110,27 +111,35 @@ export class ChatService {
 		return await this.groupMemberRepository.save(group);
 	}
 
-	async addUserToConversation(userNameToAdd: string, conversationID: number): Promise<boolean> {
+	async addFriendToConversation(addUserToConversationDto: AddFriendToConversationDto): Promise<boolean> {
 
-		const user = await this.usersRepository.findOne({
-			where: {username: userNameToAdd},
+		console.log("== ADD FRIEND TO CONVERSATION ==");
+
+		const userToAdd = await this.usersRepository.findOne({
+			where: { login: addUserToConversationDto.userToAdd },
 			relations: ['groups'],
 		});
 
-		const conversation = await this.conversationRepository.findOne({
-			where: {id: conversationID},
+		const conversationToAdd = await this.conversationRepository.findOne({
+			where: {id: addUserToConversationDto.conversationID}
 		});
 
-		if (user && conversation) {
-			// When we add a new user to a conversion, isAdmin is set to false
-			const newGroup = await this.createGroup(conversation, false);
+		if (conversationToAdd && userToAdd) {
 
-			if (Array.isArray(user.groups)) {
-				user.groups.push(newGroup);
-				await this.usersRepository.save(user);
+			const group = await this.groupMemberRepository.findOne({
+				where: {conversation: conversationToAdd}
+			});
+
+			if (group) {
+
+				userToAdd.groups.push(group);
+				await this.usersRepository.save(userToAdd);
+				return true;
 			}
-			return true;
+
+			return false;
 		}
+
 
 		return false;
 	}
@@ -171,7 +180,7 @@ export class ChatService {
 			conv.is_channel = conversationDto.is_channel;
 			await this.conversationRepository.save(conv);
 
-			// The user which created the conversation is set to admin
+			// The user who created the conversation is set to admin
 			const group = await this.createGroup(conv, true);
 
 			if (Array.isArray(user.groups)) {

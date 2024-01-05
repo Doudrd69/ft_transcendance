@@ -33,9 +33,7 @@ export class GameService {
 
     async linkSocketIDWithUser(playerID: string, playerLogin: string) {
 
-        console.log(`HHHHHHHHHHOOOOOOOOOOOOOOOOOOOOO ${playerID}`);
         const Player: User = await this.usersRepository.findOne({ where: { login: playerLogin } })
-        console.log(`=================================== ${Player.login}`);
         Player.socketGame = playerID;
         this.usersRepository.save(Player);
     }
@@ -44,8 +42,6 @@ export class GameService {
 
         const UserOne: User = await this.usersRepository.findOne({ where: { socketGame: player1ID } })
         const UserTwo: User = await this.usersRepository.findOne({ where: { socketGame: player2ID } })
-        console.log(`HHHHHHHHHHOOOOOOOOOOOOOOOOOOOOO ${UserOne.login}`);
-        console.log(`HHHHHHHHHHOOOOOOOOOOOOOOOOOOOOO ${UserTwo.id}`);
         const playersLogin: [string, string] = [UserOne.login, UserTwo.login]
         return (playersLogin);
     }

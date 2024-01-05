@@ -23,8 +23,8 @@ const FriendsListTabComponent:  React.FC<FriendsListTabComponentProps> = ({ user
 		dispatch({ type: 'ACTIVATE', payload: 'showConfirmation' });
 	};
 
-	const debugmdr = () => {
-		console.log("mdr");
+	const gameInvite = () => {
+		console.log("Inviting user to play");
 	}
 
 	const blockUser = async () => {
@@ -64,7 +64,7 @@ const FriendsListTabComponent:  React.FC<FriendsListTabComponentProps> = ({ user
 		<>
 			<div className="bloc-tab">
 				<button className='tab1'/>
-				<button className='tab2' onClick={() => handleTabClick(`Etes vous sur de vouloir défier ${user} ?`, debugmdr)} />
+				<button className='tab2' onClick={() => handleTabClick(`Etes vous sur de vouloir défier ${user} ?`, gameInvite)} />
 				<button className='tab3' onClick={() => dispatch({ type: 'ACTIVATE', payload: 'showListChannelAdd' })} />
 				<button className='tab4'/>
 				<button className='tab5' onClick={() => handleTabClick(`Etes vous sur de vouloir bloquer ${user} ?`, blockUser)}/>
@@ -74,7 +74,7 @@ const FriendsListTabComponent:  React.FC<FriendsListTabComponentProps> = ({ user
 			<ConfirmationComponent phrase={confirmationText} functionToExecute={funtionToExecute}/>
 			)}
 			{state.showListChannelAdd && (
-				<ListMyChannelComponent userSocket={userSocket}/>
+				<ListMyChannelComponent userSocket={userSocket} user={user}/>
 			)}
 		</>
 	);
