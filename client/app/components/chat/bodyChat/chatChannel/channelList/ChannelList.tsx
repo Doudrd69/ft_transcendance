@@ -10,7 +10,11 @@ interface Conversation {
   is_channel: boolean;
 }
 
-const ChannelListComponent: React.FC = () => {
+interface ChanneListComponentProps {
+	userSocket: Socket;
+}
+
+const ChannelListComponent: React.FC<ChanneListComponentProps> = ({ userSocket }) => {
 
 	const { state, dispatch } = useChat();
 
@@ -19,6 +23,7 @@ const ChannelListComponent: React.FC = () => {
 
 	const loadDiscussions = async () => {
 
+		console.log("User id : ", userID);
 		const response = await fetch(`http://localhost:3001/chat/getConversationsWithStatus/${userID}`, {
 			method: 'GET',
 			headers: {
@@ -29,7 +34,7 @@ const ChannelListComponent: React.FC = () => {
 		if (response.ok) {
 			const conversationsData = await response.json();
 			const { conversations, isAdmin } = conversationsData;
-			console.log("==> ", isAdmin);
+			console.log("isAdmin ==> ", isAdmin);
 
 			setConversations((prevConversations: Conversation[]) => [...prevConversations, ...conversations]);
 		}
@@ -58,7 +63,7 @@ const ChannelListComponent: React.FC = () => {
 		>
 			+
 		</button>
-		{state.showAddChannel && <AddConversationComponent loadDiscussions={loadDiscussions} title="Add/Create Channel" isChannel={true}/>}
+		{state.showAddChannel && <AddConversationComponent userSocket={userSocket} loadDiscussions={loadDiscussions} title="Add/Create Channel" isChannel={true}/>}
 		{userData.discussion.map((conversation, index) => (
 			conversation.is_channel && (
 			<button

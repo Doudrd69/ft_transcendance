@@ -4,12 +4,13 @@ import { useChat } from '../../ChatContext';
 import './AddConversation.css';
 
 interface AddConversationComponentProps {
+	userSocket: Socket;
 	loadDiscussions: () => void;
 	title: string;
 	isChannel: boolean;
 }
 
-const AddConversationComponent: React.FC<AddConversationComponentProps> = ({ loadDiscussions, title, isChannel }) => {
+const AddConversationComponent: React.FC<AddConversationComponentProps> = ({ userSocket, loadDiscussions, title, isChannel }) => {
 
 	const [formValue, setFormValue] = useState('');
 	const { state, dispatch } = useChat();
@@ -36,11 +37,19 @@ const AddConversationComponent: React.FC<AddConversationComponentProps> = ({ loa
 		});
 
 		if (response.ok) {
+
+			const data = await response.json();
+
+			if (userSocket.connected) {
+				userSocket.emit('joinRoom', { roomName: data.name, roomID: data.id }, () => {
+					console.log("Room creation loading...");
+				});
+			}
+
 			console.log("Conversation successfully created");
 			dispatch({ type: 'DISABLE', payload: 'showAddChannel' });
 			dispatch({ type: 'DISABLE', payload: 'showAddUser' });
 			dispatch({ type: 'DISABLE', payload: 'showAddFriend' });
-			loadDiscussions();
 		} else {
 			console.log("Conversation creation failed");
 		}

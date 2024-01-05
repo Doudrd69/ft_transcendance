@@ -61,7 +61,7 @@ export default function Home() {
 		});
 
 		if (response.ok) {
-			console.log("User added to your friend list!");
+			console.log(friendRequestDto.initiatorLogin, " added to your friend list!");
 			const roomName = friendRequestDto.initiatorLogin + friendRequestDto.recipientLogin;
 			if (userSocket.connected) {
 				userSocket.emit('friendRequestAccepted', friendRequestDto);
@@ -76,8 +76,8 @@ export default function Home() {
 	const FriendRequestReceived = ({ closeToast, toastProps, friendRequestDto }: any) => (
 		<div>
 		  You received a friend request from  {friendRequestDto.initiatorLogin}
-		  <button style={{ padding: '10px '}} onClick={() => friendRequestValidation(friendRequestDto)}>Accept</button>
-		  <button onClick={closeToast}>Deny</button>
+		  <button style={{ padding: '5px '}} onClick={() => friendRequestValidation(friendRequestDto)}>Accept</button>
+		  <button style={{ padding: '5px '}} onClick={closeToast}>Deny</button>
 		</div>
 	)
 
