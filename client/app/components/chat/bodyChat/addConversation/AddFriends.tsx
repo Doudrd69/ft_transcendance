@@ -19,6 +19,7 @@ const AddFriendComponent: React.FC<AddFriendComponentProps> = ({ userSocket, upd
 		e.preventDefault();
 
 		console.log("Friend to add :", formValue);
+
 		const friendRequestDto = {
 			initiatorLogin: sessionStorage.getItem("currentUserLogin"), // à remplacer
 			recipientLogin: formValue,
@@ -39,9 +40,9 @@ const AddFriendComponent: React.FC<AddFriendComponentProps> = ({ userSocket, upd
 			dispatch({ type: 'DISABLE', payload: 'showAddFriend' });
 			console.log("Friend request successfully created");
 
-			console.log("user is ", userSocket.id);
+			console.log("User is ", userSocket);
 			if (userSocket.connected) {
-				console.log("user is ready to sent data to gateway");
+				console.log("User is ready to sent data to gateway!");
 				userSocket.emit('addFriend', friendRequestDto, () => {
 					console.log("FriendRequest sent to General gateway");
 				});

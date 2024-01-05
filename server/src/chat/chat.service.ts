@@ -46,7 +46,6 @@ export class ChatService {
 		});
 
 		if (userToFind) {
-			console.log("Retreive conversations of ", userToFind.login);
 			if (userToFind.groups && Array.isArray(userToFind.groups)) {
 				const conversations = userToFind.groups;
 				return conversations;
@@ -64,13 +63,13 @@ export class ChatService {
 			const groups = await this.groupMemberRepository.find({
 				where: {conversation: conversations},
 			});
-			console.log("User's groups: ", groups);
+			// console.log("User's groups: ", groups);
 	
 			let isAdminArray = [];
 			groups.forEach((element: GroupMember) => {
 				isAdminArray.push(element.isAdmin);
 			});
-			console.log("IsAdminArray: ", isAdminArray);
+			// console.log("IsAdminArray: ", isAdminArray);
 
 			return isAdminArray;
 		}
@@ -188,7 +187,7 @@ export class ChatService {
 
 		let conversation = new Conversation(); 
 		conversation = await this.conversationRepository.findOne({ where: {id: messageDto.conversationID} }); 
-		console.log("Joining message to ", conversation.name, " with ID ", conversation.id);
+		console.log("Linking message to ", conversation.name, " with ID ", conversation.id);
 		if (conversation) {
 			const newMessage = new Message();
 			newMessage.from = messageDto.from;
@@ -278,7 +277,7 @@ export class ChatService {
 					isAdmin: conversationsRights,
 				}
 
-				console.log("Conversations of user with ID", userID, " -> ", conversationArray);
+				// console.log("Conversations of user with ID", userID, " -> ", conversationArray);
 
 				return conversationArray;
 			}

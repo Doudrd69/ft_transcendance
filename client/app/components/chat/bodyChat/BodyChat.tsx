@@ -24,7 +24,7 @@ const BodyChatComponent: React.FC<BodyChatComponentProps> = ({ userSocket }) => 
 			{renderComponent(<ChatUserComponent userSocket={userSocket} />, state.showChat || state.showChatList)}
 			{renderComponent(<ChatChannelComponent userSocket={userSocket}/>, state.showChannel || state.showChannelList)}
 			{renderComponent(<ChatFriendsListComponent userSocket={userSocket}/>, state.showFriendsList)}
-			{renderComponent(<AddComponent userSocket={userSocket}/>, state.showAdd)}
+			{/* {renderComponent(<AddComponent userSocket={userSocket}/>, state.showAdd)} */}
 		</div>
 	)
 };

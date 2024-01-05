@@ -186,40 +186,43 @@ export class UsersService {
 			// if the frienship already exists between the users, don't do anything
 			return null;
 		}
-		throw Error("Fatal error");
+		throw Error("Fatal error: friendrequest failed");
 	}
 	
 	async updateFriendship(friendRequestDto: FriendRequestDto, flag: boolean): Promise<Friendship> {
 
 		// recherche par login ou username?
 		const initiator = await this.usersRepository.findOne({
-			where: {login: friendRequestDto.initiatorLogin},
+			where: { login: friendRequestDto.initiatorLogin },
 			relations: ["initiatedFriendships", "acceptedFriendships", "groups"],
 		});
-	  
+
 		const friend = await this.usersRepository.findOne({
-			where: {id: friendRequestDto.recipientID},
+			where: { login: friendRequestDto.recipientLogin },
 			relations: ["initiatedFriendships", "acceptedFriendships", "groups"],
 		});
 	  
 		if (initiator && friend) {
-		  const friendshipToUpdate = await this.friendshipRepository.findOne({
-			where: { initiator: { id: initiator.id }, friend: { id: friend.id } },
-		  });
-	  
-		  if (friendshipToUpdate) {
-			friendshipToUpdate.isAccepted = flag;
-			await this.friendshipRepository.save(friendshipToUpdate);
 
-			if (flag) {
-				const status = this.chatService.createFriendsConversation(initiator, friend);
-				console.log(status);
-			}
+			const friendshipToUpdate = await this.friendshipRepository.findOne({
+				where: { initiator: { id: initiator.id }, friend: { id: friend.id } },
+			});
+	
+			if (friendshipToUpdate) {
 
-			return friendshipToUpdate;
-		  }
+				friendshipToUpdate.isAccepted = flag;
+				await this.friendshipRepository.save(friendshipToUpdate);
+
+				if (flag) {
+					const status = this.chatService.createFriendsConversation(initiator, friend);
+					console.log(status);
+				}
+
+				return friendshipToUpdate;
+		  	}
 		}
-		console.error("Fatal error: could not find user");
+
+		console.error("Fatal error: could not find user (updateFriendship)");
 		return ;
 	}
 
@@ -227,10 +230,9 @@ export class UsersService {
 
 		const newFriendship = await this.updateFriendship(friendRequestDto, true);
 		if (newFriendship) {
-			console.log("Updated friendship : ", newFriendship);
 			return newFriendship;
 		}
-		console.log("Fatal error");
+		console.log("Fatal error: could not update friendship status");
 		return ;
 	}
 
