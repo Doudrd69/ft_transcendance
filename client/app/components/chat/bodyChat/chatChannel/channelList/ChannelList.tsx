@@ -23,7 +23,6 @@ const ChannelListComponent: React.FC<ChanneListComponentProps> = ({ userSocket }
 
 	const loadDiscussions = async () => {
 
-		console.log("User id : ", userID);
 		const response = await fetch(`http://localhost:3001/chat/getConversationsWithStatus/${userID}`, {
 			method: 'GET',
 			headers: {

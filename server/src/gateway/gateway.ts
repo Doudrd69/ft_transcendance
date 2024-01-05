@@ -110,6 +110,15 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		return ;
 	}
 
+	@SubscribeMessage('addUserToRoom')
+	addUserToNewRoom( @MessageBody() data: { convID: number, convName: string, friend: string} ) {
+		const { convID, convName, friend } = data;
+		this.server.to(friend).emit('userAddedToFriendRoom', {
+			convID: convID,
+			convName: convName,
+		});
+	}
+
 	@SubscribeMessage('message')
 	handleMessage(@MessageBody() data: { dto: MessageDto, conversationName: string } ) {
 
