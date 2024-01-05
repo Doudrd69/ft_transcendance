@@ -60,14 +60,13 @@ export class UsersController {
 	@Get('getAvatar/:userId')
 	async getUserAvatar(@Param('userId') userId: number, @Res() res: ExpressResponse) {
 
+		console.log('?????????????????');
 		try {
 			
 			const avatarURL = await this.usersService.getAvatar(userId);
-
 		if (!avatarURL) {
 			console.log('getUserAvatar erreur');
 			res.status(404).send('Avatar not found');
-			return avatarURL;
 		}
 			res.setHeader('Content-Type', 'image/*'); 
 			res.redirect(301, avatarURL);

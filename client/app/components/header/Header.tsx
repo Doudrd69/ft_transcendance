@@ -8,8 +8,8 @@ import { validate, validateOrReject } from 'class-validator';
 
 
 const HeaderComponent: React.FC = () => {
-
 	const { state, dispatch } = useGlobal();
+	console.log('MONTRE MOI : ', state.showUploadAvatar);
 
 	// const notify = (flag: number, string?: string) => { 
 		
@@ -130,7 +130,15 @@ const HeaderComponent: React.FC = () => {
 	// }
 
 	// };
+	const uploadAvatar =  () => {
+		dispatch({ type: 'ACTIVATE', payload: 'showUploadAvatar' });
+	}
+	useEffect(() => {
+		uploadAvatar();
+	}, [state.showRefresh]);
 
+	const renderComponent = (component: React.ReactNode, condition: boolean) =>
+		condition ? component : null;
 	return (
 		<div className="header">
 			<div className="bloc-profils">
@@ -147,7 +155,7 @@ const HeaderComponent: React.FC = () => {
 					dispatch({ type: 'DISABLE', payload: 'showProfilsSettings'});
 					dispatch({ type: 'DISABLE', payload: 'showGameSettings'});
 				}}}>
-				<AvatarImageComponent className="profils"/>
+					{renderComponent(<AvatarImageComponent className="profils" refresh={state.showRefresh}/>, state.showUploadAvatar)}
 			</button>
 		</div>
 

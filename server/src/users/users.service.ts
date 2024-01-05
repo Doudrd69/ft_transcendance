@@ -6,9 +6,11 @@ import { User } from './entities/users.entity'
 import { Friendship } from './entities/friendship.entity'
 import { speakeasy } from 'speakeasy'
 import { QRCode } from 'qrcode'
+import { join } from 'path';
 import { FriendRequestDto } from './dto/FriendRequestDto.dto';
 import { ChatService } from '../chat/chat.service';
 import { UpdateUsernameDto } from './dto/UpdateUsernameDto.dto';
+import { existsSync, unlinkSync } from 'fs';
 
 @Injectable()
 export class UsersService {
@@ -49,14 +51,18 @@ export class UsersService {
 
 	async uploadAvatarURL(avatarURL: string, userID: number): Promise<UpdateResult | undefined> {
 		try {
-		const user = await this.getUserByID(userID);
+			const user = await this.getUserByID(userID);
+			const oldAvatarPath = join(__dirname, 'users', user.avatarURL);
 
-		if (!user) {
-			console.error(`Utilisateur avec l'ID ${userID} non trouvé.`);
-			return undefined;
-		}
-			// Mettez à jour uniquement l'avatarURL
-			const updateResult = await this.usersRepository.update({ id: userID }, { avatarURL });
+			if (existsSync(oldAvatarPath)) {
+				unlinkSync(oldAvatarPath); 
+			  }
+			if (!user) {
+				console.error(`Utilisateur avec l'ID ${userID} non trouvé.`);
+				return undefined;
+			}
+				// Mettez à jour uniquement l'avatarURL
+				const updateResult = await this.usersRepository.update({ id: userID }, { avatarURL });
 
 			return updateResult;
 		} catch (error) {
