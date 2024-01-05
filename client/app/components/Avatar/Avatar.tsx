@@ -3,25 +3,29 @@ import { useGlobal } from '@/app/GlobalContext';
 import { response } from 'express';
 
 interface AvatarImageProps {
-className?: string; // Prop pour la classe CSS
+	className?: string;
+	refresh?: boolean;
 }
 
-const AvatarImageComponent: React.FC<AvatarImageProps> = ({ className }) => {
-const { state } = useGlobal();
-const [avatarURL, setAvatarURL] = useState<string | null>(null);
+const AvatarImageComponent: React.FC<AvatarImageProps> = ({ className , refresh}) => {
 
+	const { state, dispatch } = useGlobal();
+
+	const [avatarURL, setAvatarURL] = useState('/avatars/avatar.png');
 	const fetchAvatar = async () => {
+
 		try {
+			console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+			console.log(sessionStorage.getItem('currentUserID'));
+			console.log('test1');
+
 			const response = await fetch(`http://localhost:3001/users/getAvatar/${sessionStorage.getItem('currentUserID')}`,{
 				method: 'GET',
 			});
-
+			console.log('response', response);	
 			if (response.ok) {
-				const data = await response.json();
-				if (data) {
-					console.log(data);
-					setAvatarURL(data.avatarURL);
-				}
+				setAvatarURL(`http://localhost:3001/users/getAvatar/${sessionStorage.getItem('currentUserID')}`)
+				console.log('setAvatarURL en cas de fetch reussie', avatarURL);
 			} else {
 				console.error('Error fetching Avatar URL:', response.statusText);
 			}
@@ -33,10 +37,9 @@ const [avatarURL, setAvatarURL] = useState<string | null>(null);
 	useEffect(() => {
 		fetchAvatar();
 	}, [state.showUploadAvatar]);
-
-return (
-		<img src={avatarURL || 'avatars/avatar.png'} className={className}/>
-	);
+	return (
+			<img src={avatarURL} className={className} title={`Refresh: ${refresh}`}/>
+		);
 };
 
 export default AvatarImageComponent;

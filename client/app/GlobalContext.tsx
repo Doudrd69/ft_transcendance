@@ -26,9 +26,11 @@ interface GlobalState {
 	showAvatar:boolean;
 	showHeader:boolean;
 	showUploadAvatar:boolean;
+	showRefresh:boolean;
+
 
 	avatar:string
-	[key: string]: boolean | string |  null;
+	[key: string]: boolean | string | null;
 }
 
 // État initial
@@ -40,35 +42,36 @@ const initialState: GlobalState = {
 	showGame: true,
 	showChat: true,
 	showAvatar:false,
-	showUploadAvatar:false,
+	showUploadAvatar:true,
 	showHeader:false,
+	showRefresh:false,
 	avatar:"",
 };
 
 // Réducteur
 const chatReducer = (state: GlobalState, action: Action): GlobalState => {
 	switch (action.type) {
-	  case 'ACTIVATE':
-		return { ...state, [action.payload as string]: true };
-	  case 'DISABLE':
-		return { ...state, [action.payload as string]: false };
-	  case 'TOGGLEX':
-		return { ...state, [action.payload as string]: !state[action.payload as string] };
-	  case 'TOGGLE':
-		return Object.keys(state).reduce((acc, key) => {
-		  acc[key] = key === action.payload ? true : false;
-		  return acc;
-		}, {} as GlobalState);
-	  case 'SET':
-		if (action.payload !== undefined) {
-		  if (typeof action.payload === 'object' && action.payload !== null) {
-			return Object.assign({}, state, action.payload);
-		  } else if (typeof action.payload === 'string') {
-			return { ...state, avatar: action.payload };
-		  }
-		}
-		// Gérer le cas où action.payload n'est ni un objet ni une chaîne
-		return state;
+		case 'ACTIVATE':
+			return { ...state, [action.payload as string]: true };
+		case 'DISABLE':
+			return { ...state, [action.payload as string]: false };
+		case 'TOGGLEX':
+			return { ...state, [action.payload as string]: !state[action.payload as string] };
+		case 'TOGGLE':
+			return Object.keys(state).reduce((acc, key) => {
+			acc[key] = key === action.payload ? true : false;
+			return acc;
+			}, {} as GlobalState);
+		case 'SET':
+			if (action.payload !== undefined) {
+			if (typeof action.payload === 'object' && action.payload !== null) {
+				return Object.assign({}, state, action.payload);
+			} else if (typeof action.payload === 'string') {
+				return { ...state, avatar: action.payload };
+			}
+			}
+			// Gérer le cas où action.payload n'est ni un objet ni une chaîne
+			return state;
 	  default:
 		return state;
 	}

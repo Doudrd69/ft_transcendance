@@ -28,45 +28,45 @@ const dbName = process.env.DB_NAME;
 const dbHost = process.env.HOSTNAME;
 
 if (!dbPass || !dbUsername || !dbName || !dbHost) {
-  throw new Error('One or more required environment variables are missing.');
+throw new Error('One or more required environment variables are missing.');
 }
 
 
 @Module({
 	
-  imports: [
+imports: [
 
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: dbHost,
-      port: 5432,
-      username: dbUsername,
-      password: dbPass,
-      database: dbName,
-      entities: [User, Message, Conversation, Friendship],
-      synchronize: true,
-      autoLoadEntities: true,
-    }),
+	TypeOrmModule.forRoot({
+	type: 'postgres',
+	host: dbHost,
+	port: 5432,
+	username: dbUsername,
+	password: dbPass,
+	database: dbName,
+	entities: [User, Message, Conversation, Friendship],
+	synchronize: true,
+	autoLoadEntities: true,
+	}),
 
-    ServeStaticModule.forRoot({
-      rootPath: join(__dirname, 'users', 'avatars'),
-      serveRoot: '/avatars/', 
-    }),
+	ServeStaticModule.forRoot({
+		rootPath: join(__dirname, 'users', 'avatars'),
+		serveRoot: '/avatars/', 
+	}),
 
-    AuthModule,
+	AuthModule,
 
-    UsersModule,
+	UsersModule,
 
-    ChatModule,
+	ChatModule,
 
-    GatewayModule,
+	GatewayModule,
 
-    GameGatewayModule,
+	GameGatewayModule,
 
-    GameModule,
+	GameModule,
 
-  ],
-  controllers: [AppController],
-  providers: [AppService],
+],
+controllers: [AppController],
+providers: [AppService],
 })
 export class AppModule {}

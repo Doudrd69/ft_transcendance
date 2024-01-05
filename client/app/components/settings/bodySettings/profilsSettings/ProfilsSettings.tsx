@@ -69,14 +69,17 @@ const ProfilsSettingsComponent: React.FC = () => {
 		if (response.ok){
 			console.log('Image envoyée avec succès au backend');
 			dispatch({ type: 'ACTIVATE', payload: 'showAvatar' });
-			console.log('avant------------>', state.showUploadAvatar);
-			dispatch({ type: 'TOGGLEX', payload: 'showUploadAvatar' })
-			console.log('apres------------>', state.showUploadAvatar);
+			dispatch({ type: 'DISABLE', payload: 'showUploadAvatar' });
+			console.log('aavant1------------>', state.showRefresh);
+
+			dispatch({ type: 'TOGGLEX', payload: 'showRefresh'});
+			console.log('apres1------------>', state.showRefresh);
+
 			
 		}
 		else
-			console.error('Échec de l\'envoi de l\'image au backend');
-		} 
+		console.error('Échec de l\'envoi de l\'image au backend');
+} 
 		catch (error) {
 			console.error('Erreur lors de l\'envoi de l\'image au backend :', error);
 		}
@@ -98,7 +101,6 @@ const ProfilsSettingsComponent: React.FC = () => {
 		setImageURL(null);
 	  }
 	}, [newImage]);
-
 	return (
 		<div className="bloc-profils-settings">
 			<div className="upload-image">
