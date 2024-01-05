@@ -28,26 +28,27 @@ const SendBoxComponent: React.FC<SendBoxComponentProps> = ({ userSocket }) => {
 
 		e.preventDefault();
 
-		if (socketInUse.connected) {
-			socketInUse.emit('message', { dto: messageDto, conversationName: state.currentConversation } , () => {
-				console.log("Message sent!");
-			});
-		}
-		else {
-			console.log("Client is not connected");
-		}
-
+		
 		const response = await fetch('http://localhost:3001/chat/newMessage', {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-					'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
-				},
-				body: JSON.stringify(messageDto),
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
+			},
+			body: JSON.stringify(messageDto),
 		});
-				
+		
 		if (response.ok) {
 			console.log("Message sent and created in DB");
+
+			if (socketInUse.connected) {
+				socketInUse.emit('message', { dto: messageDto, conversationName: state.currentConversation } , () => {
+					console.log("Message sent to gateway");
+				});
+			}
+			else {
+				console.log("Client is not connected");
+			}
 		}
 		else {
 			const error = await response.json();

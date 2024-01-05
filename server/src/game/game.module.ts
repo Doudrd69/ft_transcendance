@@ -8,7 +8,6 @@ import { MatchmakingService } from './matchmaking/matchmaking.service';
 import { ChatService } from 'src/chat/chat.service';
 import { Conversation } from 'src/chat/entities/conversation.entity';
 import { Game } from './entities/games.entity';
-import { GameGateway } from 'src/game_gateway/game.gateway';
 import { GameController } from './game.controller';
 import { GameService } from './game.service';
 
@@ -19,7 +18,7 @@ import { GameService } from './game.service';
       TypeOrmModule.forFeature([Game]),
   ],
   controllers: [GameController],
-  providers: [GameGateway, GameService, MatchmakingService],
+  providers: [GameService, MatchmakingService],
   exports: [GameService],
 })
 export class GameModule {

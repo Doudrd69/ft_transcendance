@@ -39,17 +39,16 @@ export class ChatService {
 	private async getAllConversations(userID: number): Promise<GroupMember[]> {
 
 		let userToFind = new User();
+		console.log("===== getAllConversations : userID = ", userID);
 		userToFind = await this.usersRepository.findOne({
 			where: { id: userID },
 			relations: ["groups"],
 		});
 
 		if (userToFind) {
+			console.log("Retreive conversations of ", userToFind.login);
 			if (userToFind.groups && Array.isArray(userToFind.groups)) {
 				const conversations = userToFind.groups;
-
-				// this.loadGroups(conversations);
-
 				return conversations;
 			}
 			return [];
@@ -61,16 +60,17 @@ export class ChatService {
 	private async getConversationsRights(conversations: GroupMember[]) {
 
 		if (conversations) {
+			console.log("==== getConversationsRights ===");
 			const groups = await this.groupMemberRepository.find({
 				where: {conversation: conversations},
 			});
-			// console.log("User's groups: ", groups);
+			console.log("User's groups: ", groups);
 	
 			let isAdminArray = [];
 			groups.forEach((element: GroupMember) => {
 				isAdminArray.push(element.isAdmin);
 			});
-			// console.log("IsAdminArray: ", isAdminArray);
+			console.log("IsAdminArray: ", isAdminArray);
 
 			return isAdminArray;
 		}
@@ -103,6 +103,7 @@ export class ChatService {
 
 	async createGroup(conversation: Conversation, isAdminFlag: boolean): Promise<GroupMember> {
 		
+		console.log("Creating group...");
 		const group = new GroupMember();
 		group.isAdmin = isAdminFlag;
 		group.joined_datetime = new Date();
@@ -244,7 +245,6 @@ export class ChatService {
 
 	async getMessages(conversationID: any): Promise<Message[]> {
 
-		console.log("Coucou : ", conversationID);
 		const allMessages = await this.getAllMessages(conversationID);
 		if (!allMessages) {
 			console.error("Fatal error: messsages not found");
@@ -278,7 +278,7 @@ export class ChatService {
 					isAdmin: conversationsRights,
 				}
 
-				// console.log("Conversations -> ", conversationArray);
+				console.log("Conversations of user with ID", userID, " -> ", conversationArray);
 
 				return conversationArray;
 			}

@@ -17,7 +17,6 @@ interface ReceiveBoxComponentProps {
 const ReceiveBoxComponent: React.FC<ReceiveBoxComponentProps> = ({ userSocket }) => {
 
 	const { state } = useChat();
-	const socketInUse = userSocket;
 	const [messages, setMessages] = useState<Message[]>([]);
 	const messagesContainerRef = useRef<HTMLDivElement>(null);
 	
@@ -70,16 +69,17 @@ const ReceiveBoxComponent: React.FC<ReceiveBoxComponentProps> = ({ userSocket })
 	// Here we retreive the last sent message and we "insert" it in the messages array
 	useEffect(() => {
 
-		socketInUse.on('onMessage', (message: Message) => {
+		userSocket.on('onMessage', (message: Message) => {
 			if (message) {
 				setMessages((prevMessages: Message[]) => [...prevMessages, message]);
 			}
 		});
 		
 		return () => {
-			socketInUse.off('onMessage')
+			userSocket.off('onMessage')
 		}
-	}, [socketInUse]);
+
+	}, [userSocket]);
 	
 	// Loading the conversation (retrieving all messages on component rendering)
 	useEffect(() => {

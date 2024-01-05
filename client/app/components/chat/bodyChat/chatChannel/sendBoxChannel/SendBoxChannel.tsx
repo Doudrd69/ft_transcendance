@@ -40,9 +40,7 @@ const SendBoxChannelComponent: React.FC<SendBoxComponentProps> = ({ userSocket }
 
 		if (response.ok) {
 			if (socketInUse.connected) {
-				socketInUse.emit('message', { dto: messageDto, conversationName: state.currentConversation } , () => {
-					console.log("Message Sent!");
-				});
+				socketInUse.emit('message', { dto: messageDto, conversationName: state.currentConversation });
 			}
 			else {
 				console.log("Client is not connected");

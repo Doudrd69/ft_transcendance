@@ -19,7 +19,7 @@ const ChatChannelComponent: React.FC<BodyChatComponentProps> = ({ userSocket }) 
 
   return (
     <div className="chat-channel">
-		{renderComponent(<ChannelListComponent />, state.showChannelList)}
+		{renderComponent(<ChannelListComponent userSocket={userSocket} />, state.showChannelList)}
 		{renderComponent(<ReceiveBoxChannelComponent userSocket={userSocket} />, state.showChannel)}
 		{renderComponent(<SendBoxChannelComponent userSocket={userSocket}/>, state.showChannel)}
     </div>

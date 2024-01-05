@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { join } from 'path';
 import dotenv from 'dotenv';
 import { User } from './users/entities/users.entity'
 import { Message } from './chat/entities/message.entity'
@@ -10,10 +11,9 @@ import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { ChatModule } from './chat/chat.module';
-import { GatewayModule } from './gateway/gateway.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
-import { join } from 'path';
 import { GameModule } from './game/game.module';
+import { GatewayModule } from './gateway/gateway.module';
 import { GameGatewayModule } from './game_gateway/gameGateway.module';
 
 //We set the synchronize option to true, which means that TypeORM will automatically
