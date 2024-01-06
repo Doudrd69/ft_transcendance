@@ -58,7 +58,6 @@ const SendBoxChannelComponent: React.FC<SendBoxComponentProps> = ({ userSocket }
 	return (
 				<form className="bloc-send-chat-channel" onSubmit={handleMessage}>
 					<input className="input-chat-channel" placeholder="message..." value={messageValue} onChange={handleMessageInput}></input>
-					<button className="button-send-channel" type="submit"></button>
 				</form>
 	)
 };
