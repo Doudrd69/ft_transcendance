@@ -63,6 +63,10 @@ const AddFriendComponent: React.FC<AddFriendComponentProps> = ({ userSocket, upd
 		}
 		else {
 			console.log("Fatal error: friend request failed");
+			const error = await response.json();
+			if (error.message) {
+				console.log(error.message[0]);
+			}
 		}
 	};
 

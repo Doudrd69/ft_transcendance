@@ -52,6 +52,7 @@ export class UsersController {
 		},
 		}),
 	}))
+
 	async uploadAvatar(@UploadedFile() avatar: Express.Multer.File, @Param('userId') userId: number) {
 		if (!avatar) {
 			return { error: "Aucun fichier d'avatar fourni." };

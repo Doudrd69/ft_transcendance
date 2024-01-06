@@ -52,7 +52,8 @@ const AddConversationComponent: React.FC<AddConversationComponentProps> = ({ use
 			dispatch({ type: 'DISABLE', payload: 'showAddFriend' });
 			dispatch({ type: 'TOGGLEX', payload: 'refreshChannel'});
 		} else {
-			console.log("Conversation creation failed");
+			const error = await response.json();
+			console.log("Error: ", error.message[0]);
 		}
 	};
 

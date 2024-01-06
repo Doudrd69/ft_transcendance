@@ -1,40 +1,39 @@
 import {
-	validate,
-	validateOrReject,
-	Contains, // Checks if the string contains the seed: @Contains(seed: string)
-	IsString,
 	IsAlpha,
-	IsAlphanumeric,
-	IsInt,
-	Length,
-	IsNotEmpty,
-	IsEmail, // Checks if the string is an email: @IsEmail(options?: IsEmailOptions)
-	IsFQDN,
 	IsAscii,
-	IsPositive,
-    IsBoolean,
-	IsDate,
-	Min,
-	Max,
+	IsBoolean,
+	IsNotEmpty,
+	IsPositive, // Checks if the string contains the seed: @Contains(seed: string)
+	IsString,
+	Length,
 	Matches,
-  } from 'class-validator';
+	Max
+} from 'class-validator';
 
 export class ConversationDto {
 
-    @IsNotEmpty()
-    @Length(6, 20)
-    @IsAscii()
-    @IsAlpha()
-    @IsString()
+	@IsNotEmpty()
+	@Length(6, 20)
+	@IsAscii()
+	@IsAlpha()
+	@IsString()
 	@Matches(/^[^"';%()|<>\\]*$/)
-    name: string;
+	name: string;
 
-    @IsNotEmpty()
+	@IsNotEmpty()
 	@IsPositive()
 	@Max(1000)
-    userID: number;
+	userID: number;
 
-    @IsNotEmpty()
-    @IsBoolean()
-    is_channel: boolean;
+	@IsNotEmpty()
+	@IsBoolean()
+	is_channel: boolean;
+
+	// @IsNotEmpty()
+	// @Length(6, 20)
+	// @IsAscii()
+	// @IsAlpha()
+	// @IsString()
+	// @Matches(/^[^"';%()|<>\\]*$/)
+	// password?: string;
 }
