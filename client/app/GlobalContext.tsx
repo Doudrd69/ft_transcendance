@@ -27,8 +27,7 @@ interface GlobalState {
 	showHeader:boolean;
 	showUploadAvatar:boolean;
 	showRefresh:boolean;
-
-
+	showIsDefault:boolean;
 	avatar:string
 	[key: string]: boolean | string | null;
 }
@@ -45,6 +44,7 @@ const initialState: GlobalState = {
 	showUploadAvatar:true,
 	showHeader:false,
 	showRefresh:false,
+	showIsDefault:false,
 	avatar:"",
 };
 

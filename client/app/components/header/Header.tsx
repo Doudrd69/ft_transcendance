@@ -9,7 +9,6 @@ import { validate, validateOrReject } from 'class-validator';
 
 const HeaderComponent: React.FC = () => {
 	const { state, dispatch } = useGlobal();
-	console.log('MONTRE MOI : ', state.showUploadAvatar);
 
 	// const notify = (flag: number, string?: string) => { 
 		
@@ -147,7 +146,6 @@ const HeaderComponent: React.FC = () => {
 				if (!state.showSettings) {
 					dispatch({ type: 'TOGGLEX', payload: 'showSettings' });
 					dispatch({ type: 'ACTIVATE', payload: 'showProfilsSettings'});
-					console.log(state);
 				} 
 				else {
 					dispatch({ type: 'DISABLE', payload: 'showSettings' });
