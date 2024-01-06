@@ -13,46 +13,52 @@ const ProfilsSettingsComponent: React.FC = () => {
 	const { state, dispatch } = useGlobal();
 
 	const notify = (flag: number) => {
-	switch (flag) {
-		case 0:
-		return;
 
-		case 1:
-		toast.success('Username has been updated');
-		return;
+		switch (flag) {
 
-		case 2:
-		toast('Authenticator code is verified');
-	}
-	};
+			case 0:
+				return;
 
-	const usernameDto = {
-	login: sessionStorage.getItem('currentUserLogin'),
-	string: username,
+			case 1:
+				toast.success('Username has been updated');
+				return;
+
+			case 2:
+				toast.success('Authenticator code is verified');
+		}
 	};
 
 	const handleUsernameSubmit = async (event: React.FormEvent) => {
-	event.preventDefault();
+		
+		event.preventDefault();
+		
+		try {
 
-	try {
-		const response = await fetch('http://localhost:3001/users/updateUsername', {
-		method: 'POST',
-		headers: {
-			'Content-Type': 'application/json',
-		},
-		body: JSON.stringify({ usernameDto }),
-		});
+			const usernameDto = {
+				userID: Number(sessionStorage.getItem('currentUserID')),
+				newUsername: username,
+			};
 
-		if (response.ok) {
-			console.log('Nom d\'utilisateur envoyé avec succès au backend');
-			notify(1);
-		} else {
-		console.error('Échec de l\'envoi du nom d\'utilisateur au backend');
-		console.log('Backend Response:', response);
+			const response = await fetch('http://localhost:3001/users/updateUsername', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`
+				},
+				body: JSON.stringify(usernameDto),
+			});
+
+			if (response.ok) {
+				console.log('Nom d\'utilisateur envoyé avec succès au backend');
+				notify(1);
+			} else {
+				const error = await response.json();
+				toast.warn(error.message[0]);
+				console.error('Fatal error: request failed');
+			}
+		} catch (error) {
+			console.error('Erreur lors de l\'envoi du nom d\'utilisateur au backend :', error);
 		}
-	} catch (error) {
-		console.error('Erreur lors de l\'envoi du nom d\'utilisateur au backend :', error);
-	}
 	};
 
 	const handleImage = async () => {
@@ -80,23 +86,24 @@ const ProfilsSettingsComponent: React.FC = () => {
 			console.error('Erreur lors de l\'envoi de l\'image au backend :', error);
 		}
 	};
+
 	const [imageURL, setImageURL] = useState<string | null>(null);
 	// Utilisez useEffect pour mettre à jour l'URL de l'image lorsque newImage change
 	useEffect(() => {
-	  if (newImage) {
-		const fileReader = new FileReader();
-		fileReader.onload = (event) => {
-		  if (event && event.target) {
-			const imageBase64 = event.target.result as string;
-			setImageURL(imageBase64);
-		  }
-		};
-	
-		fileReader.readAsDataURL(newImage);
-	  } else {
-		setImageURL(null);
-	  }
+		if (newImage) {
+			const fileReader = new FileReader();
+			fileReader.onload = (event) => {
+				if (event && event.target) {
+					const imageBase64 = event.target.result as string;
+					setImageURL(imageBase64);
+				}
+			};
+			fileReader.readAsDataURL(newImage);
+		} else {
+			setImageURL(null);
+		}
 	}, [newImage]);
+
 	return (
 		<div className="bloc-profils-settings">
 			<div className="upload-image">

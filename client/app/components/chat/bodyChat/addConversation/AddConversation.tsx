@@ -51,7 +51,8 @@ const AddConversationComponent: React.FC<AddConversationComponentProps> = ({ use
 			dispatch({ type: 'DISABLE', payload: 'showAddUser' });
 			dispatch({ type: 'DISABLE', payload: 'showAddFriend' });
 		} else {
-			console.log("Conversation creation failed");
+			const error = await response.json();
+			console.log("Error: ", error.message[0]);
 		}
 	};
 
