@@ -1,45 +1,53 @@
 import React, { useState, useEffect } from 'react';
 import { useGlobal } from '@/app/GlobalContext';
-import { response } from 'express';
 
 interface AvatarImageProps {
-	className?: string;
-	refresh?: boolean;
+className?: string;
+refresh?: boolean;
 }
 
-const AvatarImageComponent: React.FC<AvatarImageProps> = ({ className , refresh}) => {
-
+const AvatarImageComponent: React.FC<AvatarImageProps> = ({ className, refresh }) => {
 	const { state, dispatch } = useGlobal();
+	const defaultAvatar = 'https://uxwing.com/wp-content/themes/uxwing/download/peoples-avatars/corporate-user-icon.png';
 
-	const [avatarURL, setAvatarURL] = useState('/avatars/avatar.png');
+	const [isDefault, setDefault] = useState(true);
+
+	const userId = sessionStorage.getItem('currentUserID');
+	const timestamp = new Date().getTime();
+	var urlWithTimestamp = `http://localhost:3001/users/getAvatar/${userId}/${timestamp}`;
+
 	const fetchAvatar = async () => {
-
-		try {
-			console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
-			console.log(sessionStorage.getItem('currentUserID'));
-			console.log('test1');
-
-			const response = await fetch(`http://localhost:3001/users/getAvatar/${sessionStorage.getItem('currentUserID')}`,{
+			try {
+			const response = await fetch(urlWithTimestamp, {
 				method: 'GET',
 			});
-			console.log('response', response);	
+
 			if (response.ok) {
-				setAvatarURL(`http://localhost:3001/users/getAvatar/${sessionStorage.getItem('currentUserID')}`)
-				console.log('setAvatarURL en cas de fetch reussie', avatarURL);
+				console.log('fetchAvatar OK');
 			} else {
+				
+				setDefault(false);
 				console.error('Error fetching Avatar URL:', response.statusText);
 			}
 		} catch (error) {
 			console.error('Error fetching Avatar URL:', error);
 		}
+
 	};
 
 	useEffect(() => {
 		fetchAvatar();
 	}, [state.showUploadAvatar]);
 	return (
-			<img src={avatarURL} className={className} title={`Refresh: ${refresh}`}/>
-		);
+		<>
+			{isDefault ? (
+					<img src={urlWithTimestamp} className={className} alt="User Avatar" />
+				) : (
+				<img src={defaultAvatar} className={className} alt="User Avatar" />
+				) }
+
+		</>
+	);
 };
 
 export default AvatarImageComponent;
