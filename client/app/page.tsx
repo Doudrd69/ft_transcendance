@@ -105,8 +105,10 @@ export default function Home() {
 
 	const handleAccessToken = async (code: any): Promise<boolean> => {
 
-		if (sessionStorage.getItem("jwt"))
+		if (sessionStorage.getItem("jwt")) {
+			setAuthValidated(true);
 			return true;
+		}
 
 		const response = await fetch('http://localhost:3001/auth/access', {
 			method: 'POST',
