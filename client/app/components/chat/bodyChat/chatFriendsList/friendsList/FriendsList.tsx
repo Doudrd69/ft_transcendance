@@ -36,7 +36,7 @@ const FriendsListComponent: React.FC<FriendsListComponentProps> = ({ userSocket 
 		}
 	};
 	const loadFriendList = async () => {
-		
+		setFriendList([]);
 		const response = await fetch(`http://localhost:3001/users/getFriends/${username}`, {
 			method: 'GET',
 		});
@@ -53,7 +53,7 @@ const FriendsListComponent: React.FC<FriendsListComponentProps> = ({ userSocket 
 	useEffect(() => {
 		console.log("Loading friend list...");
 		loadFriendList();
-	}, []);
+	}, [state.refreshFriendList]);
 
 	return (
 		<div className="bloc-friendslist">

@@ -51,14 +51,6 @@ const ChatListComponent: React.FC<ChannelListComponentProps> = ({ userSocket }) 
 
 	return (
 		<div className="bloc-discussion-list">
-			<button
-				className="button-discussion-list-add"
-				onClick={() => {
-				dispatch({ type: 'ACTIVATE', payload: 'showAddUser' });
-			}}
-			>
-			+
-			</button>
 			{state.showAddUser && <AddConversationComponent userSocket={userSocket} loadDiscussions={loadDiscussions} title="Add/Create Conversation" isChannel={false}/>}
 			{userData.discussion.map((conversation, index) => (
 				!conversation.is_channel && (

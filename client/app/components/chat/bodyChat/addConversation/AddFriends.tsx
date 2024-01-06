@@ -36,6 +36,8 @@ const AddFriendComponent: React.FC<AddFriendComponentProps> = ({ userSocket, upd
 
 		if (response.ok) {
 
+			dispatch({ type: 'TOGGLEX', payload: 'refreshFriendsList'});
+
 			const data = await response.json();
 
 			if (data.isAccepted) {
