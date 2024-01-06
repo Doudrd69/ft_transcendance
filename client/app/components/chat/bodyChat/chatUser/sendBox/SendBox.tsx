@@ -59,7 +59,7 @@ const SendBoxComponent: React.FC<SendBoxComponentProps> = ({ userSocket }) => {
 	return (
 				<form className="bloc-send-chat" onSubmit={handleMessage}>
 					<input className="input-chat" placeholder="message..." value={messageValue} onChange={handleMessageInput}></input>
-					<button className="button-send" type="submit"></button>
+					{/* <button className="button-send" type="submit"></button> */}
 				</form>
 	)
 };

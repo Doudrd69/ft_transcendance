@@ -7,6 +7,7 @@ type ActionType =
   | 'DISABLE'
   | 'TOGGLE'
   | 'SET'
+  | 'TOGGLEX'
   | 'SET_CURRENT_CONVERSATION'
   | 'SET_CURRENT_CONVERSATION_ID';
 
@@ -31,6 +32,9 @@ interface ChatState {
 	showConfirmation:boolean,
 	showAddUser: boolean;
 	showListChannelAdd:boolean,
+	refreshChannel:boolean,
+	refreshFriendsList:boolean,
+
 	currentConversation: string | null;
 	currentConversationID: number | null;
 	[key: string]: boolean | number | string | null;
@@ -51,6 +55,8 @@ const initialState: ChatState = {
 	showUser:false,
 	showConfirmation:false,
 	showListChannelAdd:false,
+	refreshChannel:false,
+	refreshFriendsList:false,
 	currentConversation: null,
 	currentConversationID: null,
 };
@@ -67,6 +73,8 @@ const chatReducer = (state: ChatState, action: Action): ChatState => {
 		  		acc[key] = key === action.payload ? true : false;
 		  	return acc;
 			}, {} as ChatState);
+		case 'TOGGLEX':
+				return { ...state, [action.payload as string]: !state[action.payload as string] };
 		case 'SET':
 			if (typeof action.payload === 'object' && action.payload !== null) {
 			  return Object.assign({}, state, action.payload);
@@ -100,7 +108,6 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({children}
 	);
 };
 
-// Action creator pour définir la conversation actuelle
 export const setCurrentConversation = (payload: string | null): Action => ({
 	type: 'SET_CURRENT_CONVERSATION',
 	payload,

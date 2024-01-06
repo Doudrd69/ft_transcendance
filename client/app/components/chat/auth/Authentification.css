@@ -2,18 +2,24 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 90%;
+	background: url('fond.webp') no-repeat center center fixed;
+	background-size: cover;
+	padding: 20px;
+	width: 100vw;
+    height: 100vh;
 }
 
 .button-auth{
-    background-color: #a1a1a1;
+    background-color: rgba(0, 0, 0, 0.2);
+	border: 5px solid rgb(7, 106, 50);
     border-radius: 10px;
-    border: none;
-    height: 20vh;
-    width: 20vh;
-    transition: background-color 0.3s ease;
+	font-weight: bold;
+	font-family: "Arial", sans-serif;
+    font-size: 24px;
+    /* border: none; */
+	transition: transform 0.2s ease;
 }
 
 .button-auth:hover{
- background-color: aqua;
+    transform: scale(1.3);
 }
