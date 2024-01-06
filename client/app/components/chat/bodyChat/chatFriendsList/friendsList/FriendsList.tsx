@@ -45,7 +45,6 @@ const FriendsListComponent: React.FC<FriendsListComponentProps> = ({ userSocket 
 	};
 	
 	const loadFriendList = async () => {
-
 		const response = await fetch(`http://localhost:3001/users/getFriends/${username}`, {
 			method: 'GET',
 			headers: {
