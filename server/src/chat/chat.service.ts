@@ -37,10 +37,22 @@ export class ChatService {
 		return messages;
 	}
 
+	// private async getAllPublicConversations(): Promise<GroupMember[]> {
+
+	// 	const publicCOnversations = await this.groupMemberRepository.find({
+	// 		where: { isPublic: true},
+	// 	});
+
+	// 	if (publicCOnversations) {
+	// 		return publicCOnversations;
+	// 	}
+
+	// 	throw Error("No conversations found");
+	// }
+
 	private async getAllConversations(userID: number): Promise<GroupMember[]> {
 
 		let userToFind = new User();
-		console.log("===== getAllConversations : userID = ", userID);
 		userToFind = await this.usersRepository.findOne({
 			where: { id: userID },
 			relations: ["groups"],
@@ -131,7 +143,6 @@ export class ChatService {
 			});
 
 			if (group) {
-
 				userToAdd.groups.push(group);
 				await this.usersRepository.save(userToAdd);
 				return conversationToAdd;
