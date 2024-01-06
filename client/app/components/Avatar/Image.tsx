@@ -9,7 +9,7 @@ interface ImageProps {
 const ImageComponent: React.FC<ImageProps> = ({ className }) => {
 
 	const { state } = useGlobal();
-	const [avatarURL, setAvatarURL] = useState('/avatars/avatar.png');
+	const [avatarURL, setAvatarURL] = useState('http://localhost:3000/avatars/avatar.png');
 		const fetchAvatar = async () => {
 			try {
 				console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
@@ -18,22 +18,31 @@ const ImageComponent: React.FC<ImageProps> = ({ className }) => {
 
 				const response = await fetch(`http://localhost:3001/users/getAvatar/${sessionStorage.getItem('currentUserID')}`,{
 					method: 'GET',
-				});
-				console.log('response', response);	
+				});	
 				if (response.ok) {
 					setAvatarURL(`http://localhost:3001/users/getAvatar/${sessionStorage.getItem('currentUserID')}`)
+					setAvatarURL('rien');
 					console.log('setAvatarURL en cas de fetch reussie', avatarURL);
 				} else {
+					setAvatarURL('test')
+				console.log('test2');
 					console.error('Error fetching Avatar URL:', response.statusText);
 				}
 			} catch (error) {
+				setAvatarURL('test')
+				console.log('test3');
+
 				console.error('Error fetching Avatar URL:', error);
 			}
 		};
 
 		useEffect(() => {
 			fetchAvatar();
-		}, [state.showUploadAvatar]);
+			console.log(avatarURL);
+			console.log('test3');
+
+		}, [state.showRefresh]);
+		
 	return (
 				<img src={avatarURL} className={className} />
 		);

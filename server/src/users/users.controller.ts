@@ -52,25 +52,45 @@ export class UsersController {
 		}),
 	}))
 	async uploadAvatar(@UploadedFile() avatar: Express.Multer.File, @Param('userId') userId: number) {
+		if (!avatar) {
+			return { error: "Aucun fichier d'avatar fourni." };
+		}
 		const avatarURL = `/avatars/${avatar.filename}`;
 		await this.usersService.uploadAvatarURL(avatarURL, userId);
 		return { avatarURL };
 	} 
 
-	@Get('getAvatar/:userId')
-	async getUserAvatar(@Param('userId') userId: number, @Res() res: ExpressResponse) {
-
-		console.log('?????????????????');
+	@Get('getAvatar/:userId/:timestamp')
+	async getUserAvatar(@Param('userId') userId: number, @Param('timestamp') timestamp: string, @Res() res: ExpressResponse) {
 		try {
-			
 			const avatarURL = await this.usersService.getAvatar(userId);
 		if (!avatarURL) {
-			console.log('getUserAvatar erreur');
-			res.status(404).send('Avatar not found');
+			res.status(404).send('Avatar not foundi');
+			return null;
+
 		}
 			res.setHeader('Content-Type', 'image/*'); 
 			res.redirect(301, avatarURL);
-			console.log('avatarURL=====>', avatarURL)
+			return avatarURL
+		} catch (error) {
+			console.error('Error retrieving avatar:', error);
+			res.status(500).send('Internal Server Error');
+		}
+	}
+
+	@Get('getAvatar/:userId')
+	async getUserAvatarAccess(@Param('userId') userId: number, @Param('timestamp') timestamp: string, @Res() res: ExpressResponse) {
+		try {
+			const avatarURL = await this.usersService.getAvatar(userId);
+		if (!avatarURL) {
+			console.log('getUserAvatar erreur');
+			res.status(404).send('Avatar not foundi');
+			return null;
+
+		}
+			res.setHeader('Content-Type', 'image/*'); 
+			res.redirect(301, avatarURL);
+			return avatarURL
 		} catch (error) {
 			console.error('Error retrieving avatar:', error);
 			res.status(500).send('Internal Server Error');

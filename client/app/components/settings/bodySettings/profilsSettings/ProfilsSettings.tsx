@@ -70,11 +70,7 @@ const ProfilsSettingsComponent: React.FC = () => {
 			console.log('Image envoyée avec succès au backend');
 			dispatch({ type: 'ACTIVATE', payload: 'showAvatar' });
 			dispatch({ type: 'DISABLE', payload: 'showUploadAvatar' });
-			console.log('aavant1------------>', state.showRefresh);
-
 			dispatch({ type: 'TOGGLEX', payload: 'showRefresh'});
-			console.log('apres1------------>', state.showRefresh);
-
 			
 		}
 		else

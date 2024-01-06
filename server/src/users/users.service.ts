@@ -78,7 +78,6 @@ export class UsersService {
 			console.log("Avatar not found");
 			return null;
 		}
-	
 		return user.avatarURL;
 	  }
 
