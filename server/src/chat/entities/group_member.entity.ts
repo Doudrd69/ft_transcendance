@@ -10,6 +10,13 @@ export class GroupMember {
   @Column({ default: false })
   isAdmin: boolean;
 
+  @Column({ default: true})
+  isPublic: boolean;
+
+  // penser a le HASHER
+  @Column({ default: "" })
+  password: string;
+
   @ManyToOne(() => Conversation)
   conversation: Conversation;
   

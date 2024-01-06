@@ -28,4 +28,12 @@ export class ConversationDto {
 	@IsNotEmpty()
 	@IsBoolean()
 	is_channel: boolean;
+
+	// @IsNotEmpty()
+	// @Length(6, 20)
+	// @IsAscii()
+	// @IsAlpha()
+	// @IsString()
+	// @Matches(/^[^"';%()|<>\\]*$/)
+	// password?: string;
 }
