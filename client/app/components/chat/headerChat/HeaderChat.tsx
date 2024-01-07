@@ -17,7 +17,7 @@ const HeaderChatComponent: React.FC = () => {
 	return (
 		<div className="bloc-btn">
 			{renderComponent(<BackComponent />, state.showChat || state.showChannel)}
-			{renderComponent(<IdDiscussionComponent />, state.showChat || state.showChannel)}
+			{renderComponent(<IdDiscussionComponent/>, state.showChat || state.showChannel)}
 			{renderComponent(<ChatButtonComponent />, !state.showChat && !state.showChannel)}
 			{renderComponent(<ChannelButtonComponent />, !state.showChat && !state.showChannel)}
 			{renderComponent(<FriendsListButtonComponent />, !state.showChat && !state.showChannel)}
