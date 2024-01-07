@@ -10,36 +10,6 @@
     color: var(--first);
 }
 
-.message-container {
-    margin: 10px;
-    width: fit-content;
-}
-
-.my-message {
-    background-color: #4CAF50;
-    color: white;
-    border-radius: 0 10px 10px 10px;
-    margin-left: auto;
-    padding: 10px;
-    margin: 10px 0;
-    align-self: flex-end;
-    max-width: 80%;
-    word-wrap: break-word;
-    overflow-wrap: break-word;
-}
-
-.other-message {
-    background-color: #ddd;
-    color: black;
-    border-radius: 10px 0 10px 10px;
-    margin-right: auto;
-    padding: 10px;
-    margin: 10px 0;
-    align-self: flex-start;
-    max-width: 80%;
-    word-wrap: break-word;
-    overflow-wrap: break-word;
-}
 
 .channel-chat-content {
     font-family: 'Courier New', Courier, monospace;

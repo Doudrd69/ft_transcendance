@@ -49,17 +49,6 @@
 	background-color: var(--fifth);
 }
 
-
-/*++++++++ de friendlist*/
-
-.tab-and-userclicked{
-	display: flex;
-	flex-direction: column;
-}
-.amies.active{
-	background-color: var(--second);
-}
-
 /*avatar du profil*/
 .on-off {
 	width: 20px;
@@ -88,4 +77,14 @@
 	background-size: cover; /* Ajuste la taille de l'image pour remplir le cercle */
 	background-repeat: no-repeat;
 	background-position: center center;
+}
+
+/*++++++++ de friendlist*/
+
+.tab-and-userclicked{
+	display: flex;
+	flex-direction: column;
+}
+.amies.active{
+	background-color: var(--second);
 }

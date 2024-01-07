@@ -78,6 +78,39 @@ export class UsersController {
 		}
 	}
 
+	@Get('getAvatarByLogin/:login/:timestamp')
+	async getUserAvatarbyUsername(@Param('login') login: string, @Param('timestamp') timestamp: string, @Res() res: ExpressResponse) {
+		try {
+			const avatarURL = await this.usersService.getAvatarbyLogin(login);
+			if (!avatarURL) {
+				res.status(404).send('Avatar not foundi');
+				return null;
+			}
+			res.setHeader('Content-Type', 'image/*'); 
+			res.redirect(301, avatarURL);
+			return avatarURL
+		} catch (error) {
+			console.error('Error retrieving avatar:', error);
+			res.status(500).send('Internal Server Error');
+		}
+	}
+	@Get('getAvatarByLogin/:login')
+	async getUserAvatarbyUsernamebis(@Param('login') login: string, @Res() res: ExpressResponse) {
+		try {
+			const avatarURL = await this.usersService.getAvatarbyLogin(login);
+			if (!avatarURL) {
+				res.status(404).send('Avatar not foundi');
+				return null;
+			}
+			res.setHeader('Content-Type', 'image/*'); 
+			res.redirect(301, avatarURL);
+			return avatarURL
+		} catch (error) {
+			console.error('Error retrieving avatar:', error);
+			res.status(500).send('Internal Server Error');
+		}
+	}
+
 	@Get('getAvatar/:userId')
 	async getUserAvatarAccess(@Param('userId') userId: number, @Param('timestamp') timestamp: string, @Res() res: ExpressResponse) {
 		try {

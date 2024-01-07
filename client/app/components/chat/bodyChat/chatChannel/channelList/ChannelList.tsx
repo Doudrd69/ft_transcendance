@@ -51,7 +51,14 @@ const ChannelListComponent: React.FC<ChanneListComponentProps> = ({ userSocket})
 		console.log("Loading conversations...");
 		loadDiscussions();
 	}, [state.refreshChannel]);
+	const parseName = (name: string): string => {
 
+				const currentUserLogin = sessionStorage.getItem("currentUserLogin");
+				const conversationNameWithoutCurrentUser = name.replace(currentUserLogin!, '').trim()
+				const modifiedName = conversationNameWithoutCurrentUser.slice();
+				return modifiedName;
+	
+	};
 	return (
 		<div className="bloc-channel-list">
 		<button
@@ -64,17 +71,17 @@ const ChannelListComponent: React.FC<ChanneListComponentProps> = ({ userSocket})
 		</button>
 		{state.showAddChannel && <AddConversationComponent userSocket={userSocket} loadDiscussions={loadDiscussions} title="Add/Create Channel" isChannel={true}/>}
 		{userData.discussion.map((conversation, index) => (
-			conversation.is_channel && (
-			<button
-				key={index}
-				className="button-channel-list"
-				onClick={() => {
-				dispatch({ type: 'TOGGLE', payload: 'showChannel' });
-				dispatch({ type: 'SET_CURRENT_CONVERSATION', payload: conversation.name });
-				dispatch({ type: 'SET_CURRENT_CONVERSATION_ID', payload: conversation.id });
-				}}
-			>
-				<span>{conversation.name}</span>
+				conversation.is_channel && (
+				<button
+					key={index}
+					className="button-channel-list"
+					onClick={() => {
+					dispatch({ type: 'TOGGLE', payload: 'showChannel' });
+					dispatch({ type: 'SET_CURRENT_CONVERSATION', payload: conversation.name });
+					dispatch({ type: 'SET_CURRENT_CONVERSATION_ID', payload: conversation.id });
+					}}
+				>
+				<span>{parseName(conversation.name)}</span>
 			</button>
 			)
 		))}

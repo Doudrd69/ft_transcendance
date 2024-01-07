@@ -7,7 +7,7 @@ interface AvatarImageProps {
 	name?: string;
 }
 
-const AvatarImageComponent: React.FC<AvatarImageProps> = ({ className, refresh, name}) => {
+const AvatarImageBisComponent: React.FC<AvatarImageProps> = ({ className, refresh, name}) => {
 	const { state, dispatch } = useGlobal();
 	const defaultAvatar = 'https://uxwing.com/wp-content/themes/uxwing/download/peoples-avatars/corporate-user-icon.png';
 
@@ -16,7 +16,7 @@ const AvatarImageComponent: React.FC<AvatarImageProps> = ({ className, refresh, 
 	const userId = sessionStorage.getItem('currentUserID');
 	const timestamp = new Date().getTime();
 	var urlWithTimestamp = `http://localhost:3001/users/getAvatar/${userId}/${timestamp}`;
-	var urlLoginWithTimestamp = `http://localhost:3001/users/getAvatarByLogin/${userLogin}/${timestamp}`;
+	var urlLoginWithTimestamp = `http://localhost:3001/users/getAvatarByLogin/${userLogin}`;
 
 
 	const fetchAvatar = async () => {
@@ -24,6 +24,7 @@ const AvatarImageComponent: React.FC<AvatarImageProps> = ({ className, refresh, 
 				console.log("userLogin?????", userLogin);
 				let response;
 				if (userLogin) {
+					console.log("::::::::::::::::::::::::::::");
 					response = await fetch(urlLoginWithTimestamp, {
 						method: 'GET',
 					});
@@ -60,4 +61,4 @@ const AvatarImageComponent: React.FC<AvatarImageProps> = ({ className, refresh, 
 	);
 };
 
-export default AvatarImageComponent;
+export default AvatarImageBisComponent;

@@ -80,8 +80,27 @@ export class UsersService {
 			return null;
 		}
 		return user.avatarURL;
-	  }
+	}
 
+	async getAvatarbyLogin(login: string): Promise<string | null> {
+		const user = await this.getUserByLogin(login);
+	
+		if (!user || !user.avatarURL) {
+			console.log("Avatar not found");
+			return null;
+		}
+		return user.avatarURL;
+	}
+
+	async getAvatarbyLoginBis(login: string): Promise<string | null> {
+		const user = await this.getUserByLogin(login);
+	
+		if (!user || !user.avatarURL) {
+			console.log("Avatar not found");
+			return null;
+		}
+		return user.avatarURL;
+	}
 	// async deleteUserAvatar(data: Buffer, fileName:string , userID: number) {
 		
 	// 	const avatar = await this.avatarService.create(userID, data, fileName);

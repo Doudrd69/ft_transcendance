@@ -8,6 +8,7 @@ type ActionType =
   | 'TOGGLE'
   | 'SET'
   | 'TOGGLEX'
+  | 'SET_CURRENT_CONVERSATION_NAME'
   | 'SET_CURRENT_CONVERSATION'
   | 'SET_CURRENT_CONVERSATION_ID';
 
@@ -31,11 +32,12 @@ interface ChatState {
 	showAddFriend:false,
 	showConfirmation:boolean,
 	showAddUser: boolean;
+	showAvatar: boolean;
 	showListChannelAdd:boolean,
 	refreshChannel:boolean,
 	refreshFriendsList:boolean,
-
 	currentConversation: string | null;
+	currentConversationName: string | null;
 	currentConversationID: number | null;
 	[key: string]: boolean | number | string | null;
 }
@@ -53,12 +55,14 @@ const initialState: ChatState = {
 	showAdd: false,
 	showSettings: false,
 	showUser:false,
+	showAvatar: false,
 	showConfirmation:false,
 	showListChannelAdd:false,
 	refreshChannel:false,
 	refreshFriendsList:false,
 	currentConversation: null,
 	currentConversationID: null,
+	currentConversationName: null,
 };
 
 // Réducteur
@@ -84,6 +88,8 @@ const chatReducer = (state: ChatState, action: Action): ChatState => {
 			}
 		case 'SET_CURRENT_CONVERSATION':
 				return { ...state, currentConversation: action.payload || null }; // Mettre à jour la conversation actuelle 
+		case 'SET_CURRENT_CONVERSATION_NAME':
+				return { ...state, currentConversationName: action.payload || null }; // Mettre à jour la conversation actuelle 
 		case 'SET_CURRENT_CONVERSATION_ID':
 				return { ...state, currentConversationID: action.payload ? parseInt(action.payload, 10) : null};
 	  default:
@@ -113,6 +119,10 @@ export const setCurrentConversation = (payload: string | null): Action => ({
 	payload,
 });
 
+export const setCurrentConversationName = (payload: string | null): Action => ({
+	type: 'SET_CURRENT_CONVERSATION',
+	payload,
+});
 export const setCurrentConversationID = (payload: string | null): Action => ({
 	type: 'SET_CURRENT_CONVERSATION_ID',
 	payload,
