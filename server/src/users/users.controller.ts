@@ -52,7 +52,6 @@ export class UsersController {
 		},
 		}),
 	}))
-
 	async uploadAvatar(@UploadedFile() avatar: Express.Multer.File, @Param('userId') userId: number) {
 		if (!avatar) {
 			return { error: "Aucun fichier d'avatar fourni." };
@@ -66,11 +65,10 @@ export class UsersController {
 	async getUserAvatar(@Param('userId') userId: number, @Param('timestamp') timestamp: string, @Res() res: ExpressResponse) {
 		try {
 			const avatarURL = await this.usersService.getAvatar(userId);
-		if (!avatarURL) {
-			res.status(404).send('Avatar not foundi');
-			return null;
-
-		}
+			if (!avatarURL) {
+				res.status(404).send('Avatar not foundi');
+				return null;
+			}
 			res.setHeader('Content-Type', 'image/*'); 
 			res.redirect(301, avatarURL);
 			return avatarURL
@@ -84,12 +82,11 @@ export class UsersController {
 	async getUserAvatarAccess(@Param('userId') userId: number, @Param('timestamp') timestamp: string, @Res() res: ExpressResponse) {
 		try {
 			const avatarURL = await this.usersService.getAvatar(userId);
-		if (!avatarURL) {
-			console.log('getUserAvatar erreur');
-			res.status(404).send('Avatar not foundi');
-			return null;
-
-		}
+			if (!avatarURL) {
+				console.log('getUserAvatar erreur');
+				res.status(404).send('Avatar not foundi');
+				return null;
+			}
 			res.setHeader('Content-Type', 'image/*'); 
 			res.redirect(301, avatarURL);
 			return avatarURL

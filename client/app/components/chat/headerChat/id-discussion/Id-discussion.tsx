@@ -2,7 +2,10 @@ import './Id-discussion.css'
 import React from 'react';
 import { useChat } from '../../ChatContext';
 
-const IdDiscussionComponent: React.FC = () => {
+interface IdDiscussionComponentProps {
+	channel: boolean;
+}
+const IdDiscussionComponent: React.FC<IdDiscussionComponentProps>= () => {
 	const { state } = useChat();
 	return (
 		
