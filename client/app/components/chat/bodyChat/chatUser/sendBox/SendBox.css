@@ -8,6 +8,8 @@
 	/* border: 3px solid #333; */
 	box-sizing: border-box;
 	background-color:#a1a1a1 ;
+	font-family: 'Gill Sans' , sans-serif;
+	font-size: 20px;
 	margin: 0px 10px 10px 10px;
 	width: 90%;
 	border-radius:10px;
