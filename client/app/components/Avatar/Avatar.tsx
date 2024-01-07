@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useGlobal } from '@/app/GlobalContext';
 
 interface AvatarImageProps {
-className?: string;
-refresh?: boolean;
+	className?: string;
+	refresh?: boolean;
 }
 
 const AvatarImageComponent: React.FC<AvatarImageProps> = ({ className, refresh }) => {

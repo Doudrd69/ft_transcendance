@@ -1,6 +1,6 @@
 .bloc-btn {
 	flex-direction: row;
-	height: 7%;
+	height: calc(7% - 20px);
 	margin: 10px;
 	justify-content: space-between;
 	text-align: center;
