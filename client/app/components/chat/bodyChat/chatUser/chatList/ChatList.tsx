@@ -23,6 +23,7 @@ const ChatListComponent: React.FC<ChannelListComponentProps> = ({ userSocket }) 
 	const user = Number(sessionStorage.getItem("currentUserID"));
 	const [activeIndex, setActiveIndex] = useState<number | null>(null);
 	const timestamp = new Date().getTime();
+
 	const loadDiscussions = async () => {
 
 		const response = await fetch(`http://localhost:3001/chat/getConversationsWithStatus/${user}`, {
@@ -62,7 +63,7 @@ const ChatListComponent: React.FC<ChannelListComponentProps> = ({ userSocket }) 
 		return modifiedName;
 	  };
 
-	  const addHashAtEnd = (conversation: Conversation): string => {
+	const addHashAtEnd = (conversation: Conversation): string => {
 		const conversationName = conversation.name;
 		// console.log("conversationName", conversationName);
 		if (conversation.is_channel)
@@ -72,7 +73,8 @@ const ChatListComponent: React.FC<ChannelListComponentProps> = ({ userSocket }) 
 			console.log("conversationName", conversationName);
 			return conversationName;
 		}
-	  };
+	};
+
 	return (
 		<div className="bloc-discussion-list">
 			{userData.discussion.map((conversation, index) => (

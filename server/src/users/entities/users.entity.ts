@@ -9,7 +9,6 @@ export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
-
   @Column({ default: "1234" })
   socketGame: string;
 

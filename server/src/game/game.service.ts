@@ -34,7 +34,8 @@ export class GameService {
     async linkSocketIDWithUser(playerID: string, playerLogin: string) {
 
         const Player: User = await this.usersRepository.findOne({ where: { login: playerLogin } })
-        Player.socketGame = playerID;
+        if (Player && playerID)
+            Player.socketGame = playerID;
         this.usersRepository.save(Player);
     }
 
