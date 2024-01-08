@@ -20,6 +20,7 @@ import { UpdateUsernameDto } from './dto/UpdateUsernameDto.dto';
 import { BlockUserDto } from './dto/BlockUserDto.dto';
 import { validate, validateOrReject } from 'class-validator'
 import { AuthGuard } from 'src/auth/auth.guard';
+import { Conversation } from 'src/chat/entities/conversation.entity';
 
 @Controller('users')
 export class UsersController {
@@ -168,14 +169,14 @@ export class UsersController {
 	//guard
 	@HttpCode(HttpStatus.OK)
 	@Post('acceptFriendRequest')
-	acceptFriendship(@Body() friendRequestDto: FriendRequestDto): Promise<Friendship> {
+	acceptFriendship(@Body() friendRequestDto: FriendRequestDto): Promise<Conversation | Friendship> {
 		return this.usersService.acceptFriendship(friendRequestDto);
 	}
 
 	@UseGuards(AuthGuard)
 	@HttpCode(HttpStatus.OK)
 	@Post('blockUser')
-	blockUser(@Body() blockUserDto: BlockUserDto): Promise<Friendship> {
+	blockUser(@Body() blockUserDto: BlockUserDto): Promise<Conversation | Friendship> {
 		return this.usersService.blockUser(blockUserDto);
 	}
 

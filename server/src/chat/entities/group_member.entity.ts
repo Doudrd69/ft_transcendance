@@ -1,5 +1,6 @@
 import { Entity, Column, ManyToMany, OneToMany, OneToOne, ManyToOne, JoinColumn, JoinTable, PrimaryGeneratedColumn } from 'typeorm';
 import { Conversation } from './conversation.entity';
+import { User } from 'src/users/entities/users.entity';
 
 @Entity()
 export class GroupMember {
@@ -10,12 +11,12 @@ export class GroupMember {
   @Column({ default: false })
   isAdmin: boolean;
 
-  @Column({ default: true})
-  isPublic: boolean;
+  // @Column({ default: true})
+  // isPublic: boolean;
 
-  // penser a le HASHER
-  @Column({ default: "" })
-  password: string;
+  // // penser a le HASHER
+  // @Column({ default: "" })
+  // password: string;
 
   @ManyToOne(() => Conversation)
   conversation: Conversation;
