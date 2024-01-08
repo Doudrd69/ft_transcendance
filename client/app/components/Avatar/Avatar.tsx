@@ -21,9 +21,9 @@ const AvatarImageComponent: React.FC<AvatarImageProps> = ({ className, refresh, 
 
 	const fetchAvatar = async () => {
 			try {
-				console.log("userLogin?????", userLogin);
 				let response;
 				if (userLogin) {
+					console.log("userLogin?????", userLogin);
 					response = await fetch(urlLoginWithTimestamp, {
 						method: 'GET',
 					});

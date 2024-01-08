@@ -14,8 +14,9 @@
 	text-transform: uppercase;
 	font-weight: bold;
 	border-radius:10px;
-	font-size: 20px; /* Exemple de taille de police */
-	font-family: Arial, sans-serif;
+	font-weight: bold;
+	font-size: 20px;
+    font-family: 'Gill Sans' , sans-serif;
 }
 
 .main-button-channel:hover {

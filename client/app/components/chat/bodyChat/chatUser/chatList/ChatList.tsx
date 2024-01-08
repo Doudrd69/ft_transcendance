@@ -10,6 +10,13 @@ interface ChannelListComponentProps {
 	userSocket: Socket; // Assurez-vous d'avoir la bonne importation pour le type Socket
 }
 
+interface FriendShip {
+	id: number;
+	isAccepted: true;
+	isActive: boolean;
+	friend?: any;
+	initiator?: any
+}
 interface Conversation {
 	id: string,
 	name: string;
@@ -19,78 +26,52 @@ interface Conversation {
 const ChatListComponent: React.FC<ChannelListComponentProps> = ({ userSocket }) => {
 
 	const { state, dispatch } = useChat();
+
 	const [conversations, setConversations] = useState<Conversation[]>([]);
 	const user = Number(sessionStorage.getItem("currentUserID"));
+	const username = sessionStorage.getItem("currentUserLogin");
 	const [activeIndex, setActiveIndex] = useState<number | null>(null);
 	const timestamp = new Date().getTime();
-	const loadDiscussions = async () => {
+	const [friendList, setFriendList] = useState<FriendShip[]>([]);
 
-		const response = await fetch(`http://localhost:3001/chat/getConversationsWithStatus/${user}`, {
+
+	const loadFriendList = async () => {
+		setFriendList([]);
+		const response = await fetch(`http://localhost:3001/users/getFriends/${username}`, {
 			method: 'GET',
-			headers: {
-				'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
-			}
 		});
-
+		
 		if (response.ok) {
-			const conversationsData = await response.json();
-			const { conversations, isAdmin } = conversationsData;
-			setConversations((prevConversations: Conversation[]) => [...prevConversations, ...conversations]);
-		} 
-		else {
-			console.log("Fatal error");
+			const data = await response.json();
+			setFriendList([...data]);
 		}
-	};
-
-	const userData = {
-		discussion: conversations,
-		online:["on", "off", "on", "on", "off", "on", "on"],
+		else {
+			console.log("Fatal error: no friend list");
+		}
 	}
 
 	useEffect(() => {
-		console.log("Loading DMs...");
-		loadDiscussions();
-	}, []);
+		console.log("Loading friend list...");
+		loadFriendList();
+	}, [state.refreshFriendList]);
 
-	const parseName = (name: string): string => {
-		const currentUserLogin = sessionStorage.getItem("currentUserLogin");
-		const conversationNameWithoutCurrentUser = currentUserLogin
-		  ? name.replace(currentUserLogin!, '').trim()
-		  : '';
-		const modifiedName = conversationNameWithoutCurrentUser.slice();
-		
-		return modifiedName;
-	  };
-
-	  const addHashAtEnd = (conversation: Conversation): string => {
-		const conversationName = conversation.name;
-		// console.log("conversationName", conversationName);
-		if (conversation.is_channel)
-			return conversationName + "#";
-		else
-		{
-			console.log("conversationName", conversationName);
-			return conversationName;
-		}
-	  };
-	return (
+	  return (
 		<div className="bloc-discussion-list">
-			{userData.discussion.map((conversation, index) => (
-				!conversation.is_channel && (
-					<div key={index} className="bloc-button-discussion-list" >
-						{/* console.log("conversation ????????????????", conversation.name) */}
-						<AvatarImageComponent className={`profil-discussion-list ${userData.online[index]}`} refresh={true} name={parseName(conversation.name)}/>
-							<div className={`amies ${activeIndex === index ? 'active' : ''}`} key={index}  onClick={() => {
-								dispatch({ type: 'TOGGLE', payload: 'showChat' });
-								dispatch({ type: 'SET_CURRENT_CONVERSATION', payload: conversation.name});
-								dispatch({ type: 'SET_CURRENT_CONVERSATION_NAME', payload: addHashAtEnd(conversation)});
-								dispatch({ type: 'SET_CURRENT_CONVERSATION_ID', payload: conversation.id });}}>
-									<span>{parseName(conversation.name)}</span>
-							</div>
-					</div>
-				)
-			))}
+		  {friendList.map((friend: FriendShip, id: number) => (
+			<div key={friend.id} className="bloc-button-discussion-list">
+			  <img src={`http://localhost:3001${friend.friend.avatarURL}`} className={`profil-discussion-list ${friend.isActive ? 'on' : 'off'}`} alt="User Avatar" />
+			  <div className={`amies ${activeIndex === id ? 'active' : ''}`} onClick={() => {
+				console.log("Avatar URL:", `http://localhost:3001${friend.friend.avatarURL}`);
+				dispatch({ type: 'TOGGLE', payload: 'showChat' });
+				dispatch({ type: 'SET_CURRENT_CONVERSATION', payload: friend.friend.login || friend.initiator.login || 'Unknown User' });
+				dispatch({ type: 'SET_CURRENT_CONVERSATION_ID', payload: friend.friend.id || friend.initiator.id || -1 });
+			  }}>
+				{friend.friend ? friend.friend.login : friend.initiator ? friend.initiator.login : 'Unknown User'}
+			  </div>
+			</div>
+		  ))}
 		</div>
-	)
+	  );
+	  
 };
 export default ChatListComponent;
