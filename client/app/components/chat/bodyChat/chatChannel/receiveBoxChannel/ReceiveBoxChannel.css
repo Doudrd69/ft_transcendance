@@ -10,15 +10,73 @@
     color: var(--first);
 }
 
-
-.channel-chat-content {
-    font-family: 'Courier New', Courier, monospace;
-    padding: 2%;
-}
-
-.channel-chat-date {
-    font-family: 'Courier New', Courier, monospace;
-    font-size: small;
+.receive-chat {
     margin: 10px;
     width: fit-content;
 }
+
+.my-message-channel, .other-message-channel {
+    width: calc(100% - 20px);
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    padding: 5px;
+    margin: 5px;
+    white-space: pre-wrap;
+    max-width: 100%;
+}
+
+.my-message-channel {
+    background-color: cornflowerblue;
+    border-radius: 15px 15px 15px 15px;
+    margin-left: auto;
+}
+
+.bloc-avatar-username {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	margin-left: 5px;
+	margin-right: 5px;
+	width: calc(100% - 10px);
+	text-align: center;
+}
+.other-message-channel {
+	background-color: slategray;
+	border-radius: 15px 15px 15px 15px;
+}
+
+.user-name{
+	font-family: 'Gill Sans' , sans-serif;
+	margin: 5px;
+	width: 100%; 
+	font-size: 15px;
+	width: fit-content;
+	display: block;
+	text-align: center;
+}
+.channel-chat-content {
+	font-family: 'Gill Sans' , sans-serif;
+	margin: 10px;
+	max-width: calc(100% - 10px); 
+	font-size: 20px;
+	width: fit-content;
+}
+
+.channel-chat-date {
+	font-family: 'Courier New', Courier, monospace;
+	font-size: small;
+	margin: 10px;
+	width: fit-content;
+}
+.avatar-channel{
+	flex: 0 0 40px; /* Taille fixe pour l'avatar, ajustez selon vos besoins */
+	max-width: 40px; /* Garantit que l'avatar ne dépasse pas cette largeur */
+	height: auto; /* Ajustez la hauteur en conséquence ou utilisez une valeur fixe */
+	align-items: center;
+	justify-content: center;
+}
+.bloc-contain {
+	display: flex; 
+	flex-direction: column;
+	align-items: center;
+  }

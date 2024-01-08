@@ -68,12 +68,12 @@ const FriendsListComponent: React.FC<FriendsListComponentProps> = ({ userSocket 
 			{state.showAddFriend && <AddFriendComponent userSocket={userSocket} updateFriends={loadFriendList} title="Add Friend"/>}
 			{friendList.map((friend: FriendShip, id: number) => (
 			<div className="tab-and-userclicked" key={id}>
-			  <div className="bloc-button-friendslist">
-				<div className={`profil-friendslist ${friend.isActive ? 'on' : 'off'}`} />
+			<div className="bloc-button-friendslist">
+				<img src={`http://localhost:3001${friend.friend.avatarURL}`} className={`profil-friendslist ${friend.isActive ? 'on' : 'off'}`} alt="User Avatar" />
 					<div className={`amies ${activeIndex === id ? 'active' : ''}`} onClick={() => activateTabFriendsList(id)}>
 						{friend.friend ? friend.friend.login : friend.initiator ? friend.initiator.login : 'Unknown User'}
 					</div>
-			 	</div>
+				</div>
 				{activeIndex === id && <FriendsListTabComponent userSocket={userSocket} user={friend.friend ? friend.friend.login : friend.initiator ? friend.initiator.login : 'Unknown User'} />}
 			</div>
 		  ))}

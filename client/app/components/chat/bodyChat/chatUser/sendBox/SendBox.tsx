@@ -40,7 +40,6 @@ const SendBoxComponent: React.FC<SendBoxComponentProps> = ({ userSocket }) => {
 		
 		if (response.ok) {
 			console.log("Message sent and created in DB");
-			setMessageValue('');
 			if (socketInUse.connected) {
 				console.log("Conv --> ", state.currentConversation);
 				socketInUse.emit('message', { dto: messageDto, conversationName: state.currentConversation } , () => {
@@ -50,6 +49,7 @@ const SendBoxComponent: React.FC<SendBoxComponentProps> = ({ userSocket }) => {
 			else {
 				console.log("Client is not connected");
 			}
+			setMessageValue('');
 		}
 		else {
 			const error = await response.json();

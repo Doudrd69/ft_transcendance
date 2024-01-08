@@ -43,8 +43,9 @@
 
 .bloc-pong{
 	width: 80vw;
-	font-family: 'Arial', sans-serif;
+	font-weight: bold;
 	font-size: 40px;
+    font-family: 'Gill Sans' , sans-serif;
 	font-weight: 700;
 	
 }
