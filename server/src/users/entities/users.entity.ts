@@ -13,6 +13,10 @@ export class User {
   @Column({ default: "1234" })
   socketGame: string;
 
+
+  @Column({ default: false })
+  inGame: boolean;
+
   @Column()
   login: string;
 

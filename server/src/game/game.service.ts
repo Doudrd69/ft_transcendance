@@ -6,6 +6,22 @@ import { GameModule } from './game.module';
 import { env } from 'process';
 import { User } from 'src/users/entities/users.entity';
 
+interface BallPosition {
+	x: number,
+	y: number,
+	r: number,
+}
+
+/**
+ * use to share the game state
+ */
+interface GameState {
+	BallPosition: BallPosition[],
+	paddleOne: {x: number, y: number },
+	paddleTwo: {x: number, y:number },
+}
+
+
 @Injectable()
 export class GameService {
     constructor(
@@ -13,6 +29,8 @@ export class GameService {
         private gameRepository: Repository<Game>,
         @InjectRepository(User)
         private usersRepository: Repository<User>,
+
+        
     ) { }
 
     async createGame(player1ID: string, player2ID: string): Promise<Game> {
@@ -46,20 +64,16 @@ export class GameService {
         return (playersLogin);
     }
 
+
+    async paddleUpLeft(playerID: string)
+    {
+        
+    }
+
+    /**
+     * devoir creer soit un GameState avec dedans paddle 1 et 2 et ball
+     * ou quelque chose qui a l'air plus clean mais qu'il faut que je comprenne c'est
+     * cree des class wall et ball qui me permette d'avoir de l'oriente objet et leur ft
+     * 
+     */
 }
-
-
-/**
- * async createGame(players: [string, string]) {
-
-    const game = new Game();
-    console.log("New Game Create");
-    game.playerOne = players[0];
-    game.playerTwo = players[1];
-
-    // Enregistrer la partie dans le repository
-    await this.gameRepository.save(game);
-
-    return game.id;
-  }
- */

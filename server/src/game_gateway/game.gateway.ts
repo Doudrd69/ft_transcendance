@@ -71,6 +71,13 @@ export class GameGateway {
                         scoreOne: this.game.scoreOne,
                         scoreTwo: this.game.scoreTwo,
                     });
+                    this.server.to(socketIDs).emit('Game_Start', {
+                        gameId: this.game.gameId,
+                        playerOneID: this.game.playerOneID,
+                        playerTwoID: this.game.playerTwoID,
+                        scoreOne: this.game.scoreOne,
+                        scoreTwo: this.game.scoreTwo,
+                    });
 
             }
         }
@@ -84,11 +91,12 @@ export class GameGateway {
         return (playerLogin);
     }
 
-    @SubscribeMessage('move-paddle')
+    @SubscribeMessage('Game_Paddle_Up')
     async handlePaddleMove(client: Socket, game: Game) {
         const PositionPaddle: number = 90;
         if (client.id == game.playerOneID)
         {   
+            this.GameService.paddleUpLeft(client.id);
             this.server.to([game.playerOneID,game.playerTwoID]).emit('update-paddle-left', {
                 gameId: this.game.gameId,
                 playerOneID: this.game.playerOneID,
