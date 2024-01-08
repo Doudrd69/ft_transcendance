@@ -85,16 +85,12 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	}
 
 	@SubscribeMessage('joinFriendRoom')
-	async addUserToFriendRoom( @ConnectedSocket() client: Socket, @MessageBody() roomName: string ) {
+	async addUserToFriendRoom( @ConnectedSocket() client: Socket, @MessageBody() data: { roomName: string, roomID: string }) {
 
+		const { roomName, roomID } = data;
 		console.log("==== joinFriendRoom Event ====");
-		console.log("Add ", client.id," to room : ", roomName);
-		const conv = await this.chatService.getConversationByName(roomName);
-		if (conv) {
-			client.join(roomName + conv.id);
-			return ;
-		}
-		console.log("Fatal error: conversation not found (joinFriendRoom)");
+		console.log("Add ", client.id," to room : ", roomName + roomID);
+		client.join(roomName + roomID);
 		return ;
 	}
 
@@ -144,12 +140,15 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		});
 	}
 
+	// faut aussi, peut etre le nom de celui qui a accepte mdr
 	@SubscribeMessage('friendRequestAccepted')
-	handleAcceptedFriendRequest(@MessageBody() dto: any) {
-		this.server.to(dto.initiatorLogin).emit('friendRequestAcceptedNotif', {
-			recipientID: dto.recipientID,
-			recipientLogin: dto.recipientLogin,
-			initiatorLogin: dto.initiatorLogin,
+	handleAcceptedFriendRequest(@MessageBody() data: { roomName: string, roomID: string, initiator: string, recipient: string } ) {
+		const { roomName, roomID, initiator, recipient } = data;
+		this.server.to(initiator).emit('friendRequestAcceptedNotif', {
+			roomName: roomName,
+			roomID: roomID,
+			initiator: initiator,
+			recipient: recipient,
 		})
 	}
 }

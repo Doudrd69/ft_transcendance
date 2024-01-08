@@ -12,6 +12,7 @@ import { ChatService } from '../chat/chat.service';
 import { UpdateUsernameDto } from './dto/UpdateUsernameDto.dto';
 import { existsSync, unlinkSync } from 'fs';
 import { BlockUserDto } from './dto/BlockUserDto.dto';
+import { Conversation } from 'src/chat/entities/conversation.entity';
 
 @Injectable()
 export class UsersService {
@@ -227,7 +228,7 @@ export class UsersService {
 		return false;
 	}
 	
-	async updateFriendship(friendRequestDto: FriendRequestDto, flag: boolean): Promise<Friendship> {
+	async updateFriendship(friendRequestDto: FriendRequestDto, flag: boolean): Promise<Conversation | Friendship> {
 
 		// recherche par login ou username?
 		const initiator = await this.usersRepository.findOne({
@@ -252,8 +253,8 @@ export class UsersService {
 				await this.friendshipRepository.save(friendshipToUpdate);
 
 				if (flag) {
-					const status = this.chatService.createFriendsConversation(initiator, friend);
-					console.log(status);
+					const conversation = this.chatService.createFriendsConversation(initiator, friend);
+					return conversation;
 				}
 
 				return friendshipToUpdate;
@@ -264,17 +265,18 @@ export class UsersService {
 		return ;
 	}
 
-	async acceptFriendship(friendRequestDto: FriendRequestDto): Promise<Friendship> {
+	async acceptFriendship(friendRequestDto: FriendRequestDto): Promise<Conversation | Friendship> {
 
-		const newFriendship = await this.updateFriendship(friendRequestDto, true);
-		if (newFriendship) {
-			return newFriendship;
+		const newConversationBetweenFriends = await this.updateFriendship(friendRequestDto, true);
+		if (newConversationBetweenFriends) {
+			return newConversationBetweenFriends;
 		}
+
 		console.log("Fatal error: could not update friendship status");
 		return ;
 	}
 
-	async blockUser(blockUserDto: BlockUserDto): Promise<Friendship> {
+	async blockUser(blockUserDto: BlockUserDto): Promise<Conversation | Friendship> {
 
 		const friendshipToUpdate = await this.updateFriendship(blockUserDto, false);
 		if (friendshipToUpdate) {

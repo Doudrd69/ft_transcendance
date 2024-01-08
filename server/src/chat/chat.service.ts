@@ -55,7 +55,7 @@ export class ChatService {
 		let userToFind = new User();
 		userToFind = await this.usersRepository.findOne({
 			where: { id: userID },
-			relations: ["groups"],
+			// relations: ["groups"],
 		});
 
 		if (userToFind) {
@@ -154,7 +154,7 @@ export class ChatService {
 		return ;
 	}
 
-	async createFriendsConversation(initiator: User, friend: User): Promise<boolean> {
+	async createFriendsConversation(initiator: User, friend: User): Promise<Conversation> {
 
 		const roomName = initiator.login + friend.login;
 		const room = new Conversation();
@@ -162,18 +162,22 @@ export class ChatService {
 		room.is_channel = false;
 		await this.conversationRepository.save(room);
 
-		// When we "join" 2 friends in their private cnversation, there are no admins
-		const roomGroup = await this.createGroup(room, false);
-
-		if (roomGroup) {
-			initiator.groups.push(roomGroup);
-			friend.groups.push(roomGroup);
-			await this.usersRepository.save([initiator, friend]);
+		if (room) {
+			// When we "join" 2 friends in their private cnversation, there are no admins
+			const roomGroupInitiator = await this.createGroup(room, false);
+			// const roomGroupFriend = await this.createGroup(room, false);
 	
-			return true;
+			if (roomGroupInitiator) {
+	
+				initiator.groups.push(roomGroupInitiator);
+				friend.groups.push(roomGroupInitiator);
+				await this.usersRepository.save([initiator, friend]);
+			
+				return room;
+			}
 		}
 
-		return false;
+		return ;
 	}
 
 	async createConversation(conversationDto: ConversationDto): Promise<Conversation> {
@@ -241,6 +245,7 @@ export class ChatService {
 
 	async getConversationByName(name: string): Promise<Conversation> {
 
+		console.log("Find : ", name);
 		const conversation = await this.conversationRepository.findOne({ where: {name: name} });
 		if (conversation) {
 			return conversation;
