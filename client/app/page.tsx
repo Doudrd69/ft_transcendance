@@ -64,7 +64,7 @@ export default function Home() {
 			const conversationData = await response.json();
 			if (userSocket.connected) {
 				userSocket.emit('friendRequestAccepted', {roomName: conversationData.name, roomID: conversationData.id, initiator: friendRequestDto.initiatorLogin, recipient: friendRequestDto.recipientLogin});
-				userSocket.emit('joinFriendRoom', {roomName: conversationData.name, roomID: conversationData.id} );
+				userSocket.emit('joinRoom', {roomName: conversationData.name, roomID: conversationData.id} );
 			}
 		}
 		else {
@@ -151,7 +151,7 @@ export default function Home() {
 		userSocket.on('friendRequestAcceptedNotif', (data: { roomName: string, roomID: string, initiator: string, recipient: string }) => {
 			const { roomName, roomID, initiator, recipient } = data;
 			toast(<FriendRequestAccepted friend={recipient}/>);
-			userSocket.emit('joinFriendRoom', {roomName: roomName, roomID: roomID});
+			userSocket.emit('joinRoom', {roomName: roomName, roomID: roomID});
 		})
 
 		userSocket.on('userJoinedRoom', (notification: string) => {
