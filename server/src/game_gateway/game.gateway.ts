@@ -84,14 +84,24 @@ export class GameGateway {
         return (playerLogin);
     }
 
-    @SubscribeMessage('move-paddle-left')
-    async handlePaddleLeftMove(client: Socket, game: Game): number {
+    @SubscribeMessage('move-paddle')
+    async handlePaddleMove(client: Socket, game: Game) {
+        const PositionPaddle: number = 90;
         if (client.id == game.playerOneID)
         {   
-            //move paddle left
+            this.server.to([game.playerOneID,game.playerTwoID]).emit('update-paddle-left', {
+                gameId: this.game.gameId,
+                playerOneID: this.game.playerOneID,
+                playerTwoID: this.game.playerTwoID,
+                scoreOne: this.game.scoreOne,
+                scoreTwo: this.game.scoreTwo,
+                positionPaddleLeft: PositionPaddle,
+            });
         }
-        const PositionPaddle: number = 90;
-        return (PositionPaddle);
+        if (client.id == game.playerTwoID)
+        {   
+            //move paddle right
+        }
     }
 
     @SubscribeMessage('move-ball')
