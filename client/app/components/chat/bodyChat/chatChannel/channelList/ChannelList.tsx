@@ -22,7 +22,7 @@ const ChannelListComponent: React.FC<ChanneListComponentProps> = ({ userSocket})
 	const [conversations, setConversations] = useState<Conversation[]>([]);
 	
 	const loadDiscussions = async () => {
-		setConversations([]);
+
 		const response = await fetch(`http://localhost:3001/chat/getConversationsWithStatus/${userID}`, {
 			method: 'GET',
 			headers: {
@@ -54,12 +54,12 @@ const ChannelListComponent: React.FC<ChanneListComponentProps> = ({ userSocket})
 
 	const parseName = (name: string): string => {
 
-				const currentUserLogin = sessionStorage.getItem("currentUserLogin");
-				const conversationNameWithoutCurrentUser = name.replace(currentUserLogin!, '').trim()
-				const modifiedName = conversationNameWithoutCurrentUser.slice();
-				return modifiedName;
-	
+		const currentUserLogin = sessionStorage.getItem("currentUserLogin");
+		const conversationNameWithoutCurrentUser = name.replace(currentUserLogin!, '').trim()
+		const modifiedName = conversationNameWithoutCurrentUser.slice();
+		return modifiedName;
 	};
+
 	return (
 		<div className="bloc-channel-list">
 		<button

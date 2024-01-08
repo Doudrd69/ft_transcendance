@@ -55,7 +55,7 @@ export class ChatService {
 		let userToFind = new User();
 		userToFind = await this.usersRepository.findOne({
 			where: { id: userID },
-			// relations: ["groups"],
+			relations: ["groups"],
 		});
 
 		if (userToFind) {
@@ -266,7 +266,7 @@ export class ChatService {
 		return conversations;
 	}
 
-	async getMessages(conversationID: any): Promise<Message[]> {
+	async getMessages(conversationID: number): Promise<Message[]> {
 
 		const allMessages = await this.getAllMessages(conversationID);
 		if (!allMessages) {
@@ -284,6 +284,7 @@ export class ChatService {
 			console.error("Fatal error: conversations not found");
 			return [];
 		}
+		// console.log("Conversations --> ", allConversations);
 
 		return allConversations;
 	}

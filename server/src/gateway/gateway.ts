@@ -84,16 +84,6 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		delete this.connectedUsers[client.id];
 	}
 
-	@SubscribeMessage('joinFriendRoom')
-	async addUserToFriendRoom( @ConnectedSocket() client: Socket, @MessageBody() data: { roomName: string, roomID: string }) {
-
-		const { roomName, roomID } = data;
-		console.log("==== joinFriendRoom Event ====");
-		console.log("Add ", client.id," to room : ", roomName + roomID);
-		client.join(roomName + roomID);
-		return ;
-	}
-
 	@SubscribeMessage('joinRoom')
 	addUserToRoom( @ConnectedSocket() client: Socket, @MessageBody() data: { roomName: string, roomID: string } ) {
 
@@ -102,7 +92,15 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		console.log("Add ", client.id," to room : ", roomName + roomID);
 
 		client.join(roomName + roomID);
-		this.server.to(roomName + roomID).emit('userJoinedRoom', `User has joined ${roomName}`);
+		this.server.to(roomName + roomID).emit('userJoinedRoom', `User has joined ${roomName}${roomID}`);
+
+		client.on('requestRoomName', (user: string) => {
+			console.log('JPPPPPPPPPP');
+			this.server.to(user).emit('getRoomName', {
+				roomName: roomName + roomID,
+			});
+		});
+
 		return ;
 	}
 
