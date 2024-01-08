@@ -1,7 +1,8 @@
-// import './ReceiveBoxChannel.css'
+import './ReceiveBoxChannel.css'
 import React, { useState , useEffect, useRef } from 'react';
 import { Socket } from 'socket.io-client'
 import { useChat } from '../../../ChatContext';
+import AvatarImageComponent from '@/app/components/Avatar/Avatar';
 
 interface Message {
 	from: string;
@@ -20,7 +21,6 @@ const ReceiveBoxChannelComponent: React.FC<ReceiveBoxChannelComponentProps> = ({
 	const socketInUse = userSocket;
 	const [messages, setMessages] = useState<Message[]>([]);
 	const messagesContainerRef = useRef<HTMLDivElement>(null);
-	
 	const isMyMessage = (message: Message): boolean => {
 		return message.from === sessionStorage.getItem("currentUserLogin");
 	};
@@ -45,8 +45,6 @@ const ReceiveBoxChannelComponent: React.FC<ReceiveBoxChannelComponentProps> = ({
 		const formattedDate = new Intl.DateTimeFormat('en-GB', options).format(new Date(dateTimeString));
 		return formattedDate;
 	  };
-
-	// This function will retreive all the messages from the conversation and set the messages array for display
 	const getMessages = async () => {
 		
 		try {
@@ -83,8 +81,6 @@ const ReceiveBoxChannelComponent: React.FC<ReceiveBoxChannelComponentProps> = ({
 			socketInUse.off('onMessage')
 		}
 	}, [socketInUse]);
-	
-	// Loading the conversation (retrieving all messages on component rendering)
 	useEffect(() => {
 		console.log("Loading conversation...");
 		getMessages();
@@ -94,15 +90,20 @@ const ReceiveBoxChannelComponent: React.FC<ReceiveBoxChannelComponentProps> = ({
 		scrollToBottom();
 	}, [messages]);
 
+	
 	return (
 		<div ref={messagesContainerRef} className="bloc-channel-chat">
 			{messages.map((message: Message, id: number) => (
-				<>
-					<div key={id} className={`message-container ${isMyMessage(message) ? 'my-message' : 'other-message'}`}>
-						<p className="channel-chat-content">{message.content}</p>
-						<p className="channel-chat-date">{formatDateTime(message.post_datetime)}</p>
+				<div className="bloc-contain">
+					<div className="bloc-avatar-username">
+						<AvatarImageComponent className='avatar-channel' name={message.from} />
+						<div className="user-name">{message.from}</div>
 					</div>
-				</>
+					<div className={`message-container ${isMyMessage(message) ? 'my-message-channel' : 'other-message-channel'}`}>
+							<p className="channel-chat-content">{message.content}</p>
+							<p className="channel-chat-date">{formatDateTime(message.post_datetime)}</p>
+					</div>
+				</div>
 			))}
 		</div>
 	)

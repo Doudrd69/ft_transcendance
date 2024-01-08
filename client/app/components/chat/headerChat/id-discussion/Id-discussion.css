@@ -16,6 +16,8 @@
 	background-color:var(--second) ;
 	color: #f0f0f0;
 	text-transform: uppercase;
+    font-family: 'Gill Sans' , sans-serif;
+	font-size: 26px;
 	font-weight: bold;
 	border-radius:10px
 }

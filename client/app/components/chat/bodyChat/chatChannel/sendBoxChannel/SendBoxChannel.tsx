@@ -45,14 +45,15 @@ const SendBoxChannelComponent: React.FC<SendBoxComponentProps> = ({ userSocket }
 			else {
 				console.log("Client is not connected");
 			}
+			setMessageValue('');
 		}
 		else {
 			const error = await response.json();
 			if (Array.isArray(error.message))
-				console.log("Error: ", error.message[0]);
-			else
-				console.log("Error: ", error.message);
-		}
+			console.log("Error: ", error.message[0]);
+		else
+		console.log("Error: ", error.message);
+}
 	}
 
 	return (

@@ -13,8 +13,9 @@
 	margin: 10px; /* Espacement externe pour un aspect agréable */
 	padding: 10px; /* Espacement interne pour un aspect agréable */
 	color: black;
+    font-family: 'Gill Sans' , sans-serif;
+
 	font-size: 20px;
-	font-family: Arial, sans-serif;
 	border-radius: 10px;
 	display: flex;
 	align-items: center;
@@ -37,7 +38,8 @@
 	top: 50%;
 	left: 0;
 	right: 0;
-	transform: translateY(-50%);
+	margin: 5px;
+
 }
 .button-channel-list {
 	background-color: var(--fourth);
@@ -46,8 +48,11 @@
 	margin: 10px; /* Espacement externe pour un aspect agréable */
 	padding: 10px; /* Espacement interne pour un aspect agréable */
 	color: aliceblue;
+	text-transform: uppercase;
+	font-weight: bold;
 	font-size: 20px;
-	font-family: Arial, sans-serif;
+    font-family: 'Gill Sans' , sans-serif;
+	
 	border-radius: 10px;
 	display: flex;
 	align-items: center;
@@ -55,24 +60,49 @@
 	flex-direction: column;
 	box-sizing: border-box;
 	aspect-ratio: 1 / 1;
+	overflow: hidden; 
 	position: relative;
-	}
-	.button-channel-list span {
-		max-height: 50px;
-		overflow: hidden;
-		text-overflow: ellipsis; 
-		white-space: nowrap;
-		position: absolute;
-		top: 50%;
-		left: 0;
-		right: 0;
-		transform: translateY(-50%);
-  }
-  
+	transition: font-size 0.3s ease;
+	opacity: 1;
+	transition: opacity 0.3s ease;
+}
+.button-channel-list span {
+	max-height: 50px;
+	white-space: nowrap;
+	position: absolute;
+	margin: 5px;
+	top: calc(50% - 5px);
+	left: 0;
+	right: 0;
+	transform: translateY(-50%);
+	
+}
+@keyframes marquee {
+	0% {
+		transform: translateY(-50%) translateX(100%);
+	  }
+	  100% {
+		transform: translateY(-50%) translateX(-100%);
+	  }
+}
+.button-channel-list:hover span {
+	/* overflow: hidden; */
+	opacity: 0.5; 
+	font-size: 60px;
+	animation: marquee 5s linear infinite;
+	white-space: nowrap; /* Assurez-vous que le texte ne se casse pas sur plusieurs lignes */
+	display: inline-block;
+	
+} 
   .button-channel-list:hover {
+
 	background-color: var(--fifth);
   }
   
 .button-channel-list:hover{
 	background-color: var(--fifth);
+}
+
+.bloc-contain{
+	margin: 5px;
 }

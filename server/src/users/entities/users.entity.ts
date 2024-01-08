@@ -5,13 +5,12 @@ import { Conversation } from 'src/chat/entities/conversation.entity';
 
 @Entity()
 export class User {
+	@PrimaryGeneratedColumn()
+	id: number;
 
-  @PrimaryGeneratedColumn()
-  id: number;
 
-
-  @Column({ default: "1234" })
-  socketGame: string;
+	@Column({ default: "1234" })
+	socketGame: string;
 
 
   @Column({ default: false })
@@ -20,53 +19,53 @@ export class User {
   @Column()
   login: string;
 
-  @Column()
-  firstname: string;
+	@Column()
+	firstname: string;
 
-  @Column({ default: "guest" })
-  username: string;
+	@Column({ default: "guest" })
+	username: string;
 
-  @Column({ default: "/avatars/avatar.png" })
-  avatarURL: string;
+	@Column({ default: "/avatars/avatar.png" })
+	avatarURL: string;
 
-  @Column()
-  officialProfileImage: string;
+	@Column()
+	officialProfileImage: string;
 
-  @Column({ default: "" })
-  TFA_secret: string;
+	@Column({ default: "" })
+	TFA_secret: string;
 
-  @Column({ default: "" })
-  TFA_temp_secret: string;
+	@Column({ default: "" })
+	TFA_temp_secret: string;
 
-  @Column({ default: false })
-  TFA_isEnabled: boolean;
+	@Column({ default: false })
+	TFA_isEnabled: boolean;
 
-  @Column({ default: false })
-  isActive: boolean;
+	@Column({ default: false })
+	isActive: boolean;
 
-  @ManyToMany(type => Conversation, {
-    eager: true,
-  })
-  @JoinTable({
-	  name: "user_to_group",
-	  joinColumn: {
-		  name: "user",
-		  referencedColumnName: "id"
-	  },
-	  inverseJoinColumn: {
-		  name: "group",
-		  referencedColumnName: "id"
-	  }
-  })
-  groups: GroupMember[];
+	@ManyToMany(type => Conversation, {
+		eager: true,
+	})
+	@JoinTable({
+		name: "user_to_group",
+		joinColumn: {
+			name: "user",
+			referencedColumnName: "id"
+		},
+		inverseJoinColumn: {
+			name: "group",
+			referencedColumnName: "id"
+		}
+	})
+	groups: GroupMember[];
 
-  @OneToMany(() => Friendship, (friendship) => friendship.initiator, {
-    eager: true,
-  })
-  initiatedFriendships: Friendship[];
+	@OneToMany(() => Friendship, (friendship) => friendship.initiator, {
+		eager: true,
+	})
+	initiatedFriendships: Friendship[];
 
-  @OneToMany(() => Friendship, (friendship) => friendship.friend, {
-    eager: true,
-  })
-  acceptedFriendships: Friendship[];
+	@OneToMany(() => Friendship, (friendship) => friendship.friend, {
+		eager: true,
+	})
+	acceptedFriendships: Friendship[];
 }

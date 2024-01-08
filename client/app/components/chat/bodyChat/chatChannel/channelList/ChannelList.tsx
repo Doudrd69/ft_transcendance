@@ -51,6 +51,7 @@ const ChannelListComponent: React.FC<ChanneListComponentProps> = ({ userSocket})
 		console.log("Loading conversations...");
 		loadDiscussions();
 	}, [state.refreshChannel]);
+
 	const parseName = (name: string): string => {
 
 				const currentUserLogin = sessionStorage.getItem("currentUserLogin");
@@ -78,6 +79,7 @@ const ChannelListComponent: React.FC<ChanneListComponentProps> = ({ userSocket})
 					onClick={() => {
 					dispatch({ type: 'TOGGLE', payload: 'showChannel' });
 					dispatch({ type: 'SET_CURRENT_CONVERSATION', payload: conversation.name });
+					dispatch({ type: 'SET_CURRENT_CONVERSATION_ID', payload: conversation.id });
 					dispatch({ type: 'SET_CURRENT_CONVERSATION_ID', payload: conversation.id });
 					}}
 				>

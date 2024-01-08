@@ -50,7 +50,7 @@
 }
 
 /*avatar du profil*/
-.on-off {
+/* .on-off {
 	width: 20px;
 	height: 20px;
 	border-radius: 50%;
@@ -58,8 +58,8 @@
 	display: inline-block;
 	margin: 15px;
 	border-color: var(--second);
-  }
-.profil-friendslist.on{
+  } */
+/* .profil-friendslist.on{
 	background-color: green;
 	box-shadow: 0 0 10px green;
 }
@@ -67,16 +67,12 @@
 .profil-friendslist.off{
 	background-color: red;
 	box-shadow: 0 0 10px red;
-}
+} */
 .profil-friendslist{
 	width: 40px;
 	height: 40px;
 	border-radius: 50%;
 	margin: 0px 10px 0px 20px; /* Espacement entre le logo et le nom */
-	background-image: url('picture.png');
-	background-size: cover; /* Ajuste la taille de l'image pour remplir le cercle */
-	background-repeat: no-repeat;
-	background-position: center center;
 }
 
 /*++++++++ de friendlist*/
