@@ -166,7 +166,8 @@ export class UsersController {
 		return this.usersService.updateFriendship(friendRequestDto, flag);
 	}
 
-	//guard
+
+	@UseGuards(AuthGuard)
 	@HttpCode(HttpStatus.OK)
 	@Post('acceptFriendRequest')
 	acceptFriendship(@Body() friendRequestDto: FriendRequestDto): Promise<Conversation | Friendship> {
@@ -180,6 +181,7 @@ export class UsersController {
 		return this.usersService.blockUser(blockUserDto);
 	}
 
+	@UseGuards(AuthGuard)
 	@Get('getFriends/:username')
 	getFriendsList(@Param('username') username: string): Promise<Friendship[]> {
 		return this.usersService.getFriendships(username);

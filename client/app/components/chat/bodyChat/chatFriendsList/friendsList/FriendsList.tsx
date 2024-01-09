@@ -39,6 +39,9 @@ const FriendsListComponent: React.FC<FriendsListComponentProps> = ({ userSocket 
 		setFriendList([]);
 		const response = await fetch(`http://localhost:3001/users/getFriends/${username}`, {
 			method: 'GET',
+			headers: {
+				'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
+			}
 		});
 		
 		if (response.ok) {

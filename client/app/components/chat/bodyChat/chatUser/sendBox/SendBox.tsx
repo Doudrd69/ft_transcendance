@@ -39,8 +39,7 @@ const SendBoxComponent: React.FC<SendBoxComponentProps> = ({ userSocket }) => {
 		if (response.ok) {
 			console.log("Message sent and created in DB");
 			if (userSocket.connected) {
-				// await userSocket.emit('requestRoomName', (sessionStorage.getItem("currentUserLogin")));
-				userSocket.emit('message', { dto: messageDto, conversationName: state.currentConversation } , () => {
+				userSocket.emit('message', { dto: messageDto, conversationName: state.currentRoom } , () => {
 					console.log("Message sent to gateway");
 				});
 			}
@@ -54,18 +53,6 @@ const SendBoxComponent: React.FC<SendBoxComponentProps> = ({ userSocket }) => {
 			console.log("Error: ", error.message);
 		}
 	}
-
-	useEffect(() => {
-
-		userSocket.on('getRoomName', (roomName: string) => {
-			console.log("ROOM NAME == ", roomName);
-		});
-
-		return () => {
-			userSocket.off('getRoomName');
-		}
-
-	}, [userSocket]);
 
 	return (
 				<form className="bloc-send-chat" onSubmit={handleMessage}>
