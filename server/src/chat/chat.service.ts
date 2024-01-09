@@ -64,7 +64,6 @@ export class ChatService {
 			let conversationArray : Conversation[] = [];
 			if (userToFind.groups && Array.isArray(userToFind.groups)) {
 				userToFind.groups.forEach((group: GroupMember) => {
-					console.log("Conv --> ", group.conversation);
 					conversationArray.push(group.conversation)
 				})
 				return conversationArray;
@@ -133,6 +132,8 @@ export class ChatService {
 
 			if (group) {
 				userToAdd.groups.push(group);
+				await this.usersRepository.save(userToAdd);
+				return conversationToAdd;
 			}
 
 			return ;
@@ -295,11 +296,14 @@ export class ChatService {
 				isAdminArray.push(group.isAdmin);
 			});
 
+				const conversationList = await this.getAllConversations(userID);
+				console.log("Convs -> ", conversationList);
+
 				const conversationArray = {
-					conversations: await this.getAllConversations(userID),
+					conversationList: conversationList,
 					isAdmin: isAdminArray,
 				}
-
+	
 				return conversationArray;
 		}
 
