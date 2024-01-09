@@ -94,13 +94,6 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		client.join(roomName + roomID);
 		this.server.to(roomName + roomID).emit('userJoinedRoom', `User has joined ${roomName}${roomID}`);
 
-		client.on('requestRoomName', (user: string) => {
-			console.log('JPPPPPPPPPP');
-			this.server.to(user).emit('getRoomName', {
-				roomName: roomName + roomID,
-			});
-		});
-
 		return ;
 	}
 

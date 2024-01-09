@@ -210,7 +210,6 @@ export class ChatService {
 
 		let conversation = new Conversation(); 
 		conversation = await this.conversationRepository.findOne({ where: {id: messageDto.conversationID} }); 
-		console.log("Linking message to ", conversation.name, " with ID ", conversation.id);
 		if (conversation) {
 			const newMessage = new Message();
 			newMessage.from = messageDto.from;
