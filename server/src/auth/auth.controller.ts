@@ -32,6 +32,12 @@ export class AuthController {
 	}
 
 	@UseGuards(AuthGuard)
+	@Post('desactivate2fa')
+	desactivate2FA(@Body() requestTfaDto: RequestTfaDto) {
+		return this.authService.desactivate2FA(requestTfaDto);
+	}
+
+	@UseGuards(AuthGuard)
 	@Post('checkAuthenticatorCode')
 	verifyCode(@Body() authenticatorCodeDto: AuthenticatorCodeDto) {
 		return this.authService.verifyCode(authenticatorCodeDto);

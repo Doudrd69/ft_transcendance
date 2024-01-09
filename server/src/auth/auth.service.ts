@@ -127,6 +127,17 @@ export class AuthService {
 	/***							2FA							***/
 	/**************************************************************/
 
+
+	async desactivate2FA(requestTfaDto: RequestTfaDto) {
+
+			const user = await this.usersService.getUserByID(requestTfaDto.userID);
+
+			if (user) {
+				await this.usersService.save2FASecret(user, "", false);
+				return ;
+			}
+	}
+
 	async activate2FA(requestTfaDto: RequestTfaDto) {
 
 		try {
