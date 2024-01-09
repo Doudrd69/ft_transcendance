@@ -7,7 +7,7 @@ import AvatarImageComponent from '@/app/components/Avatar/Avatar';
 import AvatarImageBisComponent from '@/app/components/Avatar/AvatarBis';
 
 interface ChannelListComponentProps {
-	userSocket: Socket; // Assurez-vous d'avoir la bonne importation pour le type Socket
+	userSocket: Socket; // Assurez-vous d'avoir la bonne importation pour le type Socketg;
 }
 
 interface FriendShip {
@@ -16,7 +16,10 @@ interface FriendShip {
 	isActive: boolean;
 	friend?: any;
 	initiator?: any
+	roomName?: string;
+	roomID?: string;
 }
+
 interface Conversation {
 	id: string,
 	name: string;
@@ -26,25 +29,44 @@ interface Conversation {
 const ChatListComponent: React.FC<ChannelListComponentProps> = ({ userSocket }) => {
 
 	const { state, dispatch } = useChat();
-
-	const [conversations, setConversations] = useState<Conversation[]>([]);
-	const user = Number(sessionStorage.getItem("currentUserID"));
 	const username = sessionStorage.getItem("currentUserLogin");
 	const [activeIndex, setActiveIndex] = useState<number | null>(null);
-	const timestamp = new Date().getTime();
+	const [friendList, setFriendList] = useState<FriendShip[]>([]);
   
 	const loadFriendList = async () => {
-		setFriendList([]);
+
 		const response = await fetch(`http://localhost:3001/users/getFriends/${username}`, {
 			method: 'GET',
+			headers: {
+				'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
+			}
 		});
 		
 		if (response.ok) {
-			const data = await response.json();
-			setFriendList([...data]);
+			const friends = await response.json();
+
+			const requestDms = await fetch(`http://localhost:3001/chat/getConversations/${sessionStorage.getItem("currentUserID")}`, {
+				method: 'GET',
+				headers: {
+					'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
+				},
+			});
+
+			if (requestDms.ok) {
+				const conversations = await requestDms.json();
+				const DMs = conversations.filter((conversation: Conversation) => !conversation.is_channel);
+
+				friends.forEach((friend: FriendShip) => {
+					DMs.forEach((dm: Conversation) => {
+						friend.roomName = dm.name;
+						friend.roomID = dm.id;
+					});
+				});
+				setFriendList([...friends]);
+			}
 		}
 		else {
-			console.log("Fatal error: no friend list");
+			console.log("Fatal error");
 		}
 	}
 
@@ -52,24 +74,23 @@ const ChatListComponent: React.FC<ChannelListComponentProps> = ({ userSocket }) 
 		console.log("Loading friend list...");
 		loadFriendList();
 	}, [state.refreshFriendList]);
-   
+
   return (
 		<div className="bloc-discussion-list">
-		  {friendList.map((friend: FriendShip, id: number) => (
-			<div key={friend.id} className="bloc-button-discussion-list">
-			  <img src={`http://localhost:3001${friend.friend.avatarURL}`} className={`profil-discussion-list ${friend.isActive ? 'on' : 'off'}`} alt="User Avatar" />
-			  <div className={`amies ${activeIndex === id ? 'active' : ''}`} onClick={() => {
-          console.log("Avatar URL:", `http://localhost:3001${friend.friend.avatarURL}`);
-          dispatch({ type: 'TOGGLE', payload: 'showChat' });
-          dispatch({ type: 'SET_CURRENT_CONVERSATION', payload: friend.friend.login || friend.initiator.login || 'Unknown User' });
-          dispatch({ type: 'SET_CURRENT_CONVERSATION_ID', payload: friend.friend.id || friend.initiator.id || -1 });
-			   }}>
-				{friend.friend ? friend.friend.login : friend.initiator ? friend.initiator.login : 'Unknown User'}
-			  </div>
-			</div>
-		  ))}
+			{friendList.map((friend: FriendShip, id: number) => (
+				<div key={friend.id} className="bloc-button-discussion-list">
+					<img src={`http://localhost:3001${friend.friend ? friend.friend.avatarURL : friend.initiator ? friend.initiator.avatarURL : 'Unknown User'}`} className={`profil-discussion-list ${friend.isActive ? 'on' : 'off'}`} alt="User Avatar" />
+			  		<div className={`amies ${activeIndex === id ? 'active' : ''}`} onClick={() => {
+        					dispatch({ type: 'TOGGLE', payload: 'showChat' });
+        					dispatch({ type: 'SET_CURRENT_CONVERSATION', payload: friend.friend ? friend.friend.login : friend.initiator ? friend.initiator.login : 'Unknown User'});
+							dispatch({ type: 'SET_CURRENT_ROOM', payload: friend.roomName});
+        					dispatch({ type: 'SET_CURRENT_CONVERSATION_ID', payload: friend.roomID});
+						}}>
+						{friend.friend ? friend.friend.login : friend.initiator ? friend.initiator.login : 'Unknown User'}
+					</div>
+				</div>
+			))}
 		</div>
-	  );
-	  
+	); 
 };
 export default ChatListComponent;

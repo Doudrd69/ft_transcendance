@@ -1,5 +1,5 @@
 import './SendBox.css'
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Socket } from 'socket.io-client'
 import { useChat } from '../../../ChatContext';
 
@@ -10,7 +10,6 @@ interface SendBoxComponentProps {
 const SendBoxComponent: React.FC<SendBoxComponentProps> = ({ userSocket }) => {
 
 	const { state } = useChat();
-	const socketInUse = userSocket;
 	const [messageValue, setMessageValue] = useState('');
 
 	const handleMessageInput = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -28,7 +27,6 @@ const SendBoxComponent: React.FC<SendBoxComponentProps> = ({ userSocket }) => {
 
 		e.preventDefault();
 
-		
 		const response = await fetch('http://localhost:3001/chat/newMessage', {
 			method: 'POST',
 			headers: {
@@ -40,9 +38,8 @@ const SendBoxComponent: React.FC<SendBoxComponentProps> = ({ userSocket }) => {
 		
 		if (response.ok) {
 			console.log("Message sent and created in DB");
-			if (socketInUse.connected) {
-				console.log("Conv --> ", state.currentConversation);
-				socketInUse.emit('message', { dto: messageDto, conversationName: state.currentConversation } , () => {
+			if (userSocket.connected) {
+				userSocket.emit('message', { dto: messageDto, conversationName: state.currentRoom } , () => {
 					console.log("Message sent to gateway");
 				});
 			}
@@ -53,7 +50,7 @@ const SendBoxComponent: React.FC<SendBoxComponentProps> = ({ userSocket }) => {
 		}
 		else {
 			const error = await response.json();
-			console.log("Error: ", error.message[0]);
+			console.log("Error: ", error.message);
 		}
 	}
 

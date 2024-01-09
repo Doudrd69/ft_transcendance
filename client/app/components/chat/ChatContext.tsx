@@ -11,6 +11,7 @@ type ActionType =
   | 'SET_CURRENT_CONVERSATION_NAME'
   | 'SET_CURRENT_CONVERSATION'
   | 'SET_CURRENT_CHANNEL'
+  | 'SET_CURRENT_ROOM'
   | 'SET_CURRENT_CONVERSATION_ID';
 
 // Définir l'interface de l'action
@@ -41,6 +42,7 @@ interface ChatState {
 	currentConversationName: string | null;
 	currentConversationID: number | null;
 	currentChannel: string | null;
+	currentRoom: string | null;
 	[key: string]: boolean | number | string | null;
 }
 
@@ -66,6 +68,7 @@ const initialState: ChatState = {
 	currentConversationID: null,
 	currentConversationName: null,
 	currentChannel: null,
+	currentRoom: null,
 };
 
 // Réducteur
@@ -94,7 +97,9 @@ const chatReducer = (state: ChatState, action: Action): ChatState => {
 		case 'SET_CURRENT_CONVERSATION_NAME':
 			return { ...state, currentConversationName: action.payload || null };
 		case 'SET_CURRENT_CHANNEL':
-			return { ...state, currentChannel: action.payload || null }; 
+			return { ...state, currentChannel: action.payload || null };
+		case 'SET_CURRENT_ROOM':
+			return { ...state, currentRoom: action.payload || null }; 
 		case 'SET_CURRENT_CONVERSATION_ID':
 			return { ...state, currentConversationID: action.payload ? parseInt(action.payload, 10) : null};
 	  default:
@@ -128,6 +133,12 @@ export const setCurrentConversationName = (payload: string | null): Action => ({
 	type: 'SET_CURRENT_CONVERSATION',
 	payload,
 });
+
+export const setCurrentRoom = (payload: string | null): Action => ({
+	type: 'SET_CURRENT_ROOM',
+	payload,
+});
+
 export const setCurrentConversationID = (payload: string | null): Action => ({
 	type: 'SET_CURRENT_CONVERSATION_ID',
 	payload,
