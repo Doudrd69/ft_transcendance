@@ -14,7 +14,7 @@ interface ChanneListComponentProps {
 	userSocket: Socket;
 }
 
-const ChannelListComponent: React.FC<ChanneListComponentProps> = ({ userSocket}) => {
+const ChannelListComponent: React.FC<ChanneListComponentProps> = ({ userSocket }) => {
 
 	const { state, dispatch } = useChat();
 

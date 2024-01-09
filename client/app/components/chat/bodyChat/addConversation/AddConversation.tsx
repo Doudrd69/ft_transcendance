@@ -53,7 +53,7 @@ const AddConversationComponent: React.FC<AddConversationComponentProps> = ({ use
 			dispatch({ type: 'TOGGLEX', payload: 'refreshChannel'});
 		} else {
 			const error = await response.json();
-			console.log("Error: ", error.message[0]);
+			console.log("Error: ", error.message);
 		}
 	};
 

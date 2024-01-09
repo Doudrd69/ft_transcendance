@@ -47,7 +47,7 @@ export class ChatController {
 
 	@UseGuards(AuthGuard)
 	@Get('getConversations/:userID')
-	getConversationsFromUser(@Param('userID') userID: number): Promise<GroupMember[]> {
+	getConversationsFromUser(@Param('userID') userID: number): Promise<Conversation[]> {
 		return this.chatService.getConversations(userID);
 	}
 
