@@ -49,7 +49,7 @@ const ReceiveBoxComponent: React.FC<ReceiveBoxComponentProps> = ({ userSocket })
 	const getMessage = async () => {
 
 		try {
-			// proteger la requete dans le controller
+			console.log("Get conversation ", state.currentConversationID);
 			const response = await fetch(`http://localhost:3001/chat/getMessages/${state.currentConversationID}`, {
 				method: 'GET',
 				headers: {

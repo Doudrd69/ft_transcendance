@@ -38,7 +38,7 @@ export class User {
 	@Column({ default: false })
 	isActive: boolean;
 
-	@ManyToMany(type => Conversation, {
+	@ManyToMany(type => GroupMember, {
 		eager: true,
 	})
 	@JoinTable({

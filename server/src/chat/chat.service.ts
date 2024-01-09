@@ -37,55 +37,42 @@ export class ChatService {
 		return messages;
 	}
 
-	// private async getAllPublicConversations(): Promise<GroupMember[]> {
+	private async getAllPublicConversations(): Promise<Conversation[]> {
 
-	// 	const publicCOnversations = await this.groupMemberRepository.find({
-	// 		where: { isPublic: true},
-	// 	});
+		const publicConversations = await this.conversationRepository.find({
+			where: {isPublic: true},
+		});
 
-	// 	if (publicCOnversations) {
-	// 		return publicCOnversations;
-	// 	}
+		if (publicConversations) {
+			console.log("Public convs => ", publicConversations);
+			return publicConversations;
+		}
 
-	// 	throw Error("No conversations found");
-	// }
+		throw Error("No conversations found");
+	}
 
-	private async getAllConversations(userID: number): Promise<GroupMember[]> {
+	private async getAllConversations(userID: number): Promise<Conversation[]> {
 
-		let userToFind = new User();
-		userToFind = await this.usersRepository.findOne({
+
+		const userToFind : User = await this.usersRepository.findOne({
 			where: { id: userID },
-			relations: ["groups"],
+			relations: ["groups", "groups.conversation"],
 		});
 
 		if (userToFind) {
+
+			let conversationArray : Conversation[] = [];
 			if (userToFind.groups && Array.isArray(userToFind.groups)) {
-				const conversations = userToFind.groups;
-				return conversations;
+				userToFind.groups.forEach((group: GroupMember) => {
+					console.log("Conv --> ", group.conversation);
+					conversationArray.push(group.conversation)
+				})
+				return conversationArray;
 			}
 			return [];
 		}
 		console.error("Fatal error: user not found");
 		return [];
-	}
-
-	private async getConversationsRights(conversations: GroupMember[]) {
-
-		if (conversations) {
-			console.log("==== getConversationsRights ===");
-			const groups = await this.groupMemberRepository.find({
-				where: {conversation: conversations},
-			});
-			// console.log("User's groups: ", groups);
-	
-			let isAdminArray = [];
-			groups.forEach((element: GroupMember) => {
-				isAdminArray.push(element.isAdmin);
-			});
-			// console.log("IsAdminArray: ", isAdminArray);
-
-			return isAdminArray;
-		}
 	}
 
 	async quitConversation(conversationDto: ConversationDto) {
@@ -138,14 +125,14 @@ export class ChatService {
 
 		if (conversationToAdd && userToAdd) {
 
-			const group = await this.groupMemberRepository.findOne({
-				where: {conversation: conversationToAdd}
-			});
+			const group = new GroupMember();
+			group.isAdmin = false;
+			group.joined_datetime = new Date();
+			group.conversation = conversationToAdd;
+			await this.groupMemberRepository.save(group);
 
 			if (group) {
 				userToAdd.groups.push(group);
-				await this.usersRepository.save(userToAdd);
-				return conversationToAdd;
 			}
 
 			return ;
@@ -156,22 +143,34 @@ export class ChatService {
 
 	async createFriendsConversation(initiator: User, friend: User): Promise<Conversation> {
 
-		const roomName = initiator.login + friend.login;
 		const room = new Conversation();
-		room.name = roomName;
+		room.name = initiator.login + friend.login;;
 		room.is_channel = false;
 		await this.conversationRepository.save(room);
 
 		if (room) {
 			// When we "join" 2 friends in their private cnversation, there are no admins
-			const roomGroupInitiator = await this.createGroup(room, false);
+			// const roomGroupInitiator = await this.createGroup(room, false);
 			// const roomGroupFriend = await this.createGroup(room, false);
+			const roomGroupInitiator = new GroupMember();
+			roomGroupInitiator.isAdmin = false;
+			roomGroupInitiator.joined_datetime = new Date();
+			roomGroupInitiator.conversation = room;
+			await this.groupMemberRepository.save(roomGroupInitiator);
+
+			const roomGroupFriend = new GroupMember();
+			roomGroupFriend.isAdmin = false;
+			roomGroupFriend.joined_datetime = new Date();
+			roomGroupFriend.conversation = room;
+			await this.groupMemberRepository.save(roomGroupFriend);
 	
-			if (roomGroupInitiator) {
+			if (roomGroupInitiator && roomGroupFriend) {
+
+				friend.groups.push(roomGroupFriend);
+				await this.usersRepository.save(friend);
 	
 				initiator.groups.push(roomGroupInitiator);
-				friend.groups.push(roomGroupInitiator);
-				await this.usersRepository.save([initiator, friend]);
+				await this.usersRepository.save(initiator);
 			
 				return room;
 			}
@@ -197,10 +196,9 @@ export class ChatService {
 			// The user who created the conversation is set to admin
 			const group = await this.createGroup(conv, true);
 
-			if (Array.isArray(user.groups)) {
-				user.groups.push(group);
-				await this.usersRepository.save(user);
-			}
+			user.groups.push(group);
+			await this.usersRepository.save(user);
+
 			return conv;
 		}
 		return ;
@@ -276,37 +274,39 @@ export class ChatService {
 		return allMessages;
 	}
 
-	async getConversations(userID: number): Promise<GroupMember[]> {
+	async getConversations(userID: number): Promise<Conversation[]> {
 
 		const allConversations = await this.getAllConversations(userID);
 		if (!allConversations) {
 			console.error("Fatal error: conversations not found");
 			return [];
 		}
-		// console.log("Conversations --> ", allConversations);
 
 		return allConversations;
 	}
 
 	async getConversationsWithStatus(userID: number) {
 
-		const allConversations = await this.getAllConversations(userID);
-		if (allConversations) {
+		const user = await this.usersRepository.findOne({
+			where: { id: userID },
+			relations: ["groups"],
+		});
 
-			const conversationsRights = await this.getConversationsRights(allConversations);
-			if (conversationsRights) {
+		if (user) {
 
+			let isAdminArray = [];
+			user.groups.forEach((group: GroupMember) => {
+				isAdminArray.push(group.isAdmin);
+			});
+			// console.log("isAdminArray: ", isAdminArray);	
 				const conversationArray = {
-					conversations: allConversations,
-					isAdmin: conversationsRights,
+					conversations: await this.getAllConversations(userID),
+					isAdmin: isAdminArray,
 				}
-
 				// console.log("Conversations of user with ID", userID, " -> ", conversationArray);
-
 				return conversationArray;
-			}
 		}
-		
+
 		console.error("Fatal error: conversations not found");
 		return [];
 	}
