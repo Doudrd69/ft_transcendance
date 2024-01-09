@@ -31,11 +31,10 @@ const ChannelListComponent: React.FC<ChanneListComponentProps> = ({ userSocket }
 		});
 
 		if (response.ok) {
-			const conversationsData = await response.json();
-			const { conversations, isAdmin } = conversationsData;
+			const responseData = await response.json();
+			const { conversationList, isAdmin } = responseData;
 			console.log("isAdmin ==> ", isAdmin);
-
-			setConversations((prevConversations: Conversation[]) => [...prevConversations, ...conversations]);
+			setConversations((prevConversations: Conversation[]) => [...prevConversations, ...conversationList]);
 		}
 		else {
 			console.log("Fatal error");
