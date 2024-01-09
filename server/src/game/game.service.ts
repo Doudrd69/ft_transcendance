@@ -34,9 +34,10 @@ export class GameService {
     async linkSocketIDWithUser(playerID: string, playerLogin: string) {
 
         const Player: User = await this.usersRepository.findOne({ where: { login: playerLogin } })
-        if (Player && playerID)
+        if (Player && playerID) {
             Player.socketGame = playerID;
-        this.usersRepository.save(Player);
+            this.usersRepository.save(Player);
+        }
     }
 
     async getLoginByIDpair(player1ID: string, player2ID: string) {

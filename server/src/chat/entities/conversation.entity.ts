@@ -10,6 +10,13 @@ export class Conversation {
 
 	@Column()
 	name: string;
+
+	// penser a le HASHER
+	@Column({ default: "" })
+	password: string;
+
+	@Column({ default: true})
+  	isPublic: boolean;
 	
 	@Column({ default: false })
 	is_channel: boolean;

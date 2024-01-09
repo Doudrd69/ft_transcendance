@@ -34,10 +34,10 @@ export class ChatController {
 		return this.chatService.addFriendToConversation(addUserToConversationDto);
 	}
 
-	@Get('getMesssage/:id')
-	getMessage(@Param('id') id: number): Promise<Message | null> {
-		return this.chatService.getMessageById(id);
-	}
+	// @Get('getMesssage/:id')
+	// getMessage(@Param('id') id: number): Promise<Message | null> {
+	// 	return this.chatService.getMessageById(id);
+	// }
 
 	@UseGuards(AuthGuard)
 	@Get('getMessages/:conversationID')
@@ -47,7 +47,7 @@ export class ChatController {
 
 	@UseGuards(AuthGuard)
 	@Get('getConversations/:userID')
-	getConversationsFromUser(@Param('userID') userID: number): Promise<GroupMember[]> {
+	getConversationsFromUser(@Param('userID') userID: number): Promise<Conversation[]> {
 		return this.chatService.getConversations(userID);
 	}
 
