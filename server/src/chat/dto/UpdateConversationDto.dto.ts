@@ -10,24 +10,17 @@ import {
 	Max
 } from 'class-validator';
 
-export class ConversationDto {
+export class UpdateConversationDto {
 
-	@IsNotEmpty()
-	@Length(6, 20)
-	@IsAscii()
-	@IsAlpha()
-	@IsString()
-	@Matches(/^[^"';%()|<>\\]*$/)
-	name: string;
+    @IsNotEmpty()
+	@IsPositive()
+	@Max(1000)
+	conversationID: number;
 
 	@IsNotEmpty()
 	@IsPositive()
 	@Max(1000)
 	userID: number;
-
-	@IsNotEmpty()
-	@IsBoolean()
-	is_channel: boolean;
 
 	@IsNotEmpty()
 	@IsBoolean()
@@ -39,5 +32,5 @@ export class ConversationDto {
 	@IsAlpha()
 	@IsString()
 	@Matches(/^[^"';%()|<>\\]*$/)
-	password?: string;
+	newPassword?: string;
 }

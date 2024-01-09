@@ -129,6 +129,7 @@ export class UsersService {
 		if (!userToCreate) {
 			// const saltOrRounds = 10;
 			// password = await bcrypt.hash(password, saltOrRounds);
+			// const isMatch = await bcrypt.compare(password, hash);
 			const newUser = new User();
 			newUser.login = username;
 			newUser.firstname = username;
