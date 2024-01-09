@@ -10,12 +10,14 @@ import { Conversation } from 'src/chat/entities/conversation.entity';
 import { Game } from './entities/games.entity';
 import { GameController } from './game.controller';
 import { GameService } from './game.service';
+import { GameEngine } from './entities/gameEngine.entity';
 
 @Module({
   imports: [
       TypeOrmModule.forFeature([User]),
       TypeOrmModule.forFeature([Friendship]),
       TypeOrmModule.forFeature([Game]),
+      TypeOrmModule.forFeature([GameEngine]),
   ],
   controllers: [GameController],
   providers: [GameService, MatchmakingService],

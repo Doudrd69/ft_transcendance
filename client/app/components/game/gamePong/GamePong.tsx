@@ -29,16 +29,12 @@ const PongComponent = (socket: { socket: Socket }) => {
     const [inCountdown, setInCountdown] = useState<boolean>(true);
     const [gameState, setGameState] = useState<gameState>();
 
-    interface ball {
-        x: number,
-        y: number,
-        r: number
-    }
-
     interface gameState {
-        BallPosition: ball[] | null,
+        BallPosition: { x: number, y: number, r: number} | null,
         paddleOne: { x: number, y: number } | null,
-        paddleTwo: { x: number, y: number } | null
+        paddleTwo: { x: number, y: number } | null,
+        scoreOne: number,
+        scoreTwo: number
     }
 
     interface inputState {
@@ -63,13 +59,11 @@ const PongComponent = (socket: { socket: Socket }) => {
         gameSocket.on('Game_Update', (gameState: gameState) => {
             setGameState((prevState) => ({
                 ...prevState,
-                BallPosition: gameState.BallPosition!.map((ball) => ({
-                    x: ball.x / (16 / 9),
-                    y: ball.y,
-                    r: ball.r
-                })),
-                paddleOne: { x: gameState.paddleOne!.x / (16 / 9), y: gameState.paddleOne!.y },
-                paddleTwo: { x: gameState.paddleTwo!.x / (16 / 9), y: gameState.paddleTwo!.y }
+                BallPosition: { x: gameState.BallPosition!.x / (16 / 9), y: gameState.BallPosition!.y, r: gameState.BallPosition!.r },
+                paddleOne: { x: gameState.paddleOne!.x / (16 / 9), y: gameState.paddleOne!.y},
+                paddleTwo: { x: gameState.paddleTwo!.x / (16 / 9), y: gameState.paddleTwo!.y },
+                scoreOne: gameState.scoreOne,
+                scoreTwo: gameState.scoreTwo,
             }));
         })
     });
