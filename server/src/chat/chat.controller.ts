@@ -8,6 +8,7 @@ import { Conversation } from './entities/conversation.entity';
 import { Message } from './entities/message.entity';
 import { GroupMember } from './entities/group_member.entity';
 import { AuthGuard } from 'src/auth/auth.guard';
+import { UpdateConversationDto } from './dto/UpdateConversationDto.dto';
 
 @Controller('chat')
 export class ChatController {
@@ -32,6 +33,13 @@ export class ChatController {
 	@Post('addFriendToConversation')
 	addFriendToConversation(@Body() addUserToConversationDto: AddFriendToConversationDto): Promise<Conversation> {
 		return this.chatService.addFriendToConversation(addUserToConversationDto);
+	}
+
+	@UseGuards(AuthGuard)
+	@HttpCode(HttpStatus.OK)
+	@Post('updateConversation')
+	updateConversationStatusAndPassword(@Body() updateConversationDto: UpdateConversationDto): Promise<Conversation> {
+		return this.chatService.updateConversation(updateConversationDto);
 	}
 
 	// @Get('getMesssage/:id')
