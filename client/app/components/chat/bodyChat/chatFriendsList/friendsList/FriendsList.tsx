@@ -4,6 +4,7 @@ import FriendsListTabComponent from './friendsListTab/FriendsListTab';
 import { useChat } from '../../../ChatContext';
 import AddFriendComponent from '../../addConversation/AddFriends';
 import { Socket } from 'socket.io-client';
+import AvatarImageComponent from '@/app/components/Avatar/Avatar';
 
 
 interface FriendShip {
@@ -57,6 +58,8 @@ const FriendsListComponent: React.FC<FriendsListComponentProps> = ({ userSocket 
 		console.log("Loading friend list...");
 		loadFriendList();
 	}, [state.refreshFriendList]);
+	const timestamp = new Date().getTime();
+
 
 	return (
 		<div className="bloc-friendslist">
@@ -71,11 +74,15 @@ const FriendsListComponent: React.FC<FriendsListComponentProps> = ({ userSocket 
 			{state.showAddFriend && <AddFriendComponent userSocket={userSocket} updateFriends={loadFriendList} title="Add Friend"/>}
 			{friendList.map((friend: FriendShip, id: number) => (
 			<div className="tab-and-userclicked" key={id}>
-			<div className="bloc-button-friendslist">
-			<img src={`http://localhost:3001${friend.friend ? friend.friend.avatarURL : friend.initiator ? friend.initiator.avatarURL : 'Unknown User'}`} className={`profil-discussion-list ${friend.isActive ? 'on' : 'off'}`} alt="User Avatar" />
-					<div className={`amies ${activeIndex === id ? 'active' : ''}`} onClick={() => activateTabFriendsList(id)}>
-						{friend.friend ? friend.friend.login : friend.initiator ? friend.initiator.login : 'Unknown User'}
-					</div>
+				<div className="bloc-button-friendslist">
+						<img
+							src={`http://localhost:3001/users/getAvatarByLogin/${friend.friend ? friend.friend.login : friend.initiator ? friend.initiator.login : 'Unknown User'}/${timestamp}`}
+							className={`profil-friendslist ${friend.isActive ? 'on' : 'off'}`}
+							alt="User Avatar"
+						/>
+						<div className={`amies ${activeIndex === id ? 'active' : ''}`} onClick={() => activateTabFriendsList(id)}>
+							{friend.friend ? friend.friend.login : friend.initiator ? friend.initiator.login : 'Unknown User'}
+						</div>
 				</div>
 				{activeIndex === id && <FriendsListTabComponent userSocket={userSocket} user={friend.friend ? friend.friend.login : friend.initiator ? friend.initiator.login : 'Unknown User'} />}
 			</div>

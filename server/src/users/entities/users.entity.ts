@@ -24,7 +24,7 @@ export class User {
 	@Column({ default: "guest" })
 	username: string;
 
-	@Column({ default: "/avatars/avatar.png" })
+	@Column({ default: "https://uxwing.com/wp-content/themes/uxwing/download/peoples-avatars/corporate-user-icon.png" })
 	avatarURL: string;
 
 	@Column()
