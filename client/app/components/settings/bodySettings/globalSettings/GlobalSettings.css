@@ -1,0 +1,78 @@
+.bloc-global-settings {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	height: 100%;
+}
+
+.activate2fa {
+	background-color: #4caf50;
+	color: white;
+	border: none;
+	padding: 10px 20px;
+	text-align: center;
+	text-decoration: none;
+	display: inline-block;
+	font-size: 16px;
+	margin-bottom: 10px;
+	cursor: pointer;
+	border-radius: 5px;
+}
+
+.desactivate2fa {
+	background-color: #af4c4c;
+	color: white;
+	border: none;
+	padding: 10px 20px;
+	text-align: center;
+	text-decoration: none;
+	display: inline-block;
+	font-size: 16px;
+	margin-bottom: 10px;
+	cursor: pointer;
+	border-radius: 5px;
+}
+
+.input-field-2fa {
+	height: 20px;
+	width: calc(100% - 20px);
+	padding: 10px;
+	margin-bottom: 10px;
+	margin: 10px;
+}
+
+.check-authenticator-btn {
+	background-color: #3498db;
+	color: white;
+	border: none;
+	padding: 10px 20px;
+	text-align: center;
+	text-decoration: none;
+	display: inline-block;
+	font-size: 16px;
+	cursor: pointer;
+	border-radius: 5px;
+}
+.sans-qrcode {
+	width: 200px;
+	height: auto;
+	margin-top: 20px;
+	margin-bottom: 20px;
+	background-color: #929292;
+	height: 200px;
+}
+.qr-code-img {
+	width: 200px;
+	height: auto;
+	margin-top: 20px;
+	margin-bottom: 20px;
+}
+
+.qr-code-img-blur {
+	filter: blur(5px);
+	width: 200px;
+	height: auto;
+	margin-top: 20px;
+	margin-bottom: 20px;
+}
