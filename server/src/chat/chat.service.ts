@@ -149,9 +149,7 @@ export class ChatService {
 		await this.conversationRepository.save(room);
 
 		if (room) {
-			// When we "join" 2 friends in their private cnversation, there are no admins
-			// const roomGroupInitiator = await this.createGroup(room, false);
-			// const roomGroupFriend = await this.createGroup(room, false);
+
 			const roomGroupInitiator = new GroupMember();
 			roomGroupInitiator.isAdmin = false;
 			roomGroupInitiator.joined_datetime = new Date();
@@ -205,9 +203,8 @@ export class ChatService {
 	}
 
 	async createMessage(messageDto: MessageDto): Promise<Message> {
-
-		let conversation = new Conversation(); 
-		conversation = await this.conversationRepository.findOne({ where: {id: messageDto.conversationID} }); 
+ 
+		const conversation : Conversation = await this.conversationRepository.findOne({ where: {id: messageDto.conversationID} }); 
 		if (conversation) {
 			const newMessage = new Message();
 			newMessage.from = messageDto.from;
@@ -242,7 +239,6 @@ export class ChatService {
 
 	async getConversationByName(name: string): Promise<Conversation> {
 
-		console.log("Find : ", name);
 		const conversation = await this.conversationRepository.findOne({ where: {name: name} });
 		if (conversation) {
 			return conversation;
@@ -298,12 +294,12 @@ export class ChatService {
 			user.groups.forEach((group: GroupMember) => {
 				isAdminArray.push(group.isAdmin);
 			});
-			// console.log("isAdminArray: ", isAdminArray);	
+
 				const conversationArray = {
 					conversations: await this.getAllConversations(userID),
 					isAdmin: isAdminArray,
 				}
-				// console.log("Conversations of user with ID", userID, " -> ", conversationArray);
+
 				return conversationArray;
 		}
 
