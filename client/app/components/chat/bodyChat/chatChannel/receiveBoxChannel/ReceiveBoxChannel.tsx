@@ -6,6 +6,7 @@ import AvatarImageComponent from '@/app/components/Avatar/Avatar';
 
 interface Message {
 	from: string;
+
 	content: string;
 	post_datetime: string;
 	conversationID: number;
@@ -89,6 +90,7 @@ const ReceiveBoxChannelComponent: React.FC<ReceiveBoxChannelComponentProps> = ({
 	useEffect(() => {
 		scrollToBottom();
 	}, [messages]);
+	const timestamp = new Date().getTime();
 
 	
 	return (
@@ -96,7 +98,11 @@ const ReceiveBoxChannelComponent: React.FC<ReceiveBoxChannelComponentProps> = ({
 			{messages.map((message: Message, id: number) => (
 				<div className="bloc-contain">
 					<div className="bloc-avatar-username">
-						<AvatarImageComponent className='avatar-channel' name={message.from} />
+					<img
+							src={`http://localhost:3001/users/getAvatarByLogin/${message.from}/${timestamp}`}
+							className='avatar-channel'
+							alt="User Avatar"
+						/>
 						<div className="user-name">{message.from}</div>
 					</div>
 					<div className={`message-container ${isMyMessage(message) ? 'my-message-channel' : 'other-message-channel'}`}>

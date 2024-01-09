@@ -15,8 +15,15 @@ const AvatarImageComponent: React.FC<AvatarImageProps> = ({ className, refresh, 
 	const userLogin = name;
 	const userId = sessionStorage.getItem('currentUserID');
 	const timestamp = new Date().getTime();
-	var urlWithTimestamp = `http://localhost:3001/users/getAvatar/${userId}/${timestamp}`;
-	var urlLoginWithTimestamp = `http://localhost:3001/users/getAvatarByLogin/${userLogin}/${timestamp}`;
+	var url : string;
+	if (name){
+		
+		url = `http://localhost:3001/users/getAvatarByLogin/${userLogin}/${timestamp}`;
+	}
+	else {
+		console.log("userId?????", userId);
+		url = `http://localhost:3001/users/getAvatar/${userId}/${timestamp}`;
+	}
 
 
 	const fetchAvatar = async () => {
@@ -24,11 +31,11 @@ const AvatarImageComponent: React.FC<AvatarImageProps> = ({ className, refresh, 
 				let response;
 				if (userLogin) {
 					console.log("userLogin?????", userLogin);
-					response = await fetch(urlLoginWithTimestamp, {
+					response = await fetch(url, {
 						method: 'GET',
 					});
 				} else {
-					response = await fetch(urlWithTimestamp, {
+					response = await fetch(url, {
 						method: 'GET',
 					});
 				}
@@ -49,14 +56,7 @@ const AvatarImageComponent: React.FC<AvatarImageProps> = ({ className, refresh, 
 		fetchAvatar();
 	}, [state.showUploadAvatar]);
 	return (
-		<>
-			{isDefault ? (
-					<img src={urlWithTimestamp} className={className} alt="User Avatar" />
-				) : (
-				<img src={defaultAvatar} className={className} alt="User Avatar" />
-				) }
-
-		</>
+					<img src={url} className={className} alt="User Avatar" />	
 	);
 };
 
