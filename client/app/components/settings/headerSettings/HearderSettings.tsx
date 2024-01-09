@@ -5,7 +5,7 @@ import React, {useState, useEffect} from 'react';
 const HeaderSettingsComponent: React.FC = () => {
   const {state,  dispatch } = useGlobal();
   return (
-	  <div className="bloc-header-settings">
+	<div className="bloc-header-settings">
 		<button
 		className={`header-settings-button ${state.showProfilsSettings ? 'clicked' : ''}`}
 		onClick={() => {
@@ -14,20 +14,19 @@ const HeaderSettingsComponent: React.FC = () => {
 		dispatch({ type: 'DISABLE', payload: 'showGeneralSettings' });
 
 		}}>
-		Profils
-	  </button>
+			Profils
+		</button>
 
-	  <button
+		<button
 		className={`header-settings-button ${state.showGeneralSettings ? 'clicked' : ''}`}
 		onClick={() => {
 		dispatch({ type: 'ACTIVATE', payload: 'showGeneralSettings' });
 		dispatch({ type: 'DISABLE', payload: 'showGameSettings' });
 		dispatch({ type: 'DISABLE', payload: 'showProfilsSettings' });
-
-
 		}}>
-			General
+			2FA
 		</button>
+
 		<button
 		className={`header-settings-button ${state.showGameSettings ? 'clicked' : ''}`}
 		onClick={() => {
