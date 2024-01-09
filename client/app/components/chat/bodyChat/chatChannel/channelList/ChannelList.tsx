@@ -34,7 +34,9 @@ const ChannelListComponent: React.FC<ChanneListComponentProps> = ({ userSocket }
 			const responseData = await response.json();
 			const { conversationList, isAdmin } = responseData;
 			console.log("isAdmin ==> ", isAdmin);
-			setConversations((prevConversations: Conversation[]) => [...prevConversations, ...conversationList]);
+			console.log("--> ", conversationList);
+			if (conversationList)
+				setConversations((prevConversations: Conversation[]) => [...prevConversations, ...conversationList]);
 		}
 		else {
 			console.log("Fatal error");
@@ -49,6 +51,7 @@ const ChannelListComponent: React.FC<ChanneListComponentProps> = ({ userSocket }
 	useEffect(() => {
 		console.log("Loading conversations...");
 		loadDiscussions();
+		console.log("convs --> ", conversations);
 	}, [state.refreshChannel]);
 
 	const parseName = (name: string): string => {
