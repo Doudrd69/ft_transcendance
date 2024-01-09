@@ -74,12 +74,16 @@ const ChatListComponent: React.FC<ChannelListComponentProps> = ({ userSocket }) 
 		console.log("Loading friend list...");
 		loadFriendList();
 	}, [state.refreshFriendList]);
-
-  return (
+	const timestamp = new Date().getTime();
+	return (
 		<div className="bloc-discussion-list">
 			{friendList.map((friend: FriendShip, id: number) => (
 				<div key={friend.id} className="bloc-button-discussion-list">
-					<img src={`http://localhost:3001${friend.friend ? friend.friend.avatarURL : friend.initiator ? friend.initiator.avatarURL : 'Unknown User'}`} className={`profil-discussion-list ${friend.isActive ? 'on' : 'off'}`} alt="User Avatar" />
+				<img
+						src={`http://localhost:3001/users/getAvatarByLogin/${friend.friend ? friend.friend.login : friend.initiator ? friend.initiator.login : 'Unknown User'}/${timestamp}`}
+					className={`profil-discussion-list ${friend.isActive ? 'on' : 'off'}`}
+					alt="User Avatar"
+					/>
 			  		<div className={`amies ${activeIndex === id ? 'active' : ''}`} onClick={() => {
         					dispatch({ type: 'TOGGLE', payload: 'showChat' });
         					dispatch({ type: 'SET_CURRENT_CONVERSATION', payload: friend.friend ? friend.friend.login : friend.initiator ? friend.initiator.login : 'Unknown User'});
