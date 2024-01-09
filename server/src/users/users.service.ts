@@ -32,6 +32,8 @@ export class UsersService {
 
 		const userToUpdate = await this.usersRepository.findOne({ where: {id: userID} });
 		if (userToUpdate) {
+			if (userToUpdate.TFA_secret)
+				return ;
 			userToUpdate.TFA_temp_secret = secret;
 			return this.usersRepository.save(userToUpdate);
 		}
