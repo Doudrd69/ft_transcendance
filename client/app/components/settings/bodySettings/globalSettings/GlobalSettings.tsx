@@ -107,8 +107,7 @@ const GlobalSettingsComponent: React.FC = () => {
 			<img src={urlQrCode} className='qr-code-img' alt="QR Code" /> 
 			: 
 			<img src="https://i0.wp.com/www.mathematices.be/wp-content/uploads/2019/11/téléchargement.png?resize=256%2C256&ssl=1" className='qr-code-img-blur' alt="QR Code"/>}
-
-
+			
 			<input
 				className='input-field-2fa'
 				placeholder="Authenticator code"

@@ -12,11 +12,19 @@ interface FriendShip {
 	isAccepted: true;
 	isActive: boolean;
 	friend?: any;
-	initiator?: any
+	initiator?: any;
+	roomName?: string;
+	roomID?: string;
 }
 interface FriendsListComponentProps {
 	userSocket: Socket;
-  }
+}
+
+interface Conversation {
+	id: string,
+	name: string;
+	is_channel:boolean;
+}
   
 const FriendsListComponent: React.FC<FriendsListComponentProps> = ({ userSocket }) => {
 
@@ -25,7 +33,6 @@ const FriendsListComponent: React.FC<FriendsListComponentProps> = ({ userSocket 
 	const [friendList, setFriendList] = useState<FriendShip[]>([]);
 	const username = sessionStorage.getItem("currentUserLogin");
 	const {state, dispatch} = useChat();
-
 
 	const disableTabFriendsList = () => setTabFriendsList(false);
 
@@ -36,8 +43,9 @@ const FriendsListComponent: React.FC<FriendsListComponentProps> = ({ userSocket 
 		  setActiveIndex(index);
 		}
 	};
+	
 	const loadFriendList = async () => {
-		setFriendList([]);
+
 		const response = await fetch(`http://localhost:3001/users/getFriends/${username}`, {
 			method: 'GET',
 			headers: {
@@ -46,11 +54,30 @@ const FriendsListComponent: React.FC<FriendsListComponentProps> = ({ userSocket 
 		});
 		
 		if (response.ok) {
-			const data = await response.json();
-			setFriendList([...data]);
+			const friends = await response.json();
+
+			const requestDms = await fetch(`http://localhost:3001/chat/getConversations/${sessionStorage.getItem("currentUserID")}`, {
+				method: 'GET',
+				headers: {
+					'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
+				},
+			});
+
+			if (requestDms.ok) {
+				const conversations = await requestDms.json();
+				const DMs = conversations.filter((conversation: Conversation) => !conversation.is_channel);
+
+				friends.forEach((friend: FriendShip) => {
+					DMs.forEach((dm: Conversation) => {
+						friend.roomName = dm.name;
+						friend.roomID = dm.id;
+					});
+				});
+				setFriendList([...friends]);
+			}
 		}
 		else {
-			console.log("Fatal error: no friend list");
+			console.log("Fatal error");
 		}
 	}
 
@@ -84,7 +111,7 @@ const FriendsListComponent: React.FC<FriendsListComponentProps> = ({ userSocket 
 							{friend.friend ? friend.friend.login : friend.initiator ? friend.initiator.login : 'Unknown User'}
 						</div>
 				</div>
-				{activeIndex === id && <FriendsListTabComponent userSocket={userSocket} user={friend.friend ? friend.friend.login : friend.initiator ? friend.initiator.login : 'Unknown User'} />}
+				{activeIndex === id && <FriendsListTabComponent userSocket={userSocket} userLogin={friend.friend ? friend.friend.login : friend.initiator ? friend.initiator.login : 'Unknown User'} roomName={friend.roomName}  roomID= {friend.roomID}/>}
 			</div>
 		  ))}
 		</div>

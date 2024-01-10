@@ -5,9 +5,10 @@ import AddConversationComponent from '../../addConversation/AddConversation';
 import { Socket } from 'socket.io-client';
 
 interface Conversation {
-  id: string;
-  name: string;
-  is_channel: boolean;
+	id: string;
+	name: string;
+	is_channel: boolean;
+	isPublic: boolean;
 }
 
 interface ChanneListComponentProps {
@@ -20,6 +21,7 @@ const ChannelListComponent: React.FC<ChanneListComponentProps> = ({ userSocket }
 
 	const userID = Number(sessionStorage.getItem("currentUserID"));
 	const [conversations, setConversations] = useState<Conversation[]>([]);
+	const [isAdmin, setIsAdmin] = useState<boolean[]>([]);	
 	
 	const loadDiscussions = async () => {
 
@@ -33,34 +35,23 @@ const ChannelListComponent: React.FC<ChanneListComponentProps> = ({ userSocket }
 		if (response.ok) {
 			const responseData = await response.json();
 			const { conversationList, isAdmin } = responseData;
-			console.log("isAdmin ==> ", isAdmin);
-			console.log("--> ", conversationList);
 			if (conversationList)
-				setConversations((prevConversations: Conversation[]) => [...prevConversations, ...conversationList]);
+				setConversations([...conversationList]);
+			if (isAdmin)
+				setIsAdmin([...isAdmin]);
+			console.log("conversation --> ", conversationList);
 		}
 		else {
 			console.log("Fatal error");
 		}
 	};
 
-	const userData = {
-		discussion: conversations,
-		online: ["on", "off", "on", "on", "off", "on", "on"],
-	};
 
 	useEffect(() => {
 		console.log("Loading conversations...");
 		loadDiscussions();
-		console.log("convs --> ", conversations);
+
 	}, [state.refreshChannel]);
-
-	const parseName = (name: string): string => {
-
-		const currentUserLogin = sessionStorage.getItem("currentUserLogin");
-		const conversationNameWithoutCurrentUser = name.replace(currentUserLogin!, '').trim()
-		const modifiedName = conversationNameWithoutCurrentUser.slice();
-		return modifiedName;
-	};
 
 	return (
 		<div className="bloc-channel-list">
@@ -73,19 +64,21 @@ const ChannelListComponent: React.FC<ChanneListComponentProps> = ({ userSocket }
 			+
 		</button>
 		{state.showAddChannel && <AddConversationComponent userSocket={userSocket} loadDiscussions={loadDiscussions} title="Add/Create Channel" isChannel={true}/>}
-		{userData.discussion.map((conversation, index) => (
+		{conversations.map((conversation, index) => (
 				conversation.is_channel && (
 				<button
-					key={index}
-					className="button-channel-list"
-					onClick={() => {
+				key={index}
+				className="button-channel-list"
+				onClick={() => {
 					dispatch({ type: 'TOGGLE', payload: 'showChannel' });
 					dispatch({ type: 'SET_CURRENT_CONVERSATION', payload: conversation.name });
 					dispatch({ type: 'SET_CURRENT_CONVERSATION_ID', payload: conversation.id });
 					dispatch({ type: 'SET_CURRENT_CONVERSATION_ID', payload: conversation.id });
-					}}
+				}}
 				>
-				<span>{parseName(conversation.name)}</span>
+				 {isAdmin[index] && <img className="icon-admin-channel" src='./crown.png' alt="private" />}
+				{!conversation.isPublic && <img className="icon-private-channel" src='./padlock.png' alt="private" />}
+				<span>{conversation.name}</span>
 			</button>
 			)
 		))}
