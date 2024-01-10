@@ -13,7 +13,15 @@ interface AddConversationComponentProps {
 const AddConversationComponent: React.FC<AddConversationComponentProps> = ({ userSocket, loadDiscussions, title, isChannel }) => {
 
 	const [formValue, setFormValue] = useState('');
+	// const [passwordValue, setPasswordValue] = useState('');
+	// const [isPublicValue, setIsPublicValue] = useState(true);
+	// const [channelPassword, setChannelPassword] = useState('');
 	const { state, dispatch } = useChat();
+
+	// const handleCheckboxChange = () => {
+	//   setIsPublicValue(!isPublicValue); // Inverse l'état actuel de la checkbox
+	//   console.log(isPublicValue);
+	// };
 
 	const handleConversationCreation = async (e: React.FormEvent) => {
 
@@ -23,6 +31,8 @@ const AddConversationComponent: React.FC<AddConversationComponentProps> = ({ use
 			name: formValue,
 			userID: Number(sessionStorage.getItem("currentUserID")),
 			is_channel: isChannel,
+			isPublic: true,
+			password: '',
 		}
 
 		console.log(conversationDto);
