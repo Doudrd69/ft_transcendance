@@ -33,6 +33,10 @@ export class ConversationDto {
 	@IsBoolean()
 	isPublic: boolean;
 
+	@IsNotEmpty()
+	@IsBoolean()
+	isProtected: boolean;
+
 	// @Length(6, 20)
 	// @IsAscii()
 	// @IsAlpha()
