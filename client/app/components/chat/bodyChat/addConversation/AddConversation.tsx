@@ -19,7 +19,6 @@ const AddConversationComponent: React.FC<AddConversationComponentProps> = ({ use
 	const [passwordValue, setPasswordValue] = useState('');
 	const { state, dispatch } = useChat();
 	const [isPublic, setIsPublic] = useState(true);
-
 	const handleConversationCreation = async (e: React.FormEvent) => {
 
 		e.preventDefault();
@@ -30,7 +29,6 @@ const AddConversationComponent: React.FC<AddConversationComponentProps> = ({ use
 			is_channel: isChannel,
 			isPublic: isPublic,
 			password: isPublic ? '' : passwordValue,
-		}
 
 		console.log(conversationDto);
 

@@ -21,7 +21,7 @@ const ChannelListComponent: React.FC<ChanneListComponentProps> = ({ userSocket }
 
 	const userID = Number(sessionStorage.getItem("currentUserID"));
 	const [conversations, setConversations] = useState<Conversation[]>([]);
-	const [isAdmin, setIsAdmin] = useState<boolean[]>([]);	
+	const [isAdmin, setIsAdmin] = useState<boolean[]>([]);
 	
 
 	const loadDiscussions = async () => {
@@ -35,7 +35,7 @@ const ChannelListComponent: React.FC<ChanneListComponentProps> = ({ userSocket }
 
 		if (response.ok) {
 			const responseData = await response.json();
-			const { conversationList, isAdmin } = responseData;
+			const { conversationList, isAdmin, usersList } = responseData;
 			if (conversationList)
 				setConversations([...conversationList]);
 			if (isAdmin)
