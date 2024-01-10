@@ -77,30 +77,17 @@ export class ChatService {
 		return messages;
 	}
 
-	private async getAllPublicConversations(): Promise<Conversation[]> {
-
-		const publicConversations = await this.conversationRepository.find({
-			where: {isPublic: true},
-		});
-
-		if (publicConversations) {
-			console.log("Public convs => ", publicConversations);
-			return publicConversations;
-		}
-
-		throw Error("No conversations found");
-	}
-
+	
 	private async getAllConversations(userID: number): Promise<Conversation[]> {
-
-
+		
+		
 		const userToFind : User = await this.usersRepository.findOne({
 			where: { id: userID },
 			relations: ["groups", "groups.conversation"],
 		});
-
+		
 		if (userToFind) {
-
+			
 			let conversationArray : Conversation[] = [];
 			if (userToFind.groups && Array.isArray(userToFind.groups)) {
 				userToFind.groups.forEach((group: GroupMember) => {
@@ -128,30 +115,30 @@ export class ChatService {
 	}
 
 	async quitConversation(conversationDto: ConversationDto) {
-
+		
 		const conversationToRemove = await this.conversationRepository.findOne({ where: {name: conversationDto.name }});
-
+		
 		const user = await this.usersRepository.findOne({
 			where: {id: conversationDto.userID},
 			relations: ['groups'],
 		});
-
+		
 		const groupToRemove = user.groups.filter((group: GroupMember) => group.conversation == conversationToRemove);
 		const newArray = user.groups.filter((group: GroupMember) => group.conversation != conversationToRemove);
 		console.log(newArray);
 		await this.usersRepository.save(user);
 		console.log("Array without ", conversationToRemove.name, " --> ", user.groups);
-
+		
 		await this.groupMemberRepository.remove(groupToRemove);
 	}
-
+	
 	async eraseConversation(conversationDto: ConversationDto) {
-
+		
 		const conversationToRemove = await this.conversationRepository.findOne({ where: {name: conversationDto.name }});
 		await this.conversationRepository.remove(conversationToRemove);
 		return ;
 	}
-
+	
 	async createGroup(conversation: Conversation, isAdminFlag: boolean): Promise<GroupMember> {
 		
 		console.log("Creating group...");
@@ -161,79 +148,79 @@ export class ChatService {
 		group.conversation = conversation;
 		return await this.groupMemberRepository.save(group);
 	}
-
+	
 	async addFriendToConversation(addUserToConversationDto: AddFriendToConversationDto): Promise<Conversation> {
-
+		
 		console.log("== ADD FRIEND TO CONVERSATION ==");
-
+		
 		const userToAdd = await this.usersRepository.findOne({
 			where: { login: addUserToConversationDto.userToAdd },
 			relations: ['groups'],
 		});
-
+		
 		const conversationToAdd = await this.conversationRepository.findOne({
 			where: {id: addUserToConversationDto.conversationID}
 		});
-
+		
 		if (conversationToAdd && userToAdd) {
-
+			
 			const group = new GroupMember();
 			group.isAdmin = false;
 			group.joined_datetime = new Date();
 			group.conversation = conversationToAdd;
 			await this.groupMemberRepository.save(group);
-
+			
 			if (group) {
 				userToAdd.groups.push(group);
 				await this.usersRepository.save(userToAdd);
 				return conversationToAdd;
 			}
-
+			
 			return ;
 		}
-
+		
 		return ;
 	}
-
+	
 	async createFriendsConversation(initiator: User, friend: User): Promise<Conversation> {
-
+		
 		const room = new Conversation();
 		room.name = initiator.login + friend.login;;
 		room.is_channel = false;
 		await this.conversationRepository.save(room);
-
+		
 		if (room) {
-
+			
 			const roomGroupInitiator = new GroupMember();
 			roomGroupInitiator.isAdmin = false;
 			roomGroupInitiator.joined_datetime = new Date();
 			roomGroupInitiator.conversation = room;
 			await this.groupMemberRepository.save(roomGroupInitiator);
-
+			
 			const roomGroupFriend = new GroupMember();
 			roomGroupFriend.isAdmin = false;
 			roomGroupFriend.joined_datetime = new Date();
 			roomGroupFriend.conversation = room;
 			await this.groupMemberRepository.save(roomGroupFriend);
-	
+			
 			if (roomGroupInitiator && roomGroupFriend) {
-
+				
 				friend.groups.push(roomGroupFriend);
 				await this.usersRepository.save(friend);
-	
+				
 				initiator.groups.push(roomGroupInitiator);
 				await this.usersRepository.save(initiator);
-			
+				
 				return room;
 			}
 		}
-
+		
 		return ;
 	}
-
+	
 	// Let admins update conversation to private/public and add/remove password
 	async updateConversation(updateConversationDto: UpdateConversationDto): Promise<Conversation> {
-
+		
 		const conversationToUpdate = await this.conversationRepository.findOne({ where: { id: updateConversationDto.conversationID} });
 		const user = await this.usersRepository.findOne({
 			where: { id: updateConversationDto.userID },
@@ -241,9 +228,9 @@ export class ChatService {
 		});
 
 		if (user && conversationToUpdate) {
-
+			
 			let isAdmin : boolean;
-
+			
 			// dans un custom Guard?
 			user.groups.forEach((group: GroupMember) => {
 				if (group.conversation.id == conversationToUpdate.id) {
@@ -251,31 +238,31 @@ export class ChatService {
 				}
 			});
 			console.log(user.login, " admin status: ", isAdmin);
-
+			
 			if (isAdmin) {
-
+				
 				conversationToUpdate.isPublic = updateConversationDto.isPublic;
 				conversationToUpdate.isProtected = updateConversationDto.isProtected;
 				if (updateConversationDto.newPassword)
 					conversationToUpdate.password = await this.hashChannelPassword(updateConversationDto.newPassword);
 				return await this.conversationRepository.save(conversationToUpdate);
 			}
-
+			
 			return ;
 		}
-
+		
 		return ;
 	}
-
+	
 	async createConversation(conversationDto: ConversationDto): Promise<Conversation> {
-
+		
 		const user = await this.usersRepository.findOne({
 			where: { id: conversationDto.userID},
 			relations: ['groups'],
 		});
-
+		
 		if (user) {
-
+			
 			const conv = new Conversation();
 			conv.name = conversationDto.name;
 			conv.is_channel = conversationDto.is_channel;
@@ -285,20 +272,20 @@ export class ChatService {
 				conv.password = await this.hashChannelPassword(conversationDto.password);
 			}
 			await this.conversationRepository.save(conv);
-
+			
 			// The user who created the conversation is set to admin
 			const group = await this.createGroup(conv, true);
-
+			
 			user.groups.push(group);
 			await this.usersRepository.save(user);
-
+			
 			return conv;
 		}
 		return ;
 	}
-
+	
 	async createMessage(messageDto: MessageDto): Promise<Message> {
- 
+		
 		const conversation : Conversation = await this.conversationRepository.findOne({ where: {id: messageDto.conversationID} }); 
 		if (conversation) {
 			const newMessage = new Message();
@@ -306,18 +293,32 @@ export class ChatService {
 			newMessage.content = messageDto.content;
 			newMessage.post_datetime = messageDto.post_datetime;
 			newMessage.conversation = conversation;
-
+			
 			return await this.messageRepository.save(newMessage);
 		}
 		console.error("Fatal error: message could not be created");
 		return;
 	}
-
-
+	
+	
 	/**************************************************************/
 	/***						GETTERS							***/
 	/**************************************************************/
 
+	async getAllPublicConversations(): Promise<Conversation[]> {
+
+		const publicConversations = await this.conversationRepository.find({
+			where: {isPublic: true},
+		});
+
+		if (publicConversations) {
+			console.log("Public convs => ", publicConversations);
+			return publicConversations;
+		}
+
+		throw Error("No conversations found");
+	}
+	
 	getMessageById(idToFind: number) {
 		return this.messageRepository.findOne({ where: {id: idToFind} });
 	}
