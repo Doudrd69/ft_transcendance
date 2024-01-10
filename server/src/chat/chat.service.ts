@@ -12,6 +12,7 @@ import { GroupDto } from './dto/group.dto';
 import { group } from 'console';
 import { AddFriendToConversationDto } from './dto/addFriendToConversationDto.dto';
 import * as bcrypt from 'bcrypt'
+import { CheckPasswordDto } from './dto/checkPasswordDto.dto';
 
 
 @Injectable()
@@ -36,8 +37,6 @@ export class ChatService {
 		const hash = await bcrypt.hash(password, saltOrRounds);
 		return hash;
 
-		// will be used to compare user input to the channel's password
-		// const isMatch = await bcrypt.compare(password, hash);
 	}
 
 	private async getUserListFromConversations(user: User, conversationList: Conversation[]) {
@@ -113,6 +112,19 @@ export class ChatService {
 		}
 		console.error("Fatal error: user not found");
 		return [];
+	}
+
+	async compareChannelPassword(checkPasswordDto: CheckPasswordDto): Promise<boolean> {
+
+		const conversation : Conversation = await this.conversationRepository.findOne({ where: {id: checkPasswordDto.conversationID} });
+		if (conversation) {
+			const isMatch = await bcrypt.compare(checkPasswordDto.userInput, conversation.password);
+			if (isMatch) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	async quitConversation(conversationDto: ConversationDto) {
@@ -223,7 +235,10 @@ export class ChatService {
 	async updateConversation(updateConversationDto: UpdateConversationDto): Promise<Conversation> {
 
 		const conversationToUpdate = await this.conversationRepository.findOne({ where: { id: updateConversationDto.conversationID} });
-		const user = await this.usersRepository.findOne({ where: { id: updateConversationDto.userID } });
+		const user = await this.usersRepository.findOne({
+			where: { id: updateConversationDto.userID },
+			relations: ["groups"],
+		});
 
 		if (user && conversationToUpdate) {
 
@@ -240,7 +255,9 @@ export class ChatService {
 			if (isAdmin) {
 
 				conversationToUpdate.isPublic = updateConversationDto.isPublic;
-				conversationToUpdate.password = await this.hashChannelPassword(updateConversationDto.newPassword);
+				conversationToUpdate.isProtected = updateConversationDto.isProtected;
+				if (updateConversationDto.newPassword)
+					conversationToUpdate.password = await this.hashChannelPassword(updateConversationDto.newPassword);
 				return await this.conversationRepository.save(conversationToUpdate);
 			}
 

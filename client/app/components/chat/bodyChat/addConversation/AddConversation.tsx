@@ -13,9 +13,6 @@ interface AddConversationComponentProps {
 const AddConversationComponent: React.FC<AddConversationComponentProps> = ({ userSocket, loadDiscussions, title, isChannel}) => {
 
 	const [formValue, setFormValue] = useState('');
-	// const [passwordValue, setPasswordValue] = useState('');
-	// const [isPublicValue, setIsPublicValue] = useState(true);
-	// const [channelPassword, setChannelPassword] = useState('');
 	const [passwordValue, setPasswordValue] = useState('');
 	const { state, dispatch } = useChat();
 	const [isPublic, setIsPublic] = useState(true);
@@ -28,6 +25,7 @@ const AddConversationComponent: React.FC<AddConversationComponentProps> = ({ use
 			userID: Number(sessionStorage.getItem("currentUserID")),
 			is_channel: isChannel,
 			isPublic: isPublic,
+			isProtected: false, // a modifier avec une valeur en useState?
 			password: isPublic ? '' : passwordValue,
 		}
 
@@ -71,7 +69,7 @@ const AddConversationComponent: React.FC<AddConversationComponentProps> = ({ use
 		setIsPublic(true);
 		setPasswordValue('');
 	};
-	console.log("passowrd =====> ", passwordValue);
+
 	useEffect(() => {
 		const handleEscape = (event: KeyboardEvent) => {
 			if (event.key === 'Escape') {
