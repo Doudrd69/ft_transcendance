@@ -32,11 +32,8 @@ export class GameService {
         private gameRepository: Repository<Game>,
         @InjectRepository(User)
         private usersRepository: Repository<User>,
-<<<<<<< HEAD
         @InjectRepository(GameEngine)
         private gameEngineRepository: Repository<GameEngine>,
-=======
->>>>>>> 211bc7b (add blurgame and socketon for move paddle, start object wall)
 
         
     ) { }
@@ -74,16 +71,9 @@ export class GameService {
         return (playersLogin);
     }
 
-<<<<<<< HEAD
     async deleteGame(playerID: string) {
         const game: Game = await this.gameRepository.findOne({ where: { playerOneID: playerID } })
         // regarder comment verifier si le player est dans une game et la supprimer si c'est le cas
-=======
-
-    async paddleUpLeft(playerID: string)
-    {
-        
->>>>>>> 211bc7b (add blurgame and socketon for move paddle, start object wall)
     }
 
     /**
