@@ -72,7 +72,7 @@ const PongComponent = (socket: { socket: Socket }) => {
             scoreTwo: Game.scoreTwo;
         })
 
-        gameSocket.on('Game_Update', (gameState: gameState) => {
+        gameSocket.on('GameFrontUpdate', (gameState: gameState) => {
             setGameState((prevState) => ({
                 ...prevState,
                 BallPosition: { x: gameState.BallPosition!.x / (16 / 9), y: gameState.BallPosition!.y, r: gameState.BallPosition!.r },
@@ -126,6 +126,7 @@ const PongComponent = (socket: { socket: Socket }) => {
         gameLoopRef.current = setInterval(() => {
             if (!blurGame) {
                 updateBallPosition();
+                // gameSocket.emit('GameBackUpdate', {gameID: gameID});
             }
         }, 16);
 
@@ -222,7 +223,7 @@ const PongComponent = (socket: { socket: Socket }) => {
                     <div className="col-display" id="scoreGuest">{scorePlayer2}</div>
                 </div>
             </div>
-            <div className="ball" style={{ left: `${ballX}%`, top: `${ballY}%` }}></div>
+            <div className="ball" style={{ left: `${gameState!.BallPosition!.x}%`, top: `${gameState!.BallPosition!.y}%` }}></div>
             <div className="pongpaddle" style={{ top: `${gameState!.paddleOne!.y}%`, left: `${gameState!.paddleOne!.x}%` }}></div>
             <div className="pongpaddle" style={{ left: `${gameState!.paddleTwo!.x}%`, top: `${gameState!.paddleTwo!.y}%` }}></div>
         </div>

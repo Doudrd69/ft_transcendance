@@ -105,8 +105,8 @@ export class GameGateway {
     async handlePaddleMove(@ConnectedSocket() client: Socket, @MessageBody() data: { input: string, gameID: number }) {
         this.gameEngine = await this.GameEnginceService.getGameEngine(data.gameID);
         this.GameEnginceService.game_input(data.input, this.gameEngine, client.id);
-        this.server.to([this.gameEngine.playerOneID, this.gameEngine.playerTwoID]).emit('Game_Update', {
-            BallPosition: { x: this.gameEngine.ball!.x / (16 / 9), y: this.gameEngine.ball!.y, r: this.gameEngine.ball!.r },
+        this.server.to([this.gameEngine.playerOneID, this.gameEngine.playerTwoID]).emit('GameFrontUpdate', {
+            BallPosition: { x: this.gameEngine.ball!.x / (16 / 9), y: this.gameEngine.ball!.y , r: this.gameEngine.ball!.r },
             paddleOne: { x: this.gameEngine.PaddleOne!.x_pos / (16 / 9), y: this.gameEngine.PaddleOne!.y_pos },
             paddleTwo: { x: this.gameEngine.PaddleTwo!.x_pos / (16 / 9), y: this.gameEngine.PaddleTwo!.y_pos },
             scoreOne: this.gameEngine.scoreOne,
@@ -114,9 +114,10 @@ export class GameGateway {
         })
     }
 
-    @SubscribeMessage('move-ball')
-    async handleBallMove(client: Socket, game: Game) {
-        // move the ball
+    @SubscribeMessage('GameBackUpdate')
+    async handleGameUpdate(client: Socket, gameID: number) {
+        this.gameEngine = await this.GameEnginceService.getGameEngine(gameID);
+        this.GameEnginceService.
     }
 }
 

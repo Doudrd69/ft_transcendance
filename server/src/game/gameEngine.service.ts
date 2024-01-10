@@ -164,4 +164,8 @@ export class GameEngineService {
 		const gameEngine: GameEngine = await this.gameEngineRepository.findOne({ where: { gameID: gameID } })
 		return (gameEngine);
 	}
+
+	async updateBall() {
+		// changer la position de la balle avec la speed Vector, selon 16ms puis petite colision after et score
+	}
 }
