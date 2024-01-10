@@ -98,7 +98,7 @@ const FriendsListComponent: React.FC<FriendsListComponentProps> = ({ userSocket 
 			>
 			+
 			</button>
-			{state.showAddFriend && <AddFriendComponent userSocket={userSocket} updateFriends={loadFriendList} title="Add Friend"/>}
+			{state.showAddFriend && <AddFriendComponent userSocket={userSocket} updateFriends={loadFriendList} title="ADD NEW FRIEND"/>}
 			{friendList.map((friend: FriendShip, id: number) => (
 			<div className="tab-and-userclicked" key={id}>
 				<div className="bloc-button-friendslist">

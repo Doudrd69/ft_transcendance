@@ -1,20 +1,40 @@
 import './Settings.css'
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import HeaderSettingsComponent from './headerSettings/HearderSettings';
 import BodySettingsComponent from './bodySettings/BodySettings';
+import { useGlobal } from '@/app/GlobalContext';
 
 const SettingsComponent: React.FC = () => {
+	const {dispatch} = useGlobal();
 
-	
-		return (
-			<div className="back-settings">
-				<div className="window-settings">
-					<HeaderSettingsComponent></HeaderSettingsComponent>
-					<BodySettingsComponent></BodySettingsComponent>
-				</div>
-			</div>
-			);
+	useEffect(() => {
+		const handleEscape = (event: KeyboardEvent) => {
+			if (event.key === 'Escape') {
+				handleCloseSettings();
+			}
+		};
+		
+			document.addEventListener('keydown', handleEscape);
+			return () => {
+			  document.removeEventListener('keydown', handleEscape);
+			};
+		  }, []);
 
+	const handleCloseSettings = () => {
+		dispatch({ type: 'DISABLE' , payload: 'showSettings' });
+		dispatch({ type: 'DISABLE', payload: 'showGeneralSettings'});
+		dispatch({ type: 'DISABLE', payload: 'showProfilsSettings'});
+		dispatch({ type: 'DISABLE', payload: 'showGameSettings'});
 	};
-	
-	export default SettingsComponent;
+	return (
+		<div className="back-settings">
+			<img className="add_button_cancel" src='./close.png'  onClick={handleCloseSettings}/>
+			<div className="window-settings">
+				<HeaderSettingsComponent></HeaderSettingsComponent>
+				<BodySettingsComponent></BodySettingsComponent>
+			</div>
+		</div>
+	);
+
+};	
+export default SettingsComponent;

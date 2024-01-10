@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Socket } from 'socket.io-client';
 import { useChat } from '../../ChatContext';
 import './AddConversation.css';
@@ -16,14 +16,10 @@ const AddConversationComponent: React.FC<AddConversationComponentProps> = ({ use
 	// const [passwordValue, setPasswordValue] = useState('');
 	// const [isPublicValue, setIsPublicValue] = useState(true);
 	// const [channelPassword, setChannelPassword] = useState('');
+	const [passwordValue, setPasswordValue] = useState('');
 	const { state, dispatch } = useChat();
-	const [isPublic, setIsPublic] = useState(false);
+	const [isPublic, setIsPublic] = useState(true);
 
-	// const handleCheckboxChange = () => {
-	//   setIsPublicValue(!isPublicValue); // Inverse l'état actuel de la checkbox
-	//   console.log(isPublicValue);
-	// };
-  
 	const handleConversationCreation = async (e: React.FormEvent) => {
 
 		e.preventDefault();
@@ -33,7 +29,7 @@ const AddConversationComponent: React.FC<AddConversationComponentProps> = ({ use
 			userID: Number(sessionStorage.getItem("currentUserID")),
 			is_channel: isChannel,
 			isPublic: isPublic,
-			password: '',
+			password: isPublic ? '' : passwordValue,
 		}
 
 		console.log(conversationDto);
@@ -73,37 +69,63 @@ const AddConversationComponent: React.FC<AddConversationComponentProps> = ({ use
 		dispatch({ type: 'DISABLE', payload: 'showAddUser' });
 		dispatch({ type: 'DISABLE', payload: 'showAddFriend' });
 		setFormValue('');
+		setIsPublic(true);
+		setPasswordValue('');
 	};
+	console.log("passowrd =====> ", passwordValue);
+	useEffect(() => {
+		const handleEscape = (event: KeyboardEvent) => {
+			if (event.key === 'Escape') {
+			handleCancel();
+			}
+		};
+		document.addEventListener('keydown', handleEscape);
+		return () => {
+		document.removeEventListener('keydown', handleEscape);
+		};
+	}, []);
 
 	return (
 		<>
-		<div className="blur-background"></div>
-			<div className="bloc-add-conversation">
+			<div className="blur-background"></div>
+			<img className="add_button_cancel" src='./close.png'  onClick={handleCancel}/>
+			<div className="add_container">
+				<h2 className="add__title">{title}</h2>	
 				<div className="add__header">
-					<h2 className="add__title">{title}</h2>
+					<div className="bloc-add-conversation">
+						<div className="add__body">
+							<form className="add__form" onSubmit={(e) => handleConversationCreation(e)}>
+								<input
+									className="add__input"
+									type="text"
+									placeholder="channel"
+									value={formValue}
+									onChange={(e) => setFormValue(e.target.value)}
+								/>
+								<div className='privated-public'>
+									{isPublic ?
+										<img className='public-img' src="public.png" onClick={() => setIsPublic(false)} />
+											:
+										<img className='private-img' src="private.png" onClick={() => setIsPublic(true)} />}
+									{!isPublic && (
+										<input
+											className="add__input"
+											type="password"
+											placeholder="Mot de passe"
+											value={passwordValue}
+											onChange={(e) => setPasswordValue(e.target.value)}
+										/>
+									)}
+									<button className="add__button" type="submit">
+										create
+									</button>
+								</div>
+							</form>
+						</div>
 					</div>
-					<div className="add__body">
-						<form className="add__form" onSubmit={(e) => handleConversationCreation(e)}>
-							<input
-								className="add__input"
-								type="text"
-								placeholder="Conversation name"
-								value={formValue}
-								onChange={(e) => setFormValue(e.target.value)}
-							/>
-							<div className="add__buttons">
-							<button className="add__button" type="submit">
-								Create
-							</button>
-							<button className="add_button_cancel" type="button" onClick={handleCancel}>
-								Cancel
-							</button>
-							</div>
-						</form>
 				</div>
 			</div>
 		</>
 	);
-	};
-
-	export default AddConversationComponent;
+};
+export default AddConversationComponent;

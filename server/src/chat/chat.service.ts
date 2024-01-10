@@ -238,7 +238,7 @@ export class ChatService {
 			conv.name = conversationDto.name;
 			conv.is_channel = conversationDto.is_channel;
 			conv.isPublic = conversationDto.isPublic;
-			conv.password = conversationDto.password;
+			// conv.password = conversationDto.password;
 			await this.conversationRepository.save(conv);
 
 			// The user who created the conversation is set to admin
