@@ -1,7 +1,11 @@
 import { WebSocketGateway, WebSocketServer, SubscribeMessage, OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect, ConnectedSocket, MessageBody } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
+import { GameEngine } from 'src/game/entities/gameEngine.entity';
 import { Game } from 'src/game/entities/games.entity';
+import { Paddle } from 'src/game/entities/paddle.entity';
 import { GameService } from 'src/game/game.service';
+import { GameEngineService } from 'src/game/gameEngine.service';
+import { PaddleService } from 'src/game/gameObject/paddle.service';
 import { MatchmakingService } from 'src/game/matchmaking/matchmaking.service';
 
 @WebSocketGateway({
@@ -16,12 +20,16 @@ export class GameGateway {
     @WebSocketServer()
     server: Server;
     game: Game;
+    gameEngine: GameEngine;
+    paddle: Paddle;
     //   MatchmakingService: MatchmakingService;
     //   GameService: GameService;
 
     constructor(
         private readonly GameService: GameService,
         private readonly MatchmakingService: MatchmakingService,
+        private readonly GameEnginceService: GameEngineService,
+        private readonly PaddleService: PaddleService,
     ) { }
 
     private connectedUsers: { [userId: string]: Socket } = {};
@@ -35,6 +43,7 @@ export class GameGateway {
 
     handleDisconnect(@ConnectedSocket() client: Socket) {
         console.log(`GameGtw client disconnected : ${client.id}`);
+        
         delete this.connectedUsers[client.id];
         // client.leave(`user_game${client.id}`);
     }
@@ -60,17 +69,25 @@ export class GameGateway {
             for (const pair of pairs) {
                 const socketIDs: [string, string] = [pair[0], pair[1]];
                 this.game = await this.GameService.createGame(pair[0], pair[1]);
-                // creer une methode qui remplis la variable UsersIDs par rapport aux pair pour l'emit 
+                this.gameEngine = await this.GameEnginceService.createGameEngine(pair[0], pair[1]);
                 // const socketIDs = await getPairIDs(pair[0], pair[0]);
-                this.MatchmakingService.leave(client.id);
-                // this.MatchmakingService.leave(pair[1]);
+                this.MatchmakingService.leave(pair[0]);
+                this.MatchmakingService.leave(pair[1]);
                 this.server.to(socketIDs).emit('joinGame', {
-                        gameId: this.game.gameId,
-                        playerOneID: this.game.playerOneID,
-                        playerTwoID: this.game.playerTwoID,
-                        scoreOne: this.game.scoreOne,
-                        scoreTwo: this.game.scoreTwo,
-                    });
+                    gameId: this.game.gameId,
+                    playerOneID: this.game.playerOneID,
+                    playerTwoID: this.game.playerTwoID,
+                    scoreOne: this.game.scoreOne,
+                    scoreTwo: this.game.scoreTwo,
+                });
+                this.server.to(socketIDs).emit('Game_Start', {
+                    gameId: this.game.gameId,
+                    playerOneID: this.game.playerOneID,
+                    playerTwoID: this.game.playerTwoID,
+                    scoreOne: this.game.scoreOne,
+                    scoreTwo: this.game.scoreTwo,
+                });
+                
 
             }
         }
@@ -78,30 +95,23 @@ export class GameGateway {
     }
 
     @SubscribeMessage('leave-matchmaking')
-    handleLeaveMatchmaking(client: Socket, playerLogin: string): string {
+    handleLeaveMatchmaking(@ConnectedSocket() client: Socket, playerLogin: string): string {
         console.log("leaveMATCHMAKING");
         this.MatchmakingService.leave(playerLogin);
         return (playerLogin);
     }
 
-    @SubscribeMessage('move-paddle')
-    async handlePaddleMove(client: Socket, game: Game) {
-        const PositionPaddle: number = 90;
-        if (client.id == game.playerOneID)
-        {   
-            this.server.to([game.playerOneID,game.playerTwoID]).emit('update-paddle-left', {
-                gameId: this.game.gameId,
-                playerOneID: this.game.playerOneID,
-                playerTwoID: this.game.playerTwoID,
-                scoreOne: this.game.scoreOne,
-                scoreTwo: this.game.scoreTwo,
-                positionPaddleLeft: PositionPaddle,
-            });
-        }
-        if (client.id == game.playerTwoID)
-        {   
-            //move paddle right
-        }
+    @SubscribeMessage('Game_Input')
+    async handlePaddleMove(@ConnectedSocket() client: Socket, @MessageBody() data: { input: string, gameID: number }) {
+        this.gameEngine = await this.GameEnginceService.getGameEngine(data.gameID);
+        this.GameEnginceService.game_input(data.input, this.gameEngine, client.id);
+        this.server.to([this.gameEngine.playerOneID, this.gameEngine.playerTwoID]).emit('Game_Update', {
+            BallPosition: { x: this.gameEngine.ball!.x / (16 / 9), y: this.gameEngine.ball!.y, r: this.gameEngine.ball!.r },
+            paddleOne: { x: this.gameEngine.PaddleOne!.x_pos / (16 / 9), y: this.gameEngine.PaddleOne!.y_pos },
+            paddleTwo: { x: this.gameEngine.PaddleTwo!.x_pos / (16 / 9), y: this.gameEngine.PaddleTwo!.y_pos },
+            scoreOne: this.gameEngine.scoreOne,
+            scoreTwo: this.gameEngine.scoreTwo,
+        })
     }
 
     @SubscribeMessage('move-ball')
