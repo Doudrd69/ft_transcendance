@@ -10,11 +10,11 @@ interface AddConversationComponentProps {
 	isChannel: boolean;
 }
 
-const AddConversationComponent: React.FC<AddConversationComponentProps> = ({ userSocket, loadDiscussions, title, isChannel }) => {
+const AddConversationComponent: React.FC<AddConversationComponentProps> = ({ userSocket, loadDiscussions, title, isChannel}) => {
 
 	const [formValue, setFormValue] = useState('');
 	const { state, dispatch } = useChat();
-
+	const [isPublic, setIsPublic] = useState(false);
 	const handleConversationCreation = async (e: React.FormEvent) => {
 
 		e.preventDefault();
@@ -23,6 +23,7 @@ const AddConversationComponent: React.FC<AddConversationComponentProps> = ({ use
 			name: formValue,
 			userID: Number(sessionStorage.getItem("currentUserID")),
 			is_channel: isChannel,
+			isPublic: isPublic,
 		}
 
 		console.log(conversationDto);

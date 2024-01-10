@@ -89,7 +89,7 @@
 	/* overflow: hidden; */
 	opacity: 0.5; 
 	font-size: 60px;
-	animation: marquee 5s linear infinite;
+	animation: marquee 3s linear infinite;
 	white-space: nowrap; /* Assurez-vous que le texte ne se casse pas sur plusieurs lignes */
 	display: inline-block;
 	
@@ -104,5 +104,23 @@
 }
 
 .bloc-contain{
+	margin: 5px;
+}
+
+.icon-private-channel{
+	position: absolute;
+	top: 0;
+	right: 0;
+	width: 20%;
+	height: auto;
+	margin: 5px;
+}
+
+.icon-admin-channel{
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 20%;
+	height: auto;
 	margin: 5px;
 }
