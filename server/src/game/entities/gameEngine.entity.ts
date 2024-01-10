@@ -1,7 +1,7 @@
 import { Entity, Column, PrimaryGeneratedColumn, ManyToMany, OneToMany } from 'typeorm';
 import { Game } from './games.entity';
-import { Ball } from '../gameObject/ball';
-import { Paddle } from '../gameObject/paddle';
+import { Paddle } from './paddle.entity';
+import { Ball } from './ball.entity';
 
 @Entity()
 export class GameEngine {
@@ -15,7 +15,10 @@ export class GameEngine {
 	ball: Ball;
 
 	@Column('jsonb', { nullable: true })
-	Paddles: Paddle[];
+	PaddleOne: Paddle;
+
+	@Column('jsonb', { nullable: true })
+	PaddleTwo: Paddle;
 
 	@Column({default: 5})
 	victory_condition: number;

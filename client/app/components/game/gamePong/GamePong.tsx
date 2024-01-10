@@ -27,8 +27,9 @@ const PongComponent = (socket: { socket: Socket }) => {
     const [isWKeyPressed, setIsWKeyPressed] = useState<boolean>(false);
 
     const [inCountdown, setInCountdown] = useState<boolean>(true);
-    const [gameState, setGameState] = useState<gameState>();
-
+    const [gameID, setGameID] = useState<number | null>(null);
+    
+    
     interface gameState {
         BallPosition: { x: number, y: number, r: number} | null,
         paddleOne: { x: number, y: number } | null,
@@ -36,7 +37,17 @@ const PongComponent = (socket: { socket: Socket }) => {
         scoreOne: number,
         scoreTwo: number
     }
+    
+    const defaultGameState: gameState = {
+        BallPosition: { x: 50, y: 50, r: 5 },
+        paddleOne: { x: 0, y: 50 },
+        paddleTwo: { x: 306, y: 50 },
+        scoreOne: 0,
+        scoreTwo: 0,
+    };
 
+    const [gameState, setGameState] = useState<gameState>(defaultGameState);
+    
     interface inputState {
         up: boolean,
         down: boolean
@@ -53,7 +64,12 @@ const PongComponent = (socket: { socket: Socket }) => {
 
     useEffect(() => {
         gameSocket.on('Game_Start', (Game: Game) => {
-
+            setGameID(Game.gameId);
+            gameId: Game.gameId;
+            playerOneID: Game.playerOneID;
+            playerTwoID: Game.playerTwoID;
+            scoreOne: Game.scoreOne;
+            scoreTwo: Game.scoreTwo;
         })
 
         gameSocket.on('Game_Update', (gameState: gameState) => {
@@ -101,22 +117,6 @@ const PongComponent = (socket: { socket: Socket }) => {
             if (ballX >= 95 && ballY >= paddleY1 && ballY <= paddleY1 + 20 && ballSpeedX > 0) {
                 setBallSpeedX((prevSpeedX) => -prevSpeedX);
             }
-
-            if (isSKeyPressed) {
-                setPaddleY((prevY) => Math.min(90, prevY + paddleSpeed)); // Empêcher de descendre hors écran
-            }
-
-            if (isWKeyPressed) {
-                setPaddleY((prevY) => Math.max(10, prevY - paddleSpeed));
-            }
-
-            if (isKeyDownPressed) {
-                setPaddleY1((prevY) => Math.min(90, prevY + paddleSpeed)); // Déplacer vers le bas
-            }
-
-            if (isKeyUpPressed) {
-                setPaddleY1((prevY) => Math.max(10, prevY - paddleSpeed)); // Déplacer vers le haut
-            }
         }
     }
 
@@ -156,9 +156,10 @@ const PongComponent = (socket: { socket: Socket }) => {
     const handleKeyDown = (e: KeyboardEvent) => {
         if (e.key === 'ArrowUp') {
             setIsKeyUpPressed(true);
-            gameSocket.emit('Game_Input', { input: "ArrowUp" });
+            gameSocket.emit('Game_Input', {input: "ArrowUp", gameID: gameID});
         } else if (e.key === 'ArrowDown') {
-            gameSocket.emit('Game_Input', { input: "ArrowDown" });
+            setIsKeyDownPressed(true);
+            gameSocket.emit('Game_Input', { input: "ArrowDown", gameID: gameID });
         }
     };
 
@@ -173,9 +174,10 @@ const PongComponent = (socket: { socket: Socket }) => {
     const handleKeyS = (e: KeyboardEvent) => {
         if (e.key === 'w') {
             setIsWKeyPressed(true);
-            // gameSocket.emit()
+            gameSocket.emit('Game_Input', { input: "ArrowUp", gameID: gameID});
         } else if (e.key === 's') {
             setIsSKeyPressed(true);
+            gameSocket.emit('Game_Input', { input: "ArrowDown", gameID: gameID });
         }
     };
 
@@ -221,8 +223,8 @@ const PongComponent = (socket: { socket: Socket }) => {
                 </div>
             </div>
             <div className="ball" style={{ left: `${ballX}%`, top: `${ballY}%` }}></div>
-            <div className="pongpaddle" style={{ top: `${paddleY}%`, left: '26%' }}></div>
-            <div className="pongpaddle" style={{ right: 0, top: `${paddleY1}%` }}></div>
+            <div className="pongpaddle" style={{ top: `${gameState!.paddleOne!.y}%`, left: `${gameState!.paddleOne!.x}%` }}></div>
+            <div className="pongpaddle" style={{ left: `${gameState!.paddleTwo!.x}%`, top: `${gameState!.paddleTwo!.y}%` }}></div>
         </div>
     );
 };

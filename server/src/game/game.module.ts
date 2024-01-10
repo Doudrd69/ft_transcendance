@@ -11,6 +11,12 @@ import { Game } from './entities/games.entity';
 import { GameController } from './game.controller';
 import { GameService } from './game.service';
 import { GameEngine } from './entities/gameEngine.entity';
+import { Paddle } from './entities/paddle.entity';
+import { PaddleService } from './gameObject/paddle.service';
+import { Ball } from './entities/ball.entity';
+import { BallService } from './gameObject/ball.service';
+import { Vector } from './entities/vector.entity';
+import { VectorService } from './gameObject/vector.service';
 
 @Module({
   imports: [
@@ -18,9 +24,12 @@ import { GameEngine } from './entities/gameEngine.entity';
       TypeOrmModule.forFeature([Friendship]),
       TypeOrmModule.forFeature([Game]),
       TypeOrmModule.forFeature([GameEngine]),
+      TypeOrmModule.forFeature([Paddle]),
+      TypeOrmModule.forFeature([Ball]),
+      TypeOrmModule.forFeature([Vector]),
   ],
   controllers: [GameController],
-  providers: [GameService, MatchmakingService],
+  providers: [GameService, MatchmakingService, PaddleService, BallService, VectorService],
   exports: [GameService],
 })
 export class GameModule {

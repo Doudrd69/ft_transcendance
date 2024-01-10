@@ -6,8 +6,7 @@ import { GameModule } from './game.module';
 import { env } from 'process';
 import { User } from 'src/users/entities/users.entity';
 import { GameEngine } from './entities/gameEngine.entity';
-import { Ball } from './gameObject/ball';
-import { Paddle } from './gameObject/paddle';
+import { Paddle } from './entities/paddle.entity';
 
 
 @Injectable()
@@ -54,21 +53,9 @@ export class GameService {
         return (playersLogin);
     }
 
-
-    async createGameEnginge(player1ID: string, player2ID: string) {
-        const gameEngine = new GameEngine();
-        const game: Game = await this.gameRepository.findOne({ where: { playerOneID: player1ID } })
-        gameEngine.playerOneID = player1ID;
-        gameEngine.playerTwoID = player2ID;
-        gameEngine.scoreOne = 0;
-        gameEngine.scoreTwo = 0;
-        gameEngine.gameID = game.gameId;
-        gameEngine.ball = new Ball(10, 10, 10);
-        gameEngine.Paddles[0] = new Paddle(0.10, 0.03, 20, 0);
-        gameEngine.Paddles[1] = new Paddle(0.10, 0.03, 0, 0);
-        await this.gameEngineRepository.save(gameEngine);
-        return (gameEngine);
-
+    async deleteGame(playerID: string) {
+        const game: Game = await this.gameRepository.findOne({ where: { playerOneID: playerID } })
+        // regarder comment verifier si le player est dans une game et la supprimer si c'est le cas
     }
 
     /**
