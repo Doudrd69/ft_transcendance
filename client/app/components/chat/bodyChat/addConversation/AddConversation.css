@@ -85,16 +85,8 @@
 	align-items: center;
   }
 
-  .public-img {
+  .password-img {
 	width: 50px;
 	height: auto;
 	margin: 10px;
-  }
-
-
-  .private-img {
-	width: 50px;
-	height: auto;
-	margin: 10px;
-
   }

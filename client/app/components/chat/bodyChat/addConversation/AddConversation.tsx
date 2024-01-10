@@ -18,6 +18,7 @@ const AddConversationComponent: React.FC<AddConversationComponentProps> = ({ use
 	// const [channelPassword, setChannelPassword] = useState('');
 	const [passwordValue, setPasswordValue] = useState('');
 	const { state, dispatch } = useChat();
+	const [isPassword, setIsPassowrd] = useState(false);
 	const [isPublic, setIsPublic] = useState(true);
 	const handleConversationCreation = async (e: React.FormEvent) => {
 
@@ -28,8 +29,8 @@ const AddConversationComponent: React.FC<AddConversationComponentProps> = ({ use
 			userID: Number(sessionStorage.getItem("currentUserID")),
 			is_channel: isChannel,
 			isPublic: isPublic,
-			password: isPublic ? '' : passwordValue,
-
+			password: isPassword ? '' : passwordValue,
+		}
 		console.log(conversationDto);
 
 		const response = await fetch('http://localhost:3001/chat/newConversation', {
@@ -101,11 +102,11 @@ const AddConversationComponent: React.FC<AddConversationComponentProps> = ({ use
 									onChange={(e) => setFormValue(e.target.value)}
 								/>
 								<div className='privated-public'>
-									{isPublic ?
-										<img className='public-img' src="public.png" onClick={() => setIsPublic(false)} />
+									{isPassword ?
+											<img className='password-img' src="passowrd.png" onClick={() => setIsPassowrd(false)} />
 											:
-										<img className='private-img' src="private.png" onClick={() => setIsPublic(true)} />}
-									{!isPublic && (
+											<img className='password-img' src="no-password.png" onClick={() => setIsPassowrd(true)} />}
+									{isPassword && (
 										<input
 											className="add__input"
 											type="password"

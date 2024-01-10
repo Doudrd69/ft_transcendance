@@ -78,7 +78,8 @@ const ChannelListComponent: React.FC<ChanneListComponentProps> = ({ userSocket }
 				}}
 				>
 				
-				 {isAdmin[index] && <img className="icon-admin-channel" src='./crown.png' alt="private" />}
+				{isAdmin[index] && <img className="icon-admin-channel" src='./crown.png' alt="private" />}
+				 <img className="icon-password-channel" src='./password.png' alt="private" />
 				{!conversation.isPublic && <img className="icon-private-channel" src='./private.png' alt="private" />}
 				<span>{conversation.name}</span>
 			</button>
