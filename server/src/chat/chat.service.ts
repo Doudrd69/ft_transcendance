@@ -54,7 +54,6 @@ export class ChatService {
 					if (user_.login !== user.login) {
 						user_.groups.forEach((group: GroupMember) => {
 							if (group.conversation.id == userGroup.conversation.id) {
-								console.log("User ", user_.login, " is in conversation ", group.conversation.name);
 								userListForThisGRoup.push({login: user_.login, avatarURL: user_.avatarURL});
 							}
 						});
@@ -373,12 +372,13 @@ export class ChatService {
 			});
 
 			const conversationList = await this.getAllConversations(userID);
-			if (conversationList) {
+			const usersList = this.getUserListFromConversations(user, conversationList);
+			if (conversationList && usersList) {
 
-				const usersList = this.getUserListFromConversations(user, conversationList);
 				const conversationArray = {
 					conversationList: conversationList,
 					isAdmin: isAdminArray,
+					userList: usersList,
 				}
 
 				return conversationArray;
