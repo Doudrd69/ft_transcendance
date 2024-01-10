@@ -143,12 +143,8 @@ export class AuthService {
 		try {
 			// Verifier si le secret existe deja, auquel cas, ne pas le regenerer
 			const secret = speakeasy.generateSecret();
-
-			// We find the user activating 2FA and save the temporary secret
 			this.usersService.register2FATempSecret(requestTfaDto.userID, secret.base32);
 
-			// This function will return a QRCode URL we can use on client side
-			// to enable 2FA with an authenticator service
 			const qrcodeURL = await new Promise<string>((resolve, reject) => {
 				QRCode.toDataURL(secret.otpauth_url, function(err, data_url) {
 					if (err)

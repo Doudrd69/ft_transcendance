@@ -22,20 +22,29 @@ const ListMyChannelComponent: React.FC<ListMyChannelComponentProps> = ({ userSoc
 
 	const loadDiscussions = async () => {
 
-		const response = await fetch(`http://localhost:3001/chat/getConversations/${userID}`, {
+		const response = await fetch(`http://localhost:3001/chat/getConversationsWithStatus/${userID}`, {
 			method: 'GET',
 			headers: {
-				'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`
+				'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
 			}
 		});
 
 		if (response.ok) {
-			const userData = await response.json();
-			setConversations(userData);
-		} else {
+			const responseData = await response.json();
+			const { conversationList, isAdmin } = responseData;
+			if (conversationList)
+				setConversations((prevConversations: Conversation[]) => [...prevConversations, ...conversationList]);
+		}
+		else {
 			console.log("Fatal error");
 		}
 	};
+	
+	useEffect(() => {
+		console.log("Loading conversations...");
+		loadDiscussions();
+		console.log("convs --> ", conversations);
+	}, [state.refreshChannel]);
 
 	const addFriendToConversation = async (convID: number, friend: string) => {
 
@@ -57,25 +66,16 @@ const ListMyChannelComponent: React.FC<ListMyChannelComponentProps> = ({ userSoc
 
 		if (response.ok) {
 			const conversation = await response.json();
-
 			if (userSocket.connected) {
 				userSocket.emit('addUserToRoom', { convID: conversation.id, convName: conversation.name, friend: user } );
 			}
 			console.log("Friend has been successfully added!");
+			dispatch({ type: 'TOGGLE', payload: 'listChannelAdd' });
 		}
 		else {
 			console.log("Fatal error");
 		}
 	}
-
-	useEffect(() => {
-		loadDiscussions();
-	}, []);
-
-	const userData = {
-		discussion: conversations,
-		online: ["on", "off", "on", "on", "off", "on", "on"],
-	};
 
 	const handleCloseList = () => {
     	dispatch({ type: 'DISABLE', payload: 'showListChannelAdd' });
@@ -89,22 +89,16 @@ const ListMyChannelComponent: React.FC<ListMyChannelComponentProps> = ({ userSoc
 				</button>
 				<p className="title-list-channel-component">CHOOSE IN YOUR SERVER</p>
 					<div className="bloc-add-channel-list">
-						{userData.discussion.map((conversation, index) => (
+						{conversations.map((conversation, index) => (
 							conversation.is_channel && (
 							<button
 								key={index}
 								className="button-add-channel-list"
-								onClick={() => {addFriendToConversation(Number(conversation.id), user)}}
-								// onClick={() => {
-								// FONCTION POUR AJOUTER LE USER A LA CONVERSATION
-								// dispatch({ type: 'TOGGLE', payload: 'showChannel' });
-								// dispatch({ type: 'SET_CURRENT_CONVERSATION', payload: conversation.name });
-								// }}
-							>
+								onClick={() => {
+									addFriendToConversation(Number(conversation.id), user);}}>
 								<span>{conversation.name}</span>
 							</button>
-							)
-						))}
+						)))}
 					</div>
 			</div>
 		</div>

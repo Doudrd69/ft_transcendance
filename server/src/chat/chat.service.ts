@@ -81,6 +81,7 @@ export class ChatService {
 				userToFind.groups.forEach((group: GroupMember) => {
 					conversationArray.push(group.conversation)
 				})
+				console.log('cojoweiwerwerew ==> ', conversationArray);
 				return conversationArray;
 			}
 			return [];
@@ -344,15 +345,15 @@ export class ChatService {
 				isAdminArray.push(group.isAdmin);
 			});
 
-				const conversationList = await this.getAllConversations(userID);
-				console.log("Convs -> ", conversationList);
+			const conversationList = await this.getAllConversations(userID);
+			console.log("Convs -> ", conversationList);
 
-				const conversationArray = {
-					conversationList: conversationList,
-					isAdmin: isAdminArray,
-				}
-	
-				return conversationArray;
+			const conversationArray = {
+				conversationList: conversationList,
+				isAdmin: isAdminArray,
+			}
+
+			return conversationArray;
 		}
 
 		console.error("Fatal error: conversations not found");
