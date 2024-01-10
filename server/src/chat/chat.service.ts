@@ -63,7 +63,7 @@ export class ChatService {
 			}
 		});
 
-		console.log("=================> ", array);
+		// console.log("=================> ", array);
 	}
 
 	private async getAllMessages(conversationID: number): Promise<Message[]> {
@@ -263,7 +263,10 @@ export class ChatService {
 			conv.name = conversationDto.name;
 			conv.is_channel = conversationDto.is_channel;
 			conv.isPublic = conversationDto.isPublic;
-			// conv.password = conversationDto.password;
+			if (conversationDto.password) {
+				conv.isProtected = true;
+				conv.password = await this.hashChannelPassword(conversationDto.password);
+			}
 			await this.conversationRepository.save(conv);
 
 			// The user who created the conversation is set to admin
