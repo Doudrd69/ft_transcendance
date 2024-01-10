@@ -29,6 +29,7 @@ const AddConversationComponent: React.FC<AddConversationComponentProps> = ({ use
 			is_channel: isChannel,
 			isPublic: isPublic,
 			password: isPublic ? '' : passwordValue,
+		}
 
 		console.log(conversationDto);
 

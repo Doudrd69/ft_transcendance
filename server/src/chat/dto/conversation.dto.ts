@@ -33,11 +33,10 @@ export class ConversationDto {
 	@IsBoolean()
 	isPublic: boolean;
 
-	// @IsNotEmpty()
 	// @Length(6, 20)
 	// @IsAscii()
 	// @IsAlpha()
-	// @IsString()
-	// @Matches(/^[^"';%()|<>\\]*$/)
-	// password?: string;
+	@IsString()
+	@Matches(/^[^"';%()|<>\\]*$/)
+	password?: string;
 }

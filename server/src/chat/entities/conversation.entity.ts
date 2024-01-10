@@ -15,6 +15,9 @@ export class Conversation {
 	@Column({ default: "" })
 	password: string;
 
+	@Column({ default: false })
+	isProtected: boolean;
+
 	@Column({ default: true})
   	isPublic: boolean;
 	
