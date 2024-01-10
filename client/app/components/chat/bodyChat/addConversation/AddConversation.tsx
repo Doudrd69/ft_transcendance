@@ -17,12 +17,7 @@ const AddConversationComponent: React.FC<AddConversationComponentProps> = ({ use
 	// const [isPublicValue, setIsPublicValue] = useState(true);
 	// const [channelPassword, setChannelPassword] = useState('');
 	const { state, dispatch } = useChat();
-	const [isPublic, setIsPublic] = useState(false);
-
-	// const handleCheckboxChange = () => {
-	//   setIsPublicValue(!isPublicValue); // Inverse l'état actuel de la checkbox
-	//   console.log(isPublicValue);
-	// };
+	const [isPublic, setIsPublic] = useState(true);
   
 	const handleConversationCreation = async (e: React.FormEvent) => {
 
@@ -33,7 +28,7 @@ const AddConversationComponent: React.FC<AddConversationComponentProps> = ({ use
 			userID: Number(sessionStorage.getItem("currentUserID")),
 			is_channel: isChannel,
 			isPublic: isPublic,
-			password: '',
+			// password: '',
 		}
 
 		console.log(conversationDto);
