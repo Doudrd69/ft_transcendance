@@ -263,8 +263,8 @@ export class ChatService {
 			conv.name = conversationDto.name;
 			conv.is_channel = conversationDto.is_channel;
 			conv.isPublic = conversationDto.isPublic;
+			conv.isProtected = conversationDto.isProtected;
 			if (conversationDto.password) {
-				conv.isProtected = true;
 				conv.password = await this.hashChannelPassword(conversationDto.password);
 			}
 			await this.conversationRepository.save(conv);
