@@ -59,6 +59,12 @@ export class ChatController {
 		return this.chatService.getConversations(userID);
 	}
 
+	@UseGuards(AuthGuard)
+	@Get('getConversationsPublic')
+	getConversationsPublic(): Promise<Conversation[]> {
+		return this.chatService.getAllPublicConversations();
+	}
+
 	// verifier que le number est bon
 	@UseGuards(AuthGuard)
 	@Get('getConversationsWithStatus/:userID')
