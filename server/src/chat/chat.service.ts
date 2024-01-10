@@ -40,6 +40,33 @@ export class ChatService {
 		// const isMatch = await bcrypt.compare(password, hash);
 	}
 
+	private async getUserListFromConversations(user: User, conversationList: Conversation[]) {
+
+		const users = await this.usersRepository.find({
+			relations: ["groups", "groups.conversation"],
+		});
+
+		let array = [];
+		user.groups.forEach((userGroup: GroupMember) => {
+			if (userGroup.conversation.is_channel) {
+				let userListForThisGRoup = [];
+				users.forEach((user_: User) => {
+					if (user_.login !== user.login) {
+						user_.groups.forEach((group: GroupMember) => {
+							if (group.conversation.id == userGroup.conversation.id) {
+								console.log("User ", user_.login, " is in conversation ", group.conversation.name);
+								userListForThisGRoup.push({login: user_.login, avatarURL: user_.avatarURL});
+							}
+						});
+					}
+				});
+				array.push(userListForThisGRoup);
+			}
+		});
+
+		console.log("=================> ", array);
+	}
+
 	private async getAllMessages(conversationID: number): Promise<Message[]> {
 
 		const conversation = await this.conversationRepository.find({ where: {id: conversationID} });
@@ -81,7 +108,6 @@ export class ChatService {
 				userToFind.groups.forEach((group: GroupMember) => {
 					conversationArray.push(group.conversation)
 				})
-				console.log('cojoweiwerwerew ==> ', conversationArray);
 				return conversationArray;
 			}
 			return [];
@@ -238,7 +264,7 @@ export class ChatService {
 			conv.name = conversationDto.name;
 			conv.is_channel = conversationDto.is_channel;
 			conv.isPublic = conversationDto.isPublic;
-			conv.password = conversationDto.password;
+			// conv.password = conversationDto.password;
 			await this.conversationRepository.save(conv);
 
 			// The user who created the conversation is set to admin
@@ -331,11 +357,12 @@ export class ChatService {
 		return allConversations;
 	}
 
+	// return un array d'array avec les users de chaque channel
 	async getConversationsWithStatus(userID: number) {
 
 		const user = await this.usersRepository.findOne({
 			where: { id: userID },
-			relations: ["groups"],
+			relations: ["groups", "groups.conversation"],
 		});
 
 		if (user) {
@@ -346,14 +373,16 @@ export class ChatService {
 			});
 
 			const conversationList = await this.getAllConversations(userID);
-			console.log("Convs -> ", conversationList);
+			if (conversationList) {
 
-			const conversationArray = {
-				conversationList: conversationList,
-				isAdmin: isAdminArray,
+				const usersList = this.getUserListFromConversations(user, conversationList);
+				const conversationArray = {
+					conversationList: conversationList,
+					isAdmin: isAdminArray,
+				}
+
+				return conversationArray;
 			}
-
-			return conversationArray;
 		}
 
 		console.error("Fatal error: conversations not found");
