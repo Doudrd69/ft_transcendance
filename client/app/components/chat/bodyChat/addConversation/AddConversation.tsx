@@ -15,7 +15,8 @@ const AddConversationComponent: React.FC<AddConversationComponentProps> = ({ use
 	const [formValue, setFormValue] = useState('');
 	const [passwordValue, setPasswordValue] = useState('');
 	const { state, dispatch } = useChat();
-	const [isPublic, setIsPublic] = useState(false);
+	const [isPassword, setIsPassowrd] = useState(false);
+	const [isPublic, setIsPublic] = useState(true);
 	const handleConversationCreation = async (e: React.FormEvent) => {
 
 		e.preventDefault();
@@ -25,8 +26,9 @@ const AddConversationComponent: React.FC<AddConversationComponentProps> = ({ use
 			userID: Number(sessionStorage.getItem("currentUserID")),
 			is_channel: isChannel,
 			isPublic: isPublic,
+			isProtected: false, // a modifier avec une valeur en useState?
+			password: isPublic ? '' : passwordValue,
 		}
-
 		console.log(conversationDto);
 
 		const response = await fetch('http://localhost:3001/chat/newConversation', {

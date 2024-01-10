@@ -15,7 +15,7 @@ interface ChanneListComponentProps {
 	userSocket: Socket;
 }
 
-const ChannelListComponent: React.FC<ChanneListComponentProps> = ({ userSocket}) => {
+const ChannelListComponent: React.FC<ChanneListComponentProps> = ({ userSocket }) => {
 
 	const { state, dispatch } = useChat();
 
@@ -25,7 +25,7 @@ const ChannelListComponent: React.FC<ChanneListComponentProps> = ({ userSocket})
 	
 
 	const loadDiscussions = async () => {
-		setConversations([]);
+
 		const response = await fetch(`http://localhost:3001/chat/getConversationsWithStatus/${userID}`, {
 			method: 'GET',
 			headers: {
@@ -51,6 +51,7 @@ const ChannelListComponent: React.FC<ChanneListComponentProps> = ({ userSocket})
 	useEffect(() => {
 		console.log("Loading conversations...");
 		loadDiscussions();
+
 	}, [state.refreshChannel]);
 
 	return (

@@ -100,7 +100,6 @@ export class ChatService {
 		console.error("Fatal error: user not found");
 		return [];
 	}
-<<<<<<< HEAD
 
 	async compareChannelPassword(checkPasswordDto: CheckPasswordDto): Promise<boolean> {
 
@@ -115,9 +114,6 @@ export class ChatService {
 		return false;
 	}
 
-=======
-	
->>>>>>> 6bfdaaa (dsf)
 	async quitConversation(conversationDto: ConversationDto) {
 		
 		const conversationToRemove = await this.conversationRepository.findOne({ where: {name: conversationDto.name }});
@@ -226,16 +222,11 @@ export class ChatService {
 	async updateConversation(updateConversationDto: UpdateConversationDto): Promise<Conversation> {
 		
 		const conversationToUpdate = await this.conversationRepository.findOne({ where: { id: updateConversationDto.conversationID} });
-<<<<<<< HEAD
 		const user = await this.usersRepository.findOne({
 			where: { id: updateConversationDto.userID },
 			relations: ["groups"],
 		});
 
-=======
-		const user = await this.usersRepository.findOne({ where: { id: updateConversationDto.userID } });
-		
->>>>>>> 6bfdaaa (dsf)
 		if (user && conversationToUpdate) {
 			
 			let isAdmin : boolean;
