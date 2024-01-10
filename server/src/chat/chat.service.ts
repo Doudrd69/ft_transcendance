@@ -55,7 +55,7 @@ export class ChatService {
 						user_.groups.forEach((group: GroupMember) => {
 							if (group.conversation.id == userGroup.conversation.id) {
 								console.log("User ", user_.login, " is in conversation ", group.conversation.name);
-								userListForThisGRoup.push(user_.login);
+								userListForThisGRoup.push({login: user_.login, avatarURL: user_.avatarURL});
 							}
 						});
 					}
