@@ -78,15 +78,26 @@ const ListMyChannelComponent: React.FC<ListMyChannelComponentProps> = ({ userSoc
 	}
 
 	const handleCloseList = () => {
-    	dispatch({ type: 'DISABLE', payload: 'showListChannelAdd' });
-  	};
+		dispatch({ type: 'DISABLE', payload: 'showListChannelAdd' });
+	};
+
+	useEffect(() => {
+		const handleEscape = (event: KeyboardEvent) => {
+			if (event.key === 'Escape') {
+				handleCloseList();
+			}
+		};
+		
+			document.addEventListener('keydown', handleEscape);
+			return () => {
+			  document.removeEventListener('keydown', handleEscape);
+			};
+		  }, []);
 
 	return (
 		<div className='blur-background'>
+			<img className="add_button_cancel" src='./close.png'  onClick={handleCloseList}/>
 			<div className='juste-pour-englober'>
-				<button className="close-button" onClick={handleCloseList}>
-				&#10006;
-				</button>
 				<p className="title-list-channel-component">CHOOSE IN YOUR SERVER</p>
 					<div className="bloc-add-channel-list">
 						{conversations.map((conversation, index) => (
@@ -104,5 +115,4 @@ const ListMyChannelComponent: React.FC<ListMyChannelComponentProps> = ({ userSoc
 		</div>
 	);
 };
-
 export default ListMyChannelComponent;

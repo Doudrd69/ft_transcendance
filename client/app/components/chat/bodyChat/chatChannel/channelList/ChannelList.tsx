@@ -23,6 +23,7 @@ const ChannelListComponent: React.FC<ChanneListComponentProps> = ({ userSocket }
 	const [conversations, setConversations] = useState<Conversation[]>([]);
 	const [isAdmin, setIsAdmin] = useState<boolean[]>([]);
 	
+
 	const loadDiscussions = async () => {
 
 		const response = await fetch(`http://localhost:3001/chat/getConversationsWithStatus/${userID}`, {
@@ -63,7 +64,7 @@ const ChannelListComponent: React.FC<ChanneListComponentProps> = ({ userSocket }
 		>
 			+
 		</button>
-		{state.showAddChannel && <AddConversationComponent userSocket={userSocket} loadDiscussions={loadDiscussions} title="Add/Create Channel" isChannel={true}/>}
+		{state.showAddChannel && <AddConversationComponent userSocket={userSocket} loadDiscussions={loadDiscussions} title="ADD CHANNEL" isChannel={true}/>}
 		{conversations.map((conversation, index) => (
 				conversation.is_channel && (
 				<button
@@ -76,8 +77,9 @@ const ChannelListComponent: React.FC<ChanneListComponentProps> = ({ userSocket }
 					dispatch({ type: 'SET_CURRENT_CONVERSATION_ID', payload: conversation.id });
 				}}
 				>
+				
 				 {isAdmin[index] && <img className="icon-admin-channel" src='./crown.png' alt="private" />}
-				{!conversation.isPublic && <img className="icon-private-channel" src='./padlock.png' alt="private" />}
+				{!conversation.isPublic && <img className="icon-private-channel" src='./private.png' alt="private" />}
 				<span>{conversation.name}</span>
 			</button>
 			)

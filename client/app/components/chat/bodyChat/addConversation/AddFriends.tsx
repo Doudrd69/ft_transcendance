@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Socket } from 'socket.io-client';
 import { useChat } from '../../ChatContext';
 import './AddConversation.css';
@@ -77,33 +77,40 @@ const AddFriendComponent: React.FC<AddFriendComponentProps> = ({ userSocket, upd
 		setFormValue('');
 	};
 
+	useEffect(() => {
+	const handleEscape = (event: KeyboardEvent) => {
+		if (event.key === 'Escape') {
+		handleCancel();
+		}
+	};
+	
+		document.addEventListener('keydown', handleEscape);
+		return () => {
+		  document.removeEventListener('keydown', handleEscape);
+		};
+	  }, []);
 	return (
 		<>
 		<div className="blur-background"></div>
-		<div className="bloc-add-conversation">
-			<div className="add__header">
-			<h2 className="add__title">{title}</h2>
-			</div>
-			<div className="add__body">
-			<form className="add__form" onSubmit={(e) => handleFriendRequest(e)}>
-				<input
-					className="add__input"
-					type="text"
-					placeholder="Friend username"
-					value={formValue}
-					onChange={(e) => setFormValue(e.target.value)}
-				/>
-				<div className="add__buttons">
-				<button className="add__button" type="submit">
-					Create
-				</button>
-				<button className="add_button_cancel" type="button" onClick={handleCancel}>
-					Cancel
-				</button>
+			<img className="add_button_cancel" src='./close.png'  onClick={handleCancel}/>
+			<div className="add_container">
+				<h2 className="add__title">{title}</h2>	
+					<div className="add__header">
+						<div className="bloc-add-conversation">
+						<div className="add__body">
+							<form className="add__form" onSubmit={(e) => handleFriendRequest(e)}>
+								<input
+									className="add__input"
+									type="text"
+									placeholder="name"
+									value={formValue}
+									onChange={(e) => setFormValue(e.target.value)}
+									/>
+							</form>
+						</div>
+					</div>
 				</div>
-			</form>
 			</div>
-		</div>
 		</>
 	);
 };
