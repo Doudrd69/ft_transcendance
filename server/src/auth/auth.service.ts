@@ -141,6 +141,7 @@ export class AuthService {
 	async activate2FA(requestTfaDto: RequestTfaDto) {
 
 		try {
+			// Verifier si le secret existe deja, auquel cas, ne pas le regenerer
 			const secret = speakeasy.generateSecret();
 			this.usersService.register2FATempSecret(requestTfaDto.userID, secret.base32);
 

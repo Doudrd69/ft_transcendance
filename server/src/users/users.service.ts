@@ -32,6 +32,8 @@ export class UsersService {
 
 		const userToUpdate = await this.usersRepository.findOne({ where: {id: userID} });
 		if (userToUpdate) {
+			if (userToUpdate.TFA_secret)
+				return ;
 			userToUpdate.TFA_temp_secret = secret;
 			return this.usersRepository.save(userToUpdate);
 		}
@@ -129,6 +131,7 @@ export class UsersService {
 		if (!userToCreate) {
 			// const saltOrRounds = 10;
 			// password = await bcrypt.hash(password, saltOrRounds);
+			// const isMatch = await bcrypt.compare(password, hash);
 			const newUser = new User();
 			newUser.login = username;
 			newUser.firstname = username;

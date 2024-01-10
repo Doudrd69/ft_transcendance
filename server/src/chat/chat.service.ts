@@ -7,9 +7,11 @@ import { Message } from './entities/message.entity';
 import { User } from '../users/entities/users.entity'
 import { MessageDto } from './dto/message.dto';
 import { ConversationDto } from './dto/conversation.dto';
+import { UpdateConversationDto } from './dto/UpdateConversationDto.dto';
 import { GroupDto } from './dto/group.dto';
 import { group } from 'console';
 import { AddFriendToConversationDto } from './dto/addFriendToConversationDto.dto';
+import * as bcrypt from 'bcrypt'
 
 
 @Injectable()
@@ -24,6 +26,19 @@ export class ChatService {
 		@InjectRepository(User)
 		private usersRepository: Repository<User>,
 	) {}
+
+	private async hashChannelPassword(password: string) {
+
+		if (!password)
+			return password;
+	
+		const saltOrRounds = 10;
+		const hash = await bcrypt.hash(password, saltOrRounds);
+		return hash;
+
+		// will be used to compare user input to the channel's password
+		// const isMatch = await bcrypt.compare(password, hash);
+	}
 
 	private async getAllMessages(conversationID: number): Promise<Message[]> {
 
@@ -179,6 +194,37 @@ export class ChatService {
 		return ;
 	}
 
+	// Let admins update conversation to private/public and add/remove password
+	async updateConversation(updateConversationDto: UpdateConversationDto): Promise<Conversation> {
+
+		const conversationToUpdate = await this.conversationRepository.findOne({ where: { id: updateConversationDto.conversationID} });
+		const user = await this.usersRepository.findOne({ where: { id: updateConversationDto.userID } });
+
+		if (user && conversationToUpdate) {
+
+			let isAdmin : boolean;
+
+			// dans un custom Guard?
+			user.groups.forEach((group: GroupMember) => {
+				if (group.conversation.id == conversationToUpdate.id) {
+					isAdmin = group.isAdmin;
+				}
+			});
+			console.log(user.login, " admin status: ", isAdmin);
+
+			if (isAdmin) {
+
+				conversationToUpdate.isPublic = updateConversationDto.isPublic;
+				conversationToUpdate.password = await this.hashChannelPassword(updateConversationDto.newPassword);
+				return await this.conversationRepository.save(conversationToUpdate);
+			}
+
+			return ;
+		}
+
+		return ;
+	}
+
 	async createConversation(conversationDto: ConversationDto): Promise<Conversation> {
 
 		const user = await this.usersRepository.findOne({
@@ -191,6 +237,8 @@ export class ChatService {
 			const conv = new Conversation();
 			conv.name = conversationDto.name;
 			conv.is_channel = conversationDto.is_channel;
+			conv.isPublic = conversationDto.isPublic;
+			conv.password = conversationDto.password;
 			await this.conversationRepository.save(conv);
 
 			// The user who created the conversation is set to admin
