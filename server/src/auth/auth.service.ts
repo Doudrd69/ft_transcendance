@@ -41,20 +41,26 @@ export class AuthService {
 				},
 			});
 			
-			const responseContent = await response.json();
-			const userInformation = {
-				'login': responseContent.login,
-				'firstname': responseContent.first_name,
-				'image': responseContent.image,
-			}
+			if (response.ok) {
+				const responseContent = await response.json();
 
-			const result = await this.usersService.getUserByLogin(userInformation.login);
-			if (result) {
-				console.log("User already exists in DB");
-				return result;
+				const userInformation = {
+					'login': responseContent.login,
+					'firstname': responseContent.first_name,
+					'image': responseContent.image,
+				}
+
+				const result = await this.usersService.getUserByLogin(userInformation.login);
+				if (result) {
+					console.log("User already exists in DB");
+					return result;
+				}
+				else {
+					return this.usersService.createNew42User(userInformation);
+				}
 			}
 			else {
-				return this.usersService.createNew42User(userInformation);
+				throw "42 API request failed";
 			}
 
 		} catch (error) {
@@ -84,6 +90,7 @@ export class AuthService {
 
 				const userData = await this.getUserInfo(responseContent);
 				if (userData) {
+
 					// payload for JWT
 					const payload = {
 						sub: userData.id,
@@ -91,18 +98,18 @@ export class AuthService {
 						tfa_enabled: userData.TFA_isEnabled,
 						pp: userData.officialProfileImage,
 					};
+
 					const accessToken = await this.jwtService.signAsync(payload);
 					return { access_token: accessToken };
 				}
 				else 
 				{
-					throw new Error("Cannot retrieve user information");
+					throw "Cannot retrieve user information";
 				}
 			}
 			else {
-				throw new Error("Cannot extract data from fetch() response: " + response.status);
+				throw ("Fatal error: 42 API request failed");
 			}
-
 		} catch (error) {
 			console.error("-- Request to API FAILED --");
 			throw error;
