@@ -26,8 +26,8 @@ const AddConversationComponent: React.FC<AddConversationComponentProps> = ({ use
 			userID: Number(sessionStorage.getItem("currentUserID")),
 			is_channel: isChannel,
 			isPublic: isPublic,
-			isProtected: false, // a modifier avec une valeur en useState?
-			password: isPublic ? '' : passwordValue,
+			isProtected: isPassword,
+			password: isPassword ? '' : passwordValue,
 		}
 		console.log(conversationDto);
 
@@ -100,10 +100,14 @@ const AddConversationComponent: React.FC<AddConversationComponentProps> = ({ use
 									onChange={(e) => setFormValue(e.target.value)}
 								/>
 								<div className='privated-public'>
-									{isPassword ?
-											<img className='password-img' src="passowrd.png" onClick={() => setIsPassowrd(false)} />
+									{isPublic ?
+											<img className='public-img' src="./public.png" onClick={() => setIsPublic(false)} />
 											:
-											<img className='password-img' src="no-password.png" onClick={() => setIsPassowrd(true)} />}
+											<img className='public-img' src="./private.png" onClick={() => setIsPublic(true)} />}
+									{isPassword ?
+											<img className='password-img' src="./password.png" onClick={() => setIsPassowrd(false)} />
+											:
+											<img className='password-img' src="./no-password.png" onClick={() => setIsPassowrd(true)} />}
 									{isPassword && (
 										<input
 											className="add__input"

@@ -17,14 +17,14 @@ const corsOptions = {
 };
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
-  app.useGlobalPipes(new ValidationPipe());
-  app.use(cors(corsOptions));
+	const app = await NestFactory.create(AppModule);
+	app.useGlobalPipes(new ValidationPipe());
+	app.use(cors(corsOptions));
 
-  // const httpAdapter = app.getHttpAdapter();
-  // app.useWebSocketAdapter(new IoAdapter(httpAdapter));
+	// const httpAdapter = app.getHttpAdapter();
+	// app.useWebSocketAdapter(new IoAdapter(httpAdapter));
 
-  await app.listen(3001);
+	await app.listen(3001);
 }
 
 bootstrap();
