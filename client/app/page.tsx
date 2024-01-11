@@ -137,7 +137,6 @@ export default function Home() {
 		return false;
 	}
 
-
 	const handle2FADone = () => {
 		setShow2FAForm(false);
 	}

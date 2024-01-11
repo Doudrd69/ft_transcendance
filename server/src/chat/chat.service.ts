@@ -270,6 +270,7 @@ export class ChatService {
 
 	async quitConversation(conversationDto: ConversationDto) {
 		
+		// faire par ID
 		const conversationToRemove = await this.conversationRepository.findOne({ where: {name: conversationDto.name }});
 		
 		const user = await this.usersRepository.findOne({
@@ -279,9 +280,16 @@ export class ChatService {
 
 		if (conversationToRemove && user) {
 
-			const groupToRemove = user.groups.filter((group: GroupMember) => group.conversation == conversationToRemove);
-			// user.groups.delete(groupToRemove);
-			await this.usersRepository.save(user);
+			// methode 1
+			// const groupsUpdated = user.groups.filter((group: GroupMember) => group.conversation != conversationToRemove);
+			// user.groups = groupsUpdated;
+			// await this.usersRepository.save(user);
+
+			// methode 2
+			// const groupToRemove = user.groups.filter((group: GroupMember) => group.conversation != conversationToRemove);
+			// user.groups.splice(groupToRemove);
+			// await this.usersRepository.save(user)
+
 			return ;
 		}
 		
