@@ -34,6 +34,59 @@ export class ChatService {
 	/***			   		    PRIVATE 		   	 		 	***/
 	/**************************************************************/
 
+	// le user foit avoir charge la relation groups.conversation
+	private async getRelatedGroup(user: User, conversation: Conversation): Promise<GroupMember | null> {
+
+		user.groups.forEach((group: GroupMember) => {
+			if (group.conversation.id == conversation.id)
+				return group;
+		});
+
+		return ;
+	}
+
+	private async getGroupIsAdminStatus(user: User, conversation: Conversation): Promise<boolean> {
+
+		user.groups.forEach((group: GroupMember) => {
+			if (group.conversation.id == conversation.id) {
+				if (group.isAdmin)
+					return true;
+				else
+					return false;
+			}
+		});
+
+		return false;
+	}
+
+	private async getGroupIsBanStatus(user: User, conversation: Conversation): Promise<boolean> {
+
+		user.groups.forEach((group: GroupMember) => {
+			if (group.conversation.id == conversation.id) {
+				if (group.isBan)
+					return true;
+				else
+					return false;
+			}
+		});
+
+		return false;
+	}
+
+	private async getGroupIsMuteStatus(user: User, conversation: Conversation): Promise<boolean> {
+
+		user.groups.forEach((group: GroupMember) => {
+			if (group.conversation.id == conversation.id) {
+				if (group.isMute)
+					return true;
+				else
+					return false;
+			}
+		});
+
+		return false;
+	}
+
 	private async hashChannelPassword(password: string) {
 
 		if (!password)
@@ -239,31 +292,6 @@ export class ChatService {
 		}
 	}
 
-
-	checkUserMuteStatus(user: User, conversation: Conversation) {
-
-		user.groups.forEach((group: GroupMember) => {
-			if (group.conversation.id == conversation.id) {
-				if (group.isMute)
-					return true;
-			}
-		})
-
-		return false;
-	}
-
-	checkUserBanStatus(user: User, conversation: Conversation) {
-
-		user.groups.forEach((group: GroupMember) => {
-			if (group.conversation.id == conversation.id) {
-				if (group.isBan)
-					return true;
-			}
-		})
-
-		return false;
-	}
-
 	/**************************************************************/
 	/***					CONVERSATION						***/
 	/**************************************************************/
@@ -319,7 +347,7 @@ export class ChatService {
 		});
 
 		// check if user is banned from this conversation
-		if (this.checkUserBanStatus(userToAdd, conversationToAdd)) {
+		if (await this.getGroupIsBanStatus(userToAdd, conversationToAdd)) {
 			console.log("Fatal error: user is ban from this channel");
 			return ;
 		}
@@ -391,17 +419,7 @@ export class ChatService {
 
 		if (user && conversationToUpdate) {
 			
-			let isAdmin : boolean;
-			
-			// dans un custom Guard?
-			user.groups.forEach((group: GroupMember) => {
-				if (group.conversation.id == conversationToUpdate.id) {
-					isAdmin = group.isAdmin;
-				}
-			});
-			console.log(user.login, " admin status: ", isAdmin);
-			
-			if (isAdmin) {
+			if (await this.getGroupIsAdminStatus(user, conversationToUpdate)) {
 				
 				conversationToUpdate.isPublic = updateConversationDto.isPublic;
 				conversationToUpdate.isProtected = updateConversationDto.isProtected;
@@ -452,7 +470,8 @@ export class ChatService {
 	
 	async createMessage(messageDto: MessageDto): Promise<Message> {
 		
-		const conversation : Conversation = await this.conversationRepository.findOne({ where: {id: messageDto.conversationID} }); 
+		const conversation : Conversation = await this.conversationRepository.findOne({ where: {id: messageDto.conversationID} });
+
 		if (conversation) {
 			const newMessage = new Message();
 			newMessage.from = messageDto.from;
