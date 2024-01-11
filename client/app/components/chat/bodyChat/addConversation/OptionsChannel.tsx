@@ -8,13 +8,14 @@ interface OptionsChannelProps {
 	title: string | null;
 }
 
-interface user {
-	login: string;
-	avatarURL: string;
-	isAdmin: boolean;
-	isMute: boolean;
-	isBan: boolean;
-}	
+// interface user {
+// 	login: string;
+// 	avatarURL: string;
+// 	isAdmin: boolean;
+// 	isMute: boolean;
+// 	isBan: boolean;
+// }
+
 const OptionsChannel: React.FC<OptionsChannelProps> = ({ name,  title }) => {
 
 	const [formValue, setFormValue] = useState('');
@@ -38,11 +39,11 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({ name,  title }) => {
 		};
 	  }, []);
 
-	const user = state.currentUserList.find((user: user) => user.login === name);
-	user.isAdmin = true;
-	user.isMute = false;
-	user.isBan = false;
-	console.log('user', user);
+	// const user = state.currentUserList.find((user: user) => user.login === name);
+	// user.isAdmin = true;
+	// user.isMute = false;
+	// user.isBan = false;
+	// console.log('user', user);
 	return (
 		<>
 		<div className="blur-background"></div>
@@ -50,7 +51,7 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({ name,  title }) => {
 			<div className="add_container">
 				<h2 className="add__title">{title}</h2>	
 				<div className="option-block">
-					{user.isAdmin ?
+					{/* {user.isAdmin ?
 						<img className="option-image" src="crown.png">
 						 	admin
 						</img>
@@ -66,7 +67,7 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({ name,  title }) => {
 						<img className="option-image" src="interdit.png">ban</img>
 						:
 						<img className="option-image-opacity" src="interdit.png">no ban</img>
-					}
+					} */}
 				</div>
 			</div>
 		</>
