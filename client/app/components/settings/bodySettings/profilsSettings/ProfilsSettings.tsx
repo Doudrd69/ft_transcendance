@@ -49,15 +49,24 @@ const ProfilsSettingsComponent: React.FC = () => {
 			});
 
 			if (response.ok) {
-				console.log('Nom d\'utilisateur envoyé avec succès au backend');
-				notify(1);
+				const userName = await response.json();
+				const { newUsername } = userName;
+				console.log("newusername: ", newUsername);
+				if (!userName) {
+					toast.warn("Error: username is already used");
+					return ;
+				}
+				else {
+					sessionStorage.setItem("currentUserLogin", newUsername);
+					notify(1);
+				}
 			} else {
 				const error = await response.json();
 				toast.warn(error.message[0]);
 				console.error('Fatal error: request failed');
 			}
 		} catch (error) {
-			console.error('Erreur lors de l\'envoi du nom d\'utilisateur au backend :', error);
+			console.error('Fatal error:', error);
 		}
 	};
 

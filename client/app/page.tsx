@@ -95,8 +95,11 @@ export default function Home() {
 			console.log(payload.sub);
 			console.log(payload.login);
 			sessionStorage.setItem("currentUserID", payload.sub);
-			sessionStorage.setItem("currentUserLogin", payload.login);
 			sessionStorage.setItem("2fa", payload.tfa_enabled);
+			if (!payload.username)
+				sessionStorage.setItem("currentUserLogin", payload.login);
+			else
+				sessionStorage.setItem("currentUserLogin", payload.username);
 			if (payload.tfa_enabled) {
 				setShow2FAForm(true);
 			}

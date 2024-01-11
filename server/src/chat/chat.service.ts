@@ -114,10 +114,10 @@ export class ChatService {
 			if (userGroup.conversation.is_channel) {
 				let userListForThisGRoup = [];
 				users.forEach((user_: User) => {
-					if (user_.login !== user.login) {
+					if (user_.username !== user.username) {
 						user_.groups.forEach((group: GroupMember) => {
 							if (group.conversation.id == userGroup.conversation.id) {
-								userListForThisGRoup.push({login: user_.login, avatarURL: user_.avatarURL});
+								userListForThisGRoup.push({login: user_.username, avatarURL: user_.avatarURL});
 							}
 						});
 					}
@@ -336,7 +336,7 @@ export class ChatService {
 	async addFriendToConversation(addUserToConversationDto: AddFriendToConversationDto): Promise<Conversation> {
 		
 		const userToAdd = await this.usersRepository.findOne({
-			where: { login: addUserToConversationDto.userToAdd },
+			where: { username: addUserToConversationDto.userToAdd },
 			relations: ['groups', 'groups.conversation'],
 		});
 		
@@ -372,7 +372,7 @@ export class ChatService {
 	async createFriendsConversation(initiator: User, friend: User): Promise<Conversation> {
 		
 		const room = new Conversation();
-		room.name = initiator.login + friend.login;;
+		room.name = initiator.username + friend.username;
 		room.is_channel = false;
 		await this.conversationRepository.save(room);
 		
