@@ -189,13 +189,13 @@ export class UsersService {
 			return false;
 		}
 
-		// recherche par login ou username?
+		// recherche username a mettre en place
 		const initiator = await this.usersRepository.findOne({
 			where: {login: friendRequestDto.initiatorLogin},
 			relations: ["initiatedFriendships"],
 		});
 
-		// recherche par login ou username?
+		// recherche par username a mettre en place?
 		const recipient = await this.usersRepository.findOne({
 			where: {login: friendRequestDto.recipientLogin},
 			relations: ["initiatedFriendships"],
@@ -231,7 +231,7 @@ export class UsersService {
 	
 	async updateFriendship(friendRequestDto: FriendRequestDto, flag: boolean): Promise<Conversation | Friendship> {
 
-		// recherche par login ou username?
+		// recherche par username a mettre en place
 		const initiator = await this.usersRepository.findOne({
 			where: { login: friendRequestDto.initiatorLogin },
 			relations: ["initiatedFriendships", "acceptedFriendships", "groups"],
