@@ -27,6 +27,8 @@ const SendBoxComponent: React.FC<SendBoxComponentProps> = ({ userSocket }) => {
 
 		e.preventDefault();
 
+		console.log("DTO --> ", messageDto);
+
 		const response = await fetch('http://localhost:3001/chat/newMessage', {
 			method: 'POST',
 			headers: {

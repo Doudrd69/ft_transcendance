@@ -166,7 +166,7 @@ export const setCurrentConversationID = (payload: string | null): Action => ({
 });
 
 export const setCurrentUserList= (payload: any | null): Action => ({
-	type: 'SET_CURRENT_CONVERSATION_ID',
+	type: 'SET_CURRENT_USER_LIST',
 	payload,
 });
 

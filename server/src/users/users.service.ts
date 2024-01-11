@@ -202,7 +202,9 @@ export class UsersService {
 	/***				FRIENDSHIP MANAGEMENT					***/
 	/**************************************************************/
 
-	async createFriendship(friendRequestDto: FriendRequestDto): Promise<Friendship | boolean> {
+	async createFriendship(friendRequestDto: FriendRequestDto): Promise<boolean> {
+
+		console.log("FRDto: ", friendRequestDto);
 
 		if (friendRequestDto.initiatorLogin === friendRequestDto.recipientLogin) {
 			console.log("Fatal error: user can't add himself as friend");
@@ -224,9 +226,12 @@ export class UsersService {
 			return false;
 		}
 
+		console.log(initiator.username);
+		console.log(recipient.username);
+
 		if (initiator) {
 			
-			const friendshipAlreadyExists = await this.friendshipRepository.findOne({
+			const friendshipAlreadyExists : Friendship = await this.friendshipRepository.findOne({
 				where: {initiator: initiator, friend: recipient},
 			});
 			
@@ -236,11 +241,11 @@ export class UsersService {
 				newFriendship.initiator = initiator;
 				newFriendship.friend = recipient;
 				await this.friendshipRepository.save(newFriendship);
-				return newFriendship;
+				return true;
 			}
 
 			console.log("A friend request between those two users already exists : FR id = ", friendshipAlreadyExists.id);
-			return friendshipAlreadyExists;
+			return friendshipAlreadyExists.isAccepted;
 		}
 		
 		console.log("Fatal errror: user does not exist");
