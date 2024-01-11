@@ -14,8 +14,8 @@ const Menu = (socket: { socket: Socket }) => {
 
     interface Game {
         gameId: number;
-        playerOneID: number;
-        playerTwoID: number;
+        playerOneID: string;
+        playerTwoID: string;
         scoreOne: number;
         scoreTwo: number;
     }

@@ -1,10 +1,9 @@
 import { Entity, Column, PrimaryGeneratedColumn, ManyToMany, OneToMany } from 'typeorm';
 
 @Entity()
-export class Game
-{
+export class Game {
 	@PrimaryGeneratedColumn()
-  	gameId: number;
+	gameId: number;
 
 	@Column()
 	playerOneID: string;

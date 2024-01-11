@@ -10,31 +10,15 @@ import {
 	Max
 } from 'class-validator';
 
-export class UpdateConversationDto {
-
+export class UnbanUserDto {
+   
     @IsNotEmpty()
 	@IsPositive()
 	@Max(1000)
 	conversationID: number;
 
-	@IsNotEmpty()
+    @IsNotEmpty()
 	@IsPositive()
 	@Max(1000)
 	userID: number;
-
-	@IsNotEmpty()
-	@IsBoolean()
-	isPublic: boolean;
-
-	@IsNotEmpty()
-	@IsBoolean()
-	isProtected: boolean;
-
-	@IsNotEmpty()
-	@Length(6, 20)
-	@IsAscii()
-	@IsAlpha()
-	@IsString()
-	@Matches(/^[^"';%()|<>\\]*$/)
-	newPassword?: string;
 }

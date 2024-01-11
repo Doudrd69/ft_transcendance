@@ -21,7 +21,7 @@ const AddFriendComponent: React.FC<AddFriendComponentProps> = ({ userSocket, upd
 		console.log("Friend to add :", formValue);
 
 		const friendRequestDto = {
-			initiatorLogin: sessionStorage.getItem("currentUserLogin"), // à remplacer
+			initiatorLogin: sessionStorage.getItem("currentUserLogin"),
 			recipientLogin: formValue,
 		};
 

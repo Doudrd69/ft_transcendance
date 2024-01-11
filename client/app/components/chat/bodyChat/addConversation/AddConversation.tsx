@@ -69,7 +69,7 @@ const AddConversationComponent: React.FC<AddConversationComponentProps> = ({ use
 		setIsPublic(true);
 		setPasswordValue('');
 	};
-	console.log("passowrd =====> ", passwordValue);
+
 	useEffect(() => {
 		const handleEscape = (event: KeyboardEvent) => {
 			if (event.key === 'Escape') {
