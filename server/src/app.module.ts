@@ -26,8 +26,9 @@ const dbPass = process.env.POSTGRES_PASSWORD;
 const dbUsername = process.env.DB_USERNAME;
 const dbName = process.env.DB_NAME;
 const dbHost = process.env.HOSTNAME;
+const url = process.env.PROJECT_URL;
 
-if (!dbPass || !dbUsername || !dbName || !dbHost) {
+if (!dbPass || !dbUsername || !dbName || !dbHost || !url) {
 throw new Error('One or more required environment variables are missing.');
 }
 
