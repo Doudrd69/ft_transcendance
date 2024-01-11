@@ -22,7 +22,8 @@ type ActionType =
   | 'SET_CURRENT_ROOM'
   | 'SET_CURRENT_USER_LIST'
   | 'SET_CURRENT_CONVERSATION_ID'
-  | 'SET_CURRENT_OPTION_CHANNEL_NAME';
+  | 'SET_CURRENT_OPTION_CHANNEL_NAME'
+  | 'SET_CURRENT_FRIEND';
 // Définir l'interface de l'action
 interface Action {
   type: ActionType;
@@ -44,6 +45,7 @@ interface ChatState {
 	showConfirmation:boolean,
 	showAddUser: boolean;
 	showAvatar: boolean;
+	showCreateChannel: boolean;
 	showListChannelAdd:boolean,
 	refreshChannel:boolean,
 	refreshFriendsList:boolean,
@@ -54,8 +56,11 @@ interface ChatState {
 	currentRoom: string | null;
 	currentUserList: any;
 	isAdmin: boolean;
+	showAddCreateChannel:boolean;
 	showOptionsChannel:boolean;
 	currentOptionChannelName:string | null;
+	currentFriend: string | null;
+	showPassword: boolean;
 	[key: string]: boolean  |number | string | null;
 }
 
@@ -81,9 +86,14 @@ const initialState: ChatState = {
 	currentConversationID: null,
 	currentConversationName: null,
 	currentChannel: null,
+	showCreateChannel: false,
+	showAddCreateChannel:false,
 	showOptionsChannel:false,
 	currentRoom: null,
 	currentUserList: null,
+	currentFriend: null,
+	currentConvID: null,
+	showPassword: false,
 	isAdmin: false,
 	currentOptionChannelName:'',
 };
@@ -123,6 +133,8 @@ const chatReducer = (state: ChatState, action: Action): ChatState => {
 			return { ...state, currentConversationID: action.payload ? parseInt(action.payload, 10) : null};
 		case 'SET_CURRENT_OPTION_CHANNEL_NAME':
 			return { ...state, currentOptionChannelName: action.payload || null };
+		case 'SET_CURRENT_FRIEND':
+			return { ...state, currentFriend: action.payload || null };
 	  default:
 		return state;
 	}
@@ -172,6 +184,11 @@ export const setCurrentUserList= (payload: any | null): Action => ({
 
 export const setCurrentOptionChannelName = (payload: string | null): Action => ({
 	type: 'SET_CURRENT_OPTION_CHANNEL_NAME',
+	payload,
+});
+
+export const setCurrentFriend = (payload: string | null): Action => ({
+	type: 'SET_CURRENT_FRIEND',
 	payload,
 });
   

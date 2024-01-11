@@ -30,7 +30,7 @@
 	color: aliceblue;
 	margin: 0px 10px 0px 0px;
 	font-size: 20px; /* Exemple de taille de police */
-	font-family: Arial, sans-serif;
+	font-family: 'Gill Sans' , sans-serif;
 	flex: 1;
 	border-radius: 10px;
 	background-color: var(--fourth);

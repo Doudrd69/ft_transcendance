@@ -18,10 +18,9 @@
 	height: 75%;
 	width: 75%;
     aspect-ratio: 1 / 1; /* Maintient la forme carrée */
-
-	background: rgba(255, 255, 255, 0.1);
-	border: 10px  solid rgb(116, 116, 116); 
-	border-radius: 5px;
+	background-color: transparent;
+	border:none;
+	/* border-radius: 50px; */
 }
 .bloc-pong,
 .bloc-profils,
@@ -34,7 +33,7 @@
 
 .bloc-username{
 	width: 80vw;
-	font-family: 'Arial', sans-serif;
+	font-family: 'Gill Sans' , sans-serif;
 	font-size: 10px;
 	margin:10px;
 	font-weight: 700;

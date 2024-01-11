@@ -3,6 +3,8 @@ import React, { useState, useEffect } from 'react';
 import { useChat } from '../../../ChatContext';
 import AddConversationComponent from '../../addConversation/AddConversation';
 import { Socket } from 'socket.io-client';
+import ListMyChannelComponent from '../../listMyChannel/ListMyChannel';
+import PasswordComponent from '../../listMyChannel/Password';
 
 interface Conversation {
 	id: string;
@@ -28,6 +30,7 @@ const ChannelListComponent: React.FC<ChanneListComponentProps> = ({ userSocket }
 	const [conversations, setConversations] = useState<Conversation[]>([]);
 	const [isAdmin, setIsAdmin] = useState<boolean[]>([]);
 	const [userList, setUserList] = useState<userList[]>([]);
+	const [isAdd, setIsAdd] = useState<boolean>(false);
 	
 
 	const loadDiscussions = async () => {
@@ -56,7 +59,8 @@ const ChannelListComponent: React.FC<ChanneListComponentProps> = ({ userSocket }
 			console.log("Fatal error");
 		}
 	};
-
+	
+	console.log("state.showPassword =====> ", state.showPassword);
 
 	useEffect(() => {
 		console.log("Loading conversations...");
@@ -64,18 +68,49 @@ const ChannelListComponent: React.FC<ChanneListComponentProps> = ({ userSocket }
 
 	}, [state.refreshChannel]);
 
+	const handleCloseAddCreate = () => {
+		dispatch({ type: 'DISABLE', payload: 'showAddCreateChannel' });
+	};
+
+	useEffect(() => {
+		const handleEscape = (event: KeyboardEvent) => {
+			if (event.key === 'Escape') {
+				handleCloseAddCreate();
+			}
+		};
+		
+			document.addEventListener('keydown', handleEscape);
+			return () => {
+			  document.removeEventListener('keydown', handleEscape);
+			};
+		  }, []);
 	return (
 		<div className="bloc-channel-list">
 		<button
-			className={`button-channel-list-add ${state.showAddChannel ? 'green-border' : ''}`}
+			className={`button-channel-list-add ${state.showAddCreateChannel ? 'green-border' : ''}`}
 			onClick={() => {
-			dispatch({ type: 'ACTIVATE', payload: 'showAddChannel' });
+			dispatch({ type: 'ACTIVATE', payload: 'showAddCreateChannel' });
 			}}
 		>
 			+
 		</button>
-		<div>
-			{state.showAddChannel ? <AddConversationComponent userSocket={userSocket} loadDiscussions={loadDiscussions} title="ADD CHANNEL" isChannel={true} /> : null}
+		<div className='create-add'>
+			{ state.showAddCreateChannel ?
+				<div className='blur'>
+					<img className="add_button_cancel" src='./close.png'  onClick={handleCloseAddCreate}/>
+					<div className='bloc-add-create'>
+						<button className='button-add' onClick= {() => {dispatch({type:'ACTIVATE', payload: 'showCreateChannel'})}}>
+							CREATE
+						</button>
+						<button className='button-add' onClick= {() => {dispatch({type:'ACTIVATE', payload: 'showAddChannel'})}}>
+							JOIN 
+						</button>
+					</div>
+				</div>
+				: null}
+			{state.showPassword ? <PasswordComponent userSocket={userSocket}/> : null}
+			{state.showAddChannel ? <ListMyChannelComponent userSocket={userSocket} isAdd={false} title="JOIN CHANNEL"></ListMyChannelComponent> : null}
+			{state.showCreateChannel ? <AddConversationComponent userSocket={userSocket} loadDiscussions={loadDiscussions} title="CREATE CHANNEL" isChannel={true} /> : null}
 		</div>
 		{conversations.map((conversation, index) => (
 				conversation.is_channel && (
@@ -89,9 +124,7 @@ const ChannelListComponent: React.FC<ChanneListComponentProps> = ({ userSocket }
 					dispatch({ type: 'SET_CURRENT_CONVERSATION_ID', payload: conversation.id });
 					dispatch({ type: 'SET_CURRENT_USER_LIST', payload: userList[index] });
 					console.log("userList[index] =====> ", index ,userList[index]);
-				}}
-				>
-				
+				}}>
 				{isAdmin[index] && <img className="icon-admin-channel" src='./crown.png' alt="private" />}
 				{conversation.isProtected &&  <img className="icon-password-channel" src='./password.png' alt="private" />}
 				{!conversation.isPublic && <img className="icon-private-channel" src='./private.png' alt="private" />}
