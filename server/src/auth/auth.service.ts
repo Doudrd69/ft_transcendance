@@ -95,6 +95,7 @@ export class AuthService {
 					const payload = {
 						sub: userData.id,
 						login: userData.login,
+						username: userData.username,
 						tfa_enabled: userData.TFA_isEnabled,
 						pp: userData.officialProfileImage,
 					};

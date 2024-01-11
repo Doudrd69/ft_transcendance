@@ -11,16 +11,16 @@ export class User {
 	@Column({ default: "1234" })
 	socketGame: string;
 
-  @Column({ default: false })
-  inGame: boolean;
+	@Column({ default: false })
+	inGame: boolean;
 
-  @Column()
-  login: string;
+	@Column()
+ 	login: string;
 
 	@Column()
 	firstname: string;
 
-	@Column({ default: "guest" })
+	@Column({ default: null })
 	username: string;
 
 	@Column({ default: "https://uxwing.com/wp-content/themes/uxwing/download/peoples-avatars/corporate-user-icon.png" })
