@@ -67,8 +67,6 @@ export class ChatService {
 				array.push(userListForThisGRoup);
 			}
 		});
-
-		// console.log("=================> ", array);
 	}
 
 	private async getAllMessages(conversationID: number): Promise<Message[]> {
@@ -163,7 +161,6 @@ export class ChatService {
 		}
 	}
 
-
 	async unmuteUserFromConversation(unmuteUserDto: UnmuteUserDto) {
 
 		const userToMute : User = await this.usersRepository.findOne({
@@ -252,7 +249,6 @@ export class ChatService {
 		return false;
 	}
 
-
 	checkUserBanStatus(user: User, conversation: Conversation) {
 
 		user.groups.forEach((group: GroupMember) => {
@@ -281,7 +277,7 @@ export class ChatService {
 		if (conversationToRemove && user) {
 
 			const groupToRemove = user.groups.filter((group: GroupMember) => group.conversation == conversationToRemove);
-			user.groups.delete(groupToRemove);
+			// user.groups.delete(groupToRemove);
 			await this.usersRepository.save(user);
 			return ;
 		}
@@ -303,7 +299,7 @@ export class ChatService {
 		
 		const userToAdd = await this.usersRepository.findOne({
 			where: { login: addUserToConversationDto.userToAdd },
-			relations: ['groups'],
+			relations: ['groups', 'groups.conversation'],
 		});
 
 		
