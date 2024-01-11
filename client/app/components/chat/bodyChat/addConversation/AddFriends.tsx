@@ -55,6 +55,7 @@ const AddFriendComponent: React.FC<AddFriendComponentProps> = ({ userSocket, upd
 			dispatch({ type: 'DISABLE', payload: 'showAddFriend' });
 			
 			console.log("Friend request successfully created");
+
 			if (userSocket.connected) {
 				userSocket.emit('addFriend', friendRequestDto, () => {
 					console.log("FriendRequest sent to General gateway");

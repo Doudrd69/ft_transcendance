@@ -6,8 +6,14 @@ import { useGlobal } from '@/app/GlobalContext';
 import './ProfilsSettings.css';
 import FileDropZoneComponent from './fileDropZone/FileDropZone';
 import AvatarImageComponent from '@/app/components/Avatar/Avatar';
+import { Socket } from 'socket.io-client'
 
-const ProfilsSettingsComponent: React.FC = () => {
+interface ProfileSettingsComponentProps {
+	userSocket: Socket;
+}
+
+const ProfilsSettingsComponent: React.FC<ProfileSettingsComponentProps> = ({ userSocket }) => {
+
 	const [newImage, setNewImage] = useState<File | null>(null);
 	const [username, setUsername] = useState('');
 	const { state, dispatch } = useGlobal();
@@ -58,6 +64,8 @@ const ProfilsSettingsComponent: React.FC = () => {
 				}
 				else {
 					sessionStorage.setItem("currentUserLogin", newUsername);
+					// emit pour update la room du user
+					userSocket.emit('joinRoom',  { roomName: sessionStorage.getItem("currentUserLogin"), roomID: sessionStorage.getItem("currentUserID") });
 					notify(1);
 				}
 			} else {

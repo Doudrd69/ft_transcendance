@@ -29,7 +29,8 @@ const AddConversationComponent: React.FC<AddConversationComponentProps> = ({ use
 			isProtected: isPassword,
 			password: isPassword ? '' : passwordValue,
 		}
-		console.log(conversationDto);
+
+		console.log("To create => ", conversationDto);
 
 		const response = await fetch('http://localhost:3001/chat/newConversation', {
 			method: 'POST',

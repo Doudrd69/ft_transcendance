@@ -4,8 +4,13 @@ import ProfilsSettingsComponent from './profilsSettings/ProfilsSettings';
 import GlobalSettingsComponent from './globalSettings/GlobalSettings';
 import GameSettingsComponent from './gameSettings/GameSettings';
 import { useGlobal } from '@/app/GlobalContext';
+import { Socket } from 'socket.io-client'
 
-const BodySettingsComponent: React.FC = () => {
+interface BodySettingsComponentProps {
+	userSocket: Socket;
+}
+
+const BodySettingsComponent: React.FC<BodySettingsComponentProps> = ({ userSocket }) => {
 
 	const { state, dispatch } = useGlobal();
 
@@ -13,7 +18,7 @@ const BodySettingsComponent: React.FC = () => {
 		condition ? component : null;
 		return (
 				<div className="bloc-body-settings">
-					{renderComponent(<ProfilsSettingsComponent/>, state.showProfilsSettings)}
+					{renderComponent(<ProfilsSettingsComponent userSocket={userSocket}/>, state.showProfilsSettings)}
 					{renderComponent(<GlobalSettingsComponent/>, state.showGeneralSettings)}
 					{renderComponent(<GameSettingsComponent/>, state.showGameSettings)}
 				</div>
