@@ -97,7 +97,6 @@ const ProfilsSettingsComponent: React.FC = () => {
 	};
 
 	const [imageURL, setImageURL] = useState<string | null>(null);
-	// Utilisez useEffect pour mettre à jour l'URL de l'image lorsque newImage change
 	useEffect(() => {
 		if (newImage) {
 			const fileReader = new FileReader();
@@ -112,27 +111,26 @@ const ProfilsSettingsComponent: React.FC = () => {
 			setImageURL(null);
 		}
 	}, [newImage]);
-
 	return (
 		<div className="bloc-profils-settings">
 			<div className="upload-image">
-			{imageURL ? (
-				<img src={imageURL} alt="Profile Image" className="profil-image" />
-				) : (<AvatarImageComponent className="profil-image"/>
-						)}
+			{imageURL ?
+				(<img src={imageURL} alt="profile-image" className="profil-image" />) 
+				:
+				(<AvatarImageComponent className="profil-image"/>)}
 				<FileDropZoneComponent onChange={(newImage) => setNewImage(newImage)} />
 				<button className="button-modified-image" onClick={() => {handleImage()}}>
 					Update Avatar
 				</button>
 			</div>
 			<div className="change-username">
-			<form onSubmit={handleUsernameSubmit}>
-				<label className="form-change-username">
-					Update Username:
-					<input type="text" value={username} onChange={(e) => setUsername(e.target.value)} />
-				</label>
-				<button className="button-modified-username" type="submit">Envoyer</button>
-			</form>
+				<form onSubmit={handleUsernameSubmit}>
+					<label className="form-change-username">
+						Update Username:
+						<input type="text" value={username} onChange={(e) => setUsername(e.target.value)} />
+					</label>
+				</form>
+				<button className="button-modified-username" type="submit">Update Username</button>
 			</div>
 		</div>
 	);

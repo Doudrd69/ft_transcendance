@@ -155,7 +155,7 @@ const HeaderComponent: React.FC = () => {
 					}}}>
 						{renderComponent(<AvatarImageComponent className="profils" refresh={state.showRefresh}/>, state.showUploadAvatar)}
 				</button>
-		</div>
+			</div>
 		<div className="bloc-pong">PONG&CHAT</div>
 		<div className="bloc-settings">
 			<button
