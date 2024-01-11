@@ -124,9 +124,7 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 
 	@SubscribeMessage('addFriend')
 	handleFriendRequest(@MessageBody() dto: any) {
-		console.log(dto);
 		this.server.to(dto.recipientLogin).emit('friendRequest', {
-			recipientID: dto.recipientID,
 			recipientLogin: dto.recipientLogin,
 			initiatorLogin: dto.initiatorLogin,
 		});

@@ -18,8 +18,6 @@ const AddFriendComponent: React.FC<AddFriendComponentProps> = ({ userSocket, upd
 
 		e.preventDefault();
 
-		console.log("Friend to add :", formValue);
-
 		const friendRequestDto = {
 			initiatorLogin: sessionStorage.getItem("currentUserLogin"),
 			recipientLogin: formValue,
@@ -39,12 +37,7 @@ const AddFriendComponent: React.FC<AddFriendComponentProps> = ({ userSocket, upd
 			dispatch({ type: 'TOGGLEX', payload: 'refreshFriendsList'});
 
 			const data = await response.json();
-
-			if (data.isAccepted) {
-				console.log("A friendrequest has already been sent to this user.");
-				return ;
-			}
-
+			console.log("Return ", data);
 			if (!data) {
 				console.log("Request denied, please enter a valid username");
 				return ;
@@ -53,13 +46,9 @@ const AddFriendComponent: React.FC<AddFriendComponentProps> = ({ userSocket, upd
 			dispatch({ type: 'DISABLE', payload: 'showAddChannel' });
 			dispatch({ type: 'DISABLE', payload: 'showAddUser' });
 			dispatch({ type: 'DISABLE', payload: 'showAddFriend' });
-			
-			console.log("Friend request successfully created");
 
 			if (userSocket.connected) {
-				userSocket.emit('addFriend', friendRequestDto, () => {
-					console.log("FriendRequest sent to General gateway");
-				});
+				userSocket.emit('addFriend', friendRequestDto);
 			}
 		}
 		else {

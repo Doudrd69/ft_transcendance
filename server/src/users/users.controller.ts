@@ -155,7 +155,7 @@ export class UsersController {
 	@UseGuards(AuthGuard)
 	@HttpCode(HttpStatus.OK)
 	@Post('addfriend')
-	createFriendship(@Body() friendRequestDto: FriendRequestDto): Promise<Friendship | boolean> {
+	createFriendship(@Body() friendRequestDto: FriendRequestDto): Promise<boolean> {
 		return this.usersService.createFriendship(friendRequestDto);
 	}
 

@@ -62,6 +62,7 @@ export default function Home() {
 
 		if (response.ok) {
 			const conversationData = await response.json();
+			console.log("convData: ", conversationData);
 			if (userSocket.connected) {
 				userSocket.emit('friendRequestAccepted', {roomName: conversationData.name, roomID: conversationData.id, initiator: friendRequestDto.initiatorLogin, recipient: friendRequestDto.recipientLogin});
 				userSocket.emit('joinRoom', {roomName: conversationData.name, roomID: conversationData.id} );
