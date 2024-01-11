@@ -32,8 +32,6 @@ export class UsersService {
 
 		const userToUpdate = await this.usersRepository.findOne({ where: {id: userID} });
 		if (userToUpdate) {
-			if (userToUpdate.TFA_secret)
-				return ;
 			userToUpdate.TFA_temp_secret = secret;
 			return this.usersRepository.save(userToUpdate);
 		}
@@ -45,7 +43,7 @@ export class UsersService {
 		// hash le code?
 		user.TFA_secret = code;
 		user.TFA_isEnabled = flag;
-		console.log("-- 2FA UPDATED --");
+		console.log("-- 2FA UPDATED to ", flag, " --");
 		return this.usersRepository.save(user);
 	}
 
