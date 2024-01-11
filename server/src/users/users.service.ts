@@ -24,6 +24,16 @@ export class UsersService {
 		private chatService: ChatService,
 	) {}
 
+	private async isUsernameValid(usernameToFInd: string): Promise<boolean> {
+
+		const usernameMatch = await this.usersRepository.findOne({ where: {username: usernameToFInd } });
+
+		if (usernameMatch) {
+			return false;
+		}
+		return true;
+	}
+
 	/**************************************************************/
 	/***							2FA							***/
 	/**************************************************************/
@@ -32,8 +42,6 @@ export class UsersService {
 
 		const userToUpdate = await this.usersRepository.findOne({ where: {id: userID} });
 		if (userToUpdate) {
-			if (userToUpdate.TFA_secret)
-				return ;
 			userToUpdate.TFA_temp_secret = secret;
 			return this.usersRepository.save(userToUpdate);
 		}
@@ -45,7 +53,7 @@ export class UsersService {
 		// hash le code?
 		user.TFA_secret = code;
 		user.TFA_isEnabled = flag;
-		console.log("-- 2FA UPDATED --");
+		console.log("-- 2FA UPDATED to ", flag, " --");
 		return this.usersRepository.save(user);
 	}
 
@@ -153,6 +161,7 @@ export class UsersService {
 	async updateUserStatus(userID: number, flag: boolean) {
 
 		const user = await this.usersRepository.findOne({where: { id: userID }});
+		
 		if (user) {
 			user.isActive = flag;
 			return await this.usersRepository.save(user);
@@ -162,22 +171,31 @@ export class UsersService {
 	async createNew42User(userData): Promise<User> {
 		const new42User = new User();
 		new42User.login = userData.login;
+		new42User.username = userData.login;
 		new42User.firstname = userData.firstname;
 		new42User.officialProfileImage = userData.image;
 		new42User.groups = [];
 		return this.usersRepository.save(new42User);
 	}
+	
+	async updateUsername(updateUsernameDto: UpdateUsernameDto) {
+		
+		const user : User = await this.usersRepository.findOne({ where: {id: updateUsernameDto.userID} });
+		const usernameValidation = await this.isUsernameValid(updateUsernameDto.newUsername);
+		
+		if (usernameValidation) {
 
-	async updateUsername(updateUsernameDto: UpdateUsernameDto): Promise<User> {
-
-		const user = await this.usersRepository.findOne({ where: {id: updateUsernameDto.userID} });
-		if (user) {
-			user.username = updateUsernameDto.newUsername;
-			return await this.usersRepository.save(user);
+			if (user) {
+				user.username = updateUsernameDto.newUsername;
+				await this.usersRepository.save(user);
+				return { newUsername: user.username };
+			}
+			console.error("Fatal error: user not found");
+			return { newUsername: null };
 		}
 
-		console.error("Fatal error: user not found");
-		return;
+		console.log("Error: this username is already used");
+		return { newUsername: null };
 	}
 
 	/**************************************************************/
@@ -191,15 +209,15 @@ export class UsersService {
 			return false;
 		}
 
-		// recherche par login ou username?
+		// recherche username a mettre en place
 		const initiator = await this.usersRepository.findOne({
-			where: {login: friendRequestDto.initiatorLogin},
+			where: {username: friendRequestDto.initiatorLogin},
 			relations: ["initiatedFriendships"],
 		});
 
-		// recherche par login ou username?
+		// recherche par username a mettre en place?
 		const recipient = await this.usersRepository.findOne({
-			where: {login: friendRequestDto.recipientLogin},
+			where: {username: friendRequestDto.recipientLogin},
 			relations: ["initiatedFriendships"],
 		});
 
@@ -233,14 +251,14 @@ export class UsersService {
 	
 	async updateFriendship(friendRequestDto: FriendRequestDto, flag: boolean): Promise<Conversation | Friendship> {
 
-		// recherche par login ou username?
+		// recherche par username a mettre en place
 		const initiator = await this.usersRepository.findOne({
-			where: { login: friendRequestDto.initiatorLogin },
+			where: { username: friendRequestDto.initiatorLogin },
 			relations: ["initiatedFriendships", "acceptedFriendships", "groups"],
 		});
 
 		const friend = await this.usersRepository.findOne({
-			where: { login: friendRequestDto.recipientLogin },
+			where: { username: friendRequestDto.recipientLogin },
 			relations: ["initiatedFriendships", "acceptedFriendships", "groups"],
 		});
 	  
@@ -299,16 +317,15 @@ export class UsersService {
 	}
 
 	async getUserByLogin(loginToSearch: string): Promise<User> {
-		return await this.usersRepository.findOne({ where: {login: loginToSearch}});
+		return await this.usersRepository.findOne({ where: {username: loginToSearch}});
 	}
 
 	async getFriendships(username: string): Promise<Friendship[]> {
 
 		console.log(username, "friend list loading...");
-		let user = new User();
-		// recherche par login ou username?
-		user = await this.usersRepository.findOne({
-			where: {login: username},
+
+		const user : User = await this.usersRepository.findOne({
+			where: { username: username },
 			relations: ["initiatedFriendships.friend", "acceptedFriendships.initiator"],
 		});
 
@@ -316,6 +333,8 @@ export class UsersService {
 			let initiatedfriends = await user.initiatedFriendships.filter((friendship: Friendship) => friendship.isAccepted);
 			let acceptedfriends = await user.acceptedFriendships.filter((friendship: Friendship) => friendship.isAccepted);
 			const friends = [...initiatedfriends, ...acceptedfriends];
+
+			console.log(friends)
 			return friends;
 		}
 		return [];
@@ -324,10 +343,10 @@ export class UsersService {
 	async getPendingFriendships(username: string): Promise<Friendship[]> {
 
 		console.log(username, " pending friendships loading...");
+
 		let user = new User();
-		// recherche par login ou username?
 		user = await this.usersRepository.findOne({
-			where: {login: username},
+			where: { username: username },
 			relations: ["initiatedFriendships.friend", "acceptedFriendships.initiator"],
 		});
 

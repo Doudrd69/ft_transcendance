@@ -28,9 +28,8 @@ const dbName = process.env.DB_NAME;
 const dbHost = process.env.HOSTNAME;
 
 if (!dbPass || !dbUsername || !dbName || !dbHost) {
-throw new Error('One or more required environment variables are missing.');
+	throw new Error('One or more required environment variables are missing.');
 }
-
 
 @Module({
 	

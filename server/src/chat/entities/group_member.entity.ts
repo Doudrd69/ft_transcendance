@@ -11,6 +11,12 @@ export class GroupMember {
   @Column({ default: false })
   isAdmin: boolean;
 
+  @Column({ default: false})
+  isBan: boolean;
+
+  @Column({ default: false})
+  isMute: boolean;
+
   @ManyToOne(() => Conversation)
   conversation: Conversation;
   

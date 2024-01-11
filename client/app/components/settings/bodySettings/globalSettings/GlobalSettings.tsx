@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 
 const GlobalSettingsComponent: React.FC = () => {
+
 	const [authenticatorCodeInput, setAuthenticatorCodeInput] = useState('');
 	const [urlQrCode, setUrlQrCode] = useState('');
 	const handleAuthenticatorCodeInput = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -11,50 +12,55 @@ const GlobalSettingsComponent: React.FC = () => {
 	const [activeUrlImg, setActiveUrlImg] = useState(false);
 
 	const desactivate2FA = async () => {
+
 		const tfaDto = {
 			userID: Number(sessionStorage.getItem("currentUserID")),
-			}
+		}
 	
-			const response = await fetch('http://localhost:3001/auth/desactivate2fa', {
+		const response = await fetch('http://localhost:3001/auth/desactivate2fa', {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
 				'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
 			},
 			body: JSON.stringify(tfaDto),
-			});
+		});
 	
-			if (response.ok) {
-				setActiveUrlImg(false);
-			} else {
-				const error = await response.json();
-			}
-	  }
+		if (response.ok) {
+			setActiveUrlImg(false);
+			toast.warn("2fa is now disabled");
+
+		} else {
+			const error = await response.json();
+			console.log(error.message);
+		}
+	}
+
 	const activate2FA = async () => {
 
 		const tfaDto = {
-		userID: Number(sessionStorage.getItem("currentUserID")),
+			userID: Number(sessionStorage.getItem("currentUserID")),
 		}
 
 		const response = await fetch('http://localhost:3001/auth/request2fa', {
-		method: 'POST',
-		headers: {
-			'Content-Type': 'application/json',
-			'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
-		},
-		body: JSON.stringify(tfaDto),
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
+			},
+			body: JSON.stringify(tfaDto),
 		});
 
 		if (response.ok) {
 			const qrcode = await response.json();
-			console.log("2FA QRCode => ", qrcode.qrcodeURL);
+			// console.log("2FA QRCode => ", qrcode.qrcodeURL);
 			setUrlQrCode(qrcode.qrcodeURL);
 			setActiveUrlImg(true);
 		} else {
 		const error = await response.json();
 		console.log("Fatal error: ", error.message);
 		}
-		console.log("activateUrlImge: ", activeUrlImg);
+		console.log("activateUrlImage: ", activeUrlImg);
 
 	}
 
@@ -86,8 +92,9 @@ const GlobalSettingsComponent: React.FC = () => {
 			toast.warn(error.message);
 		}
 	}
+
 	useEffect(() => {
-		console.log("!!!!!!", activeUrlImg);
+		console.log("urlImg = ", activeUrlImg);
 		sessionStorage.getItem("2faEnabled") === "true" ? setActiveUrlImg(true) : setActiveUrlImg(false);
 	},[]);
 	
