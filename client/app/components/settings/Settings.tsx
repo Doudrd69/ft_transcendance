@@ -3,8 +3,13 @@ import React, { useState, useEffect } from 'react';
 import HeaderSettingsComponent from './headerSettings/HearderSettings';
 import BodySettingsComponent from './bodySettings/BodySettings';
 import { useGlobal } from '@/app/GlobalContext';
+import { Socket } from 'socket.io-client'
 
-const SettingsComponent: React.FC = () => {
+interface SettingsComponentProps {
+	userSocket: Socket;
+}
+
+const SettingsComponent: React.FC<SettingsComponentProps> = ({ userSocket }) => {
 	const {dispatch} = useGlobal();
 
 	useEffect(() => {
@@ -31,7 +36,7 @@ const SettingsComponent: React.FC = () => {
 			<img className="add_button_cancel" src='./close.png'  onClick={handleCloseSettings}/>
 			<div className="window-settings">
 				<HeaderSettingsComponent></HeaderSettingsComponent>
-				<BodySettingsComponent></BodySettingsComponent>
+				<BodySettingsComponent userSocket={userSocket}></BodySettingsComponent>
 			</div>
 		</div>
 	);

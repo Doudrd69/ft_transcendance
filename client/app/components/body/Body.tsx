@@ -26,7 +26,7 @@ const BodyComponent: React.FC<BodyComponentProps> = ({ userSocket, gameSocket })
 	return (
 		<>
 				<div className="container">
-					{renderComponent(<SettingsComponent/>, state.showSettings)}
+					{renderComponent(<SettingsComponent userSocket={userSocket}/>, state.showSettings)}
 						<ChatComponent userSocket={userSocket}/>
 						<GameProvider>
 							<GameComponent socket={gameSocket}/>

@@ -112,16 +112,22 @@ export class ChatService {
 		let array = [];
 		user.groups.forEach((userGroup: GroupMember) => {
 			if (userGroup.conversation.is_channel) {
-				let userListForThisGRoup = [];
+				let userListForThisGroup = [];
 				users.forEach((user_: User) => {
 						user_.groups.forEach((group: GroupMember) => {
 							if (group.conversation.id == userGroup.conversation.id) {
 								if (group.conversation.is_channel)
-									userListForThisGRoup.push({login: user_.login, avatarURL: user_.avatarURL});
+									userListForThisGroup.push({
+										login: user_.login,
+										avatarURL: user_.avatarURL,
+										isAdmin: group.isAdmin,
+										isBan: group.isBan,
+										isMute: group.isMute,
+									});
 							}
 						});
 				});
-				array.push(userListForThisGRoup);
+				array.push(userListForThisGroup);
 			}
 		});
 

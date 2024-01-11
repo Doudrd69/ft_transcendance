@@ -209,13 +209,11 @@ export class UsersService {
 			return false;
 		}
 
-		// recherche username a mettre en place
 		const initiator = await this.usersRepository.findOne({
 			where: {username: friendRequestDto.initiatorLogin},
 			relations: ["initiatedFriendships"],
 		});
 
-		// recherche par username a mettre en place?
 		const recipient = await this.usersRepository.findOne({
 			where: {username: friendRequestDto.recipientLogin},
 			relations: ["initiatedFriendships"],
