@@ -80,3 +80,22 @@
 	flex-direction: column;
 	align-items: center;
   }
+
+.list-users-channel{
+	background-color: var(--fourth);
+
+	margin: 10px;
+	margin-top: 0px;
+	border-radius: 10px;
+	display: flex;
+	flex-direction: row;
+}
+
+.img-list-users-channel{
+	width: 50px;
+	height: auto;
+	margin: 10px;
+}
+.admin{
+
+}

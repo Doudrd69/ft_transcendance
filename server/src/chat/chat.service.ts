@@ -51,19 +51,19 @@ export class ChatService {
 			if (userGroup.conversation.is_channel) {
 				let userListForThisGRoup = [];
 				users.forEach((user_: User) => {
-					if (user_.login !== user.login) {
 						user_.groups.forEach((group: GroupMember) => {
 							if (group.conversation.id == userGroup.conversation.id) {
-								userListForThisGRoup.push({login: user_.login, avatarURL: user_.avatarURL});
+								if (group.conversation.is_channel)
+									userListForThisGRoup.push({login: user_.login, avatarURL: user_.avatarURL});
 							}
 						});
-					}
 				});
 				array.push(userListForThisGRoup);
 			}
 		});
 
-		// console.log("=================> ", array);
+		console.log("=================> ", array);
+		return array;
 	}
 
 	private async getAllMessages(conversationID: number): Promise<Message[]> {
@@ -92,7 +92,8 @@ export class ChatService {
 			let conversationArray : Conversation[] = [];
 			if (userToFind.groups && Array.isArray(userToFind.groups)) {
 				userToFind.groups.forEach((group: GroupMember) => {
-					conversationArray.push(group.conversation)
+					if (group.conversation.is_channel)
+						conversationArray.push(group.conversation)
 				})
 				return conversationArray;
 			}
@@ -376,15 +377,15 @@ export class ChatService {
 			});
 
 			const conversationList = await this.getAllConversations(userID);
-			const usersList = this.getUserListFromConversations(user, conversationList);
+			const usersList = await this.getUserListFromConversations(user, conversationList);
 			if (conversationList && usersList) {
 
 				const conversationArray = {
 					conversationList: conversationList,
 					isAdmin: isAdminArray,
-					userList: usersList,
+					usersList: usersList,
 				}
-
+				console.log("userList => ", conversationArray.usersList);	
 				return conversationArray;
 			}
 		}

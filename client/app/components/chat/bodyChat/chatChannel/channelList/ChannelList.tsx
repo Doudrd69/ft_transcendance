@@ -9,10 +9,15 @@ interface Conversation {
 	name: string;
 	is_channel: boolean;
 	isPublic: boolean;
+	isProtected: boolean;
 }
 
 interface ChanneListComponentProps {
 	userSocket: Socket;
+}
+interface userList {
+	login: string;
+	avatarURL: string;
 }
 
 const ChannelListComponent: React.FC<ChanneListComponentProps> = ({ userSocket }) => {
@@ -22,6 +27,7 @@ const ChannelListComponent: React.FC<ChanneListComponentProps> = ({ userSocket }
 	const userID = Number(sessionStorage.getItem("currentUserID"));
 	const [conversations, setConversations] = useState<Conversation[]>([]);
 	const [isAdmin, setIsAdmin] = useState<boolean[]>([]);
+	const [userList, setUserList] = useState<userList[]>([]);
 	
 
 	const loadDiscussions = async () => {
@@ -40,7 +46,11 @@ const ChannelListComponent: React.FC<ChanneListComponentProps> = ({ userSocket }
 				setConversations([...conversationList]);
 			if (isAdmin)
 				setIsAdmin([...isAdmin]);
-			console.log("conversation --> ", conversationList);
+			if (usersList ) {
+				setUserList([...usersList]);
+			}	
+			console.log("userList --> ", userList);
+			console.log("isAdmin --> ", isAdmin);
 		}
 		else {
 			console.log("Fatal error");
@@ -64,7 +74,9 @@ const ChannelListComponent: React.FC<ChanneListComponentProps> = ({ userSocket }
 		>
 			+
 		</button>
-		{state.showAddChannel && <AddConversationComponent userSocket={userSocket} loadDiscussions={loadDiscussions} title="ADD CHANNEL" isChannel={true}/>}
+		<div>
+			{state.showAddChannel ? <AddConversationComponent userSocket={userSocket} loadDiscussions={loadDiscussions} title="ADD CHANNEL" isChannel={true} /> : null}
+		</div>
 		{conversations.map((conversation, index) => (
 				conversation.is_channel && (
 				<button
@@ -75,11 +87,13 @@ const ChannelListComponent: React.FC<ChanneListComponentProps> = ({ userSocket }
 					dispatch({ type: 'SET_CURRENT_CONVERSATION', payload: conversation.name });
 					dispatch({ type: 'SET_CURRENT_CONVERSATION_ID', payload: conversation.id });
 					dispatch({ type: 'SET_CURRENT_CONVERSATION_ID', payload: conversation.id });
+					dispatch({ type: 'SET_CURRENT_USER_LIST', payload: userList[index] });
+					console.log("userList[index] =====> ", index ,userList[index]);
 				}}
 				>
 				
 				{isAdmin[index] && <img className="icon-admin-channel" src='./crown.png' alt="private" />}
-				 <img className="icon-password-channel" src='./password.png' alt="private" />
+				{conversation.isProtected &&  <img className="icon-password-channel" src='./password.png' alt="private" />}
 				{!conversation.isPublic && <img className="icon-private-channel" src='./private.png' alt="private" />}
 				<span>{conversation.name}</span>
 			</button>
