@@ -14,11 +14,13 @@ interface BodyChatComponentProps {
 const ChatChannelComponent: React.FC<BodyChatComponentProps> = ({ userSocket }) => {
   const { state, dispatch } = useChat();
 
-  const renderComponent = (component: React.ReactNode, condition: boolean) =>
+  	const renderComponent = (component: React.ReactNode, condition: boolean) =>
     condition ? component : null;
+
 
   return (
     <div className="chat-channel">
+
 		{renderComponent(<ChannelListComponent userSocket={userSocket} />, state.showChannelList)}
 		{renderComponent(<ReceiveBoxChannelComponent userSocket={userSocket} />, state.showChannel)}
 		{renderComponent(<SendBoxChannelComponent userSocket={userSocket}/>, state.showChannel)}

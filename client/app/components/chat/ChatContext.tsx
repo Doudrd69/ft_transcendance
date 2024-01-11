@@ -2,6 +2,14 @@
 import React, { createContext, useContext, useReducer } from 'react';
 
 // Définir les types d'action
+interface userList {
+	login: string;
+	avatarURL: string;
+	isAdmin: boolean;
+	isMute: boolean;
+	isBan: boolean;
+}
+
 type ActionType =
   | 'ACTIVATE'
   | 'DISABLE'
@@ -12,12 +20,13 @@ type ActionType =
   | 'SET_CURRENT_CONVERSATION'
   | 'SET_CURRENT_CHANNEL'
   | 'SET_CURRENT_ROOM'
-  | 'SET_CURRENT_CONVERSATION_ID';
-
+  | 'SET_CURRENT_USER_LIST'
+  | 'SET_CURRENT_CONVERSATION_ID'
+  | 'SET_CURRENT_OPTION_CHANNEL_NAME';
 // Définir l'interface de l'action
 interface Action {
   type: ActionType;
-  payload?: string | null | undefined; // Utilisé pour les actions qui ont un payload
+  payload?: string | any | null | undefined; // Utilisé pour les actions qui ont un payload
 }
 
 // Définir l'interface de l'état
@@ -43,7 +52,11 @@ interface ChatState {
 	currentConversationID: number | null;
 	currentChannel: string | null;
 	currentRoom: string | null;
-	[key: string]: boolean | number | string | null;
+	currentUserList: any;
+	isAdmin: boolean;
+	showOptionsChannel:boolean;
+	currentOptionChannelName:string | null;
+	[key: string]: boolean  |number | string | null;
 }
 
 // État initial
@@ -68,7 +81,11 @@ const initialState: ChatState = {
 	currentConversationID: null,
 	currentConversationName: null,
 	currentChannel: null,
+	showOptionsChannel:false,
 	currentRoom: null,
+	currentUserList: null,
+	isAdmin: false,
+	currentOptionChannelName:'',
 };
 
 // Réducteur
@@ -100,8 +117,12 @@ const chatReducer = (state: ChatState, action: Action): ChatState => {
 			return { ...state, currentChannel: action.payload || null };
 		case 'SET_CURRENT_ROOM':
 			return { ...state, currentRoom: action.payload || null }; 
+		case 'SET_CURRENT_USER_LIST':
+				return { ...state, currentUserList: action.payload || null }; 
 		case 'SET_CURRENT_CONVERSATION_ID':
 			return { ...state, currentConversationID: action.payload ? parseInt(action.payload, 10) : null};
+		case 'SET_CURRENT_OPTION_CHANNEL_NAME':
+			return { ...state, currentOptionChannelName: action.payload || null };
 	  default:
 		return state;
 	}
@@ -143,6 +164,17 @@ export const setCurrentConversationID = (payload: string | null): Action => ({
 	type: 'SET_CURRENT_CONVERSATION_ID',
 	payload,
 });
+
+export const setCurrentUserList= (payload: any | null): Action => ({
+	type: 'SET_CURRENT_CONVERSATION_ID',
+	payload,
+});
+
+export const setCurrentOptionChannelName = (payload: string | null): Action => ({
+	type: 'SET_CURRENT_OPTION_CHANNEL_NAME',
+	payload,
+});
+  
   
 // Hook personnalisé pour utiliser le contexte
 export const useChat = () => {
