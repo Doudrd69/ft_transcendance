@@ -3,11 +3,6 @@ import { Socket } from 'socket.io-client';
 import { useChat } from '../../ChatContext';
 import './AddConversation.css';
 
-interface OptionsUserChannelProps {
-	name: string | null;
-	title: string | null;
-}
-
 interface user {
 	login: string;
 	avatarURL: string;
@@ -16,7 +11,12 @@ interface user {
 	isBan: boolean;
 }
 
-const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ name,  title }) => {
+interface OptionsUserChannelProps {
+	name: string | null;
+	title: string | null;
+	user: user
+}
+const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ name,  title, user }) => {
 
 	const [formValue, setFormValue] = useState('');
 	const { state, dispatch } = useChat();
@@ -38,6 +38,68 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ name,  title })
 		  document.removeEventListener('keydown', handleEscape);
 		};
 	  }, []);
+
+	const handleMute = async() => {
+		try {
+			const userOptionDto = {conversationID: state.currentConversationID, userID: state.currentUserID, state : user.isMute}
+			const response = await fetch(`http://localhost:3001/chat/getMessages/muteUser`, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
+				},
+				body: JSON.stringify(userOptionDto),
+			});
+	
+			if (response.ok) {
+				user.isMute = !user.isMute;
+				console.log("Mute");
+			}
+			} catch (error) {
+			console.log(error);
+			}
+	}
+
+	const handleBan = async() => {
+		try {
+			const userOptionDto = {conversationID: state.currentConversationID, userID: state.currentUserID, state : user.isBan}
+			const response = await fetch(`http://localhost:3001/chat/banUser`, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
+				},
+				body: JSON.stringify(userOptionDto),
+			});
+	
+			if (response.ok) {
+				user.isBan = !user.isBan;
+				console.log("Mute");
+			}
+			} catch (error) {
+			console.log(error);
+			}
+	}
+	const handleAdmin = async() => {
+		try {
+			const userOptionDto = {conversationID: state.currentConversationID, userID: state.currentUserID, state : user.isAdmin}
+			const response = await fetch(`http://localhost:3001/chat/adminUser`, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
+				},
+				body: JSON.stringify(userOptionDto),
+			});
+	
+			if (response.ok) {
+				user.isAdmin = !user.isAdmin;
+				console.log("Mute");
+			}
+			} catch (error) {
+			console.log(error);
+			}
+	}
 	return (
 		<>
 		<div className="blur-background"></div>
@@ -45,23 +107,21 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ name,  title })
 			<div className="add_container">
 				<h2 className="add__title">{title}</h2>	
 				<div className="option-block">
-					{/* {user.isAdmin ?
-						<img className="option-image" src="crown.png">
-						 	admin
-						</img>
+					{user.isAdmin ?
+						<img className="option-image" src="crown.png"/>
 						:
-						<img className="option-image-opacity" src="crown.png">no admmin</img>
+						<img className="option-image-opacity" src="crown.png"/>
 					}
 					{user.isMute ?
-						<img className="option-image" src="volume-mute.png">mute</img>
+						<img className="option-image" src="volume-mute.png"/>
 						:
-						<img className="option-image-opacity" src="volume-mute.png">no mute </img>
+						<img className="option-image-opacity" src="volume-mute.png"/>
 					}
 					{user.isBan ?
-						<img className="option-image" src="interdit.png">ban</img>
+						<img className="option-image" src="interdit.png"/>
 						:
-						<img className="option-image-opacity" src="interdit.png">no ban</img>
-					} */}
+						<img className="option-image-opacity" src="interdit.png"/>
+					}
 				</div>
 			</div>
 		</>
