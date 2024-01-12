@@ -123,8 +123,8 @@ const ChannelListComponent: React.FC<ChanneListComponentProps> = ({ userSocket }
 						dispatch({ type: 'TOGGLE', payload: 'showChannel' });
 						dispatch({ type: 'SET_CURRENT_CONVERSATION', payload: conversation.name });
 						dispatch({ type: 'SET_CURRENT_CONVERSATION_ID', payload: conversation.id });
-						dispatch({ type: 'SET_CURRENT_CONVERSATION_IS_PRIVATE', payload: state.currentConversationIsPublic });
-						dispatch({ type: 'SET_CURRENT_CONVERSATION_IS_PROTECTED', payload: state.currentConversationIsProtected });
+						dispatch({ type: 'SET_CURRENT_CONVERSATION_IS_PRIVATE', payload: conversation.isPublic });
+						dispatch({ type: 'SET_CURRENT_CONVERSATION_IS_PROTECTED', payload: conversation.isProtected });
 						dispatch({ type: 'ACTIVATE', payload: 'currentChannelBool' });
 						if(isAdmin[index])
 							dispatch({ type: 'ACTIVATE', payload: 'showAdmin' });

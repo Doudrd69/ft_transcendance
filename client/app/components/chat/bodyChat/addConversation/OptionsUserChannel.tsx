@@ -42,7 +42,7 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ name,  title, u
 
 	const handleMute = async() => {
 		try {
-			const userOptionDto = {conversationID: state.currentConversationID, userName: user.login , state: user.isMute}
+			const userOptionDto = {conversationID: state.currentConversationID, username: user.login , state: user.isMute}
 			const response = await fetch(`http://localhost:3001/chat/muteUser`, {
 				method: 'POST',
 				headers: {
@@ -67,7 +67,7 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ name,  title, u
 			console.log("userLogin", user.login);
 			console.log("user.isBan", user.isBan);
 			console.log("user", user);
-			const userOptionDto = {conversationID: state.currentConversationID, userName: user.login, state : user.isBan}
+			const userOptionDto = {conversationID: state.currentConversationID, username: user.login, state : user.isBan}
 			const response = await fetch(`http://localhost:3001/chat/banUser`, {
 				method: 'POST',
 				headers: {
@@ -79,7 +79,7 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ name,  title, u
 	
 			if (response.ok) {
 				user.isBan = !user.isBan;
-				console.log("Mute");
+				console.log("ban");
 			}
 			} catch (error) {
 			console.log(error);
@@ -88,7 +88,7 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ name,  title, u
 
 	const handleAdmin = async() => {
 		try {
-			const userOptionDto = {conversationID: state.currentConversationID, userName: user.login, state : user.isAdmin}
+			const userOptionDto = {conversationID: state.currentConversationID, username: user.login, state : user.isAdmin}
 			const response = await fetch(`http://localhost:3001/chat/adminUser`, {
 				method: 'POST',
 				headers: {
@@ -100,7 +100,7 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ name,  title, u
 	
 			if (response.ok) {
 				user.isAdmin = !user.isAdmin;
-				console.log("Mute");
+				console.log("admin");
 			}
 			} catch (error) {
 			console.log(error);
