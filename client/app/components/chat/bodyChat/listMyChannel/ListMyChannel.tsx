@@ -29,7 +29,8 @@ const ListMyChannelComponent: React.FC<ListMyChannelComponentProps> = ({ userSoc
 
 	const handlePasswordSubmit = (password: string) => {
 		setPassword(password);
-	  };
+	};
+
 	const loadDiscussions = async () => {
 
 		const response = await fetch(`http://localhost:3001/chat/getConversationsWithStatus/${userID}`, {
@@ -80,31 +81,34 @@ const ListMyChannelComponent: React.FC<ListMyChannelComponentProps> = ({ userSoc
 		console.log("convs --> ", conversations);
 	}, [state.refreshChannel]);
 
-	const addFriendToConversation = async (convID: number, friend: string) => {
+	const addUserToConversation = async (convID: number, friend: string) => {
 
-		const addFriendToConversationDto = {
+		const addUserToConversationDto = {
 			userToAdd: friend,
 			conversationID: convID,
 		}
 
-		console.log(addFriendToConversationDto);
-
-		const response = await fetch('http://localhost:3001/chat/addFriendToConversation', {
+		const response = await fetch('http://localhost:3001/chat/addUserToConversation', {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
 				'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`
 			},
-			body: JSON.stringify(addFriendToConversationDto),
+			body: JSON.stringify(addUserToConversationDto),
 		});
 
 		if (response.ok) {
 			const conversation = await response.json();
-			if (userSocket.connected) {
-				userSocket.emit('addUserToRoom', { convID: conversation.id, convName: conversation.name, friend: user } );
+			if (conversation.id) {
+				if (userSocket.connected) {
+					userSocket.emit('addUserToRoom', { convID: conversation.id, convName: conversation.name, friend: user } );
+				}
+				console.log("Friend has been successfully added!");
+				dispatch({ type: 'TOGGLE', payload: 'listChannelAdd' });
 			}
-			console.log("Friend has been successfully added!");
-			dispatch({ type: 'TOGGLE', payload: 'listChannelAdd' });
+			else {
+				console.log(conversation);
+			}
 		}
 		else {
 			console.log("Fatal error");
@@ -153,7 +157,7 @@ const ListMyChannelComponent: React.FC<ListMyChannelComponentProps> = ({ userSoc
 										dispatch({ type: 'DISABLE', payload: 'showAddCreateChannel' });
 									}
 									else
-										addFriendToConversation(Number(conversation.id), user || 'no-user');}}>
+										addUserToConversation(Number(conversation.id), user || 'no-user');}}>
 									{conversation.isProtected && <img className="icon-password-channel" src='./password.png' alt="private" />}
 									<span>{`${conversation.name}#${conversation.id}`}</span>
 							</button>

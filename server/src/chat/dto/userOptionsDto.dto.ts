@@ -10,7 +10,7 @@ import {
 	Max
 } from 'class-validator';
 
-export class MuteUserDto {
+export class UserOptionsDto {
    
     @IsNotEmpty()
 	@IsPositive()
@@ -21,4 +21,8 @@ export class MuteUserDto {
 	@IsPositive()
 	@Max(1000)
 	userID: number;
+
+	@IsNotEmpty()
+	@IsBoolean()
+	state: boolean;
 }

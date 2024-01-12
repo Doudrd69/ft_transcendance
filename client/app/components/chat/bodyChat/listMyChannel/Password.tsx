@@ -8,51 +8,45 @@ userSocket: Socket;
 }
 
 const PasswordComponent: React.FC<PasswordComponentProps> = ({ userSocket }) => {
+
 	const [password, setPassword] = useState('');
 
 	const { state, dispatch } = useChat();
+
+	console.log("Password: ", password);
 
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setPassword(e.target.value);
 	};
 
 	const handlePasswordSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+
 		e.preventDefault();
-		if (state.currentConversationID != null && state.currentFriend != null) {
-		await addFriendToConversation(state.currentConversationID, state.currentFriend, password);
+
+		const checkPasswordDto = {
+			conversationID: state.currentConversationID,
+			userInput: password,
+			username: sessionStorage.getItem("currentUserLogin"),
+		}
+	
+		const response = await fetch('http://localhost:3001/chat/checkPassword', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`
+			},
+			body: JSON.stringify(checkPasswordDto),
+		});
+	
+		if (response.ok) {
+			const passwordValidated = await response.json();
+			console.log("--> passwordValidated: ", passwordValidated);
+			dispatch({ type: 'DISABLE', payload: 'showPassword' });
+		}
+		else {
+			console.log("Fatal error");
 		}
 	};
-	console.log("pwd --> ", password);
-	console.log("state --> ", state.currentConversationID);
-	console.log("state --> ", state.currentFriend);
-	const addFriendToConversation = async (convID: number, friend: string, password: string) => {
-		const addFriendToConversationDto = {
-		userToAdd: friend,
-		conversationID: convID,
-		};
-
-		console.log(addFriendToConversationDto);
-
-		const response = await fetch('http://localhost:3001/chat/addFriendToConversation', {
-		method: 'POST',
-		headers: {
-			'Content-Type': 'application/json',
-			'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`
-		},
-		body: JSON.stringify(addFriendToConversationDto),
-		});
-
-		if (response.ok) {
-		const conversation = await response.json();
-		if (userSocket.connected) {
-			userSocket.emit('addUserToRoom', { convID: conversation.id || null, convName: conversation.name, friend: friend });
-		}
-		console.log("Friend has been successfully added!");
-		dispatch({ type: 'TOGGLE', payload: 'listChannelAdd' });
-		} else {
-		console.log("Fatal error");
-		}
-	}
 
 	const handleClosePassword = () => {
 		dispatch({ type: 'DISABLE', payload: 'showPassword' });
@@ -61,14 +55,14 @@ const PasswordComponent: React.FC<PasswordComponentProps> = ({ userSocket }) => 
 
 	useEffect(() => {
 		const handleEscape = (event: KeyboardEvent) => {
-		if (event.key === 'Escape') {
-			handleClosePassword();
-		}
+			if (event.key === 'Escape') {
+					handleClosePassword();
+			}
 		};
 
 		document.addEventListener('keydown', handleEscape);
 		return () => {
-		document.removeEventListener('keydown', handleEscape);
+			document.removeEventListener('keydown', handleEscape);
 		};
 	}, []);
 

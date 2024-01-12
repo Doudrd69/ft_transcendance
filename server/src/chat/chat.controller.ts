@@ -3,7 +3,7 @@ import { ChatService } from './chat.service';
 import { GroupDto } from './dto/group.dto';
 import { MessageDto } from './dto/message.dto';
 import { ConversationDto } from './dto/conversation.dto';
-import { AddFriendToConversationDto } from './dto/addFriendToConversationDto.dto';
+import { AddUserToConversationDto } from './dto/addUserToConversationDto.dto';
 import { Conversation } from './entities/conversation.entity';
 import { Message } from './entities/message.entity';
 import { GroupMember } from './entities/group_member.entity';
@@ -33,9 +33,9 @@ export class ChatController {
 
 	@UseGuards(AuthGuard)
 	@HttpCode(HttpStatus.OK)
-	@Post('addFriendToConversation')
-	addFriendToConversation(@Body() addUserToConversationDto: AddFriendToConversationDto): Promise<Conversation> {
-		return this.chatService.addFriendToConversation(addUserToConversationDto);
+	@Post('addUserToConversation')
+	addUserToConversation(@Body() addUserToConversationDto: AddUserToConversationDto): Promise<Conversation | string> {
+		return this.chatService.addUserToConversation(addUserToConversationDto);
 	}
 
 	@UseGuards(AuthGuard)

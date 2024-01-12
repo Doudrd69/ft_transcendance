@@ -25,6 +25,8 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 	const [formValue, setFormValue] = useState('');
 	const { state, dispatch } = useChat();
 
+	// console.log(' user ========>', user);
+
 	const handleCancel = () => {
 		dispatch({ type: 'DISABLE', payload: 'showOptionChannel' });
 		setFormValue('');

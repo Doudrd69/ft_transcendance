@@ -27,10 +27,8 @@ const AddConversationComponent: React.FC<AddConversationComponentProps> = ({ use
 			is_channel: isChannel,
 			isPublic: isPublic,
 			isProtected: isPassword,
-			password: isPassword ? '' : passwordValue,
+			password: !isPassword ? '' : passwordValue,
 		}
-
-		console.log("To create => ", conversationDto);
 
 		const response = await fetch('http://localhost:3001/chat/newConversation', {
 			method: 'POST',
