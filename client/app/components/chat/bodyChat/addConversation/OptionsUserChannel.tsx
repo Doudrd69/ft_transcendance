@@ -16,6 +16,7 @@ interface OptionsUserChannelProps {
 	title: string | null;
 	user: user
 }
+
 const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ name,  title, user }) => {
 
 	const [formValue, setFormValue] = useState('');

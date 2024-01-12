@@ -107,7 +107,7 @@ const ListMyChannelComponent: React.FC<ListMyChannelComponentProps> = ({ userSoc
 				dispatch({ type: 'TOGGLE', payload: 'listChannelAdd' });
 			}
 			else {
-				console.log(conversation);
+				console.log("Error", conversation.error);
 			}
 		}
 		else {

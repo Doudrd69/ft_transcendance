@@ -45,6 +45,7 @@ export class ChatService {
 		user.groups.forEach((group: GroupMember) => {
 			if (group.id == groupToSearch.id) {
 				groupToReturn = group;
+				return ;
 			}
 		});
 
@@ -54,17 +55,30 @@ export class ChatService {
 		return ;
 	}
 
+	private async getGroupIsOwnerStatus(user: User, conversation: Conversation): Promise<boolean> {
+
+		let status = false;
+		user.groups.forEach((group: GroupMember) => {
+			if (group.conversation.id == conversation.id) {
+				if (group.isOwner) {
+					status = true;
+					return ;
+				}
+			}
+		});
+
+		return status;
+	}
+
 	private async getGroupIsAdminStatus(user: User, conversation: Conversation): Promise<boolean> {
 
-		let status;
+		let status = false;
 		user.groups.forEach((group: GroupMember) => {
 			if (group.conversation.id == conversation.id) {
 				if (group.isAdmin) {
 					status = true;
 					return ;
 				}
-				else
-					status = false;
 			}
 		});
 
@@ -73,30 +87,32 @@ export class ChatService {
 
 	private async getGroupIsBanStatus(user: User, conversation: Conversation): Promise<boolean> {
 
+		let status = false;
 		user.groups.forEach((group: GroupMember) => {
 			if (group.conversation.id == conversation.id) {
-				if (group.isBan)
-					return true;
-				else
-					return false;
+				if (group.isBan) {
+					status = true;
+					return ;
+				}
 			}
 		});
 
-		return false;
+		return status;
 	}
 
 	private async getGroupIsMuteStatus(user: User, conversation: Conversation): Promise<boolean> {
 
+		let status = false;
 		user.groups.forEach((group: GroupMember) => {
 			if (group.conversation.id == conversation.id) {
-				if (group.isMute)
-					return true;
-				else
-					return false;
+				if (group.isMute) {
+					status = true;
+					return ;
+				}
 			}
 		});
 
-		return false;
+		return status;
 	}
 
 	/***					PASSWORD HANDLER				***/
@@ -109,7 +125,6 @@ export class ChatService {
 		const saltOrRounds = 10;
 		const hash = await bcrypt.hash(password, saltOrRounds);
 		return hash;
-
 	}
 
 	/***					VARIOUS GETTERS					***/
@@ -210,10 +225,11 @@ export class ChatService {
 	/***						GROUP							***/
 	/**************************************************************/
 
-	async createGroup(conversation: Conversation, isAdminFlag: boolean): Promise<GroupMember> {
+	async createGroup(conversation: Conversation, isAdminFlag: boolean, isOwnerFlag: boolean): Promise<GroupMember> {
 		
 		console.log("Creating group...");
 		const group = new GroupMember();
+		group.isOwner = isOwnerFlag;
 		group.isAdmin = isAdminFlag;
 		group.joined_datetime = new Date();
 		group.conversation = conversation;
@@ -295,13 +311,17 @@ export class ChatService {
 		if (userToMute && conversation) {
 
 			const groupToUpdate = await this.getRelatedGroup(userToMute, conversation);
-			if (groupToUpdate) {
 
-				if (muteUserDto.state)
-					groupToUpdate.isMute = false;
-				else
-					groupToUpdate.isMute = true;
-				await this.groupMemberRepository.save(groupToUpdate);
+			// If userToMute is the owner == error
+			if (!groupToUpdate.isOwner) {
+				if (groupToUpdate) {
+	
+					if (muteUserDto.state)
+						groupToUpdate.isMute = false;
+					else
+						groupToUpdate.isMute = true;
+					await this.groupMemberRepository.save(groupToUpdate);
+				}
 			}
 
 			return ;
@@ -320,13 +340,16 @@ export class ChatService {
 		if (userToBan && conversation) {
 
 			const groupToUpdate = await this.getRelatedGroup(userToBan, conversation);
-			if (groupToUpdate) {
-
-				if (banUserDto.state)
-					groupToUpdate.isBan = false;
-				else
-					groupToUpdate.isBan = true;
-				await this.groupMemberRepository.save(groupToUpdate);
+			// If userToBan is the owner == error
+			if (!groupToUpdate.isOwner) {
+				if (groupToUpdate) {
+	
+					if (banUserDto.state)
+						groupToUpdate.isBan = false;
+					else
+						groupToUpdate.isBan = true;
+					await this.groupMemberRepository.save(groupToUpdate);
+				}
 			}
 
 			return ;
@@ -345,13 +368,16 @@ export class ChatService {
 		if (userToPromote && conversation) {
 
 			const groupToUpdate = await this.getRelatedGroup(userToPromote, conversation);
-			if (groupToUpdate) {
-
-				if (promoteUserToAdminDto.state)
-					groupToUpdate.isBan = false;
-				else
-					groupToUpdate.isBan = true;
-				await this.groupMemberRepository.save(groupToUpdate);
+			// If userToMute is the owner == error
+			if (!groupToUpdate.isOwner) {
+				if (groupToUpdate) {
+	
+					if (promoteUserToAdminDto.state)
+						groupToUpdate.isBan = false;
+					else
+						groupToUpdate.isBan = true;
+					await this.groupMemberRepository.save(groupToUpdate);
+				}
 			}
 
 			return ;
@@ -398,7 +424,7 @@ export class ChatService {
 		return ;
 	}
 	
-	async addUserToConversation(addUserToConversationDto: AddUserToConversationDto): Promise<Conversation> {
+	async addUserToConversation(addUserToConversationDto: AddUserToConversationDto): Promise<Conversation | { error: string }> {
 		
 		const userToAdd = await this.usersRepository.findOne({
 			where: { username: addUserToConversationDto.userToAdd },
@@ -412,12 +438,12 @@ export class ChatService {
 		const isGroupInUsersArray = await this.getRelatedGroup(userToAdd, conversationToAdd);
 		if (isGroupInUsersArray) {
 			console.log("User has already joined", isGroupInUsersArray.conversation.name );
-			return ;
+			return { error: "User has already joined this discussion" };
 		}
 
 		if (await this.getGroupIsBanStatus(userToAdd, conversationToAdd)) {
 			console.log("Fatal error: user is ban from this channel");
-			return ;
+			return { error: "User is banned from this discussion" };
 		}
 		
 		if (conversationToAdd && userToAdd) {
@@ -433,11 +459,9 @@ export class ChatService {
 				await this.usersRepository.save(userToAdd);
 				return conversationToAdd;
 			}
-			
-			return ;
 		}
 		
-		return ;
+		return { error: "Fatal error" };
 	}
 	
 	async createFriendsConversation(initiator: User, friend: User): Promise<Conversation> {
@@ -523,7 +547,7 @@ export class ChatService {
 			await this.conversationRepository.save(conv);
 			
 			// The user who created the conversation is set to admin
-			const group = await this.createGroup(conv, true);
+			const group = await this.createGroup(conv, true, true);
 			
 			user.groups.push(group);
 			await this.usersRepository.save(user);
