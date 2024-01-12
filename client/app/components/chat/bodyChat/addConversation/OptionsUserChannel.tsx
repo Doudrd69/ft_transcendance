@@ -3,7 +3,12 @@ import { Socket } from 'socket.io-client';
 import { useChat } from '../../ChatContext';
 import './AddConversation.css';
 
-interface User {
+interface OptionsUserChannelProps {
+	name: string | null;
+	title: string | null;
+}
+
+interface user {
 	login: string;
 	avatarURL: string;
 	isAdmin: boolean;
@@ -11,24 +16,13 @@ interface User {
 	isBan: boolean;
 }
 
-interface OptionsChannelProps {
-	title: string;
-}
-
-interface Conversation {
-	isPrivate: boolean;
-	isProtected: boolean;
-}
-
-const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
+const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ name,  title }) => {
 
 	const [formValue, setFormValue] = useState('');
 	const { state, dispatch } = useChat();
-
-	console.log(' user ========>', user);
-
+	console.log('========>', name);
 	const handleCancel = () => {
-		dispatch({ type: 'DISABLE', payload: 'showOptionChannel' });
+		dispatch({ type: 'DISABLE', payload: 'showOptionsUserChannel' });
 		setFormValue('');
 	};
 
@@ -51,17 +45,22 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 			<div className="add_container">
 				<h2 className="add__title">{title}</h2>	
 				<div className="option-block">
-					{/* {conversation.isPrivate ?
+					{/* {user.isAdmin ?
 						<img className="option-image" src="crown.png">
 						 	admin
 						</img>
 						:
 						<img className="option-image-opacity" src="crown.png">no admmin</img>
 					}
-					{Conversation.isProtected ?
+					{user.isMute ?
 						<img className="option-image" src="volume-mute.png">mute</img>
 						:
 						<img className="option-image-opacity" src="volume-mute.png">no mute </img>
+					}
+					{user.isBan ?
+						<img className="option-image" src="interdit.png">ban</img>
+						:
+						<img className="option-image-opacity" src="interdit.png">no ban</img>
 					} */}
 				</div>
 			</div>
@@ -69,4 +68,4 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 	);
 };
 
-export default OptionsChannel;
+export default OptionsUserChannel;

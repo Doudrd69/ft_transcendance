@@ -2,7 +2,7 @@ import './ReceiveBoxChannel.css';
 import React, { useState, useEffect, useRef } from 'react';
 import { Socket } from 'socket.io-client';
 import { useChat } from '../../../ChatContext';
-import OptionsChannel from '../../addConversation/OptionsChannel';
+import OptionsUserChannel from '../../addConversation/OptionsUserChannel';
 
 interface Message {
 	from: string;
@@ -107,14 +107,14 @@ const ReceiveBoxChannelComponent: React.FC<ReceiveBoxChannelComponentProps> = ({
 				className='img-list-users-channel'
 				src={`http://localhost:3001${userList.avatarURL}`}
 				onClick={() => {
-					dispatch({ type: 'ACTIVATE', payload: 'showOptionsChannel' });
+					dispatch({ type: 'ACTIVATE', payload: 'showOptionsUserChannel' });
 					dispatch({ type: 'SET_CURRENT_OPTION_CHANNEL_NAME', payload: userList.login });
 				}}
 				/>
 			</div>
 			))}
-			{state.showOptionsChannel && (
-			<OptionsChannel name={state.currentOptionChannelName} title={state.currentOptionChannelName} user={state.currentUserList.filter((user: userList) => user.login === state.currentOptionChannelName)} />
+			{state.showOptionsUserChannel && (
+			<OptionsUserChannel name={state.currentOptionChannelName} title={state.currentOptionChannelName} />
 			)}
 		</div>
 		<div ref={messagesContainerRef} className="bloc-channel-chat">
