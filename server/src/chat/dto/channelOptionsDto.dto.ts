@@ -19,7 +19,7 @@ export class ChannelOptionsDto {
 
     @IsNotEmpty()
 	@IsBoolean()
-	userID: boolean;
+	userID: number;
 
 	@IsNotEmpty()
 	@IsBoolean()
