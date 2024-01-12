@@ -579,7 +579,8 @@ export class ChatService {
 
 			let isAdminArray = [];
 			user.groups.forEach((group: GroupMember) => {
-				isAdminArray.push(group.isAdmin);
+				if (group.conversation.is_channel)
+					isAdminArray.push(group.isAdmin);
 			});
 
 			const conversationList = await this.getAllConversations(userID);

@@ -1,7 +1,7 @@
 .window-settings{
 	display: flex;
 	flex-direction: column;
-	background-color: var(--first);
+	background-color: transparent;
 	position: relative;
 	top: 45%;
 	left: 50%;

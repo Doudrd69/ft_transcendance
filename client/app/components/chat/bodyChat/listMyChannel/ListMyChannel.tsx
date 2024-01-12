@@ -5,21 +5,31 @@ import { Socket } from 'socket.io-client';
 
 interface ListMyChannelComponentProps {
 	userSocket: Socket; // Assurez-vous d'avoir la bonne importation pour le type Socket
-	user: string;
+	user?: string;
+	isAdd?: boolean;
+	title?: string;
 }
 
 interface Conversation {
 	id: number;
 	name: string;
 	is_channel: boolean;
+	isProtected: boolean;
 }
 
-const ListMyChannelComponent: React.FC<ListMyChannelComponentProps> = ({ userSocket, user }) => {
+const ListMyChannelComponent: React.FC<ListMyChannelComponentProps> = ({ userSocket, user, isAdd, title}) => {
 
 	const { state, dispatch } = useChat();
 	const [conversations, setConversations] = useState<Conversation[]>([]);
 	const userID = sessionStorage.getItem("currentUserID");
+	const userLogin = sessionStorage.getItem("currentUserLogin") || 'no-user';
+	const [showPassword, setShowPassword] = useState<boolean>(false);
 
+	const [password, setPassword] = useState('');
+
+	const handlePasswordSubmit = (password: string) => {
+		setPassword(password);
+	  };
 	const loadDiscussions = async () => {
 
 		const response = await fetch(`http://localhost:3001/chat/getConversationsWithStatus/${userID}`, {
@@ -79,6 +89,9 @@ const ListMyChannelComponent: React.FC<ListMyChannelComponentProps> = ({ userSoc
 
 	const handleCloseList = () => {
 		dispatch({ type: 'DISABLE', payload: 'showListChannelAdd' });
+		dispatch({ type: 'DISABLE', payload: 'showAddChannel' });
+		dispatch({ type: 'DISABLE', payload: 'showCreateChannel' });
+		dispatch({ type: 'DISABLE', payload: 'showAddCreateChannel' });
 	};
 
 	useEffect(() => {
@@ -98,7 +111,7 @@ const ListMyChannelComponent: React.FC<ListMyChannelComponentProps> = ({ userSoc
 		<div className='blur-background'>
 			<img className="add_button_cancel" src='./close.png'  onClick={handleCloseList}/>
 			<div className='juste-pour-englober'>
-				<p className="title-list-channel-component">CHOOSE IN YOUR SERVER</p>
+				<p className="title-list-channel-component">{title}</p>
 					<div className="bloc-add-channel-list">
 						{conversations.map((conversation, index) => (
 							conversation.is_channel && (
@@ -106,7 +119,17 @@ const ListMyChannelComponent: React.FC<ListMyChannelComponentProps> = ({ userSoc
 								key={index}
 								className="button-add-channel-list"
 								onClick={() => {
-									addFriendToConversation(Number(conversation.id), user);}}>
+									if (conversation.isProtected)
+									{
+										dispatch({ type: 'SET_CURRENT_CONVERSATION_ID', payload: conversation.id });
+										dispatch({ type: 'SET_CURRENT_FRIEND', payload: user });
+										dispatch({ type: 'ACTIVATE', payload: 'showPassword' });
+										dispatch({ type: 'DISABLE', payload: 'showAddChannel' });
+										dispatch({ type: 'DISABLE', payload: 'showAddCreateChannel' });
+									}
+									else
+										addFriendToConversation(Number(conversation.id), user || 'no-user');}}>
+									{conversation.isProtected && <img className="icon-password-channel" src='./password.png' alt="private" />}
 								<span>{conversation.name}</span>
 							</button>
 						)))}

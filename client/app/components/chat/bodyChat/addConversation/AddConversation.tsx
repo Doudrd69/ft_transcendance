@@ -56,6 +56,7 @@ const AddConversationComponent: React.FC<AddConversationComponentProps> = ({ use
 			dispatch({ type: 'DISABLE', payload: 'showAddUser' });
 			dispatch({ type: 'DISABLE', payload: 'showAddFriend' });
 			dispatch({ type: 'TOGGLEX', payload: 'refreshChannel'});
+			
 		} else {
 			const error = await response.json();
 			console.log("Error: ", error.message);
@@ -66,6 +67,10 @@ const AddConversationComponent: React.FC<AddConversationComponentProps> = ({ use
 		dispatch({ type: 'DISABLE', payload: 'showAddChannel' });
 		dispatch({ type: 'DISABLE', payload: 'showAddUser' });
 		dispatch({ type: 'DISABLE', payload: 'showAddFriend' });
+		dispatch({ type: 'DISABLE', payload: 'showListChannelAdd' });
+		dispatch({ type: 'DISABLE', payload: 'showAddChannel' });
+		dispatch({ type: 'DISABLE', payload: 'showCreateChannel' });
+		dispatch({ type: 'DISABLE', payload: 'showAddCreateChannel' });
 		setFormValue('');
 		setIsPublic(true);
 		setPasswordValue('');
