@@ -19,10 +19,17 @@ const PasswordChangeComponent: React.FC<PasswordComponentProps> = ({ userSocket 
 		setPassword(e.target.value);
 	};
 
-	const handleProtected = async(e: React.FormEvent<HTMLFormElement>) => {
+	const handleProtected = async() => {
 		try {
-			const channelOptionDto = {conversationID: state.currentConversationID, userID:sessionStorage.getItem("currentID"),  state : state.currentConversationIsProtected, password: password}
-			const response = await fetch(`http://localhost:3001/chat/adminUser`, {
+
+			const channelOptionDto = {
+				conversationID: Number(state.currentConversationID),
+				userID: Number(sessionStorage.getItem("currentUserID")),
+				state: state.currentConversationIsProtected,
+				password: password,
+			}
+
+			const response = await fetch(`http://localhost:3001/chat/updateIsProtected`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
@@ -32,8 +39,8 @@ const PasswordChangeComponent: React.FC<PasswordComponentProps> = ({ userSocket 
 			});
 	
 			if (response.ok) {
-				dispatch({ type: 'TOGGLE', payload: 'currentConversationIsProtected' });
-				console.log("Mute");
+				dispatch({ type: 'TOGGLEX', payload: 'currentConversationIsProtected' });
+				console.log("Update PASSWORD");
 			}
 			} catch (error) {
 			console.log(error);
@@ -41,8 +48,8 @@ const PasswordChangeComponent: React.FC<PasswordComponentProps> = ({ userSocket 
 	}
 
 	const handleClosePassword = () => {
-		dispatch({ type: 'DISABLE', payload: 'showPasswordChange' });
 		dispatch({ type: 'ACTIVATE', payload: 'showOptionChannel' });
+		dispatch({ type: 'DISABLE', payload: 'showPasswordChange' });
 	};
 
 	useEffect(() => {
