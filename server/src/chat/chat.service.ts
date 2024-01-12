@@ -220,7 +220,7 @@ export class ChatService {
 	async updateUserMuteStatusFromConversation(muteUserDto: UserOptionsDto) {
 
 		const userToMute : User = await this.usersRepository.findOne({
-			where: { id: muteUserDto.userID },
+			where: { username: muteUserDto.username },
 			relations: ["groups"],
 		});
 
@@ -245,7 +245,7 @@ export class ChatService {
 	async updateUserBanStatusFromConversation(banUserDto: UserOptionsDto) {
 
 		const userToBan : User = await this.usersRepository.findOne({
-			where: { id: banUserDto.userID },
+			where: { username: banUserDto.username },
 			relations: ["groups"],
 		});
 
@@ -270,7 +270,7 @@ export class ChatService {
 	async updateUserAdminStatusFromConversation(promoteUserToAdminDto: UserOptionsDto) {
 
 		const userToPromote : User = await this.usersRepository.findOne({
-			where: { id: promoteUserToAdminDto.userID },
+			where: { username: promoteUserToAdminDto.username },
 			relations: ['groups'],
 		});
 

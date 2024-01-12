@@ -17,10 +17,13 @@ export class UserOptionsDto {
 	@Max(1000)
 	conversationID: number;
 
-    @IsNotEmpty()
-	@IsPositive()
-	@Max(1000)
-	userID: number;
+	@IsNotEmpty()
+	@Length(6, 20)
+	@IsAscii()
+	@IsAlpha()
+	@IsString()
+	@Matches(/^[^"';%()|<>\\]*$/)
+	username: string;
 
 	@IsNotEmpty()
 	@IsBoolean()
