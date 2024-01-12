@@ -19,7 +19,7 @@ interface userList {
 	login: string;
 	avatarURL: string;
 	isAdmin: boolean;
-	mute: string[];
+	isMute: boolean;
 	isBan: boolean;
 }
 
@@ -114,7 +114,7 @@ const ReceiveBoxChannelComponent: React.FC<ReceiveBoxChannelComponentProps> = ({
 			</div>
 			))}
 			{state.showOptionsChannel && (
-			<OptionsChannel name={state.currentOptionChannelName} title={state.currentOptionChannelName} />
+			<OptionsChannel name={state.currentOptionChannelName} title={state.currentOptionChannelName} user={state.currentUserList.filter((user: userList) => user.login === state.currentOptionChannelName)} />
 			)}
 		</div>
 		<div ref={messagesContainerRef} className="bloc-channel-chat">
