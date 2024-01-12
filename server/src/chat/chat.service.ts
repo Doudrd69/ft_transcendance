@@ -146,6 +146,7 @@ export class ChatService {
 									userListForThisGroup.push({
 										login: user_.login,
 										avatarURL: user_.avatarURL,
+										isOwner: group.isOwner,
 										isAdmin: group.isAdmin,
 										isBan: group.isBan,
 										isMute: group.isMute,
@@ -241,7 +242,7 @@ export class ChatService {
 	async updateChannelIsPublicStatus(channelOptionsDto: ChannelOptionsDto) {
 
 		const user : User = await this.usersRepository.findOne({
-			where: { id: this.usersRepository.id },
+			where: { id: channelOptionsDto.userID },
 			relations: ["groups", "groups.conversation"],
 		});
 
@@ -269,7 +270,7 @@ export class ChatService {
 	async updateChannelIsProtectedStatus(channelOptionsDto: ChannelOptionsDto) {
 
 		const user : User = await this.usersRepository.findOne({
-			where: { id: this.usersRepository.id },
+			where: { id: channelOptionsDto.userID},
 			relations: ["groups", "groups.conversation"],
 		});
 

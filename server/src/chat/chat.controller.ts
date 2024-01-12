@@ -10,10 +10,6 @@ import { UserOptionsDto } from './dto/userOptionsDto.dto';
 import { Conversation } from './entities/conversation.entity';
 import { Message } from './entities/message.entity';
 import { GroupMember } from './entities/group_member.entity';
-import { AuthGuard } from 'src/auth/auth.guard';
-import { UpdateConversationDto } from './dto/UpdateConversationDto.dto';
-import { CheckPasswordDto } from './dto/checkPasswordDto.dto';
-import { UserOptionsDto } from './dto/userOptionsDto.dto';
 import { ChannelOptionsDto } from './dto/channelOptionsDto.dto';
 
 @Controller('chat')
