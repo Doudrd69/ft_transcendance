@@ -10,6 +10,8 @@ import { GroupMember } from './entities/group_member.entity';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { UpdateConversationDto } from './dto/UpdateConversationDto.dto';
 import { CheckPasswordDto } from './dto/checkPasswordDto.dto';
+import { MuteUserDto } from './dto/muteUserDto.dto';
+import { BanUserDto } from './dto/banUserDto.dto';
 
 @Controller('chat')
 export class ChatController {
@@ -48,6 +50,20 @@ export class ChatController {
 	@Post('checkPassword')
 	checkuserInputToPassword(@Body() checkPasswordDto: CheckPasswordDto): Promise<boolean> {
 		return this.chatService.compareChannelPassword(checkPasswordDto);
+	}
+
+	@UseGuards(AuthGuard)
+	@HttpCode(HttpStatus.OK)
+	@Post('banUser')
+	banUserFromConversation(@Body() banUserDto: BanUserDto){
+		return this.chatService.banUserFromConversation(banUserDto);
+	}
+
+	@UseGuards(AuthGuard)
+	@HttpCode(HttpStatus.OK)
+	@Post('muteUser')
+	muteUserFromConversation(@Body() muteUserDto: MuteUserDto) {
+		return this.chatService.muteUserFromConversation(muteUserDto);
 	}
 
 	// @Get('getMesssage/:id')
