@@ -108,14 +108,14 @@ const ReceiveBoxChannelComponent: React.FC<ReceiveBoxChannelComponentProps> = ({
 				src={`http://localhost:3001${userList.avatarURL}`}
 				onClick={() => {
 					dispatch({ type: 'ACTIVATE', payload: 'showOptionsUserChannel' });
-					dispatch({ type: 'SET_CURRENT_OPTION_CHANNEL_NAME', payload: userList.login });
+					dispatch({ type: 'SET_CURRENT_OPTION_CHANNEL_NAME', payload: userList.login});
 				}}
 				/>
+				{state.showOptionsUserChannel && (
+				<OptionsUserChannel name={state.currentOptionChannelName} title={state.currentOptionChannelName} user={userList}/>
+				)}
 			</div>
 			))}
-			{state.showOptionsUserChannel && (
-			<OptionsUserChannel name={state.currentOptionChannelName} title={state.currentOptionChannelName} />
-			)}
 		</div>
 		<div ref={messagesContainerRef} className="bloc-channel-chat">
 			{messages.map((message: Message, id: number) => (

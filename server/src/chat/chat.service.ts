@@ -230,7 +230,7 @@ export class ChatService {
 		}
 	}
 
-	async unmuteUserFromConversation(unmuteUserDto: UnmuteUserDto) {
+	async uneUserFromConversation(unmuteUserDto: UnmuteUserDto) {
 
 		const userToMute : User = await this.usersRepository.findOne({
 			where: { id: unmuteUserDto.userID },
