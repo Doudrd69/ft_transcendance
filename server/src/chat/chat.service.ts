@@ -9,7 +9,7 @@ import { User } from '../users/entities/users.entity'
 import { MessageDto } from './dto/message.dto';
 import { ConversationDto } from './dto/conversation.dto';
 import { UpdateConversationDto } from './dto/UpdateConversationDto.dto';
-import { AddFriendToConversationDto } from './dto/addFriendToConversationDto.dto';
+import { AddUserToConversationDto } from './dto/addUserToConversationDto.dto';
 import { CheckPasswordDto } from './dto/checkPasswordDto.dto';
 import { BanUserDto } from './dto/banUserDto.dto';
 import { UnbanUserDto } from './dto/unbanUserDto.dto';
@@ -131,7 +131,6 @@ export class ChatService {
 			}
 		});
 
-		console.log("=================> ", array);
 		return array;
 	}
 
@@ -182,7 +181,13 @@ export class ChatService {
 		if (conversation) {
 			const isMatch = await bcrypt.compare(checkPasswordDto.userInput, conversation.password);
 			if (isMatch) {
-				return true;
+				const addUserToConversationDto ={
+					userToAdd: checkPasswordDto.username,
+					conversationID: conversation.id,
+				}
+				const conversationToAdd = await this.addUserToConversation(addUserToConversationDto);
+				if (conversationToAdd)
+					return true;
 			}
 		}
 
@@ -342,7 +347,7 @@ export class ChatService {
 		return ;
 	}
 	
-	async addFriendToConversation(addUserToConversationDto: AddFriendToConversationDto): Promise<Conversation> {
+	async addUserToConversation(addUserToConversationDto: AddUserToConversationDto): Promise<Conversation> {
 		
 		const userToAdd = await this.usersRepository.findOne({
 			where: { username: addUserToConversationDto.userToAdd },
@@ -454,8 +459,10 @@ export class ChatService {
 			conv.is_channel = conversationDto.is_channel;
 			conv.isPublic = conversationDto.isPublic;
 			conv.isProtected = conversationDto.isProtected;
-			if (conversationDto.password)
+			if (conversationDto.password) {
+				console.log("Password to saave: ", conversationDto.password);
 				conv.password = await this.hashChannelPassword(conversationDto.password);
+			}
 			await this.conversationRepository.save(conv);
 			
 			// The user who created the conversation is set to admin
@@ -592,7 +599,7 @@ export class ChatService {
 					isAdmin: isAdminArray,
 					usersList: usersList,
 				}
-				console.log("userList => ", conversationArray.usersList);	
+	
 				return conversationArray;
 			}
 		}

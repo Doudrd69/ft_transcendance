@@ -24,4 +24,12 @@ export class CheckPasswordDto {
 	@IsString()
 	@Matches(/^[^"';%()|<>\\]*$/)
 	userInput: string;
+
+	@IsNotEmpty()
+	@Length(6, 20)
+	@IsAscii()
+	@IsAlpha()
+	@IsString()
+	@Matches(/^[^"';%()|<>\\]*$/)
+	username: string;
 }
