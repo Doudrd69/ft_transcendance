@@ -2,7 +2,7 @@ import './ReceiveBoxChannel.css';
 import React, { useState, useEffect, useRef } from 'react';
 import { Socket } from 'socket.io-client';
 import { useChat } from '../../../ChatContext';
-import OptionsChannel from '../../addConversation/OptionsChannel';
+import OptionsUserChannel from '../../addConversation/OptionsUserChannel';
 
 interface Message {
 	from: string;
@@ -21,9 +21,11 @@ interface userList {
 	isAdmin: boolean;
 	isMute: boolean;
 	isBan: boolean;
+	isOwner: boolean;
 }
 
 const ReceiveBoxChannelComponent: React.FC<ReceiveBoxChannelComponentProps> = ({ userSocket }) => {
+
 	const { state, dispatch } = useChat();
 	const socketInUse = userSocket;
 	const [messages, setMessages] = useState<Message[]>([]);
@@ -70,7 +72,8 @@ const ReceiveBoxChannelComponent: React.FC<ReceiveBoxChannelComponentProps> = ({
 		console.log(error);
 		}
 	};
-
+	const ownerUsers_array = state.currentUserList.filter((user: userList) => user.isOwner === true);
+	const ownerUsers = ownerUsers_array[0];
 	useEffect(() => {
 		socketInUse.on('userJoinedRoom', (notification: string) => {
 		console.log("Channel log: ", notification);
@@ -97,25 +100,75 @@ const ReceiveBoxChannelComponent: React.FC<ReceiveBoxChannelComponentProps> = ({
 	}, [messages]);
 
 	const timestamp = new Date().getTime();
-
 	return (
 		<>
-		<div className='list-users-channel'>
-			{state.currentUserList && state.currentUserList.map((userList: userList, index: number) => (
-			<div key={index} className='user-list-item'>
-				<img
-				className='img-list-users-channel'
-				src={`http://localhost:3001${userList.avatarURL}`}
-				onClick={() => {
-					dispatch({ type: 'ACTIVATE', payload: 'showOptionsChannel' });
-					dispatch({ type: 'SET_CURRENT_OPTION_CHANNEL_NAME', payload: userList.login });
-				}}
-				/>
+		<div className='bloc-owner-user'>
+			<div className='list-users-channel-owner'>
+				<div className='user-list-item'>
+						{ownerUsers.isAdmin && 
+							<div className='avatar-container'>
+								<img className='admin-user' src='./crown.png' alt='user' />
+								<img
+								className='img-list-users-channel-admin'
+								src={`http://localhost:3001${ownerUsers.avatarURL}`}
+								onClick={() => {
+									dispatch({ type: 'ACTIVATE', payload: 'dontcandcel' });
+									dispatch({ type: 'ACTIVATE', payload: 'showOptionsUserChannelOwner' });
+									dispatch({ type: 'SET_CURRENT_OPTION_CHANNEL_NAME', payload: ownerUsers.login});
+									dispatch({ type: 'DISABLE', payload: 'showBackComponent' });
+							}}/>
+							</div>}
+						{!ownerUsers.isAdmin && 
+							<img
+								className='img-list-users-channel'
+								src={`http://localhost:3001${ownerUsers.avatarURL}`}
+								onClick={() => {
+									dispatch({ type: 'ACTIVATE', payload: 'dontcandcel' });
+									dispatch({ type: 'ACTIVATE', payload: 'showOptionsUserChannelOwner' });
+									dispatch({ type: 'SET_CURRENT_OPTION_CHANNEL_NAME', payload: ownerUsers.login});
+									dispatch({ type: 'DISABLE', payload: 'showBackComponent' });
+							}}/>}
+					{state.showOptionsUserChannelOwner && 
+						<OptionsUserChannel user={ownerUsers}
+											userSocket={userSocket}/>
+					}
+				</div>
 			</div>
-			))}
-			{state.showOptionsChannel && (
-			<OptionsChannel name={state.currentOptionChannelName} title={state.currentOptionChannelName} user={state.currentUserList.filter((user: userList) => user.login === state.currentOptionChannelName)} />
-			)}
+			<div className='list-users-channel'>
+				{state.currentUserList && state.currentUserList.map((userList: userList, index: number) => (
+				<div key={index} className='user-list-item'>
+
+						{userList.isAdmin && !userList.isOwner &&
+							<div className='avatar-container'>
+								<img className='admin-user' src='./crown.png' alt='user' />
+								<img
+								className='img-list-users-channel-admin'
+								src={`http://localhost:3001${userList.avatarURL}`}
+								onClick={() => {
+									dispatch({ type: 'ACTIVATE', payload: 'dontcandcel' });
+									dispatch({ type: 'ACTIVATE', payload: 'showOptionsUserChannel' });
+									dispatch({ type: 'SET_CURRENT_OPTION_CHANNEL_NAME', payload: userList.login});
+									dispatch({ type: 'DISABLE', payload: 'showBackComponent' });
+								}}/>
+							</div>}
+						{!userList.isAdmin && !userList.isOwner &&
+							<img
+								className='img-list-users-channel'
+								src={`http://localhost:3001${userList.avatarURL}`}
+								onClick={() => {
+									dispatch({ type: 'ACTIVATE', payload: 'dontcandcel' });
+									dispatch({ type: 'ACTIVATE', payload: 'showOptionsUserChannel' });
+									dispatch({ type: 'SET_CURRENT_OPTION_CHANNEL_NAME', payload: userList.login});
+									dispatch({ type: 'DISABLE', payload: 'showBackComponent'});
+							}}/>}
+					{state.showOptionsUserChannel && !userList.isOwner &&
+						(<OptionsUserChannel 
+							user={userList}
+							userSocket={userSocket}/>)
+					}
+				</div>
+				))}
+			</div>
 		</div>
 		<div ref={messagesContainerRef} className="bloc-channel-chat">
 			{messages.map((message: Message, id: number) => (

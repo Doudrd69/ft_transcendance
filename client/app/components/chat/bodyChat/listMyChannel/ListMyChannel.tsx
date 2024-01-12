@@ -5,7 +5,7 @@ import { Socket } from 'socket.io-client';
 
 interface ListMyChannelComponentProps {
 	userSocket: Socket; // Assurez-vous d'avoir la bonne importation pour le type Socket
-	user?: string;
+	user: string;
 	isAdd?: boolean;
 	title?: string;
 }
@@ -18,18 +18,26 @@ interface Conversation {
 }
 
 const ListMyChannelComponent: React.FC<ListMyChannelComponentProps> = ({ userSocket, user, isAdd, title}) => {
-
+	
 	const { state, dispatch } = useChat();
 	const [conversations, setConversations] = useState<Conversation[]>([]);
 	const userID = sessionStorage.getItem("currentUserID");
 	const userLogin = sessionStorage.getItem("currentUserLogin") || 'no-user';
 	const [showPassword, setShowPassword] = useState<boolean>(false);
-
+	
 	const [password, setPassword] = useState('');
-
+	
 	const handlePasswordSubmit = (password: string) => {
 		setPassword(password);
 	};
+
+	const handleCloseList = () => {
+		dispatch({ type: 'DISABLE', payload: 'showListChannelAdd' });
+		dispatch({ type: 'DISABLE', payload: 'showAddChannel' });
+		dispatch({ type: 'DISABLE', payload: 'showCreateChannel' });
+		dispatch({ type: 'DISABLE', payload: 'showAddCreateChannel' });
+	};
+
 
 	const loadDiscussions = async () => {
 
@@ -38,8 +46,7 @@ const ListMyChannelComponent: React.FC<ListMyChannelComponentProps> = ({ userSoc
 			headers: {
 				'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
 			}
-		});
-
+		});	
 		if (response.ok) {
 			const responseData = await response.json();
 			const { conversationList, isAdmin } = responseData;
@@ -51,13 +58,27 @@ const ListMyChannelComponent: React.FC<ListMyChannelComponentProps> = ({ userSoc
 		}
 	};
 	
-	useEffect(() => {
-		console.log("Loading conversations...");
-		loadDiscussions();
-	}, [state.refreshChannel]);
+	const loadDiscussionsPublic = async () => {
 
+		const response = await fetch(`http://localhost:3001/chat/getConversationsPublic/${userID}`, {
+			method: 'GET',
+			headers: {
+				'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
+			}
+		});	
+		if (response.ok) {
+			const conversationPublic = await response.json();
+			if (conversationPublic)
+				setConversations((prevConversations: Conversation[]) => [...prevConversations, ...conversationPublic]);
+				// console.log(responseData);
+		}
+		else {
+			console.log("Fatal error");
+		}
+	};
+	
 	const addUserToConversation = async (convID: number, friend: string) => {
-
+		
 		const addUserToConversationDto = {
 			userToAdd: friend,
 			conversationID: convID,
@@ -74,23 +95,30 @@ const ListMyChannelComponent: React.FC<ListMyChannelComponentProps> = ({ userSoc
 
 		if (response.ok) {
 			const conversation = await response.json();
-			if (userSocket.connected) {
-				userSocket.emit('addUserToRoom', { convID: conversation.id, convName: conversation.name, friend: user } );
+			if (conversation.id) {
+				if (userSocket.connected) {
+					userSocket.emit('joinRoom', { roomName: conversation.name, roomID: conversation.id });
+				}
+				console.log("Friend has been successfully added!");
+				dispatch({ type: 'TOGGLEX', payload: 'showAddCreateChannel' });
+				dispatch({ type: 'TOGGLEX', payload: 'showAddChannel' });
 			}
-			console.log("Friend has been successfully added!");
-			dispatch({ type: 'TOGGLE', payload: 'listChannelAdd' });
+			else {
+				console.log("Error", conversation.error);
+			}
 		}
 		else {
 			console.log("Fatal error");
 		}
 	}
+	
 
-	const handleCloseList = () => {
-		dispatch({ type: 'DISABLE', payload: 'showListChannelAdd' });
-		dispatch({ type: 'DISABLE', payload: 'showAddChannel' });
-		dispatch({ type: 'DISABLE', payload: 'showCreateChannel' });
-		dispatch({ type: 'DISABLE', payload: 'showAddCreateChannel' });
-	};
+	useEffect(() => {
+		if (!isAdd)
+			loadDiscussions();
+		else
+			loadDiscussionsPublic();
+	}, [state.refreshChannel]);
 
 	useEffect(() => {
 		const handleEscape = (event: KeyboardEvent) => {
@@ -117,10 +145,11 @@ const ListMyChannelComponent: React.FC<ListMyChannelComponentProps> = ({ userSoc
 								key={index}
 								className="button-add-channel-list"
 								onClick={() => {
-									if (conversation.isProtected)
+									if (conversation.isProtected && isAdd )
 									{
 										dispatch({ type: 'SET_CURRENT_CONVERSATION_ID', payload: conversation.id });
-										dispatch({ type: 'SET_CURRENT_FRIEND', payload: user });
+										dispatch({ type: 'SET_CURRENT_CONVERSATION', payload: conversation.name });
+										dispatch({ type: 'SET_CURRENT_FRIEND', payload: userLogin });
 										dispatch({ type: 'ACTIVATE', payload: 'showPassword' });
 										dispatch({ type: 'DISABLE', payload: 'showAddChannel' });
 										dispatch({ type: 'DISABLE', payload: 'showAddCreateChannel' });
@@ -128,7 +157,7 @@ const ListMyChannelComponent: React.FC<ListMyChannelComponentProps> = ({ userSoc
 									else
 										addUserToConversation(Number(conversation.id), user || 'no-user');}}>
 									{conversation.isProtected && <img className="icon-password-channel" src='./password.png' alt="private" />}
-								<span>{conversation.name}</span>
+									<span>{`${conversation.name}#${conversation.id}`}</span>
 							</button>
 						)))}
 					</div>

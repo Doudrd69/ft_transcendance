@@ -42,6 +42,9 @@ const PasswordComponent: React.FC<PasswordComponentProps> = ({ userSocket }) => 
 			const passwordValidated = await response.json();
 			console.log("--> passwordValidated: ", passwordValidated);
 			dispatch({ type: 'DISABLE', payload: 'showPassword' });
+			if (userSocket.connected) {
+				userSocket.emit('joinRoom', { roomName: state.currentConversation, roomID: state.currentConversationID });
+			}
 		}
 		else {
 			console.log("Fatal error");

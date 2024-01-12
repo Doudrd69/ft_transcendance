@@ -27,6 +27,8 @@ const ChannelListComponent: React.FC<ChanneListComponentProps> = ({ userSocket }
 	const { state, dispatch } = useChat();
 
 	const userID = Number(sessionStorage.getItem("currentUserID"));
+	const userName = sessionStorage.getItem("currentUserLogin")
+
 	const [conversations, setConversations] = useState<Conversation[]>([]);
 	const [isAdmin, setIsAdmin] = useState<boolean[]>([]);
 	const [userList, setUserList] = useState<userList[]>([]);
@@ -86,52 +88,54 @@ const ChannelListComponent: React.FC<ChanneListComponentProps> = ({ userSocket }
 		  }, []);
 	return (
 		<div className="bloc-channel-list">
-		<button
-			className={`button-channel-list-add ${state.showAddCreateChannel ? 'green-border' : ''}`}
-			onClick={() => {
-			dispatch({ type: 'ACTIVATE', payload: 'showAddCreateChannel' });
-			}}
-		>
-			+
-		</button>
-		<div className='create-add'>
-			{ state.showAddCreateChannel ?
-				<div className='blur'>
-					<img className="add_button_cancel" src='./close.png'  onClick={handleCloseAddCreate}/>
-					<div className='bloc-add-create'>
-						<button className='button-add' onClick= {() => {dispatch({type:'ACTIVATE', payload: 'showCreateChannel'})}}>
-							CREATE
-						</button>
-						<button className='button-add' onClick= {() => {dispatch({type:'ACTIVATE', payload: 'showAddChannel'})}}>
-							JOIN 
-						</button>
-					</div>
-				</div>
-				: null}
-			{state.showPassword ? <PasswordComponent userSocket={userSocket}/> : null}
-			{state.showAddChannel ? <ListMyChannelComponent userSocket={userSocket} isAdd={false} title="JOIN CHANNEL"></ListMyChannelComponent> : null}
-			{state.showCreateChannel ? <AddConversationComponent userSocket={userSocket} loadDiscussions={loadDiscussions} title="CREATE CHANNEL" isChannel={true} /> : null}
-		</div>
-		{conversations.map((conversation, index) => (
-				conversation.is_channel && (
-				<button
-				key={index}
-				className="button-channel-list"
+			<button
+				className={`button-channel-list-add ${state.showAddCreateChannel ? 'green-border' : ''}`}
 				onClick={() => {
-					dispatch({ type: 'TOGGLE', payload: 'showChannel' });
-					dispatch({ type: 'SET_CURRENT_CONVERSATION', payload: conversation.name });
-					dispatch({ type: 'SET_CURRENT_CONVERSATION_ID', payload: conversation.id });
-					dispatch({ type: 'SET_CURRENT_CONVERSATION_ID', payload: conversation.id });
-					dispatch({ type: 'SET_CURRENT_USER_LIST', payload: userList[index] });
-					console.log("userList[index] =====> ", index ,userList[index]);
-				}}>
-				{isAdmin[index] && <img className="icon-admin-channel" src='./crown.png' alt="private" />}
-				{conversation.isProtected &&  <img className="icon-password-channel" src='./password.png' alt="private" />}
-				{!conversation.isPublic && <img className="icon-private-channel" src='./private.png' alt="private" />}
-				<span>{conversation.name}</span>
+				dispatch({ type: 'ACTIVATE', payload: 'showAddCreateChannel' });
+				}}
+			>
+				+
 			</button>
-			)
-		))}
+			<div className='create-add'>
+				{ state.showAddCreateChannel ?
+					<div className='blur'>
+						<img className="add_button_cancel" src='./close.png'  onClick={handleCloseAddCreate}/>
+						<div className='bloc-add-create'>
+							<button className='button-add' onClick= {() => {dispatch({type:'ACTIVATE', payload: 'showCreateChannel'})}}>
+								CREATE
+							</button>
+							<button className='button-add' onClick= {() => {dispatch({type:'ACTIVATE', payload: 'showAddChannel'})}}>
+								JOIN 
+							</button>
+						</div>
+					</div>
+					: null}
+				{state.showPassword ? <PasswordComponent userSocket={userSocket}/> : null}
+				{state.showAddChannel ? <ListMyChannelComponent userSocket={userSocket} user={userName || 'no-user'} isAdd={true} title="JOIN CHANNEL"></ListMyChannelComponent> : null}
+				{state.showCreateChannel ? <AddConversationComponent userSocket={userSocket} loadDiscussions={loadDiscussions} title="CREATE CHANNEL" isChannel={true} /> : null}
+			</div>
+			{conversations.map((conversation, index) => (
+					conversation.is_channel && (
+					<button
+					key={index}
+					className="button-channel-list"
+					onClick={() => {
+						dispatch({ type: 'TOGGLE', payload: 'showChannel' });
+						dispatch({ type: 'SET_CURRENT_CONVERSATION', payload: conversation.name });
+						dispatch({ type: 'SET_CURRENT_CONVERSATION_ID', payload: conversation.id });
+						dispatch({ type: 'ACTIVATE', payload: 'currentChannelBool' });
+						if(isAdmin[index])
+							dispatch({ type: 'ACTIVATE', payload: 'showAdmin' });
+						dispatch({ type: 'SET_CURRENT_USER_LIST', payload: userList[index] });
+						console.log("userList[index] =====> ", index ,userList[index]);
+					}}>
+					{isAdmin[index] && <img className="icon-admin-channel" src='./crown.png' alt="private" />}
+					{conversation.isProtected &&  <img className="icon-password-channel" src='./password.png' alt="private" />}
+					{!conversation.isPublic && <img className="icon-private-channel" src='./private.png' alt="private" />}
+					<span>{`${conversation.name}#${conversation.id}`}</span>
+				</button>
+				)
+			))}
 		</div>
 	);
 };

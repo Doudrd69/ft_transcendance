@@ -1,23 +1,43 @@
+.bloc-id{
+	display: flex;
+	background-color:var(--second) ;
+	height: 100%;
+	width: 90%;
+	text-align: center;
+	align-items: center;
+	border-radius:10px;
+	justify-content: center;
+	position: relative;
+	margin: 10px;
+}
+
+.image-id{
+	width: 25px;
+	height: auto;
+	background-color: transparent;
+	position: absolute;
+  	right: 10px;
+}
+
+.image-id:hover {
+	transform: rotate(80deg) scale(1.20);;
+	transition: transform 0.3s ease; /* Ajoutez une transition pour une animation fluide */
+  }
+
 .id {
 	/* border: 3px solid #333; */
 	/* border:none; */
+	margin: 10px ;
 	overflow: hidden;
 	text-overflow: ellipsis; 
-	text-align: center;
-	align-items: center;
-	justify-content: center;
 	display :flex;
 	overflow: hidden; 
 	white-space: nowrap;
 	text-overflow: ellipsis;
-	height: 100%;
-	width: 90%;
 	/* border-top: none; */
-	background-color:var(--second) ;
 	color: #f0f0f0;
 	text-transform: uppercase;
     font-family: 'Gill Sans' , sans-serif;
 	font-size: 26px;
 	font-weight: bold;
-	border-radius:10px
 }
