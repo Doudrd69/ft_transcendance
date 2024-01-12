@@ -80,6 +80,7 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ name,  title, u
 			console.log(error);
 			}
 	}
+
 	const handleAdmin = async() => {
 		try {
 			const userOptionDto = {conversationID: state.currentConversationID, userID: state.currentUserID, state : user.isAdmin}
@@ -100,6 +101,7 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ name,  title, u
 			console.log(error);
 			}
 	}
+
 	return (
 		<>
 		<div className="blur-background"></div>
