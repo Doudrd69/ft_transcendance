@@ -32,7 +32,7 @@ export class ChatController {
 	@UseGuards(AuthGuard)
 	@HttpCode(HttpStatus.OK)
 	@Post('addUserToConversation')
-	addUserToConversation(@Body() addUserToConversationDto: AddUserToConversationDto): Promise<Conversation> {
+	addUserToConversation(@Body() addUserToConversationDto: AddUserToConversationDto): Promise<Conversation | string> {
 		return this.chatService.addUserToConversation(addUserToConversationDto);
 	}
 

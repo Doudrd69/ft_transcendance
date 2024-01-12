@@ -1,20 +1,17 @@
 import { Injectable } from '@nestjs/common';
-import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import * as bcrypt from 'bcrypt'
+import * as bcrypt from 'bcrypt';
+import { Repository } from 'typeorm';
+import { User } from '../users/entities/users.entity';
+import { UpdateConversationDto } from './dto/UpdateConversationDto.dto';
+import { AddUserToConversationDto } from './dto/addUserToConversationDto.dto';
+import { UserOptionsDto } from './dto/userOptionsDto.dto';
+import { CheckPasswordDto } from './dto/checkPasswordDto.dto';
+import { ConversationDto } from './dto/conversation.dto';
+import { MessageDto } from './dto/message.dto';
 import { Conversation } from './entities/conversation.entity';
 import { GroupMember } from './entities/group_member.entity';
 import { Message } from './entities/message.entity';
-import { User } from '../users/entities/users.entity'
-import { MessageDto } from './dto/message.dto';
-import { ConversationDto } from './dto/conversation.dto';
-import { UpdateConversationDto } from './dto/UpdateConversationDto.dto';
-import { AddUserToConversationDto } from './dto/addUserToConversationDto.dto';
-import { CheckPasswordDto } from './dto/checkPasswordDto.dto';
-import { BanUserDto } from './dto/banUserDto.dto';
-import { UnbanUserDto } from './dto/unbanUserDto.dto';
-import { MuteUserDto } from './dto/muteUserDto.dto';
-import { UnmuteUserDto } from './dto/unmuteUserDto.dto';
 import { group } from 'console';
 
 @Injectable()
@@ -46,7 +43,6 @@ export class ChatService {
 		let groupToReturn;
 		user.groups.forEach((group: GroupMember) => {
 			if (group.id == groupToSearch.id) {
-				console.log("Group is in user's group array with ID: ", group.id);
 				groupToReturn = group;
 			}
 		});
@@ -221,7 +217,7 @@ export class ChatService {
 	}
 
 	/***					ADMINS RIGHTS				***/
-	async muteUserFromConversation(muteUserDto: MuteUserDto) {
+	async updateUserMuteStatusFromConversation(muteUserDto: UserOptionsDto) {
 
 		const userToMute : User = await this.usersRepository.findOne({
 			where: { id: muteUserDto.userID },
@@ -232,46 +228,21 @@ export class ChatService {
 
 		if (userToMute && conversation) {
 
-			let groupToUpdate : GroupMember;
+			const groupToUpdate = await this.getRelatedGroup(userToMute, conversation);
+			if (groupToUpdate) {
 
-			userToMute.groups.forEach((group: GroupMember) => {
-				if (group.conversation.id == conversation.id) {
-					groupToUpdate = group;
-				}
-			})
+				if (muteUserDto.state)
+					groupToUpdate.isMute = false;
+				else
+					groupToUpdate.isMute = true;
+				await this.groupMemberRepository.save(groupToUpdate);
+			}
 
-			groupToUpdate.isMute = true;
-			await this.groupMemberRepository.save(groupToUpdate);
 			return ;
 		}
 	}
 
-	async unmuteUserFromConversation(unmuteUserDto: UnmuteUserDto) {
-
-		const userToMute : User = await this.usersRepository.findOne({
-			where: { id: unmuteUserDto.userID },
-			relations: ["groups"],
-		});
-
-		const conversation = await this.conversationRepository.findOne({ where: { id: unmuteUserDto.conversationID } });
-
-		if (userToMute && conversation) {
-
-			let groupToUpdate : GroupMember;
-
-			userToMute.groups.forEach((group: GroupMember) => {
-				if (group.conversation.id == conversation.id) {
-					groupToUpdate = group;
-				}
-			})
-
-			groupToUpdate.isMute = false;
-			await this.groupMemberRepository.save(groupToUpdate);
-			return ;
-		}
-	}
-
-	async banUserFromConversation(banUserDto: BanUserDto) {
+	async updateUserBanStatusFromConversation(banUserDto: UserOptionsDto) {
 
 		const userToBan : User = await this.usersRepository.findOne({
 			where: { id: banUserDto.userID },
@@ -282,39 +253,41 @@ export class ChatService {
 
 		if (userToBan && conversation) {
 
-			let groupToUpdate : GroupMember;
+			const groupToUpdate = await this.getRelatedGroup(userToBan, conversation);
+			if (groupToUpdate) {
 
-			userToBan.groups.forEach((group: GroupMember) => {
-				if (group.conversation.id == conversation.id) {
-					groupToUpdate = group;
-				}
-			})
+				if (banUserDto.state)
+					groupToUpdate.isBan = false;
+				else
+					groupToUpdate.isBan = true;
+				await this.groupMemberRepository.save(groupToUpdate);
+			}
 
-			groupToUpdate.isBan = true;
-			await this.groupMemberRepository.save(groupToUpdate);
 			return ;
 		}
 	}
 
-	async unbanUserFromConversation(unbanUserDto: UnbanUserDto) {
+	async updateUserAdminStatusFromConversation(promoteUserToAdminDto: UserOptionsDto) {
 
-		const userToUnban : User = await this.usersRepository.findOne({
-			where: { id: unbanUserDto.userID },
-			relations: ["groups"],
+		const userToPromote : User = await this.usersRepository.findOne({
+			where: { id: promoteUserToAdminDto.userID },
+			relations: ['groups'],
 		});
 
-		const conversation = await this.conversationRepository.findOne({ where: { id: unbanUserDto.conversationID } });
+		const conversation = await this.conversationRepository.findOne({ where: { id: promoteUserToAdminDto.conversationID } });
+	
+		if (userToPromote && conversation) {
 
-		if (userToUnban && conversation) {
-
-			const groupToUpdate = await this.getRelatedGroup(userToUnban, conversation);
+			const groupToUpdate = await this.getRelatedGroup(userToPromote, conversation);
 			if (groupToUpdate) {
-				groupToUpdate.isBan = false;
+
+				if (promoteUserToAdminDto.state)
+					groupToUpdate.isBan = false;
+				else
+					groupToUpdate.isBan = true;
 				await this.groupMemberRepository.save(groupToUpdate);
-				return ;
 			}
 
-			console.log("Fatal error");
 			return ;
 		}
 	}
@@ -478,7 +451,7 @@ export class ChatService {
 			conv.isPublic = conversationDto.isPublic;
 			conv.isProtected = conversationDto.isProtected;
 			if (conversationDto.password) {
-				console.log("Password to saave: ", conversationDto.password);
+				console.log("Password to save: ", conversationDto.password);
 				conv.password = await this.hashChannelPassword(conversationDto.password);
 			}
 			await this.conversationRepository.save(conv);
@@ -628,8 +601,6 @@ export class ChatService {
 
 	async getAllPublicConversationsOption(userID : number)
 	{
-
-		console.log("userID bBBBBBBBACCCKKKK", userID);
 		const user = await this.usersRepository.findOne({
 			where: { id: userID },
 			relations: ["groups", "groups.conversation"],
