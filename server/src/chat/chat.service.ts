@@ -241,6 +241,7 @@ export class ChatService {
 
 	async updateChannelIsPublicStatus(channelOptionsDto: ChannelOptionsDto) {
 
+		console.log("AHAHAHAHHAHAHAHHA");
 		const user : User = await this.usersRepository.findOne({
 			where: { id: channelOptionsDto.userID },
 			relations: ["groups", "groups.conversation"],
@@ -253,9 +254,11 @@ export class ChatService {
 		// check if user is admin/owner
 		const isUserIsAdmin = await this.getGroupIsAdminStatus(user, channelToUpdate);
 
+		console.log(channelOptionsDto);
 		if (isUserIsAdmin) {
 			if (channelToUpdate) {
 	
+				console.log(channelToUpdate.name);
 				if (channelOptionsDto.state)
 					channelToUpdate.isPublic = false;
 				else
