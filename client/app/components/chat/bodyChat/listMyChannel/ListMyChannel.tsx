@@ -149,8 +149,8 @@ const ListMyChannelComponent: React.FC<ListMyChannelComponentProps> = ({ userSoc
 								onClick={() => {
 									if (conversation.isProtected && isAdd )
 									{
-										console.log("mon ami est protégé", userLogin);
 										dispatch({ type: 'SET_CURRENT_CONVERSATION_ID', payload: conversation.id });
+										dispatch({ type: 'SET_CURRENT_CONVERSATION', payload: conversation.name });
 										dispatch({ type: 'SET_CURRENT_FRIEND', payload: userLogin });
 										dispatch({ type: 'ACTIVATE', payload: 'showPassword' });
 										dispatch({ type: 'DISABLE', payload: 'showAddChannel' });
