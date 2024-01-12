@@ -13,6 +13,7 @@ import { Conversation } from './entities/conversation.entity';
 import { GroupMember } from './entities/group_member.entity';
 import { Message } from './entities/message.entity';
 import { group } from 'console';
+import { ChannelOptionsDto } from './dto/channelOptionsDto.dto';
 
 @Injectable()
 export class ChatService {
@@ -55,16 +56,19 @@ export class ChatService {
 
 	private async getGroupIsAdminStatus(user: User, conversation: Conversation): Promise<boolean> {
 
+		let status;
 		user.groups.forEach((group: GroupMember) => {
 			if (group.conversation.id == conversation.id) {
-				if (group.isAdmin)
-					return true;
+				if (group.isAdmin) {
+					status = true;
+					return ;
+				}
 				else
-					return false;
+					status = false;
 			}
 		});
 
-		return false;
+		return status;
 	}
 
 	private async getGroupIsBanStatus(user: User, conversation: Conversation): Promise<boolean> {
@@ -216,7 +220,69 @@ export class ChatService {
 		return await this.groupMemberRepository.save(group);
 	}
 
-	/***					ADMINS RIGHTS				***/
+	/***						CHANNEL OPTIONS					***/
+
+	async updateChannelIsPublicStatus(channelOptionsDto: ChannelOptionsDto) {
+
+		const user : User = await this.usersRepository.findOne({
+			where: { id: this.usersRepository.id },
+			relations: ["groups", "groups.conversation"],
+		});
+
+		const channelToUpdate : Conversation = await this.conversationRepository.findOne({
+			where: { id: channelOptionsDto.conversationID },
+		});
+
+		// check if user is admin/owner
+		const isUserIsAdmin = await this.getGroupIsAdminStatus(user, channelToUpdate);
+
+		if (isUserIsAdmin) {
+			if (channelToUpdate) {
+	
+				if (channelOptionsDto.state)
+					channelToUpdate.isPublic = false;
+				else
+					channelToUpdate.isPublic = true;
+				await this.conversationRepository.save(channelToUpdate);
+			}
+		}
+
+		return ;
+	}
+
+	async updateChannelIsProtectedStatus(channelOptionsDto: ChannelOptionsDto) {
+
+		const user : User = await this.usersRepository.findOne({
+			where: { id: this.usersRepository.id },
+			relations: ["groups", "groups.conversation"],
+		});
+
+		const channelToUpdate : Conversation = await this.conversationRepository.findOne({
+			where: { id: channelOptionsDto.conversationID },
+		});
+
+		// check if user is admin/owner
+		const isUserIsAdmin = await this.getGroupIsAdminStatus(user, channelToUpdate);
+
+		if (isUserIsAdmin) {
+			if (channelToUpdate) {
+	
+				if (channelOptionsDto.state)
+					channelToUpdate.isProtected = false;
+				else {					
+					channelToUpdate.isProtected = true;
+					if (channelOptionsDto.password)
+						channelToUpdate.password = await this.hashChannelPassword(channelOptionsDto.password)
+				}
+
+				await this.conversationRepository.save(channelToUpdate);
+			}
+		}
+
+		return ;
+	}
+
+	/***					USER CHANNEL OPTIONS				***/
 	async updateUserMuteStatusFromConversation(muteUserDto: UserOptionsDto) {
 
 		const userToMute : User = await this.usersRepository.findOne({

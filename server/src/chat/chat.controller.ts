@@ -1,17 +1,15 @@
-import { Controller, Post, HttpCode, HttpStatus, Body, Get, Param, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post, UseGuards } from '@nestjs/common';
+import { AuthGuard } from 'src/auth/auth.guard';
 import { ChatService } from './chat.service';
-import { GroupDto } from './dto/group.dto';
-import { MessageDto } from './dto/message.dto';
-import { ConversationDto } from './dto/conversation.dto';
+import { UpdateConversationDto } from './dto/UpdateConversationDto.dto';
 import { AddUserToConversationDto } from './dto/addUserToConversationDto.dto';
+import { CheckPasswordDto } from './dto/checkPasswordDto.dto';
+import { ConversationDto } from './dto/conversation.dto';
+import { MessageDto } from './dto/message.dto';
+import { UserOptionsDto } from './dto/userOptionsDto.dto';
 import { Conversation } from './entities/conversation.entity';
 import { Message } from './entities/message.entity';
-import { GroupMember } from './entities/group_member.entity';
-import { AuthGuard } from 'src/auth/auth.guard';
-import { UpdateConversationDto } from './dto/UpdateConversationDto.dto';
-import { CheckPasswordDto } from './dto/checkPasswordDto.dto';
-import { MuteUserDto } from './dto/muteUserDto.dto';
-import { BanUserDto } from './dto/banUserDto.dto';
+import { ChannelOptionsDto } from './dto/channelOptionsDto.dto';
 
 @Controller('chat')
 export class ChatController {
@@ -52,18 +50,43 @@ export class ChatController {
 		return this.chatService.compareChannelPassword(checkPasswordDto);
 	}
 
+	/****** USER OPTIONS ON CHANNEL ******/
+
 	@UseGuards(AuthGuard)
 	@HttpCode(HttpStatus.OK)
 	@Post('banUser')
-	banUserFromConversation(@Body() banUserDto: BanUserDto){
-		return this.chatService.banUserFromConversation(banUserDto);
+	banUserFromConversation(@Body() userOptionsDto: UserOptionsDto){
+		return this.chatService.updateUserBanStatusFromConversation(userOptionsDto);
 	}
 
 	@UseGuards(AuthGuard)
 	@HttpCode(HttpStatus.OK)
 	@Post('muteUser')
-	muteUserFromConversation(@Body() muteUserDto: MuteUserDto) {
-		return this.chatService.muteUserFromConversation(muteUserDto);
+	muteUserFromConversation(@Body() userOptionsDto: UserOptionsDto) {
+		return this.chatService.updateUserMuteStatusFromConversation(userOptionsDto);
+	}
+
+	@UseGuards(AuthGuard)
+	@HttpCode(HttpStatus.OK)
+	@Post('adminUser')
+	adminUserFromConversation(@Body() userOptionsDto: UserOptionsDto) {
+		return this.chatService.updateUserAdminStatusFromConversation(userOptionsDto);
+	}
+
+	/****** CHANNEL OPTIONS ON CHANNEL ******/
+
+	@UseGuards(AuthGuard)
+	@HttpCode(HttpStatus.OK)
+	@Post('updateIsPublic')
+	updateChannelIsPublicStatus(@Body() channelOptionsDto: ChannelOptionsDto){
+		return this.chatService.updateChannelIsPublicStatus(channelOptionsDto);
+	}
+
+	@UseGuards(AuthGuard)
+	@HttpCode(HttpStatus.OK)
+	@Post('updateIsProtected')
+	updateChannelIsprotectedStatus(@Body() channelOptionsDto: ChannelOptionsDto) {
+		return this.chatService.updateChannelIsProtectedStatus(channelOptionsDto);
 	}
 
 	// @Get('getMesssage/:id')
