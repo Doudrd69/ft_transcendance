@@ -22,7 +22,9 @@ const PasswordComponent: React.FC<PasswordComponentProps> = ({ userSocket }) => 
 		await addFriendToConversation(state.currentConversationID, state.currentFriend, password);
 		}
 	};
-
+	console.log("pwd --> ", password);
+	console.log("state --> ", state.currentConversationID);
+	console.log("state --> ", state.currentFriend);
 	const addFriendToConversation = async (convID: number, friend: string, password: string) => {
 		const addFriendToConversationDto = {
 		userToAdd: friend,

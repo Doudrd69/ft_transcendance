@@ -60,7 +60,10 @@ interface ChatState {
 	showOptionsChannel:boolean;
 	currentOptionChannelName:string | null;
 	currentFriend: string | null;
+	currentChannelBool: boolean;
 	showPassword: boolean;
+	showOptionsUserChannel: boolean;
+	showAdmin: boolean;
 	[key: string]: boolean  |number | string | null;
 }
 
@@ -94,8 +97,12 @@ const initialState: ChatState = {
 	currentFriend: null,
 	currentConvID: null,
 	showPassword: false,
+	showAdmin: false,
 	isAdmin: false,
 	currentOptionChannelName:'',
+	showOptionsUserChannel: false,
+	currentChannelBool: false,
+
 };
 
 // Réducteur

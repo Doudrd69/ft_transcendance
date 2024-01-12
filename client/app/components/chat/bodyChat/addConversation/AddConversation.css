@@ -79,6 +79,7 @@
 	z-index: 2;
 	text-align: center;
 	color: white;
+	white-space: nowrap;
   }
 
   .privated-public {

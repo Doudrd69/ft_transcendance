@@ -15,6 +15,7 @@ import { BanUserDto } from './dto/banUserDto.dto';
 import { UnbanUserDto } from './dto/unbanUserDto.dto';
 import { MuteUserDto } from './dto/muteUserDto.dto';
 import { UnmuteUserDto } from './dto/unmuteUserDto.dto';
+import { group } from 'console';
 
 @Injectable()
 export class ChatService {
@@ -599,5 +600,43 @@ export class ChatService {
 
 		console.error("Fatal error: conversations not found");
 		return [];
+	}
+
+	async getAllPublicConversationsOption(userID : number)
+	{
+
+		console.log("userID bBBBBBBBACCCKKKK", userID);
+		const user = await this.usersRepository.findOne({
+			where: { id: userID },
+			relations: ["groups", "groups.conversation"],
+		});
+
+		const groups  = await this.groupMemberRepository.find({
+			relations: ["conversation"],
+		});
+
+		let array = [];
+
+		const groupIsChannel = groups.filter((group: GroupMember) => group.conversation.is_channel == true);
+		const groupIsPublic = groupIsChannel.filter((group: GroupMember) => group.conversation.isPublic == true);
+
+		// console.log(groupIsPublic);
+
+		groupIsPublic.forEach((group: GroupMember) => {
+			if (!user.groups[group.id]) {
+				array.push({
+					id: group.conversation.id,
+					name: group.conversation.name,
+					is_channel: group.conversation.is_channel,
+					isProtected: group.conversation.isProtected,
+				});
+			}
+		});
+
+		console.log("notme: ", array);
+		if (array)
+			return array;
+		else
+			throw Error("No conversations found");
 	}
 }
