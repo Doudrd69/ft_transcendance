@@ -10,8 +10,7 @@ import { GroupMember } from './entities/group_member.entity';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { UpdateConversationDto } from './dto/UpdateConversationDto.dto';
 import { CheckPasswordDto } from './dto/checkPasswordDto.dto';
-import { MuteUserDto } from './dto/muteUserDto.dto';
-import { BanUserDto } from './dto/banUserDto.dto';
+import { UserOptionsDto } from './dto/userOptionsDto.dto';
 
 @Controller('chat')
 export class ChatController {
@@ -55,15 +54,22 @@ export class ChatController {
 	@UseGuards(AuthGuard)
 	@HttpCode(HttpStatus.OK)
 	@Post('banUser')
-	banUserFromConversation(@Body() banUserDto: BanUserDto){
-		return this.chatService.banUserFromConversation(banUserDto);
+	banUserFromConversation(@Body() userOptionDto: UserOptionsDto){
+		return this.chatService.updateUserBanStatusFromConversation(userOptionDto);
 	}
 
 	@UseGuards(AuthGuard)
 	@HttpCode(HttpStatus.OK)
 	@Post('muteUser')
-	muteUserFromConversation(@Body() muteUserDto: MuteUserDto) {
-		return this.chatService.muteUserFromConversation(muteUserDto);
+	muteUserFromConversation(@Body() userOptionDto: UserOptionsDto) {
+		return this.chatService.updateUserMuteStatusFromConversation(userOptionDto);
+	}
+
+	@UseGuards(AuthGuard)
+	@HttpCode(HttpStatus.OK)
+	@Post('adminUser')
+	adminUserFromConversation(@Body() userOptionDto: UserOptionsDto) {
+		return this.chatService.updateUserAdminStatusFromConversation(userOptionDto);
 	}
 
 	// @Get('getMesssage/:id')
