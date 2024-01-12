@@ -3,6 +3,14 @@ import { Socket } from 'socket.io-client';
 import { useChat } from '../../ChatContext';
 import './AddConversation.css';
 
+interface User {
+	login: string;
+	avatarURL: string;
+	isAdmin: boolean;
+	isMute: boolean;
+	isBan: boolean;
+}
+
 interface OptionsChannelProps {
 	title: string;
 }
@@ -16,7 +24,9 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 
 	const [formValue, setFormValue] = useState('');
 	const { state, dispatch } = useChat();
-	console.log('========>', name);
+
+	console.log(' user ========>', user);
+
 	const handleCancel = () => {
 		dispatch({ type: 'DISABLE', payload: 'showOptionChannel' });
 		setFormValue('');

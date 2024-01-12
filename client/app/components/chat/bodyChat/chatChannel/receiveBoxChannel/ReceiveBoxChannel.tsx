@@ -19,7 +19,7 @@ interface userList {
 	login: string;
 	avatarURL: string;
 	isAdmin: boolean;
-	mute: string[];
+	isMute: boolean;
 	isBan: boolean;
 }
 
