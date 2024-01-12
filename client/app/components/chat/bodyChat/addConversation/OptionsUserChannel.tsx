@@ -41,8 +41,8 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ name,  title, u
 
 	const handleMute = async() => {
 		try {
-			const userOptionDto = {conversationID: state.currentConversationID, userID: state.currentUserID, state : user.isMute}
-			const response = await fetch(`http://localhost:3001/chat/getMessages/muteUser`, {
+			const userOptionDto = {conversationID: state.currentConversationID, userName: user.login , state: user.isMute}
+			const response = await fetch(`http://localhost:3001/chat/muteUser`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
@@ -62,7 +62,11 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ name,  title, u
 
 	const handleBan = async() => {
 		try {
-			const userOptionDto = {conversationID: state.currentConversationID, userID: state.currentUserID, state : user.isBan}
+			console.log("state.currentConversationID", state.currentConversationID);
+			console.log("userLogin", user.login);
+			console.log("user.isBan", user.isBan);
+			console.log("user", user);
+			const userOptionDto = {conversationID: state.currentConversationID, userName: user.login, state : user.isBan}
 			const response = await fetch(`http://localhost:3001/chat/banUser`, {
 				method: 'POST',
 				headers: {
@@ -83,7 +87,7 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ name,  title, u
 
 	const handleAdmin = async() => {
 		try {
-			const userOptionDto = {conversationID: state.currentConversationID, userID: state.currentUserID, state : user.isAdmin}
+			const userOptionDto = {conversationID: state.currentConversationID, userName: user.login, state : user.isAdmin}
 			const response = await fetch(`http://localhost:3001/chat/adminUser`, {
 				method: 'POST',
 				headers: {
@@ -110,19 +114,19 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ name,  title, u
 				<h2 className="add__title">{title}</h2>	
 				<div className="option-block">
 					{user.isAdmin ?
-						<img className="option-image" src="crown.png"/>
+						<img className="option-image" src="crown.png" onClick={handleAdmin}/>
 						:
-						<img className="option-image-opacity" src="crown.png"/>
+						<img className="option-image-opacity" src="crown.png" onClick={handleAdmin}/>
 					}
 					{user.isMute ?
-						<img className="option-image" src="volume-mute.png"/>
+						<img className="option-image" src="volume-mute.png" onClick={handleMute}/>
 						:
-						<img className="option-image-opacity" src="volume-mute.png"/>
+						<img className="option-image-opacity" src="volume-mute.png" onClick={handleMute}/>
 					}
 					{user.isBan ?
-						<img className="option-image" src="interdit.png"/>
+						<img className="option-image" src="interdit.png" onClick={handleBan}/>
 						:
-						<img className="option-image-opacity" src="interdit.png"/>
+						<img className="option-image-opacity" src="interdit.png" onClick={handleBan}/>
 					}
 				</div>
 			</div>

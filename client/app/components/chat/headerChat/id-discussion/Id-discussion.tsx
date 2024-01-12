@@ -2,9 +2,14 @@ import './Id-discussion.css'
 import React, { use ,  useEffect, useState} from 'react';
 import { useChat } from '../../ChatContext';
 import OptionsChannel from '../../bodyChat/addConversation/OptionsChannel';
+import { Socket } from 'socket.io-client';
+import PasswordChangeComponent from './PasswordChange';
 
+interface IdDiscussionProps {
+	userSocket: Socket;
+	}
 
-const IdDiscussionComponent: React.FC= () => {
+const IdDiscussionComponent: React.FC<IdDiscussionProps>= ({userSocket}) => {
 	const { state, dispatch } = useChat();
 	var id;
 	if (state.currentChannelBool)
@@ -13,18 +18,20 @@ const IdDiscussionComponent: React.FC= () => {
 	}
 	else
 		id = state.currentConversation;
-		return (
-			<div className='bloc-id'>
-			  <p className="id">{id}</p>
-			  {state.showAdmin && (
-				<img
-				  className='image-id'
-				  src='settings.png'
-				  onClick={() => { dispatch({ type: 'ACTIVATE', payload: 'showOptionChannel' }); }}
-				/>
-			  )}
-			  {state.showOptionChannel && <OptionsChannel title="CHANNEL OPTION" />}
-			</div>
-		  );
+
+	return (
+		<div className='bloc-id'>
+			<p className="id">{id}</p>
+			{state.showAdmin && (
+			<img
+				className='image-id'
+				src='settings.png'
+				onClick={() => { dispatch({ type: 'ACTIVATE', payload: 'showOptionChannel' }); }}
+			/>
+			)}
+			{state.showPasswordChange && <PasswordChangeComponent userSocket={userSocket}/>}
+			{state.showOptionChannel && <OptionsChannel title="CHANNEL OPTION"/>}
+		</div>
+		);
 };
 export default IdDiscussionComponent;

@@ -23,7 +23,9 @@ type ActionType =
   | 'SET_CURRENT_USER_LIST'
   | 'SET_CURRENT_CONVERSATION_ID'
   | 'SET_CURRENT_OPTION_CHANNEL_NAME'
-  | 'SET_CURRENT_FRIEND';
+  | 'SET_CURRENT_FRIEND'
+  |'SET_CURRENT_CONVERSATION_IS_PRIVATE'
+  | 'SET_CURRENT_CONVERSATION_IS_PROTECTED';
 // Définir l'interface de l'action
 interface Action {
   type: ActionType;
@@ -64,11 +66,16 @@ interface ChatState {
 	showPassword: boolean;
 	showOptionsUserChannel: boolean;
 	showAdmin: boolean;
+	currentConversationIsProtected: boolean;
+	currentConversationIsPrivate: boolean;
+	showPasswordChange:boolean;
 	[key: string]: boolean  |number | string | null;
 }
 
 // État initial
 const initialState: ChatState = {
+	currentConversationIsPrivate: false,
+	currentConversationIsProtected: false,
 	showFriendsList: false,
 	showChatList: false,
 	showChannelList: true,
@@ -102,6 +109,7 @@ const initialState: ChatState = {
 	currentOptionChannelName:'',
 	showOptionsUserChannel: false,
 	currentChannelBool: false,
+	showPasswordChange:false,
 
 };
 
@@ -142,6 +150,10 @@ const chatReducer = (state: ChatState, action: Action): ChatState => {
 			return { ...state, currentOptionChannelName: action.payload || null };
 		case 'SET_CURRENT_FRIEND':
 			return { ...state, currentFriend: action.payload || null };
+		case 'SET_CURRENT_CONVERSATION_IS_PRIVATE':
+				return {...state, currentConversationIsPrivate: action.payload,};
+		case 'SET_CURRENT_CONVERSATION_IS_PROTECTED':
+				return {...state, currentConversationIsProtected: action.payload,};
 	  default:
 		return state;
 	}
@@ -184,7 +196,7 @@ export const setCurrentConversationID = (payload: string | null): Action => ({
 	payload,
 });
 
-export const setCurrentUserList= (payload: any | null): Action => ({
+export const setCurrentUserLis = (payload: any | null): Action => ({
 	type: 'SET_CURRENT_USER_LIST',
 	payload,
 });
@@ -196,6 +208,16 @@ export const setCurrentOptionChannelName = (payload: string | null): Action => (
 
 export const setCurrentFriend = (payload: string | null): Action => ({
 	type: 'SET_CURRENT_FRIEND',
+	payload,
+});
+
+export const setCurrentConversationIsPrivate = (payload: boolean): Action => ({
+	type: 'SET_CURRENT_CONVERSATION_IS_PRIVATE',
+	payload,
+});
+
+export const setCurrentConversationIsProtected = (payload: boolean): Action => ({
+	type: 'SET_CURRENT_CONVERSATION_IS_PROTECTED',
 	payload,
 });
   

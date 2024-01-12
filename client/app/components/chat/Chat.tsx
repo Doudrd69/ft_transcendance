@@ -13,7 +13,7 @@ const ChatComponent: React.FC<ChatComponentProps> = ({ userSocket }) => {
 	return (
 		<ChatProvider>
 			<div className="left-half">
-					<HeaderChatComponent/>
+					<HeaderChatComponent userSocket={userSocket}/>
 					<BodyChatComponent userSocket={userSocket}/>
 			</div>
 		</ChatProvider>
