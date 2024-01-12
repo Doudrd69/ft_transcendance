@@ -36,12 +36,22 @@ export class ChatService {
 	/***					PRIVATE STATUS GETTERS				***/
 
 	// le user foit avoir charge la relation groups.conversation pour toutes ces fonctions
-	private async getRelatedGroup(user: User, conversation: Conversation): Promise<GroupMember | null> {
+	private async getRelatedGroup(user: User, conversation: Conversation): Promise<GroupMember> {
 
-		user.groups.forEach((group: GroupMember) => {
-			if (group.conversation.id == conversation.id)
-				return group;
+		const groupToSearch : GroupMember = await this.groupMemberRepository.findOne({
+			where: { conversation: conversation },
 		});
+
+		let groupToReturn;
+		user.groups.forEach((group: GroupMember) => {
+			if (group.id == groupToSearch.id) {
+				console.log("Group is in user's group array with ID: ", group.id);
+				groupToReturn = group;
+			}
+		});
+
+		if (groupToReturn)
+			return groupToReturn
 
 		return ;
 	}
@@ -185,6 +195,7 @@ export class ChatService {
 					userToAdd: checkPasswordDto.username,
 					conversationID: conversation.id,
 				}
+				console.log("Add user to protected conv");
 				const conversationToAdd = await this.addUserToConversation(addUserToConversationDto);
 				if (conversationToAdd)
 					return true;
@@ -358,6 +369,12 @@ export class ChatService {
 			where: {id: addUserToConversationDto.conversationID}
 		});
 
+		const isGroupInUsersArray = await this.getRelatedGroup(userToAdd, conversationToAdd);
+		if (isGroupInUsersArray) {
+			console.log("User has already joined", isGroupInUsersArray.conversation.name );
+			return ;
+		}
+
 		if (await this.getGroupIsBanStatus(userToAdd, conversationToAdd)) {
 			console.log("Fatal error: user is ban from this channel");
 			return ;
@@ -431,7 +448,7 @@ export class ChatService {
 		if (user && conversationToUpdate) {
 			
 			if (await this.getGroupIsAdminStatus(user, conversationToUpdate)) {
-				
+
 				conversationToUpdate.isPublic = updateConversationDto.isPublic;
 				conversationToUpdate.isProtected = updateConversationDto.isProtected;
 				if (updateConversationDto.newPassword)

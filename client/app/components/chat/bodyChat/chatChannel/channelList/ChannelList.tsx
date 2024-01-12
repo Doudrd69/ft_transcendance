@@ -52,8 +52,8 @@ const ChannelListComponent: React.FC<ChanneListComponentProps> = ({ userSocket }
 			if (usersList ) {
 				setUserList([...usersList]);
 			}	
-			console.log("userList --> ", userList);
-			console.log("isAdmin --> ", isAdmin);
+			// console.log("userList --> ", userList);
+			// console.log("isAdmin --> ", isAdmin);
 		}
 		else {
 			console.log("Fatal error");
