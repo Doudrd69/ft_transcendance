@@ -21,92 +21,92 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ name,  title, u
 
 	const [formValue, setFormValue] = useState('');
 	const { state, dispatch } = useChat();
-	console.log('========>', name);
+
+	console.log("Name: ", name);
+	const handleMute = async() => {
+
+		const userOptionDto = {conversationID: Number(state.currentConversationID), username: user.login , state: user.isMute}
+		const response = await fetch(`http://localhost:3001/chat/muteUser`, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
+			},
+			body: JSON.stringify(userOptionDto),
+		});
+	
+		if (response.ok) {
+			user.isMute = !user.isMute;
+			console.log("Mute");
+		}
+		else {
+			console.error("Fatal error");
+		}
+	}
+	
+	const handleBan = async() => {
+
+		const userOptionDto = {conversationID: Number(state.currentConversationID), username: user.login, state : user.isBan}
+		const response = await fetch(`http://localhost:3001/chat/banUser`, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
+			},
+			body: JSON.stringify(userOptionDto),
+		});
+	
+		if (response.ok) {
+			user.isBan = !user.isBan;
+			console.log("ban");
+		}
+		else {
+			console.error("Fatal error");
+		}
+	}
+		
+	const handleAdmin = async() => {
+
+		console.log("Name: ", name);
+
+		const userOptionDto = {conversationID: Number(state.currentConversationID), username: name, state : user.isAdmin}
+		console.log("DTO --> ", userOptionDto);
+		const response = await fetch(`http://localhost:3001/chat/adminUser`, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
+			},
+			body: JSON.stringify(userOptionDto),
+		});
+	
+		if (response.ok) {
+			user.isAdmin = !user.isAdmin;
+			console.log("admin");
+		}
+		else {
+			console.error("Fatal error");
+		}
+	}
+
 	const handleCancel = () => {
 		dispatch({ type: 'DISABLE', payload: 'showOptionsUserChannel' });
 		setFormValue('');
 	};
 
 	useEffect(() => {
-	const handleEscape = (event: KeyboardEvent) => {
-		if (event.key === 'Escape') {
-		handleCancel();
-		}
-	};
+		const handleEscape = (event: KeyboardEvent) => {
+			if (event.key === 'Escape') {
+			handleCancel();
+			}
+		};
 	
 		document.addEventListener('keydown', handleEscape);
 		return () => {
 		  document.removeEventListener('keydown', handleEscape);
 		};
-	  }, []);
-
-	const handleMute = async() => {
-		try {
-			const userOptionDto = {conversationID: state.currentConversationID, username: user.login , state: user.isMute}
-			const response = await fetch(`http://localhost:3001/chat/muteUser`, {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-					'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
-				},
-				body: JSON.stringify(userOptionDto),
-			});
+	}, []);
 	
-			if (response.ok) {
-				user.isMute = !user.isMute;
-				console.log("Mute");
-			}
-			} catch (error) {
-			console.log(error);
-			}
-	}
-
-	const handleBan = async() => {
-		try {
-			console.log("state.currentConversationID", state.currentConversationID);
-			console.log("userLogin", user.login);
-			console.log("user.isBan", user.isBan);
-			console.log("user", user);
-			const userOptionDto = {conversationID: state.currentConversationID, username: user.login, state : user.isBan}
-			const response = await fetch(`http://localhost:3001/chat/banUser`, {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-					'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
-				},
-				body: JSON.stringify(userOptionDto),
-			});
-	
-			if (response.ok) {
-				user.isBan = !user.isBan;
-				console.log("ban");
-			}
-			} catch (error) {
-			console.log(error);
-			}
-	}
-
-	const handleAdmin = async() => {
-		try {
-			const userOptionDto = {conversationID: state.currentConversationID, username: user.login, state : user.isAdmin}
-			const response = await fetch(`http://localhost:3001/chat/adminUser`, {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-					'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
-				},
-				body: JSON.stringify(userOptionDto),
-			});
-	
-			if (response.ok) {
-				user.isAdmin = !user.isAdmin;
-				console.log("admin");
-			}
-			} catch (error) {
-			console.log(error);
-			}
-	}
-
 	return (
 		<>
 		<div className="blur-background"></div>

@@ -15,14 +15,13 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 	const { state, dispatch } = useChat();
 
 	const handlePrivate = async() => {
-		try {
 
 			const channelOptionDto = {
 				conversationID: Number(state.currentConversationID),
 				userID: Number(sessionStorage.getItem("currentUserID")),
 				state: state.currentConversationIsPrivate,
 			}
-			
+
 			console.log("HANDLE PRIVATE: ", channelOptionDto);
 			const response = await fetch(`http://localhost:3001/chat/updateIsPublic`, {
 				method: 'POST',
@@ -32,23 +31,23 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 				},
 				body: JSON.stringify(channelOptionDto),
 			});
-	
+
 			if (response.ok) {
 				dispatch({ type: 'TOGGLEX', payload: 'currentConversationIsPrivate' });
 				console.log("Updated status");
 			}
-			} catch (error) {
-			console.log(error);
+			else {
+				console.log("Fatal error");
 			}
 	}
 
 	const handleProtected = async() => {
-		try {
 
 			const channelOptionDto = {
 				conversationID: Number(state.currentConversationID),
 				userID: Number(sessionStorage.getItem("currentUserID")),
-				state: state.currentConversationIsProtected, password: formValue,
+				state: state.currentConversationIsProtected,
+				password: formValue,
 			}
 
 			const response = await fetch(`http://localhost:3001/chat/updateIsProtected`, {
@@ -62,29 +61,31 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 	
 			if (response.ok) {
 				dispatch({ type: 'TOGGLEX', payload: 'currentConversationIsProtected' });
-				console.log("Mute");
+				console.log("Update PASSWORD");
 			}
-			} catch (error) {
-			console.log(error);
+			else {
+				console.log("Fatal error");
 			}
 	}
+
 	const handleCancel = () => {
 		dispatch({ type: 'DISABLE', payload: 'showOptionChannel' });
 		setFormValue('');
 	};
 
 	useEffect(() => {
-	const handleEscape = (event: KeyboardEvent) => {
-		if (event.key === 'Escape') {
-		handleCancel();
-		}
-	};
-	
+		const handleEscape = (event: KeyboardEvent) => {
+			if (event.key === 'Escape') {
+			handleCancel();
+			}
+		};
+
 		document.addEventListener('keydown', handleEscape);
 		return () => {
 		  document.removeEventListener('keydown', handleEscape);
 		};
-	  }, []);
+	}, []);
+
 	return (
 		<>
 		<div className="blur-background"></div>

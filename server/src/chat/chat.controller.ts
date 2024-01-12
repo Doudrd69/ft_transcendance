@@ -80,7 +80,6 @@ export class ChatController {
 	@HttpCode(HttpStatus.OK)
 	@Post('updateIsPublic')
 	updateChannelIsPublicStatus(@Body() channelOptionsDto: ChannelOptionsDto){
-		console.log("MDRRRRRRRRRRRRRR");
 		return this.chatService.updateChannelIsPublicStatus(channelOptionsDto);
 	}
 

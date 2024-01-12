@@ -37,20 +37,25 @@ export class ChatService {
 	// le user foit avoir charge la relation groups.conversation pour toutes ces fonctions
 	private async getRelatedGroup(user: User, conversation: Conversation): Promise<GroupMember> {
 
-		const groupToSearch : GroupMember = await this.groupMemberRepository.findOne({
+		// Groups linked to the conversation
+		const groupList : GroupMember[] = await this.groupMemberRepository.find({
 			where: { conversation: conversation },
 		});
 
-		let groupToReturn;
-		user.groups.forEach((group: GroupMember) => {
-			if (group.id == groupToSearch.id) {
-				groupToReturn = group;
-				return ;
-			}
+		// Now we need to find the good one which is related our user
+		// const group = user.groups.filter((group: GroupMember) => group.id == groupToSearch.id);
+		let groupFound;
+		user.groups.forEach((userGroup: GroupMember) => {
+			groupList.forEach((group: GroupMember) => {
+				if (userGroup.id == group.id) {
+					console.log("Foumd ", group.id);
+					groupFound = group;
+				}
+			});
 		});
 
-		if (groupToReturn)
-			return groupToReturn
+		if (groupFound)
+			return groupFound;
 
 		return ;
 	}
@@ -241,7 +246,6 @@ export class ChatService {
 
 	async updateChannelIsPublicStatus(channelOptionsDto: ChannelOptionsDto) {
 
-		console.log("AHAHAHAHHAHAHAHHA");
 		const user : User = await this.usersRepository.findOne({
 			where: { id: channelOptionsDto.userID },
 			relations: ["groups", "groups.conversation"],
@@ -377,9 +381,9 @@ export class ChatService {
 				if (groupToUpdate) {
 	
 					if (promoteUserToAdminDto.state)
-						groupToUpdate.isBan = false;
+						groupToUpdate.isAdmin = false;
 					else
-						groupToUpdate.isBan = true;
+						groupToUpdate.isAdmin = true;
 					await this.groupMemberRepository.save(groupToUpdate);
 				}
 			}
