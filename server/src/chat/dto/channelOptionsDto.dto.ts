@@ -10,22 +10,26 @@ import {
 	Max
 } from 'class-validator';
 
-export class UserOptionsDto {
+export class ChannelOptionsDto {
    
     @IsNotEmpty()
 	@IsPositive()
 	@Max(1000)
 	conversationID: number;
 
+    @IsNotEmpty()
+	@IsBoolean()
+	userID: boolean;
+
 	@IsNotEmpty()
+	@IsBoolean()
+	state: boolean;
+
+    @IsNotEmpty()
 	@Length(6, 20)
 	@IsAscii()
 	@IsAlpha()
 	@IsString()
 	@Matches(/^[^"';%()|<>\\]*$/)
-	username: string;
-
-	@IsNotEmpty()
-	@IsBoolean()
-	state: boolean;
+    password?: string;
 }
