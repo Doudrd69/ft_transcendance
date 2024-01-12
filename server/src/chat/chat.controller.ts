@@ -1,16 +1,16 @@
-import { Controller, Post, HttpCode, HttpStatus, Body, Get, Param, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post, UseGuards, Req } from '@nestjs/common';
+import { AuthGuard } from 'src/auth/auth.guard';
 import { ChatService } from './chat.service';
-import { GroupDto } from './dto/group.dto';
-import { MessageDto } from './dto/message.dto';
-import { ConversationDto } from './dto/conversation.dto';
+import { UpdateConversationDto } from './dto/UpdateConversationDto.dto';
 import { AddUserToConversationDto } from './dto/addUserToConversationDto.dto';
+import { CheckPasswordDto } from './dto/checkPasswordDto.dto';
+import { ConversationDto } from './dto/conversation.dto';
+import { MessageDto } from './dto/message.dto';
+import { UserOptionsDto } from './dto/userOptionsDto.dto';
 import { Conversation } from './entities/conversation.entity';
 import { Message } from './entities/message.entity';
 import { GroupMember } from './entities/group_member.entity';
-import { AuthGuard } from 'src/auth/auth.guard';
-import { UpdateConversationDto } from './dto/UpdateConversationDto.dto';
-import { CheckPasswordDto } from './dto/checkPasswordDto.dto';
-import { UserOptionsDto } from './dto/userOptionsDto.dto';
+import { ChannelOptionsDto } from './dto/channelOptionsDto.dto';
 
 @Controller('chat')
 export class ChatController {
@@ -26,14 +26,14 @@ export class ChatController {
 	@UseGuards(AuthGuard)
 	@HttpCode(HttpStatus.OK)
 	@Post('newMessage')
-	createNewMessage(@Body() messageDto: MessageDto): Promise<Message> {
+	createNewMessage(@Body() messageDto: MessageDto): Promise<Message | boolean> {
 		return this.chatService.createMessage(messageDto);
 	}
 
 	@UseGuards(AuthGuard)
 	@HttpCode(HttpStatus.OK)
 	@Post('addUserToConversation')
-	addUserToConversation(@Body() addUserToConversationDto: AddUserToConversationDto): Promise<Conversation | string> {
+	addUserToConversation(@Body() addUserToConversationDto: AddUserToConversationDto): Promise<Conversation | { error: string }> {
 		return this.chatService.addUserToConversation(addUserToConversationDto);
 	}
 
@@ -51,25 +51,82 @@ export class ChatController {
 		return this.chatService.compareChannelPassword(checkPasswordDto);
 	}
 
+	/******		USER OPTIONS ON CHANNEL		******/
+
 	@UseGuards(AuthGuard)
 	@HttpCode(HttpStatus.OK)
 	@Post('banUser')
-	banUserFromConversation(@Body() userOptionDto: UserOptionsDto){
-		return this.chatService.updateUserBanStatusFromConversation(userOptionDto);
+	banUserFromConversation(@Body() userOptionsDto: UserOptionsDto): Promise<boolean>{
+		return this.chatService.updateUserBanStatusFromConversation(userOptionsDto);
+	}
+
+	@UseGuards(AuthGuard)
+	@HttpCode(HttpStatus.OK)
+	@Post('unbanUser')
+	unbanUserFromConversation(@Body() userOptionsDto: UserOptionsDto): Promise<boolean>{
+		return this.chatService.updateUserUnbanStatusFromConversation(userOptionsDto);
 	}
 
 	@UseGuards(AuthGuard)
 	@HttpCode(HttpStatus.OK)
 	@Post('muteUser')
-	muteUserFromConversation(@Body() userOptionDto: UserOptionsDto) {
-		return this.chatService.updateUserMuteStatusFromConversation(userOptionDto);
+	muteUserFromConversation(@Body() userOptionsDto: UserOptionsDto): Promise<boolean> {
+		return this.chatService.updateUserMuteStatusFromConversation(userOptionsDto);
 	}
 
 	@UseGuards(AuthGuard)
 	@HttpCode(HttpStatus.OK)
-	@Post('adminUser')
-	adminUserFromConversation(@Body() userOptionDto: UserOptionsDto) {
-		return this.chatService.updateUserAdminStatusFromConversation(userOptionDto);
+	@Post('unmuteUser')
+	unmuteUserFromConversation(@Body() userOptionsDto: UserOptionsDto): Promise<boolean> {
+		return this.chatService.updateUserUnmuteStatusFromConversation(userOptionsDto);
+	}
+
+	@UseGuards(AuthGuard)
+	@HttpCode(HttpStatus.OK)
+	@Post('promoteAdminUser')
+	promoteadminUserFromConversation(@Body() userOptionsDto: UserOptionsDto): Promise<boolean> {
+		return this.chatService.updateUserAdminStatusFromConversationTrue(userOptionsDto);
+	}
+
+	@UseGuards(AuthGuard)
+	@HttpCode(HttpStatus.OK)
+	@Post('demoteAdminUser')
+	demoteadminUserFromConversation(@Body() userOptionsDto: UserOptionsDto): Promise<boolean> {
+		return this.chatService.updateUserAdminStatusFromConversationFalse(userOptionsDto);
+	}
+
+	/******		CHANNEL OPTIONS		******/
+
+	@UseGuards(AuthGuard)
+	@HttpCode(HttpStatus.OK)
+	@Post('updateIsPublicTrue')
+	updateChannelIsPublicStatusTrue(@Req() req, @Body() channelOptionsDto: ChannelOptionsDto){
+		const { user } = req;
+		console.log("TEST DU CONTROLLER MDR ", user);
+		return this.chatService.updateChannelPublicStatusToTrue(channelOptionsDto, user);
+	}
+
+	@UseGuards(AuthGuard)
+	@HttpCode(HttpStatus.OK)
+	@Post('updateIsPublicFalse')
+	updateChannelIsPublicStatusFalse(@Req() req, @Body() channelOptionsDto: ChannelOptionsDto){
+		const { user } = req;
+		console.log("TEST DU CONTROLLER MDR ", user);
+		return this.chatService.updateChannelPublicStatusToFalse(channelOptionsDto, user);
+	}
+
+	@UseGuards(AuthGuard)
+	@HttpCode(HttpStatus.OK)
+	@Post('updateIsProtectedTrue')
+	updateChannelIsprotectedStatusTrue(@Body() channelOptionsDto: ChannelOptionsDto): Promise<boolean> {
+		return this.chatService.updateChannelIsProtectedStatusToTrue(channelOptionsDto);
+	}
+
+	@UseGuards(AuthGuard)
+	@HttpCode(HttpStatus.OK)
+	@Post('updateIsProtectedFalse')
+	updateChannelIsprotectedStatusFalse(@Body() channelOptionsDto: ChannelOptionsDto): Promise<boolean> {
+		return this.chatService.updateChannelIsProtectedStatusToFalse(channelOptionsDto);
 	}
 
 	// @Get('getMesssage/:id')
@@ -90,6 +147,12 @@ export class ChatController {
 	}
 
 	@UseGuards(AuthGuard)
+	@Get('getFriendConversations/:userID')
+	getFriendConversationsFromUser(@Param('userID') userID: number): Promise<Conversation[]> {
+		return this.chatService.getFriendConversations(userID);
+	}
+
+	@UseGuards(AuthGuard)
 	@Get('getConversationsPublic')
 	getConversationsPublic(): Promise<Conversation[]> {
 		return this.chatService.getAllPublicConversations();
@@ -97,7 +160,7 @@ export class ChatController {
 
 	@UseGuards(AuthGuard)
 	@Get('getConversationsPublic/:userID')
-	getConversationsPublicOption(@Param('userID') userID: number): Promise<Conversation[]> {
+	getConversationsPublicOption(@Param('userID') userID: number)  {
 		console.log("userID", userID);
 		return this.chatService.getAllPublicConversationsOption(userID);
 	}
