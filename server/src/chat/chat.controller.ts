@@ -73,6 +73,13 @@ export class ChatController {
 		return this.chatService.getAllPublicConversations();
 	}
 
+	@UseGuards(AuthGuard)
+	@Get('getConversationsPublic/:userID')
+	getConversationsPublicOption(@Param('userID') userID: number): Promise<Conversation[]> {
+		console.log("userID", userID);
+		return this.chatService.getAllPublicConversationsOption(userID);
+	}
+
 	// verifier que le number est bon
 	@UseGuards(AuthGuard)
 	@Get('getConversationsWithStatus/:userID')
