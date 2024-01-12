@@ -3,7 +3,7 @@ import {
     IsString
 } from 'class-validator';
 
-export class AddFriendToConversationDto {
+export class AddUserToConversationDto {
 
     @IsNotEmpty()
     @IsString()
