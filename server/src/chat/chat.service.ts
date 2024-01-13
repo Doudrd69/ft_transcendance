@@ -230,6 +230,30 @@ export class ChatService {
 		return [];
 	}
 
+	private async getAllFriendConversations(userID: number): Promise<Conversation[]> {
+		
+		
+		const userToFind : User = await this.usersRepository.findOne({
+			where: { id: userID },
+			relations: ["groups", "groups.conversation"],
+		});
+		
+		if (userToFind) {
+			
+			let conversationArray : Conversation[] = [];
+			if (userToFind.groups && Array.isArray(userToFind.groups)) {
+				userToFind.groups.forEach((group: GroupMember) => {
+					if (!group.conversation.is_channel)
+						conversationArray.push(group.conversation)
+				})
+				return conversationArray;
+			}
+			return [];
+		}
+		console.error("Fatal error: user not found");
+		return [];
+	}
+
 	/**************************************************************/
 	/***					CHANNEL PASSWORD					***/
 	/**************************************************************/

@@ -226,9 +226,6 @@ export class UsersService {
 			return false;
 		}
 
-		console.log(initiator.username);
-		console.log(recipient.username);
-
 		if (initiator) {
 			
 			const friendshipAlreadyExists : Friendship = await this.friendshipRepository.findOne({
@@ -320,7 +317,8 @@ export class UsersService {
 	}
 
 	async getUserByLogin(loginToSearch: string): Promise<User> {
-		return await this.usersRepository.findOne({ where: {username: loginToSearch}});
+		// We search by login because it is unique
+		return await this.usersRepository.findOne({ where: { login: loginToSearch} });
 	}
 
 	async getFriendships(username: string): Promise<Friendship[]> {
