@@ -14,11 +14,15 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 	const [formValue, setFormValue] = useState('');
 	const { state, dispatch } = useChat();
 
-	// console.log(' user ========>', user);
-
 	const handlePrivate = async() => {
-		try {
-			const channelOptionDto = {conversationID: state.currentConversationID,userID:  sessionStorage.getItem("currentID"), state:state.currentConversationIsPrivate}
+
+			const channelOptionDto = {
+				conversationID: Number(state.currentConversationID),
+				userID: Number(sessionStorage.getItem("currentUserID")),
+				state: state.currentConversationIsPrivate,
+			}
+
+			console.log("HANDLE PRIVATE: ", channelOptionDto);
 			const response = await fetch(`http://localhost:3001/chat/updateIsPublic`, {
 				method: 'POST',
 				headers: {
@@ -27,20 +31,26 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 				},
 				body: JSON.stringify(channelOptionDto),
 			});
-	
+
 			if (response.ok) {
-				dispatch({ type: 'TOGGLE', payload: 'currentConversationIsPrivate' });
-				console.log("Mute");
+				dispatch({ type: 'TOGGLEX', payload: 'currentConversationIsPrivate' });
+				console.log("Updated status");
 			}
-			} catch (error) {
-			console.log(error);
+			else {
+				console.log("Fatal error");
 			}
 	}
 
 	const handleProtected = async() => {
-		try {
-			const channelOptionDto = {conversationID: state.currentConversationID, userID:sessionStorage.getItem("currentID"),  state : state.currentConversationIsProtected, password: formValue}
-			const response = await fetch(`http://localhost:3001/chat/adminUser`, {
+
+			const channelOptionDto = {
+				conversationID: Number(state.currentConversationID),
+				userID: Number(sessionStorage.getItem("currentUserID")),
+				state: state.currentConversationIsProtected,
+				password: formValue,
+			}
+
+			const response = await fetch(`http://localhost:3001/chat/updateIsProtected`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
@@ -50,30 +60,32 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 			});
 	
 			if (response.ok) {
-				dispatch({ type: 'TOGGLE', payload: 'currentConversationIsProtected' });
-				console.log("Mute");
+				dispatch({ type: 'TOGGLEX', payload: 'currentConversationIsProtected' });
+				console.log("Update PASSWORD");
 			}
-			} catch (error) {
-			console.log(error);
+			else {
+				console.log("Fatal error");
 			}
 	}
+
 	const handleCancel = () => {
 		dispatch({ type: 'DISABLE', payload: 'showOptionChannel' });
 		setFormValue('');
 	};
 
 	useEffect(() => {
-	const handleEscape = (event: KeyboardEvent) => {
-		if (event.key === 'Escape') {
-		handleCancel();
-		}
-	};
-	
+		const handleEscape = (event: KeyboardEvent) => {
+			if (event.key === 'Escape') {
+			handleCancel();
+			}
+		};
+
 		document.addEventListener('keydown', handleEscape);
 		return () => {
 		  document.removeEventListener('keydown', handleEscape);
 		};
-	  }, []);
+	}, []);
+
 	return (
 		<>
 		<div className="blur-background"></div>
@@ -84,12 +96,12 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 					{state.currentConversationIsPrivate ?
 						<img className="option-image" src="private.png"  onClick={handlePrivate}/>
 						:
-						<img className="option-image-opacity" src="public.png" onClick={handlePrivate}/>
+						<img className="option-image" src="public.png" onClick={handlePrivate}/>
 					}
 					{state.currentConversationIsProtected ?
 						<img className="option-image" src="password.png" onClick={handleProtected}/>
 						:
-						<img className="option-image-opacity" src="no-password.png" 
+						<img className="option-image" src="no-password.png" 
 						onClick={() => { 
 								dispatch({ type: 'ACTIVATE', payload: 'showPasswordChange' });
 								dispatch({ type: 'DISABLE', payload: 'showOptionChannel' });
