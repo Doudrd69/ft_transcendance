@@ -102,15 +102,13 @@
   .option-image{
 	width: 50px;
 	height: auto;
-	margin: 10px;
+	margin: 10px;;
+}
 
-  }
-  .option-image:hidden{
-	width: 50px;
-	height: auto;
-	margin: 10px;
-
-  }
+	.option-image:hover{
+		transform: scale(1.2);
+		transition: transform 0.3s ease;
+	}
   .option-image-opacity{
 	width: 50px;
 	height: auto;

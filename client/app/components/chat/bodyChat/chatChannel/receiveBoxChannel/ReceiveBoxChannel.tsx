@@ -55,6 +55,8 @@ const ReceiveBoxChannelComponent: React.FC<ReceiveBoxChannelComponentProps> = ({
 		return formattedDate;
 	};
 
+	console.log("currentComponent 2  =====> ", state.currentComponent);
+
 	const getMessages = async () => {
 		try {
 		const response = await fetch(`http://localhost:3001/chat/getMessages/${state.currentConversationID}`, {

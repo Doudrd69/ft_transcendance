@@ -50,9 +50,9 @@ const AddConversationComponent: React.FC<AddConversationComponentProps> = ({ use
 			}
 
 			console.log("Conversation successfully created");
-			dispatch({ type: 'DISABLE', payload: 'showAddChannel' });
-			dispatch({ type: 'DISABLE', payload: 'showAddUser' });
-			dispatch({ type: 'DISABLE', payload: 'showAddFriend' });
+			dispatch({ type: 'DISABLE', payload: 'showCreateChannel' });
+			dispatch({ type: 'DISABLE', payload: 'showAddCreateChannel' });
+
 			dispatch({ type: 'TOGGLEX', payload: 'refreshChannel'});
 			
 		} else {

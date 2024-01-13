@@ -24,8 +24,9 @@ type ActionType =
   | 'SET_CURRENT_CONVERSATION_ID'
   | 'SET_CURRENT_OPTION_CHANNEL_NAME'
   | 'SET_CURRENT_FRIEND'
-  |'SET_CURRENT_CONVERSATION_IS_PRIVATE'
-  | 'SET_CURRENT_CONVERSATION_IS_PROTECTED';
+  |	'SET_CURRENT_CONVERSATION_IS_PRIVATE'
+  | 'SET_CURRENT_CONVERSATION_IS_PROTECTED'
+  | 'SET_CURRENT_COMPONENT';
 // Définir l'interface de l'action
 interface Action {
   type: ActionType;
@@ -68,6 +69,7 @@ interface ChatState {
 	showAdmin: boolean;
 	currentConversationIsProtected: boolean;
 	currentConversationIsPrivate: boolean;
+	currentComponent: string | null;
 	showPasswordChange:boolean;
 	[key: string]: boolean  |number | string | null;
 }
@@ -108,8 +110,9 @@ const initialState: ChatState = {
 	isAdmin: false,
 	currentOptionChannelName:'',
 	showOptionsUserChannel: false,
-	currentChannelBool: false,
 	showPasswordChange:false,
+	currentComponent: '',
+	currentChannelBool: false,
 
 };
 
@@ -154,6 +157,8 @@ const chatReducer = (state: ChatState, action: Action): ChatState => {
 				return {...state, currentConversationIsPrivate: action.payload,};
 		case 'SET_CURRENT_CONVERSATION_IS_PROTECTED':
 				return {...state, currentConversationIsProtected: action.payload,};
+		case 'SET_CURRENT_COMPONENT':
+			return { ...state, currentComponent: action.payload || null };
 	  default:
 		return state;
 	}
@@ -211,6 +216,19 @@ export const setCurrentFriend = (payload: string | null): Action => ({
 	payload,
 });
 
+// export const setCurrentComponent = (payload: string | null): Action => ({
+// 	type: 'SET_CURRENT_COMPONENT',
+// 	payload,
+// });
+
+export const setCurrentComponent = (payload: string | null): Action => {
+	console.log("payload =====> ", payload);
+	return {
+	  type: 'SET_CURRENT_COMPONENT',
+	  payload,
+	};
+  };
+  
 export const setCurrentConversationIsPrivate = (payload: boolean): Action => ({
 	type: 'SET_CURRENT_CONVERSATION_IS_PRIVATE',
 	payload,
