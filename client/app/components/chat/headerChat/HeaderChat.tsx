@@ -21,8 +21,8 @@ const HeaderChatComponent: React.FC<HeaderChatProps>= ({userSocket}) => {
     	condition ? component : null;
 	return (
 		<div className="bloc-btn">
-			{renderComponent(<BackComponent />, state.showChat || state.showChannel)}
 			{renderComponent(<IdDiscussionComponent userSocket={userSocket} />, state.showChat || state.showChannel)}
+			{renderComponent(<BackComponent />, state.showChat || state.showChannel)}
 			{renderComponent(<ChatButtonComponent />, !state.showChat && !state.showChannel)}
 			{renderComponent(<ChannelButtonComponent />, !state.showChat && !state.showChannel)}
 			{renderComponent(<FriendsListButtonComponent />, !state.showChat && !state.showChannel)}

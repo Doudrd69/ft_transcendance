@@ -5,6 +5,7 @@ import AddConversationComponent from '../../addConversation/AddConversation';
 import { Socket } from 'socket.io-client';
 import ListMyChannelComponent from '../../listMyChannel/ListMyChannel';
 import PasswordComponent from '../../listMyChannel/Password';
+import { setCurrentComponent } from '../../../ChatContext';
 
 interface Conversation {
 	id: string;
@@ -54,8 +55,6 @@ const ChannelListComponent: React.FC<ChanneListComponentProps> = ({ userSocket }
 			if (usersList ) {
 				setUserList([...usersList]);
 			}	
-			// console.log("userList --> ", userList);
-			// console.log("isAdmin --> ", isAdmin);
 		}
 		else {
 			console.log("Fatal error");
@@ -86,6 +85,21 @@ const ChannelListComponent: React.FC<ChanneListComponentProps> = ({ userSocket }
 			  document.removeEventListener('keydown', handleEscape);
 			};
 		  }, []);
+
+	const handleConv = (conversation: Conversation, userList: userList, index: number) => {
+		dispatch({ type: 'SET_CURRENT_CONVERSATION', payload: conversation.name });
+		dispatch(setCurrentComponent('showChannelList'));
+		dispatch({ type: 'SET_CURRENT_CONVERSATION_ID', payload: conversation.id });
+		dispatch({ type: 'SET_CURRENT_CONVERSATION_IS_PRIVATE', payload: conversation.isPublic });
+		dispatch({ type: 'SET_CURRENT_CONVERSATION_IS_PROTECTED', payload: conversation.isProtected });
+		dispatch({ type: 'ACTIVATE', payload: 'currentChannelBool' });
+		if(isAdmin[index])
+			dispatch({ type: 'ACTIVATE', payload: 'showAdmin' });
+		dispatch({ type: 'SET_CURRENT_USER_LIST', payload: userList });
+		dispatch({ type: 'DISABLE', payload: 'showChannelList' });
+		dispatch({ type: 'ACTIVATE', payload: 'showChannel' });
+	
+	}
 	return (
 		<div className="bloc-channel-list">
 			<button
@@ -119,18 +133,7 @@ const ChannelListComponent: React.FC<ChanneListComponentProps> = ({ userSocket }
 					<button
 					key={index}
 					className="button-channel-list"
-					onClick={() => {
-						dispatch({ type: 'TOGGLE', payload: 'showChannel' });
-						dispatch({ type: 'SET_CURRENT_CONVERSATION', payload: conversation.name });
-						dispatch({ type: 'SET_CURRENT_CONVERSATION_ID', payload: conversation.id });
-						dispatch({ type: 'SET_CURRENT_CONVERSATION_IS_PRIVATE', payload: conversation.isPublic });
-						dispatch({ type: 'SET_CURRENT_CONVERSATION_IS_PROTECTED', payload: conversation.isProtected });
-						dispatch({ type: 'ACTIVATE', payload: 'currentChannelBool' });
-						if(isAdmin[index])
-							dispatch({ type: 'ACTIVATE', payload: 'showAdmin' });
-						dispatch({ type: 'SET_CURRENT_USER_LIST', payload: userList[index] });
-						console.log("userList[index] =====> ", index ,userList[index]);
-					}}>
+					onClick={() => {handleConv(conversation, userList[index], index);}}>
 					{isAdmin[index] && <img className="icon-admin-channel" src='./crown.png' alt="private" />}
 					{conversation.isProtected &&  <img className="icon-password-channel" src='./password.png' alt="private" />}
 					{!conversation.isPublic && <img className="icon-private-channel" src='./private.png' alt="private" />}

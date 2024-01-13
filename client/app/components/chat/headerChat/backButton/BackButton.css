@@ -1,19 +1,18 @@
 .back-button{
-    /* scroll-behavior: auto; */
-    box-sizing: border-box;
-    /* border: 3px solid #333; */
-    margin: 10px 10px 10px 0px;
-    width: 15%;
-    height: 100%;
-    border-radius:10px;
-    background-color: transparent;
-    color: #000000;
-    background-image: url('back.png');
-    border: none;
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center center;
-    transition: transform 0.2s ease;
+	scroll-behavior: auto;
+	box-sizing: border-box;
+	aspect-ratio: 1/1;
+	margin: 10px;
+	width: 6%;
+	height: auto;
+	border-radius:10px;
+	background-color: transparent;
+	color: #000000;
+	border: none;
+	background-size: contain;
+	background-repeat: no-repeat;
+	background-position: center center;
+	transition: transform 0.2s ease;
 }
 .back-button:hover {
     transform: scale(1.4);

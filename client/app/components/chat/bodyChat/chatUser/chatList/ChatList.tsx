@@ -5,6 +5,7 @@ import AddConversationComponent from '../../addConversation/AddConversation';
 import { Socket } from 'socket.io-client';
 import AvatarImageComponent from '@/app/components/Avatar/Avatar';
 import AvatarImageBisComponent from '@/app/components/Avatar/AvatarBis';
+import { setCurrentComponent } from '../../../ChatContext';
 
 interface ChannelListComponentProps {
 	userSocket: Socket; // Assurez-vous d'avoir la bonne importation pour le type Socketg;
@@ -85,10 +86,12 @@ const ChatListComponent: React.FC<ChannelListComponentProps> = ({ userSocket }) 
 					alt="User Avatar"
 					/>
 			  		<div className={`amies ${activeIndex === id ? 'active' : ''}`} onClick={() => {
-        					dispatch({ type: 'TOGGLE', payload: 'showChat' });
-        					dispatch({ type: 'SET_CURRENT_CONVERSATION', payload: friend.friend ? friend.friend.login : friend.initiator ? friend.initiator.login : 'Unknown User'});
-							dispatch({ type: 'SET_CURRENT_ROOM', payload: friend.roomName});
-        					dispatch({ type: 'SET_CURRENT_CONVERSATION_ID', payload: friend.roomID});
+						  dispatch({ type: 'SET_CURRENT_CONVERSATION', payload: friend.friend ? friend.friend.login : friend.initiator ? friend.initiator.login : 'Unknown User'});
+						  dispatch({ type: 'SET_CURRENT_ROOM', payload: friend.roomName});
+						  dispatch({ type: 'SET_CURRENT_CONVERSATION_ID', payload: friend.roomID});
+						  dispatch({ type: 'DISABLE', payload: 'showChatList' });
+						  dispatch({ type: 'ACTIVATE', payload: 'showChat' });
+						  dispatch(setCurrentComponent('showChatList'));
 						}}>
 						{friend.friend ? friend.friend.login : friend.initiator ? friend.initiator.login : 'Unknown User'}
 					</div>
