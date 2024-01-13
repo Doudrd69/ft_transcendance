@@ -14,6 +14,7 @@ import { GroupMember } from './entities/group_member.entity';
 import { Message } from './entities/message.entity';
 import { group } from 'console';
 import { ChannelOptionsDto } from './dto/channelOptionsDto.dto';
+import { FormatInputPathObject } from 'path';
 
 @Injectable()
 export class ChatService {
@@ -605,6 +606,20 @@ export class ChatService {
 		throw Error("No conversations found");
 	}
 	
+	async getAllPrivateConversations(): Promise<Conversation[]> {
+
+		const publicConversations = await this.conversationRepository.find({
+			where: {isPublic: false},
+		});
+
+		if (publicConversations) {
+			return publicConversations;
+		}
+
+		throw Error("No conversations found");
+	}
+	
+
 	getMessageById(idToFind: number) {
 		return this.messageRepository.findOne({ where: {id: idToFind} });
 	}
@@ -697,39 +712,39 @@ export class ChatService {
 		return [];
 	}
 
-	async getAllPublicConversationsOption(userID : number)
-	{
+	async getAllPublicConversationsOption(userID : number) {
+
 		const user = await this.usersRepository.findOne({
 			where: { id: userID },
 			relations: ["groups", "groups.conversation"],
 		});
 
-		const groups  = await this.groupMemberRepository.find({
+		const groups : GroupMember[] = await this.groupMemberRepository.find({
 			relations: ["conversation"],
 		});
 
+		let conversations : Conversation[] = await this.conversationRepository.find();
+		console.log("Conversations --> ", conversations);
+
+		let arrayCopy = groups;
+
+		// const groupIsChannel = groups.filter((group: GroupMember) => group.conversation.is_channel == true);
+		// const groupIsPublic = groupIsChannel.filter((group: GroupMember) => group.conversation.isPublic == true);
+
 		let array = [];
-
-		const groupIsChannel = groups.filter((group: GroupMember) => group.conversation.is_channel == true);
-		const groupIsPublic = groupIsChannel.filter((group: GroupMember) => group.conversation.isPublic == true);
-
-		// console.log(groupIsPublic);
-
-		groupIsPublic.forEach((group: GroupMember) => {
-			if (!user.groups[group.id]) {
-				array.push({
-					id: group.conversation.id,
-					name: group.conversation.name,
-					is_channel: group.conversation.is_channel,
-					isProtected: group.conversation.isProtected,
-				});
-			}
+		groups.forEach((group: GroupMember) => {
+			console.log("group:", group);
+			user.groups.forEach((userGroup: GroupMember) => {
+				console.log("usergroup: ", userGroup);
+				if (group.conversation.id == userGroup.conversation.id) {
+					console.log("User is in conv: ", userGroup.conversation.name);
+					conversations = conversations.filter((conversation: Conversation) => conversation.id == userGroup.conversation.id);
+					return ;
+				}
+			});
 		});
+		console.log("Discusion ou je suis pas: ", conversations);
 
-		console.log("notme: ", array);
-		if (array)
-			return array;
-		else
-			throw Error("No conversations found");
+		return conversations;
 	}
 }

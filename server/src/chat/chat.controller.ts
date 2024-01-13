@@ -115,7 +115,7 @@ export class ChatController {
 
 	@UseGuards(AuthGuard)
 	@Get('getConversationsPublic/:userID')
-	getConversationsPublicOption(@Param('userID') userID: number): Promise<Conversation[]> {
+	getConversationsPublicOption(@Param('userID') userID: number)  {
 		console.log("userID", userID);
 		return this.chatService.getAllPublicConversationsOption(userID);
 	}

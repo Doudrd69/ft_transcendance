@@ -52,7 +52,6 @@ const ListMyChannelComponent: React.FC<ListMyChannelComponentProps> = ({ userSoc
 	
 	const loadDiscussionsPublic = async () => {
 
-		console.log("TEST..");
 		const response = await fetch(`http://localhost:3001/chat/getConversationsPublic/${userID}`, {
 			method: 'GET',
 			headers: {
@@ -70,7 +69,6 @@ const ListMyChannelComponent: React.FC<ListMyChannelComponentProps> = ({ userSoc
 		}
 	};
 	useEffect(() => {
-		console.log("isAdd --------> ", isAdd);
 		if (!isAdd)
 			loadDiscussions();
 		else
