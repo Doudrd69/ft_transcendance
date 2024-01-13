@@ -108,6 +108,12 @@ export class ChatController {
 	}
 
 	@UseGuards(AuthGuard)
+	@Get('getFriendConversations/:userID')
+	getFriendConversationsFromUser(@Param('userID') userID: number): Promise<Conversation[]> {
+		return this.chatService.getFriendConversations(userID);
+	}
+
+	@UseGuards(AuthGuard)
 	@Get('getConversationsPublic')
 	getConversationsPublic(): Promise<Conversation[]> {
 		return this.chatService.getAllPublicConversations();

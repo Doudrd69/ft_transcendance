@@ -45,7 +45,7 @@ const ChatListComponent: React.FC<ChannelListComponentProps> = ({ userSocket }) 
 		if (response.ok) {
 			const friends = await response.json();
 
-			const requestDms = await fetch(`http://localhost:3001/chat/getConversations/${sessionStorage.getItem("currentUserID")}`, {
+			const requestDms = await fetch(`http://localhost:3001/chat/getFriendConversations/${sessionStorage.getItem("currentUserID")}`, {
 				method: 'GET',
 				headers: {
 					'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
@@ -54,10 +54,9 @@ const ChatListComponent: React.FC<ChannelListComponentProps> = ({ userSocket }) 
 
 			if (requestDms.ok) {
 				const conversations = await requestDms.json();
-				const DMs = conversations.filter((conversation: Conversation) => !conversation.is_channel);
 
 				friends.forEach((friend: FriendShip) => {
-					DMs.forEach((dm: Conversation) => {
+					conversations.forEach((dm: Conversation) => {
 						friend.roomName = dm.name;
 						friend.roomID = dm.id;
 					});
@@ -74,7 +73,9 @@ const ChatListComponent: React.FC<ChannelListComponentProps> = ({ userSocket }) 
 		console.log("Loading friend list...");
 		loadFriendList();
 	}, [state.refreshFriendList]);
+
 	const timestamp = new Date().getTime();
+
 	return (
 		<div className="bloc-discussion-list">
 			{friendList.map((friend: FriendShip, id: number) => (

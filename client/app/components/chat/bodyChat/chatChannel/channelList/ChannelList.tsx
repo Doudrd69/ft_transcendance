@@ -6,6 +6,10 @@ import { Socket } from 'socket.io-client';
 import ListMyChannelComponent from '../../listMyChannel/ListMyChannel';
 import PasswordComponent from '../../listMyChannel/Password';
 
+interface ChanneListComponentProps {
+	userSocket: Socket;
+}
+
 interface Conversation {
 	id: string;
 	name: string;
@@ -14,9 +18,6 @@ interface Conversation {
 	isProtected: boolean;
 }
 
-interface ChanneListComponentProps {
-	userSocket: Socket;
-}
 interface userList {
 	login: string;
 	avatarURL: string;
@@ -54,8 +55,6 @@ const ChannelListComponent: React.FC<ChanneListComponentProps> = ({ userSocket }
 			if (usersList ) {
 				setUserList([...usersList]);
 			}	
-			// console.log("userList --> ", userList);
-			// console.log("isAdmin --> ", isAdmin);
 		}
 		else {
 			console.log("Fatal error");
