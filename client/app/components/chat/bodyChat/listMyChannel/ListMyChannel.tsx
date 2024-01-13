@@ -100,7 +100,8 @@ const ListMyChannelComponent: React.FC<ListMyChannelComponentProps> = ({ userSoc
 					userSocket.emit('joinRoom', { roomName: conversation.name, roomID: conversation.id });
 				}
 				console.log("Friend has been successfully added!");
-				dispatch({ type: 'TOGGLE', payload: 'listChannelAdd' });
+				dispatch({ type: 'TOGGLEX', payload: 'showAddCreateChannel' });
+				dispatch({ type: 'TOGGLEX', payload: 'showAddChannel' });
 			}
 			else {
 				console.log("Error", conversation.error);

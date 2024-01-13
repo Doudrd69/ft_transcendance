@@ -98,6 +98,11 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 						:
 						<img className="option-image" src="public.png" onClick={handlePrivate}/>
 					}
+					<img className="option-image" src="upload-password.png"  onClick={() => { 
+								dispatch({ type: 'ACTIVATE', payload: 'showPasswordChange' });
+								dispatch({ type: 'DISABLE', payload: 'showOptionChannel' });
+
+							}}/>
 					{state.currentConversationIsProtected ?
 						<img className="option-image" src="password.png" onClick={handleProtected}/>
 						:
