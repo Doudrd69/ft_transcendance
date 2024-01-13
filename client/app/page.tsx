@@ -93,11 +93,10 @@ export default function Home() {
 		const jwtArray = jwt?.split('.');
 		if (jwtArray.length != 0) {
 			const payload = JSON.parse(atob(jwtArray[1]));
-			console.log(payload.sub);
-			console.log(payload.login);
 			sessionStorage.setItem("currentUserID", payload.sub);
 			sessionStorage.setItem("2fa", payload.tfa_enabled);
-			if (!payload.username)
+			console.log("Username: ", payload.username);
+			if (payload.username === payload.login)
 				sessionStorage.setItem("currentUserLogin", payload.login);
 			else
 				sessionStorage.setItem("currentUserLogin", payload.username);

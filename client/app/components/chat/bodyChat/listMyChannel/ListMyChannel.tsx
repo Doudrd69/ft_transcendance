@@ -18,18 +18,26 @@ interface Conversation {
 }
 
 const ListMyChannelComponent: React.FC<ListMyChannelComponentProps> = ({ userSocket, user, isAdd, title}) => {
-
+	
 	const { state, dispatch } = useChat();
 	const [conversations, setConversations] = useState<Conversation[]>([]);
 	const userID = sessionStorage.getItem("currentUserID");
 	const userLogin = sessionStorage.getItem("currentUserLogin") || 'no-user';
 	const [showPassword, setShowPassword] = useState<boolean>(false);
-
+	
 	const [password, setPassword] = useState('');
-
+	
 	const handlePasswordSubmit = (password: string) => {
 		setPassword(password);
 	};
+
+	const handleCloseList = () => {
+		dispatch({ type: 'DISABLE', payload: 'showListChannelAdd' });
+		dispatch({ type: 'DISABLE', payload: 'showAddChannel' });
+		dispatch({ type: 'DISABLE', payload: 'showCreateChannel' });
+		dispatch({ type: 'DISABLE', payload: 'showAddCreateChannel' });
+	};
+
 
 	const loadDiscussions = async () => {
 
@@ -68,19 +76,9 @@ const ListMyChannelComponent: React.FC<ListMyChannelComponentProps> = ({ userSoc
 			console.log("Fatal error");
 		}
 	};
-	useEffect(() => {
-		if (!isAdd)
-			loadDiscussions();
-		else
-		{
-			loadDiscussionsPublic();
-
-		}
-		console.log("convs --> ", conversations);
-	}, [state.refreshChannel]);
-
+	
 	const addUserToConversation = async (convID: number, friend: string) => {
-
+		
 		const addUserToConversationDto = {
 			userToAdd: friend,
 			conversationID: convID,
@@ -99,7 +97,7 @@ const ListMyChannelComponent: React.FC<ListMyChannelComponentProps> = ({ userSoc
 			const conversation = await response.json();
 			if (conversation.id) {
 				if (userSocket.connected) {
-					userSocket.emit('addUserToRoom', { convID: conversation.id, convName: conversation.name, friend: user } );
+					userSocket.emit('joinRoom', { roomName: conversation.name, roomID: conversation.id });
 				}
 				console.log("Friend has been successfully added!");
 				dispatch({ type: 'TOGGLE', payload: 'listChannelAdd' });
@@ -112,13 +110,14 @@ const ListMyChannelComponent: React.FC<ListMyChannelComponentProps> = ({ userSoc
 			console.log("Fatal error");
 		}
 	}
+	
 
-	const handleCloseList = () => {
-		dispatch({ type: 'DISABLE', payload: 'showListChannelAdd' });
-		dispatch({ type: 'DISABLE', payload: 'showAddChannel' });
-		dispatch({ type: 'DISABLE', payload: 'showCreateChannel' });
-		dispatch({ type: 'DISABLE', payload: 'showAddCreateChannel' });
-	};
+	useEffect(() => {
+		if (!isAdd)
+			loadDiscussions();
+		else
+			loadDiscussionsPublic();
+	}, [state.refreshChannel]);
 
 	useEffect(() => {
 		const handleEscape = (event: KeyboardEvent) => {

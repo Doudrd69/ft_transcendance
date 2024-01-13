@@ -10,7 +10,6 @@ interface SendBoxComponentProps {
 const SendBoxChannelComponent: React.FC<SendBoxComponentProps> = ({ userSocket }) => {
 
 	const { state } = useChat();
-	const socketInUse = userSocket;
 	const [messageValue, setMessageValue] = useState('');
 
 	const handleMessageInput = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -39,8 +38,8 @@ const SendBoxChannelComponent: React.FC<SendBoxComponentProps> = ({ userSocket }
 		});
 
 		if (response.ok) {
-			if (socketInUse.connected) {
-				socketInUse.emit('message', { dto: messageDto, conversationName: state.currentConversation });
+			if (userSocket.connected) {
+				userSocket.emit('message', { dto: messageDto, conversationName: state.currentConversation });
 			}
 			else {
 				console.log("Client is not connected");
