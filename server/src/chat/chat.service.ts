@@ -724,27 +724,12 @@ export class ChatService {
 		});
 
 		let conversations : Conversation[] = await this.conversationRepository.find();
-		console.log("Conversations --> ", conversations);
-
-		let arrayCopy = groups;
-
-		// const groupIsChannel = groups.filter((group: GroupMember) => group.conversation.is_channel == true);
-		// const groupIsPublic = groupIsChannel.filter((group: GroupMember) => group.conversation.isPublic == true);
-
-		let array = [];
-		groups.forEach((group: GroupMember) => {
-			console.log("group:", group);
-			user.groups.forEach((userGroup: GroupMember) => {
-				console.log("usergroup: ", userGroup);
-				if (group.conversation.id == userGroup.conversation.id) {
-					console.log("User is in conv: ", userGroup.conversation.name);
-					conversations = conversations.filter((conversation: Conversation) => conversation.id == userGroup.conversation.id);
-					return ;
-				}
-			});
+		user.groups.forEach((group: GroupMember) => {
+			conversations = conversations.filter((conversation: Conversation) => 
+				conversation.id != group.conversation.id 
+				&& conversation.isPublic == true 
+				&& conversation.is_channel == true);
 		});
-		console.log("Discusion ou je suis pas: ", conversations);
-
 		return conversations;
 	}
 }
