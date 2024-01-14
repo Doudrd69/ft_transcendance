@@ -16,7 +16,6 @@ const ChatUserComponent: React.FC<ChatUserComponentProps> = ({ userSocket }) => 
 	const { state, dispatch } = useChat();
 
 	const renderComponent = (component: React.ReactNode, condition: boolean) => condition ? component : null;
-
 	return (
 		<div className="chat-user">
 			{renderComponent(<ChatListComponent userSocket={userSocket}/>, state.showChatList)}

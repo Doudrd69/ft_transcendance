@@ -21,8 +21,6 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ name,  title, u
 
 	const [formValue, setFormValue] = useState('');
 	const { state, dispatch } = useChat();
-
-	console.log("Name: ", name);
 	const handleMute = async() => {
 
 		const userOptionDto = {conversationID: Number(state.currentConversationID), username: user.login , state: user.isMute}
@@ -91,13 +89,17 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ name,  title, u
 
 	const handleCancel = () => {
 		dispatch({ type: 'DISABLE', payload: 'showOptionsUserChannel' });
+		dispatch({ type: 'ACTIVATE', payload: 'showBackComponent' });
+
 		setFormValue('');
 	};
-
+	
 	useEffect(() => {
 		const handleEscape = (event: KeyboardEvent) => {
 			if (event.key === 'Escape') {
-			handleCancel();
+				console.log("HHHHEEEEEEEEELLLLLLLLLPPPPPPPP ");
+
+				handleCancel();
 			}
 		};
 	

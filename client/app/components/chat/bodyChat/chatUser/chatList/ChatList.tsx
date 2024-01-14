@@ -93,6 +93,7 @@ const ChatListComponent: React.FC<ChannelListComponentProps> = ({ userSocket }) 
 						  dispatch({ type: 'DISABLE', payload: 'showChatList' });
 						  dispatch({ type: 'ACTIVATE', payload: 'showChat' });
 						  dispatch(setCurrentComponent('showChatList'));
+
 						}}>
 						{friend.friend ? friend.friend.login : friend.initiator ? friend.initiator.login : 'Unknown User'}
 					</div>

@@ -71,6 +71,8 @@ interface ChatState {
 	currentConversationIsPrivate: boolean;
 	currentComponent: string | null;
 	showPasswordChange:boolean;
+	dontcancel:boolean;
+	showBackComponent: boolean;
 	[key: string]: boolean  |number | string | null;
 }
 
@@ -112,6 +114,8 @@ const initialState: ChatState = {
 	showOptionsUserChannel: false,
 	showPasswordChange:false,
 	currentComponent: '',
+	dontcancel:false,
+	showBackComponent: true,
 	currentChannelBool: false,
 
 };
