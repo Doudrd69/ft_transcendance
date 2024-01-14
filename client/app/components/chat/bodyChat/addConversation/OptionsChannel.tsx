@@ -13,7 +13,6 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 
 	const [formValue, setFormValue] = useState('');
 	const { state, dispatch } = useChat();
-
 	const handlePrivate = async() => {
 
 			const channelOptionDto = {
@@ -70,13 +69,16 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 
 	const handleCancel = () => {
 		dispatch({ type: 'DISABLE', payload: 'showOptionChannel' });
+		dispatch({ type: 'ACTIVATE', payload: 'showBackComponent' });
+		console.log("state =========================: ", state.showBackComponent);
 		setFormValue('');
 	};
 
 	useEffect(() => {
 		const handleEscape = (event: KeyboardEvent) => {
 			if (event.key === 'Escape') {
-			handleCancel();
+				console.log("HHHHEEEEEEEEELLLLLLLLLPPPPPPPP ");
+				handleCancel();
 			}
 		};
 

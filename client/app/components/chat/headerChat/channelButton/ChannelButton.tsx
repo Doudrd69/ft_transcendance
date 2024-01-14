@@ -8,8 +8,9 @@ const ChannelButtonComponent: React.FC = () => {
   return (
 	<button
 	  className={`main-button-channel ${state.showChannelList ? 'clicked' : ''}`}
-	  onClick={() => 
-	  dispatch({ type: 'TOGGLE', payload: 'showChannelList' })}>
+	  onClick={() => {
+	  dispatch({ type: 'TOGGLE', payload: 'showChannelList' })
+	  dispatch({type: 'ACTIVATE', payload: 'showBackComponent'})}}>
 	  Channel
 	</button>
   );

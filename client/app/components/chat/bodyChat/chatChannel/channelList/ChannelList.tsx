@@ -94,6 +94,7 @@ const ChannelListComponent: React.FC<ChanneListComponentProps> = ({ userSocket }
 		dispatch({ type: 'SET_CURRENT_CONVERSATION_IS_PRIVATE', payload: conversation.isPublic });
 		dispatch({ type: 'SET_CURRENT_CONVERSATION_IS_PROTECTED', payload: conversation.isProtected });
 		dispatch({ type: 'ACTIVATE', payload: 'currentChannelBool' });
+		dispatch({ type: 'ACTIVATE', payload: 'dontcancel' });
 		if(isAdmin[index])
 			dispatch({ type: 'ACTIVATE', payload: 'showAdmin' });
 		dispatch({ type: 'SET_CURRENT_USER_LIST', payload: userList });
@@ -126,7 +127,7 @@ const ChannelListComponent: React.FC<ChanneListComponentProps> = ({ userSocket }
 					</div>
 					: null}
 				{state.showPassword ? <PasswordComponent userSocket={userSocket}/> : null}
-				{state.showAddChannel ? <ListMyChannelComponent userSocket={userSocket} user={userName || 'no-user'} isAdd={true} title="JOIN CHANNEL"></ListMyChannelComponent> : null}
+				{state.showAddChannel ? <ListMyChannelComponent userSocket={userSocket} user={userName || 'no-user'} isAdd={true} title="JOIN CHANNEL"/> : null}
 				{state.showCreateChannel ? <AddConversationComponent userSocket={userSocket} loadDiscussions={loadDiscussions} title="CREATE CHANNEL" isChannel={true} /> : null}
 			</div>
 			{conversations.map((conversation, index) => (

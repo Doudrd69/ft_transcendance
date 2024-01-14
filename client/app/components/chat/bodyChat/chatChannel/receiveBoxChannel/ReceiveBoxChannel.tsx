@@ -105,14 +105,29 @@ const ReceiveBoxChannelComponent: React.FC<ReceiveBoxChannelComponentProps> = ({
 		<div className='list-users-channel'>
 			{state.currentUserList && state.currentUserList.map((userList: userList, index: number) => (
 			<div key={index} className='user-list-item'>
-				<img
-				className='img-list-users-channel'
-				src={`http://localhost:3001${userList.avatarURL}`}
-				onClick={() => {
-					dispatch({ type: 'ACTIVATE', payload: 'showOptionsUserChannel' });
-					dispatch({ type: 'SET_CURRENT_OPTION_CHANNEL_NAME', payload: userList.login});
-				}}
-				/>
+					{userList.isAdmin && 
+					<div className='avatar-container'>
+						<img className='admin-user' src='./crown.png' alt='user' />
+						<img
+						className='img-list-users-channel-admin'
+						src={`http://localhost:3001${userList.avatarURL}`}
+						onClick={() => {
+							dispatch({ type: 'ACTIVATE', payload: 'dontcandcel' });
+							dispatch({ type: 'ACTIVATE', payload: 'showOptionsUserChannel' });
+							dispatch({ type: 'SET_CURRENT_OPTION_CHANNEL_NAME', payload: userList.login});
+							dispatch({ type: 'DISABLE', payload: 'showBackComponent' });
+						}}/>
+					</div>}
+					{!userList.isAdmin &&
+					<img
+						className='img-list-users-channel'
+						src={`http://localhost:3001${userList.avatarURL}`}
+						onClick={() => {
+							dispatch({ type: 'ACTIVATE', payload: 'dontcandcel' });
+							dispatch({ type: 'ACTIVATE', payload: 'showOptionsUserChannel' });
+							dispatch({ type: 'SET_CURRENT_OPTION_CHANNEL_NAME', payload: userList.login});
+							dispatch({ type: 'DISABLE', payload: 'showBackComponent' });
+					}}/>}
 				{state.showOptionsUserChannel && (
 				<OptionsUserChannel name={state.currentOptionChannelName} title={state.currentOptionChannelName} user={userList}/>
 				)}

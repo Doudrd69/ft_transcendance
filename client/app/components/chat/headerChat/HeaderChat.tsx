@@ -19,14 +19,14 @@ const HeaderChatComponent: React.FC<HeaderChatProps>= ({userSocket}) => {
 	const { state, dispatch } = useChat();
 	const renderComponent = (component: React.ReactNode, condition: boolean) =>
     	condition ? component : null;
+		console.log("staaaaate", state);
 	return (
 		<div className="bloc-btn">
 			{renderComponent(<IdDiscussionComponent userSocket={userSocket} />, state.showChat || state.showChannel)}
-			{renderComponent(<BackComponent />, state.showChat || state.showChannel)}
+			{renderComponent(<BackComponent />, (state.showChat || state.showChannel) && state.showBackComponent)}
 			{renderComponent(<ChatButtonComponent />, !state.showChat && !state.showChannel)}
 			{renderComponent(<ChannelButtonComponent />, !state.showChat && !state.showChannel)}
 			{renderComponent(<FriendsListButtonComponent />, !state.showChat && !state.showChannel)}
-			{/* {renderComponent(<AddComponent />, !state.showChat && !state.showChannel)} */}
 		</div>
 	)
 };
