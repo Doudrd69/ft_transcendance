@@ -166,7 +166,6 @@ export class UsersController {
 		return this.usersService.updateFriendship(friendRequestDto, flag);
 	}
 
-
 	@UseGuards(AuthGuard)
 	@HttpCode(HttpStatus.OK)
 	@Post('acceptFriendRequest')
@@ -177,8 +176,22 @@ export class UsersController {
 	@UseGuards(AuthGuard)
 	@HttpCode(HttpStatus.OK)
 	@Post('blockUser')
-	blockUser(@Body() blockUserDto: BlockUserDto): Promise<Conversation | Friendship> {
+	removeFriend(@Body() blockUserDto: BlockUserDto): Promise<Conversation | Friendship> {
+		return this.usersService.removeFriend(blockUserDto);
+	}
+
+	@UseGuards(AuthGuard)
+	@HttpCode(HttpStatus.OK)
+	@Post('blockUser')
+	blockUser(@Body() blockUserDto: BlockUserDto): Promise<boolean> {
 		return this.usersService.blockUser(blockUserDto);
+	}
+
+	@UseGuards(AuthGuard)
+	@HttpCode(HttpStatus.OK)
+	@Post('unblockUser')
+	unblockUser(@Body() blockUserDto: BlockUserDto): Promise<boolean> {
+		return this.usersService.unblockUser(blockUserDto);
 	}
 
 	@UseGuards(AuthGuard)

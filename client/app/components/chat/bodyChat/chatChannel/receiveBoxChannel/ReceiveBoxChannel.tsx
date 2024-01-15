@@ -69,7 +69,7 @@ const ReceiveBoxChannelComponent: React.FC<ReceiveBoxChannelComponentProps> = ({
 			setMessages((prevMessages: Message[]) => [...prevMessages, ...messageList]);
 		}
 		} catch (error) {
-		console.log(error);
+			console.log(error);
 		}
 	};
 	const ownerUsers = state.currentUserList.filter((user: userList) => user.isOwner === true);
@@ -85,8 +85,8 @@ const ReceiveBoxChannelComponent: React.FC<ReceiveBoxChannelComponentProps> = ({
 		});
 
 		return () => {
-		socketInUse.off('userJoinedRoom');
-		socketInUse.off('onMessage');
+			socketInUse.off('userJoinedRoom');
+			socketInUse.off('onMessage');
 		};
 	}, [socketInUse]);
 

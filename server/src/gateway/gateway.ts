@@ -13,7 +13,11 @@ import { MessageDto } from 'src/chat/dto/message.dto';
 	},
 })
 
-// creer un dossier pour les dto de la gateway ?
+// quand ton client se connecte, il join les rooms des gens qu il a bloque
+// join()
+// to('room').except("WhoBlocked#senderId") (tu connais senderId)
+// creer un dossier pour les dto de la gateway
+// 
 
 export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
@@ -27,7 +31,7 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 
 	private connectedUsers: { [userId: string]: Socket } = {};
 
-	private  async userRejoinsRooms(client: Socket, userID: number ) {
+	private  async userRejoinsRooms(client: Socket, userID: number) {
 		const conversations = await this.chatService.getConversations(userID);
 		if (conversations) {
 			let ids = <number[]>[];
@@ -39,10 +43,17 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 			conv.forEach(function (value) {
 				client.join(value.name + value.id);
 			})
+
+			const blockedUsers = await this.userService.getBlockedUserList(userID);
+			if (blockedUsers) {
+				blockedUsers.forEach((blockedUser: string) => {
+					client.join(`whoblocked${blockedUser}`)
+				})
+			}
 		}
 	}
 
-	private async userLeavesRooms(client: Socket, userID: number ) {
+	private async userLeavesRooms(client: Socket, userID: number) {
 		const conversations = await this.chatService.getConversations(userID);
 		if (conversations) {
 			let ids = <number[]>[];
@@ -54,6 +65,13 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 			conv.forEach(function (value) {
 				client.leave(value.name);
 			})
+
+			const blockedUsers = await this.userService.getBlockedUserList(userID);
+			if (blockedUsers) {
+				blockedUsers.forEach((blockedUser: string) => {
+					client.leave(`whoblocked${blockedUser}`)
+				})
+			}
 		}
 	}
 
@@ -65,6 +83,7 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		client.on('joinPersonnalRoom', (personnalRoom: string, userID: number) => {
 			client.join(personnalRoom);
 			console.log("Client ", client.id, " has joined ", personnalRoom, " room");
+			const blockedUsers = this.userService.getBlockedUserList(userID);
 			this.userRejoinsRooms(client, userID);
 			this.userService.updateUserStatus(userID, true);
 
