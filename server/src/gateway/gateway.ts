@@ -97,6 +97,17 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		return ;
 	}
 
+	@SubscribeMessage('leaveRoom')
+	leaveRoom( @ConnectedSocket() client: Socket, @MessageBody() data: { roomName: string, roomID: string } ) {
+
+		const { roomName, roomID } = data;
+		console.log("==== leaveRoom Event ====");
+		console.log("Remove ", client.id," from room : ", roomName + roomID);
+
+		client.leave(roomName + roomID);
+		return ;
+	}
+
 	@SubscribeMessage('addUserToRoom')
 	addUserToNewRoom( @MessageBody() data: { convID: number, convName: string, friend: string} ) {
 		const { convID, convName, friend } = data;
