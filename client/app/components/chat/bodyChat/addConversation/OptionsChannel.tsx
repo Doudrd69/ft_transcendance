@@ -63,6 +63,7 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 	
 			if (response.ok) {
 				const status = await response.json();
+				console.log(status);
 				if (status) {
 					dispatch({ type: 'TOGGLEX', payload: 'currentConversationIsProtected' });
 					console.log("Password updated");

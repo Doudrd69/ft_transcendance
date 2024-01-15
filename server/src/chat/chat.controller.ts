@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post, UseGuards, Req } from '@nestjs/common';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { ChatService } from './chat.service';
 import { UpdateConversationDto } from './dto/UpdateConversationDto.dto';
@@ -62,6 +62,13 @@ export class ChatController {
 
 	@UseGuards(AuthGuard)
 	@HttpCode(HttpStatus.OK)
+	@Post('unbanUser')
+	unbanUserFromConversation(@Body() userOptionsDto: UserOptionsDto): Promise<boolean>{
+		return this.chatService.updateUserUnbanStatusFromConversation(userOptionsDto);
+	}
+
+	@UseGuards(AuthGuard)
+	@HttpCode(HttpStatus.OK)
 	@Post('muteUser')
 	muteUserFromConversation(@Body() userOptionsDto: UserOptionsDto): Promise<boolean> {
 		return this.chatService.updateUserMuteStatusFromConversation(userOptionsDto);
@@ -69,25 +76,57 @@ export class ChatController {
 
 	@UseGuards(AuthGuard)
 	@HttpCode(HttpStatus.OK)
-	@Post('adminUser')
-	adminUserFromConversation(@Body() userOptionsDto: UserOptionsDto): Promise<boolean> {
-		return this.chatService.updateUserAdminStatusFromConversation(userOptionsDto);
+	@Post('unmuteUser')
+	unmuteUserFromConversation(@Body() userOptionsDto: UserOptionsDto): Promise<boolean> {
+		return this.chatService.updateUserUnmuteStatusFromConversation(userOptionsDto);
+	}
+
+	@UseGuards(AuthGuard)
+	@HttpCode(HttpStatus.OK)
+	@Post('promoteAdminUser')
+	promoteadminUserFromConversation(@Body() userOptionsDto: UserOptionsDto): Promise<boolean> {
+		return this.chatService.updateUserAdminStatusFromConversationTrue(userOptionsDto);
+	}
+
+	@UseGuards(AuthGuard)
+	@HttpCode(HttpStatus.OK)
+	@Post('demoteAdminUser')
+	demoteadminUserFromConversation(@Body() userOptionsDto: UserOptionsDto): Promise<boolean> {
+		return this.chatService.updateUserAdminStatusFromConversationFalse(userOptionsDto);
 	}
 
 	/******		CHANNEL OPTIONS		******/
 
 	@UseGuards(AuthGuard)
 	@HttpCode(HttpStatus.OK)
-	@Post('updateIsPublic')
-	updateChannelIsPublicStatus(@Body() channelOptionsDto: ChannelOptionsDto){
-		return this.chatService.updateChannelIsPublicStatus(channelOptionsDto);
+	@Post('updateIsPublicTrue')
+	updateChannelIsPublicStatusTrue(@Req() req, @Body() channelOptionsDto: ChannelOptionsDto){
+		const { user } = req;
+		console.log("TEST DU CONTROLLER MDR ", user);
+		return this.chatService.updateChannelPublicStatusToTrue(channelOptionsDto, user);
 	}
 
 	@UseGuards(AuthGuard)
 	@HttpCode(HttpStatus.OK)
-	@Post('updateIsProtected')
-	updateChannelIsprotectedStatus(@Body() channelOptionsDto: ChannelOptionsDto): Promise<boolean> {
-		return this.chatService.updateChannelIsProtectedStatus(channelOptionsDto);
+	@Post('updateIsPublicFalse')
+	updateChannelIsPublicStatusFalse(@Req() req, @Body() channelOptionsDto: ChannelOptionsDto){
+		const { user } = req;
+		console.log("TEST DU CONTROLLER MDR ", user);
+		return this.chatService.updateChannelPublicStatusToFalse(channelOptionsDto, user);
+	}
+
+	@UseGuards(AuthGuard)
+	@HttpCode(HttpStatus.OK)
+	@Post('updateIsProtectedTrue')
+	updateChannelIsprotectedStatusTrue(@Body() channelOptionsDto: ChannelOptionsDto): Promise<boolean> {
+		return this.chatService.updateChannelIsProtectedStatusToTrue(channelOptionsDto);
+	}
+
+	@UseGuards(AuthGuard)
+	@HttpCode(HttpStatus.OK)
+	@Post('updateIsProtectedFalse')
+	updateChannelIsprotectedStatusFalse(@Body() channelOptionsDto: ChannelOptionsDto): Promise<boolean> {
+		return this.chatService.updateChannelIsProtectedStatusToFalse(channelOptionsDto);
 	}
 
 	// @Get('getMesssage/:id')
