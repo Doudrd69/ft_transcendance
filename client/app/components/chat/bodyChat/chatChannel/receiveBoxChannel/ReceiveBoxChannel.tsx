@@ -114,7 +114,7 @@ const ReceiveBoxChannelComponent: React.FC<ReceiveBoxChannelComponentProps> = ({
 				}}
 				/>
 				{state.showOptionsUserChannel && (
-				<OptionsUserChannel name={state.currentOptionChannelName} title={state.currentOptionChannelName} user={userList}/>
+				<OptionsUserChannel name={state.currentOptionChannelName} title={state.currentOptionChannelName} user={userList} userSocket={userSocket}/>
 				)}
 			</div>
 			))}

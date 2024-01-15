@@ -15,14 +15,14 @@ interface OptionsUserChannelProps {
 	name: string | null;
 	title: string | null;
 	user: user
+	userSocket: Socket,
 }
 
-const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ name,  title, user }) => {
+const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ name,  title, user, userSocket }) => {
 
 	const [formValue, setFormValue] = useState('');
 	const { state, dispatch } = useChat();
 
-	console.log("Name: ", name);
 	const handleMute = async() => {
 
 		const userOptionDto = {conversationID: Number(state.currentConversationID), username: user.login , state: user.isMute}
@@ -58,7 +58,11 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ name,  title, u
 	
 		if (response.ok) {
 			user.isBan = !user.isBan;
-			console.log("ban");
+			console.log("ban status: ", user.isBan);
+			if (user.isBan)
+				userSocket.emit('leaveRoom', { roomName: state.currentConversation, roomID: state.currentConversationID } );
+			else
+				userSocket.emit('joinRoom', { roomName: state.currentConversation, roomID: state.currentConversationID } );
 		}
 		else {
 			console.error("Fatal error");

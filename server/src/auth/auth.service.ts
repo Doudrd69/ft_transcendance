@@ -146,6 +146,8 @@ export class AuthService {
 		}
 	}
 
+	// on genere le secret si on en a pas
+	// et au premier coup, si tout est bon on enregistre le temp_secret comme secret onn
 	async activate2FA(requestTfaDto: RequestTfaDto) {
 
 		try {

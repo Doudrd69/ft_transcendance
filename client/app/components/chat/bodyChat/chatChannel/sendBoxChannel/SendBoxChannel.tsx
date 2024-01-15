@@ -26,7 +26,6 @@ const SendBoxChannelComponent: React.FC<SendBoxComponentProps> = ({ userSocket }
 	const handleMessage = async (e: React.FormEvent) => {
 		
 		e.preventDefault();
-
 		
 		const response = await fetch('http://localhost:3001/chat/newMessage', {
 			method: 'POST',
@@ -38,11 +37,20 @@ const SendBoxChannelComponent: React.FC<SendBoxComponentProps> = ({ userSocket }
 		});
 
 		if (response.ok) {
-			if (userSocket.connected) {
-				userSocket.emit('message', { dto: messageDto, conversationName: state.currentConversation });
+			const data = await response.json();
+			console.log(data);
+			// c'est misereux, a revoir
+			if (data) {
+				if (userSocket.connected) {
+					userSocket.emit('message', { dto: messageDto, conversationName: state.currentConversation });
+				}
+				else {
+					console.log("Client is not connected");
+				}
 			}
 			else {
-				console.log("Client is not connected");
+				// ce serait bien de recuperer le bon message d'erreur mdrrr
+				console.log("Fatal error");
 			}
 			setMessageValue('');
 		}

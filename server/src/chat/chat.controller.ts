@@ -26,7 +26,7 @@ export class ChatController {
 	@UseGuards(AuthGuard)
 	@HttpCode(HttpStatus.OK)
 	@Post('newMessage')
-	createNewMessage(@Body() messageDto: MessageDto): Promise<Message> {
+	createNewMessage(@Body() messageDto: MessageDto): Promise<Message | boolean> {
 		return this.chatService.createMessage(messageDto);
 	}
 

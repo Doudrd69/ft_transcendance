@@ -193,7 +193,7 @@ export class ChatService {
 			let conversationArray : Conversation[] = [];
 			if (userToFind.groups && Array.isArray(userToFind.groups)) {
 				userToFind.groups.forEach((group: GroupMember) => {
-					if (group.conversation.is_channel)
+					if (group.conversation.is_channel && !group.isBan)
 						conversationArray.push(group.conversation)
 				})
 				return conversationArray;
@@ -361,6 +361,7 @@ export class ChatService {
 		}
 	}
 
+	// aussi penser a emit pour leave la room
 	async updateUserBanStatusFromConversation(banUserDto: UserOptionsDto) {
 
 		const userToBan : User = await this.usersRepository.findOne({
@@ -373,6 +374,7 @@ export class ChatService {
 		if (userToBan && conversation) {
 
 			const groupToUpdate = await this.getRelatedGroup(userToBan, conversation);
+			console.log("group to update: ", groupToUpdate);
 			// If userToBan is the owner == error
 			if (!groupToUpdate.isOwner) {
 				if (groupToUpdate) {
@@ -420,35 +422,6 @@ export class ChatService {
 	/**************************************************************/
 	/***					CONVERSATION						***/
 	/**************************************************************/
-
-	async quitConversation(conversationDto: ConversationDto) {
-		
-		// faire par ID
-		const conversationToRemove = await this.conversationRepository.findOne({ where: {name: conversationDto.name }});
-		
-		const user = await this.usersRepository.findOne({
-			where: {id: conversationDto.userID},
-			relations: ['groups'],
-		});
-
-		if (conversationToRemove && user) {
-
-			// methode 1
-			// const groupsUpdated = user.groups.filter((group: GroupMember) => group.conversation != conversationToRemove);
-			// user.groups = groupsUpdated;
-			// await this.usersRepository.save(user);
-
-			// methode 2
-			// const groupToRemove = user.groups.filter((group: GroupMember) => group.conversation != conversationToRemove);
-			// user.groups.splice(groupToRemove);
-			// await this.usersRepository.save(user)
-
-			return ;
-		}
-		
-		console.log("Fatal error");
-		return ;
-	}
 	
 	async eraseConversation(conversationDto: ConversationDto) {
 		
@@ -595,9 +568,19 @@ export class ChatService {
 	/**************************************************************/
 	
 	// need to check muteStatus here or in front?
-	async createMessage(messageDto: MessageDto): Promise<Message> {
+	async createMessage(messageDto: MessageDto): Promise<Message | boolean> {
 		
 		const conversation : Conversation = await this.conversationRepository.findOne({ where: {id: messageDto.conversationID} });
+		const sender : User = await this.usersRepository.findOne({
+			where: { username: messageDto.from },
+			relations: ["groups", "groups.conversation"],
+		});
+
+		const isMuteStatus = await this.getGroupIsMuteStatus(sender, conversation);
+		if (isMuteStatus) {
+			console.error("User is mute");
+			return false;
+		}
 
 		if (conversation) {
 			const newMessage = new Message();
@@ -610,7 +593,7 @@ export class ChatService {
 		}
 
 		console.error("Fatal error: message could not be created");
-		return;
+		return ;
 	}
 
 	/**************************************************************/
@@ -754,16 +737,13 @@ export class ChatService {
 			relations: ["groups", "groups.conversation"],
 		});
 
-		const groups : GroupMember[] = await this.groupMemberRepository.find({
-			relations: ["conversation"],
-		});
-
 		let conversations : Conversation[] = await this.conversationRepository.find();
+		// faire des test avec la liste quand le user a qu'un channel et qu'il est ban
 		user.groups.forEach((group: GroupMember) => {
-			conversations = conversations.filter((conversation: Conversation) => 
-				conversation.id != group.conversation.id 
-				&& conversation.isPublic == true 
-				&& conversation.is_channel == true);
+				conversations = conversations.filter((conversation: Conversation) => 
+					conversation.id != group.conversation.id 
+					&& conversation.isPublic == true 
+					&& conversation.is_channel == true);
 		});
 		return conversations;
 	}
