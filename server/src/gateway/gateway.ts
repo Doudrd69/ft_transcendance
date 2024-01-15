@@ -119,6 +119,26 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		});
 	}
 
+	@SubscribeMessage('banUser')
+	handleUserBan(@MessageBody() data: { userToBan: string, roomName: string, roomID: string } ) {
+		const { userToBan, roomName, roomID } = data;
+		console.log(userToBan);
+		this.server.to(userToBan).emit('userIsBan', {
+			roomName: roomName,
+			roomID: roomID,
+		});
+	}
+
+	@SubscribeMessage('unbanUser')
+	handleUserUnban(@MessageBody() data: { userToUnban: string, roomName: string, roomID: string } ) {
+		const { userToUnban, roomName, roomID } = data;
+		console.log(userToUnban);
+		this.server.to(userToUnban).emit('userIsUnban', {
+			roomName: roomName,
+			roomID: roomID,
+		});
+	}
+
 	@SubscribeMessage('message')
 	handleMessage(@MessageBody() data: { dto: MessageDto, conversationName: string } ) {
 

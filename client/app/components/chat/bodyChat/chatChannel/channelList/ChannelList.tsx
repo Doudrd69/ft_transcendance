@@ -61,8 +61,6 @@ const ChannelListComponent: React.FC<ChanneListComponentProps> = ({ userSocket }
 			console.log("Fatal error");
 		}
 	};
-	
-	console.log("state.showPassword =====> ", state.showPassword);
 
 	useEffect(() => {
 		console.log("Loading conversations...");
