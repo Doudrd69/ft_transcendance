@@ -2,6 +2,8 @@
 	display: flex;
 	justify-content: space-between;
 	resize: none;
+	width: 100%;
+
 	
 }
 .input-chat{
@@ -36,4 +38,19 @@
 }
 .button-send:hover {
 	transform: scale(1.2);
+}
+
+.img-enter{
+	width: 50px;
+	height: auto;
+	margin: 0px 10px 10px 0px;
+}
+.img-enter:hover{
+	transition: transform 0.2s ease;
+	transform: scale(1.2);
+}
+.bloc-chat-enter{
+	display: flex;
+	flex-direction: row;
+	flex:1;
 }
