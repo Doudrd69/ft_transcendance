@@ -13,11 +13,11 @@ import { MessageDto } from 'src/chat/dto/message.dto';
 	},
 })
 
-// quand ton client se connecte, il join les rooms des gens qu il a bloque
-// join()
+// quand ton client se connecte, il rejoin les rooms des gens qu il a bloque
+// join(whoblockedUSERLOGIN)
 // to('room').except("WhoBlocked#senderId") (tu connais senderId)
+// reste a implementer dans le front les events au moment du fetch pour tout se suite rejoindre/qutter les rooms de block
 // creer un dossier pour les dto de la gateway
-// 
 
 export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
@@ -165,7 +165,7 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		console.log("Message sent to: ", conversationName + dto.conversationID);
 
 		// The room's name is not the conversation's name in DB
-		this.server.to(conversationName + dto.conversationID).emit('onMessage', {
+		this.server.to(conversationName + dto.conversationID).except(`whoblocked${dto.from}`).emit('onMessage', {
 			from: dto.from,
 			content: dto.content,
 			post_datetime: dto.post_datetime,
@@ -174,6 +174,7 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		});
 	}
 
+	// je peux aussi utiliser la liste userBlocked pour except les demandes d'amis
 	@SubscribeMessage('addFriend')
 	handleFriendRequest(@MessageBody() dto: any) {
 		this.server.to(dto.recipientLogin).emit('friendRequest', {
