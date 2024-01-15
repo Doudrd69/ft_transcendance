@@ -16,7 +16,7 @@ export class MessageDto {
 	@IsString()
 	@IsAscii()
 	@Matches(/^[^"';%()|<>\\]*$/)
-	@Length(1, 254)
+	@Length(1, 180)
 	content: string;
 
 	@IsNotEmpty()

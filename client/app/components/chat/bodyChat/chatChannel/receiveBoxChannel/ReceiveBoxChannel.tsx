@@ -159,7 +159,7 @@ const ReceiveBoxChannelComponent: React.FC<ReceiveBoxChannelComponentProps> = ({
 								dispatch({ type: 'DISABLE', payload: 'showBackComponent' });
 						}}/>}
 					{state.showOptionsUserChannel && (
-					<OptionsUserChannel name={state.currentOptionChannelName} title={state.currentOptionChannelName} user={userList}/>)}
+					<OptionsUserChannel name={state.currentOptionChannelName} title={state.currentOptionChannelName} user={userList} userSocket={userSocket}/>)}
 				</div>
 				))}
 			</div>
