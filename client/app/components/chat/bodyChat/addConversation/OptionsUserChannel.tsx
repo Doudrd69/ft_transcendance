@@ -32,7 +32,8 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ name,  title, u
 		const userOptionDto = {
 			conversationID: Number(state.currentConversationID),
 			username: user.login,
-			state: user.isMute
+			state: user.isMute,
+			from: Number(sessionStorage.getItem("currentUserID")),
 		}
 
 		const response = await fetch(`http://localhost:3001/chat/muteUser`, {
@@ -59,7 +60,8 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ name,  title, u
 		const userOptionDto = {
 			conversationID: Number(state.currentConversationID),
 			username: user.login,
-			state : user.isBan
+			state : user.isBan,
+			from: Number(sessionStorage.getItem("currentUserID")),
 		}
 
 		const response = await fetch(`http://localhost:3001/chat/banUser`, {
@@ -92,7 +94,8 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ name,  title, u
 		const userOptionDto = {
 			conversationID: Number(state.currentConversationID),
 			username: name,
-			state : user.isAdmin
+			state : user.isAdmin,
+			from: Number(sessionStorage.getItem("currentUserID")),
 		}
 
 		const response = await fetch(`http://localhost:3001/chat/adminUser`, {

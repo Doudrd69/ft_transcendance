@@ -412,7 +412,6 @@ export class ChatService {
 		const user = await this.usersRepository.findOne({ where: { id: promoteUserToAdminDto.from } });
 		const conversation = await this.conversationRepository.findOne({ where: { id: promoteUserToAdminDto.conversationID } });
 		const userGroup = await this.getRelatedGroup(user, conversation);
-
 	
 		if (userToPromote && conversation && userGroup) {
 			const groupToUpdate = await this.getRelatedGroup(userToPromote, conversation);
@@ -459,10 +458,11 @@ export class ChatService {
 			return true;
 		}
 		else {
-			// si aucun membre pour etre owner, ou pas de membrs: on supprime le group et a conversation
+			// si aucun membre pour etre owner, ou pas de membres: on supprime le group et a conversation
 			const allGroups = await this.groupMemberRepository.find();
+			console.log("all groups before filter: ", allGroups);
 			// ca c'est de la merde
-			// allGroups.filter((groups: GroupMember[]) => groups != relatedGroups);
+			allGroups.filter((group: GroupMember) => group.id != relatedGroups[group.id].id);
 			await this.groupMemberRepository.save(allGroups);
 			console.log("all groups after filter: ", allGroups);
 
@@ -485,7 +485,6 @@ export class ChatService {
 
 		if (user && conversation) {
 
-			
 			const groupToRemove = await this.getRelatedGroup(user, conversation);
 			const isOwnerStatus = await this.getGroupIsOwnerStatus(user, conversation);
 			
@@ -497,7 +496,7 @@ export class ChatService {
 
 				if (isOwnerStatus) {
 					const status = await this.promoteNewOwner(conversation);
-					console.log(status);
+					console.log("Promote status: ", status);
 				}
 
 				return ;
@@ -506,13 +505,6 @@ export class ChatService {
 
 		return ;
 	}
-
-	// async eraseConversation(conversationDto: ConversationDto) {
-		
-	// 	const conversationToRemove = await this.conversationRepository.findOne({ where: {name: conversationDto.name }});
-	// 	await this.conversationRepository.remove(conversationToRemove);
-	// 	return ;
-	// }
 	
 	async addUserToConversation(addUserToConversationDto: AddUserToConversationDto): Promise<Conversation | { error: string }> {
 		
