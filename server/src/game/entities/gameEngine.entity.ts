@@ -8,17 +8,8 @@ export class GameEngine {
 	@PrimaryGeneratedColumn()
 	gameEngineId: number;
 
-	@Column()
+	@Column({default: 5})
 	gameID: number;
-
-	@Column({ type: 'jsonb' })
-	ball: Ball;
-
-	@Column('jsonb', { nullable: true })
-	PaddleOne: Paddle;
-
-	@Column('jsonb', { nullable: true })
-	PaddleTwo: Paddle;
 
 	@Column({default: 5})
 	victory_condition: number;

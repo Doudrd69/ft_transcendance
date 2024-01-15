@@ -6,9 +6,9 @@ export class Vector {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column()
+    @Column({ type: 'decimal', precision : 7, scale: 4})
     x: number;
 
-    @Column()
+    @Column({ type: 'decimal', precision : 7, scale: 4})
     y: number;
 }

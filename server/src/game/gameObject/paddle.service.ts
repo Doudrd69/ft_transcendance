@@ -5,6 +5,7 @@ import { Game } from '../entities/games.entity';
 import { User } from 'src/users/entities/users.entity';
 import { GameEngine } from '../entities/gameEngine.entity';
 import { Paddle } from '../entities/paddle.entity';
+import { paddle_instance } from 'src/game_gateway/game.gateway';
 
 @Injectable()
 export class PaddleService {
@@ -19,17 +20,34 @@ export class PaddleService {
 		private paddleRepository: Repository<Paddle>,
 
 
-	) { }
+	) {}
 
-	async up(paddle: Paddle) {
-		paddle.y_pos -= paddle.speed;
-		if (paddle.y_pos < 0)
-		paddle.y_pos = 0;
+	async updatePaddlePosition(paddle: paddle_instance) {
+		if (paddle.up) {
+			paddle.y -= paddle.speed;
+			if (paddle.y < 0)
+				paddle.y = 0;
+		}
+		else if (paddle.down) {
+			paddle.y -= (paddle.speed * -1);
+			if (paddle.y > 82)
+				paddle.y = 82;
+		}
 	}
 
-	async down(paddle: Paddle) {
-		paddle.y_pos -= (paddle.speed * -1);
-		if (paddle.y_pos > 82)
-		paddle.y_pos = 82;
-	}
+	process_input (paddle: paddle_instance, input: string) {
+        //console.log("process input : ", body);
+        if (input === "ArrowUp" || input === "w") {
+            paddle.up = !paddle.up;
+            if (paddle.up) {
+                paddle.down = false;
+            }
+        }
+		if (input === "ArrowDown" || input === "s") {
+            paddle.down = !paddle.down;
+            if (paddle.down) {
+                paddle.up = false;
+            }
+        }
+    }
 }

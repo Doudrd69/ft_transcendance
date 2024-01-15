@@ -76,10 +76,4 @@ export class GameService {
         // regarder comment verifier si le player est dans une game et la supprimer si c'est le cas
     }
 
-    /**
-     * devoir creer soit un GameState avec dedans paddle 1 et 2 et ball
-     * ou quelque chose qui a l'air plus clean mais qu'il faut que je comprenne c'est
-     * cree des class wall et ball qui me permette d'avoir de l'oriente objet et leur ft
-     * 
-     */
 }
