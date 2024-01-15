@@ -66,6 +66,7 @@ interface ChatState {
 	currentChannelBool: boolean;
 	showPassword: boolean;
 	showOptionsUserChannel: boolean;
+	showOptionsUserChannelOwner: boolean;
 	showAdmin: boolean;
 	currentConversationIsProtected: boolean;
 	currentConversationIsPrivate: boolean;
@@ -111,6 +112,7 @@ const initialState: ChatState = {
 	showAdmin: false,
 	isAdmin: false,
 	currentOptionChannelName:'',
+	showOptionsUserChannelOwner: false,
 	showOptionsUserChannel: false,
 	showPasswordChange:false,
 	currentComponent: '',

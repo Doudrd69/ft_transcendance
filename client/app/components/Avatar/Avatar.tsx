@@ -21,7 +21,6 @@ const AvatarImageComponent: React.FC<AvatarImageProps> = ({ className, refresh, 
 		url = `http://localhost:3001/users/getAvatarByLogin/${userLogin}/${timestamp}`;
 	}
 	else {
-		console.log("userId?????", userId);
 		url = `http://localhost:3001/users/getAvatar/${userId}/${timestamp}`;
 	}
 
