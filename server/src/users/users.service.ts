@@ -242,7 +242,7 @@ export class UsersService {
 			}
 
 			console.log("A friend request between those two users already exists : FR id = ", friendshipAlreadyExists.id);
-			return friendshipAlreadyExists.isAccepted;
+			return false
 		}
 		
 		console.log("Fatal errror: user does not exist");

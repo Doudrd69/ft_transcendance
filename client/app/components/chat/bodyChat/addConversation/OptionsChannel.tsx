@@ -13,6 +13,7 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 
 	const [formValue, setFormValue] = useState('');
 	const { state, dispatch } = useChat();
+
 	const handlePrivate = async() => {
 
 			const channelOptionDto = {
@@ -42,6 +43,8 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 
 	const handleProtected = async() => {
 
+		// error Error: Missing getServerSnapshot, which is required for server-rendered content. Will revert to client rendering.
+
 			const channelOptionDto = {
 				conversationID: Number(state.currentConversationID),
 				userID: Number(sessionStorage.getItem("currentUserID")),
@@ -59,18 +62,25 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 			});
 	
 			if (response.ok) {
-				dispatch({ type: 'TOGGLEX', payload: 'currentConversationIsProtected' });
-				console.log("Update PASSWORD");
+				const status = await response.json();
+				if (status) {
+					dispatch({ type: 'TOGGLEX', payload: 'currentConversationIsProtected' });
+					console.log("Password updated");
+				}
+				else {
+					console.log("User is not admin on this channel");
+				}
 			}
 			else {
 				console.log("Fatal error");
 			}
+
+			return ;
 	}
 
 	const handleCancel = () => {
 		dispatch({ type: 'DISABLE', payload: 'showOptionChannel' });
 		dispatch({ type: 'ACTIVATE', payload: 'showBackComponent' });
-		console.log("state =========================: ", state.showBackComponent);
 		setFormValue('');
 	};
 
@@ -83,7 +93,7 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 
 		document.addEventListener('keydown', handleEscape);
 		return () => {
-		  document.removeEventListener('keydown', handleEscape);
+			document.removeEventListener('keydown', handleEscape);
 		};
 	}, []);
 

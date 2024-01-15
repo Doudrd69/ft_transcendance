@@ -14,7 +14,9 @@ import { GroupMember } from './entities/group_member.entity';
 import { Message } from './entities/message.entity';
 import { group } from 'console';
 import { ChannelOptionsDto } from './dto/channelOptionsDto.dto';
+import { QuitConversationDto } from './dto/quitConversationDto.dto';
 import { FormatInputPathObject } from 'path';
+import { GroupDto } from './dto/group.dto';
 
 @Injectable()
 export class ChatService {
@@ -49,7 +51,7 @@ export class ChatService {
 		user.groups.forEach((userGroup: GroupMember) => {
 			groupList.forEach((group: GroupMember) => {
 				if (userGroup.id == group.id) {
-					console.log("Foumd ", group.id);
+					console.log("Found ", group.id);
 					groupFound = group;
 				}
 			});
@@ -193,7 +195,7 @@ export class ChatService {
 			let conversationArray : Conversation[] = [];
 			if (userToFind.groups && Array.isArray(userToFind.groups)) {
 				userToFind.groups.forEach((group: GroupMember) => {
-					if (group.conversation.is_channel)
+					if (group.conversation.is_channel && !group.isBan)
 						conversationArray.push(group.conversation)
 				})
 				return conversationArray;
@@ -299,7 +301,7 @@ export class ChatService {
 		return ;
 	}
 
-	async updateChannelIsProtectedStatus(channelOptionsDto: ChannelOptionsDto) {
+	async updateChannelIsProtectedStatus(channelOptionsDto: ChannelOptionsDto): Promise<boolean> {
 
 		const user : User = await this.usersRepository.findOne({
 			where: { id: channelOptionsDto.userID},
@@ -310,7 +312,6 @@ export class ChatService {
 			where: { id: channelOptionsDto.conversationID },
 		});
 
-		// check if user is admin/owner
 		const isUserIsAdmin = await this.getGroupIsAdminStatus(user, channelToUpdate);
 
 		if (isUserIsAdmin) {
@@ -320,19 +321,22 @@ export class ChatService {
 					channelToUpdate.isProtected = false;
 				else {					
 					channelToUpdate.isProtected = true;
-					if (channelOptionsDto.password)
+					if (channelOptionsDto.password) {
+						console.log("Updating password to ", channelOptionsDto.password);
 						channelToUpdate.password = await this.hashChannelPassword(channelOptionsDto.password)
+					}
 				}
 
 				await this.conversationRepository.save(channelToUpdate);
+				return true;
 			}
 		}
 
-		return ;
+		return false;
 	}
 
 	/***					USER CHANNEL OPTIONS				***/
-	async updateUserMuteStatusFromConversation(muteUserDto: UserOptionsDto) {
+	async updateUserMuteStatusFromConversation(muteUserDto: UserOptionsDto): Promise<boolean> {
 
 		const userToMute : User = await this.usersRepository.findOne({
 			where: { username: muteUserDto.username },
@@ -346,14 +350,19 @@ export class ChatService {
 			const groupToUpdate = await this.getRelatedGroup(userToMute, conversation);
 
 			// If userToMute is the owner == error
-			if (!groupToUpdate.isOwner) {
+			if (!groupToUpdate.isOwner || !groupToUpdate.isAdmin) {
 				if (groupToUpdate) {
 	
-					if (muteUserDto.state)
+					if (muteUserDto.state) {
 						groupToUpdate.isMute = false;
-					else
+						await this.groupMemberRepository.save(groupToUpdate);
+						return false;
+					}
+					else {
 						groupToUpdate.isMute = true;
-					await this.groupMemberRepository.save(groupToUpdate);
+						await this.groupMemberRepository.save(groupToUpdate);
+						return true;	
+					}
 				}
 			}
 
@@ -361,7 +370,8 @@ export class ChatService {
 		}
 	}
 
-	async updateUserBanStatusFromConversation(banUserDto: UserOptionsDto) {
+	// aussi penser a emit pour leave la room
+	async updateUserBanStatusFromConversation(banUserDto: UserOptionsDto): Promise<boolean> {
 
 		const userToBan : User = await this.usersRepository.findOne({
 			where: { username: banUserDto.username },
@@ -373,15 +383,22 @@ export class ChatService {
 		if (userToBan && conversation) {
 
 			const groupToUpdate = await this.getRelatedGroup(userToBan, conversation);
+			console.log("group to update: ", groupToUpdate);
 			// If userToBan is the owner == error
-			if (!groupToUpdate.isOwner) {
+			if (!groupToUpdate.isOwner || !groupToUpdate.isAdmin) {
 				if (groupToUpdate) {
 	
-					if (banUserDto.state)
+					if (banUserDto.state) {
 						groupToUpdate.isBan = false;
-					else
+						await this.groupMemberRepository.save(groupToUpdate);
+						return false;
+
+					}
+					else {
 						groupToUpdate.isBan = true;
-					await this.groupMemberRepository.save(groupToUpdate);
+						await this.groupMemberRepository.save(groupToUpdate);
+						return true;
+					}
 				}
 			}
 
@@ -389,7 +406,7 @@ export class ChatService {
 		}
 	}
 
-	async updateUserAdminStatusFromConversation(promoteUserToAdminDto: UserOptionsDto) {
+	async updateUserAdminStatusFromConversation(promoteUserToAdminDto: UserOptionsDto): Promise<boolean> {
 
 		const userToPromote : User = await this.usersRepository.findOne({
 			where: { username: promoteUserToAdminDto.username },
@@ -402,14 +419,19 @@ export class ChatService {
 
 			const groupToUpdate = await this.getRelatedGroup(userToPromote, conversation);
 			// If userToMute is the owner == error
-			if (!groupToUpdate.isOwner) {
+			if (!groupToUpdate.isOwner || !groupToUpdate.isAdmin) {
 				if (groupToUpdate) {
 	
-					if (promoteUserToAdminDto.state)
+					if (promoteUserToAdminDto.state) {
 						groupToUpdate.isAdmin = false;
-					else
+						await this.groupMemberRepository.save(groupToUpdate);
+						return false;
+					}
+					else {
 						groupToUpdate.isAdmin = true;
-					await this.groupMemberRepository.save(groupToUpdate);
+						await this.groupMemberRepository.save(groupToUpdate);
+						return true;
+					}
 				}
 			}
 
@@ -420,42 +442,78 @@ export class ChatService {
 	/**************************************************************/
 	/***					CONVERSATION						***/
 	/**************************************************************/
+	
+	async promoteNewOwner(conversation: Conversation): Promise<boolean> {
 
-	async quitConversation(conversationDto: ConversationDto) {
-		
-		// faire par ID
-		const conversationToRemove = await this.conversationRepository.findOne({ where: {name: conversationDto.name }});
-		
-		const user = await this.usersRepository.findOne({
-			where: {id: conversationDto.userID},
-			relations: ['groups'],
+		let groupToPromote : GroupMember;
+		const relatedGroups: GroupMember[] = await this.groupMemberRepository.find({ where: { conversation: conversation} });
+		// On a au moins un membre
+		if (relatedGroups) {
+			relatedGroups.forEach((group: GroupMember) => {
+				if (!group.isBan) {
+					groupToPromote = group;
+					return ;
+				}
+			});
+			groupToPromote.isOwner = true;
+			await this.groupMemberRepository.save(groupToPromote);
+
+			return true;
+		}
+		else {
+			// si aucun membre pour etre owner, ou pas de membrs: on supprime le group et a conversation
+			const allGroups = await this.groupMemberRepository.find();
+			allGroups.filter((groups: GroupMember[]) => groups != relatedGroups);
+			await this.groupMemberRepository.save(allGroups);
+			console.log("all groups after filter: ", allGroups);
+
+			await this.conversationRepository.delete(conversation);
+
+			return false;
+		}
+	}
+
+	async quitConversation(quiConversationDto: QuitConversationDto): Promise<boolean> {
+
+		const user : User = await this.usersRepository.findOne({
+			where: { id: quiConversationDto.userID },
+			relations: ["groups", "groups.conversation"],
 		});
 
-		if (conversationToRemove && user) {
+		const conversation : Conversation = await this.conversationRepository.findOne({
+			where: { id: quiConversationDto.conversationID },
+		});
 
-			// methode 1
-			// const groupsUpdated = user.groups.filter((group: GroupMember) => group.conversation != conversationToRemove);
-			// user.groups = groupsUpdated;
-			// await this.usersRepository.save(user);
+		if (user && conversation) {
 
-			// methode 2
-			// const groupToRemove = user.groups.filter((group: GroupMember) => group.conversation != conversationToRemove);
-			// user.groups.splice(groupToRemove);
-			// await this.usersRepository.save(user)
+			
+			const groupToRemove = await this.getRelatedGroup(user, conversation);
+			const isOwnerStatus = await this.getGroupIsOwnerStatus(user, conversation);
+			
+			if (groupToRemove) {
+				console.log("Before: ", user.groups);
+				user.groups.filter((group: GroupMember) => group.id != groupToRemove.id);
+				await this.usersRepository.save(user);
+				console.log("After: ", user.groups);
 
-			return ;
+				if (isOwnerStatus) {
+					const status = await this.promoteNewOwner(conversation);
+					console.log(status);
+				}
+
+				return ;
+			}
 		}
-		
-		console.log("Fatal error");
+
 		return ;
 	}
-	
-	async eraseConversation(conversationDto: ConversationDto) {
+
+	// async eraseConversation(conversationDto: ConversationDto) {
 		
-		const conversationToRemove = await this.conversationRepository.findOne({ where: {name: conversationDto.name }});
-		await this.conversationRepository.remove(conversationToRemove);
-		return ;
-	}
+	// 	const conversationToRemove = await this.conversationRepository.findOne({ where: {name: conversationDto.name }});
+	// 	await this.conversationRepository.remove(conversationToRemove);
+	// 	return ;
+	// }
 	
 	async addUserToConversation(addUserToConversationDto: AddUserToConversationDto): Promise<Conversation | { error: string }> {
 		
@@ -595,9 +653,19 @@ export class ChatService {
 	/**************************************************************/
 	
 	// need to check muteStatus here or in front?
-	async createMessage(messageDto: MessageDto): Promise<Message> {
+	async createMessage(messageDto: MessageDto): Promise<Message | boolean> {
 		
 		const conversation : Conversation = await this.conversationRepository.findOne({ where: {id: messageDto.conversationID} });
+		const sender : User = await this.usersRepository.findOne({
+			where: { username: messageDto.from },
+			relations: ["groups", "groups.conversation"],
+		});
+
+		const isMuteStatus = await this.getGroupIsMuteStatus(sender, conversation);
+		if (isMuteStatus) {
+			console.error("User is mute");
+			return false;
+		}
 
 		if (conversation) {
 			const newMessage = new Message();
@@ -610,7 +678,7 @@ export class ChatService {
 		}
 
 		console.error("Fatal error: message could not be created");
-		return;
+		return ;
 	}
 
 	/**************************************************************/
@@ -754,16 +822,13 @@ export class ChatService {
 			relations: ["groups", "groups.conversation"],
 		});
 
-		const groups : GroupMember[] = await this.groupMemberRepository.find({
-			relations: ["conversation"],
-		});
-
 		let conversations : Conversation[] = await this.conversationRepository.find();
+		// faire des test avec la liste quand le user a qu'un channel et qu'il est ban
 		user.groups.forEach((group: GroupMember) => {
-			conversations = conversations.filter((conversation: Conversation) => 
-				conversation.id != group.conversation.id 
-				&& conversation.isPublic == true 
-				&& conversation.is_channel == true);
+				conversations = conversations.filter((conversation: Conversation) => 
+					conversation.id != group.conversation.id 
+					&& conversation.isPublic == true 
+					&& conversation.is_channel == true);
 		});
 		return conversations;
 	}

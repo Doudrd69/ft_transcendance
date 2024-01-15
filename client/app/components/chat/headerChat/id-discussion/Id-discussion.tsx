@@ -9,7 +9,7 @@ interface IdDiscussionProps {
 	userSocket: Socket;
 	}
 
-const IdDiscussionComponent: React.FC<IdDiscussionProps>= ({userSocket}) => {
+const IdDiscussionComponent: React.FC<IdDiscussionProps>= ({ userSocket }) => {
 	const { state, dispatch } = useChat();
 	var id;
 	if (state.currentChannelBool)

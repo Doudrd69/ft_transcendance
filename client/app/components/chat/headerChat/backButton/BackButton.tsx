@@ -11,7 +11,6 @@ const BackButtonComponent: React.FC = () => {
 			dispatch({ type: 'DISABLE', payload: 'showChannel' });
 			dispatch({ type: 'DISABLE', payload: 'showOptionsUserChannel' });
 			dispatch({ type: 'DISABLE', payload: 'showOptionsChannel' });
-			console.log("Current component =========================: ", state.currentComponent);
 			dispatch({ type: 'ACTIVATE', payload: state.currentComponent });
 	};
 

@@ -26,7 +26,7 @@ export class ChatController {
 	@UseGuards(AuthGuard)
 	@HttpCode(HttpStatus.OK)
 	@Post('newMessage')
-	createNewMessage(@Body() messageDto: MessageDto): Promise<Message> {
+	createNewMessage(@Body() messageDto: MessageDto): Promise<Message | boolean> {
 		return this.chatService.createMessage(messageDto);
 	}
 
@@ -51,30 +51,30 @@ export class ChatController {
 		return this.chatService.compareChannelPassword(checkPasswordDto);
 	}
 
-	/****** USER OPTIONS ON CHANNEL ******/
+	/******		USER OPTIONS ON CHANNEL		******/
 
 	@UseGuards(AuthGuard)
 	@HttpCode(HttpStatus.OK)
 	@Post('banUser')
-	banUserFromConversation(@Body() userOptionsDto: UserOptionsDto){
+	banUserFromConversation(@Body() userOptionsDto: UserOptionsDto): Promise<boolean>{
 		return this.chatService.updateUserBanStatusFromConversation(userOptionsDto);
 	}
 
 	@UseGuards(AuthGuard)
 	@HttpCode(HttpStatus.OK)
 	@Post('muteUser')
-	muteUserFromConversation(@Body() userOptionsDto: UserOptionsDto) {
+	muteUserFromConversation(@Body() userOptionsDto: UserOptionsDto): Promise<boolean> {
 		return this.chatService.updateUserMuteStatusFromConversation(userOptionsDto);
 	}
 
 	@UseGuards(AuthGuard)
 	@HttpCode(HttpStatus.OK)
 	@Post('adminUser')
-	adminUserFromConversation(@Body() userOptionsDto: UserOptionsDto) {
+	adminUserFromConversation(@Body() userOptionsDto: UserOptionsDto): Promise<boolean> {
 		return this.chatService.updateUserAdminStatusFromConversation(userOptionsDto);
 	}
 
-	/****** CHANNEL OPTIONS ON CHANNEL ******/
+	/******		CHANNEL OPTIONS		******/
 
 	@UseGuards(AuthGuard)
 	@HttpCode(HttpStatus.OK)
@@ -86,7 +86,7 @@ export class ChatController {
 	@UseGuards(AuthGuard)
 	@HttpCode(HttpStatus.OK)
 	@Post('updateIsProtected')
-	updateChannelIsprotectedStatus(@Body() channelOptionsDto: ChannelOptionsDto) {
+	updateChannelIsprotectedStatus(@Body() channelOptionsDto: ChannelOptionsDto): Promise<boolean> {
 		return this.chatService.updateChannelIsProtectedStatus(channelOptionsDto);
 	}
 

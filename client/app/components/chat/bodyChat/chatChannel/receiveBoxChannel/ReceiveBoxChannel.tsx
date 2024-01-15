@@ -25,6 +25,7 @@ interface userList {
 }
 
 const ReceiveBoxChannelComponent: React.FC<ReceiveBoxChannelComponentProps> = ({ userSocket }) => {
+
 	const { state, dispatch } = useChat();
 	const socketInUse = userSocket;
 	const [messages, setMessages] = useState<Message[]>([]);
@@ -53,8 +54,6 @@ const ReceiveBoxChannelComponent: React.FC<ReceiveBoxChannelComponentProps> = ({
 		const formattedDate = new Intl.DateTimeFormat('en-GB', options).format(new Date(dateTimeString));
 		return formattedDate;
 	};
-
-	console.log("currentComponent 2  =====> ", state.currentComponent);
 
 	const getMessages = async () => {
 		try {

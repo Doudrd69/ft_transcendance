@@ -97,6 +97,17 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		return ;
 	}
 
+	@SubscribeMessage('leaveRoom')
+	leaveRoom( @ConnectedSocket() client: Socket, @MessageBody() data: { roomName: string, roomID: string } ) {
+
+		const { roomName, roomID } = data;
+		console.log("==== leaveRoom Event ====");
+		console.log("Remove ", client.id," from room : ", roomName + roomID);
+
+		client.leave(roomName + roomID);
+		return ;
+	}
+
 	@SubscribeMessage('addUserToRoom')
 	addUserToNewRoom( @MessageBody() data: { convID: number, convName: string, friend: string} ) {
 		const { convID, convName, friend } = data;
@@ -105,6 +116,26 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		this.server.to(friend).emit('userAddedToFriendRoom', {
 			convID: convID,
 			convName: convName,
+		});
+	}
+
+	@SubscribeMessage('banUser')
+	handleUserBan(@MessageBody() data: { userToBan: string, roomName: string, roomID: string } ) {
+		const { userToBan, roomName, roomID } = data;
+		console.log(userToBan);
+		this.server.to(userToBan).emit('userIsBan', {
+			roomName: roomName,
+			roomID: roomID,
+		});
+	}
+
+	@SubscribeMessage('unbanUser')
+	handleUserUnban(@MessageBody() data: { userToUnban: string, roomName: string, roomID: string } ) {
+		const { userToUnban, roomName, roomID } = data;
+		console.log(userToUnban);
+		this.server.to(userToUnban).emit('userIsUnban', {
+			roomName: roomName,
+			roomID: roomID,
 		});
 	}
 
