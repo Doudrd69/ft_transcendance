@@ -28,4 +28,9 @@ export class UserOptionsDto {
 	@IsNotEmpty()
 	@IsBoolean()
 	state: boolean;
+
+	@IsNotEmpty()
+	@IsPositive()
+	@Max(1000)
+	from: number;
 }
