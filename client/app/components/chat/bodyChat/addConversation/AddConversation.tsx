@@ -60,7 +60,6 @@ const AddConversationComponent: React.FC<AddConversationComponentProps> = ({ use
 			console.log("Error: ", error.message);
 		}
 	};
-
 	const handleCancel = () => {
 		dispatch({ type: 'DISABLE', payload: 'showAddChannel' });
 		dispatch({ type: 'DISABLE', payload: 'showAddUser' });
@@ -85,7 +84,12 @@ const AddConversationComponent: React.FC<AddConversationComponentProps> = ({ use
 		document.removeEventListener('keydown', handleEscape);
 		};
 	}, []);
-
+	const handleImageClick = (e: React.MouseEvent<HTMLImageElement>) => {
+		// Call the function you want to execute when the image is clicked
+		// For example, you can call handleConversationCreation here
+		handleConversationCreation(e);
+	};
+	
 	return (
 		<>
 			<div className="blur-background"></div>
@@ -121,9 +125,7 @@ const AddConversationComponent: React.FC<AddConversationComponentProps> = ({ use
 											onChange={(e) => setPasswordValue(e.target.value)}
 										/>
 									)}
-									<button className="add__button" type="submit">
-										create
-									</button>
+									<img className='img-enter-conversation' src="enter.png" onClick={(e) => handleImageClick(e)} />
 								</div>
 							</form>
 						</div>

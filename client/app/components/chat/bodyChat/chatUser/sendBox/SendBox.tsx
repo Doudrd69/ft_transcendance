@@ -57,10 +57,13 @@ const SendBoxComponent: React.FC<SendBoxComponentProps> = ({ userSocket }) => {
 	}
 
 	return (
+			<div className="bloc-chat-enter">
 				<form className="bloc-send-chat" onSubmit={handleMessage}>
 					<input className="input-chat" placeholder="message..." value={messageValue} onChange={handleMessageInput}></input>
 					{/* <button className="button-send" type="submit"></button> */}
 				</form>
+				<img className= "img-enter" src="enter.png" alt="entrer" />
+			</div>
 	)
 };
 export default SendBoxComponent;
