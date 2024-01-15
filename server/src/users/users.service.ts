@@ -297,7 +297,7 @@ export class UsersService {
 		return ;
 	}
 
-	async blockUser(blockUserDto: BlockUserDto): Promise<Conversation | Friendship> {
+	async removeFriend(blockUserDto: BlockUserDto): Promise<Conversation | Friendship> {
 
 		const friendshipToUpdate = await this.updateFriendship(blockUserDto, false);
 		if (friendshipToUpdate) {
@@ -306,6 +306,36 @@ export class UsersService {
 
 		console.log("Fatal error: could not update frienship status");
 		return ;
+	}
+
+	// Pour block/unblock ne pas oublier de faire emit sur les events correspondant
+	// peut etre return l'id du user qui est bloque pour le whoBlock#ID
+	async blockUser(blockUserDto: BlockUserDto): Promise<boolean> {
+
+		const user : User = await this.usersRepository.findOne({ where: { username: blockUserDto.initiatorLogin } });
+		const userToBlock : User = await this.usersRepository.findOne({ where: {username: blockUserDto.recipientLogin } });
+
+		if (user && userToBlock) {
+			user.blockedUser.push(userToBlock.login);
+			await this.usersRepository.save(user);
+			return true;
+		}
+
+		return false;
+	}
+
+	async unblockUser(blockUserDto: BlockUserDto): Promise<boolean> {
+
+		const user : User = await this.usersRepository.findOne({ where: { username: blockUserDto.initiatorLogin } });
+		const userToUnblock : User = await this.usersRepository.findOne({ where: {username: blockUserDto.recipientLogin } });
+
+		if (user && userToUnblock) {
+			user.blockedUser.filter((user: string) => user != userToUnblock.login);
+			await this.usersRepository.save(user);
+			return true;
+		}
+
+		return false;
 	}
 
 	/**************************************************************/
@@ -319,6 +349,16 @@ export class UsersService {
 	async getUserByLogin(loginToSearch: string): Promise<User> {
 		// We search by login because it is unique
 		return await this.usersRepository.findOne({ where: { login: loginToSearch} });
+	}
+
+	async getBlockedUserList(userID: number) {
+
+		const user = await this.usersRepository.findOne({ where: { id: userID } });
+		if (user) {
+			return user.blockedUser;
+		}
+
+		return [];
 	}
 
 	async getFriendships(username: string): Promise<Friendship[]> {

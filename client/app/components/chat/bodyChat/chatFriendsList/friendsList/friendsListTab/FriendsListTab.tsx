@@ -42,7 +42,7 @@ const FriendsListTabComponent:  React.FC<FriendsListTabComponentProps> = ({ user
 			recipientLogin:  userLogin,
 		}
 
-		const response = await fetch('http://localhost:3001/users/blockUser', {
+		const response = await fetch('http://localhost:3001/users/removeFriend', {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',

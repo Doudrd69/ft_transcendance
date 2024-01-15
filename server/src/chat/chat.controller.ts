@@ -129,6 +129,9 @@ export class ChatController {
 		return this.chatService.updateChannelIsProtectedStatusToFalse(channelOptionsDto);
 	}
 
+
+	/******		GETTERS		******/
+
 	// @Get('getMesssage/:id')
 	// getMessage(@Param('id') id: number): Promise<Message | null> {
 	// 	return this.chatService.getMessageById(id);
