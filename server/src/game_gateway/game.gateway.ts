@@ -18,6 +18,7 @@ export interface ball_instance {
     position: vector_instance;
     speed: vector_instance;
     r: number;
+    alive: boolean;
 }
 
 export interface paddle_instance {

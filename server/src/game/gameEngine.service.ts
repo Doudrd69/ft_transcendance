@@ -42,7 +42,8 @@ export class GameEngineService {
 			ball : { 	
 						position: {x: 153, y: 50},
 						speed: {x: 0.5 * 16/9, y: 0.35},
-						r: 1,
+						r: 0.04,
+						alive: true,
 			},
 			player1_score : 0,
 			player2_score : 0,

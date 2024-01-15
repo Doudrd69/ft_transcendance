@@ -35,13 +35,16 @@ export class BallService {
 
 	updateBallPosition(ball: ball_instance) {
         ball.position = this.VectorService.add(ball.position, ball.speed);
-		// if (ball.position.x - ball.r < 0) {
-			// ball.alive = false;
-		// }
-		// else if (ball.position.x + ball.r > ball.aspect_ratio) {
-            // ball.alive = false;
+		if (ball.position.x - ball.r < 0) {
+			ball.alive = false;
+		}
+		else if (ball.position.x + ball.r > 16/9) {
+            ball.alive = false;
+		}
 		return (ball);
     }
+
+	//peut etre donner le score et le changer ici ?
 
 	// private async createAndSaveBall(x: number, y: number, speedx: number, speedy: number) {
 
