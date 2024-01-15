@@ -26,7 +26,11 @@ const IdDiscussionComponent: React.FC<IdDiscussionProps>= ({userSocket}) => {
 			<img
 				className='image-id'
 				src='settings.png'
-				onClick={() => { dispatch({ type: 'ACTIVATE', payload: 'showOptionChannel' }); }}
+				onClick={() => { 
+					dispatch({ type: 'ACTIVATE', payload: 'dontcandcel' });
+					dispatch({ type: 'ACTIVATE', payload: 'showOptionChannel' });
+					dispatch({ type: 'DISABLE', payload: 'showBackComponent' });
+				}}
 			/>
 			)}
 			{state.showPasswordChange && <PasswordChangeComponent userSocket={userSocket}/>}

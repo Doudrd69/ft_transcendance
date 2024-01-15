@@ -299,7 +299,7 @@ export class ChatService {
 		return ;
 	}
 
-	async updateChannelIsProtectedStatus(channelOptionsDto: ChannelOptionsDto) {
+	async updateChannelIsProtectedStatus(channelOptionsDto: ChannelOptionsDto): Promise<boolean> {
 
 		const user : User = await this.usersRepository.findOne({
 			where: { id: channelOptionsDto.userID},
@@ -310,7 +310,6 @@ export class ChatService {
 			where: { id: channelOptionsDto.conversationID },
 		});
 
-		// check if user is admin/owner
 		const isUserIsAdmin = await this.getGroupIsAdminStatus(user, channelToUpdate);
 
 		if (isUserIsAdmin) {
@@ -320,15 +319,18 @@ export class ChatService {
 					channelToUpdate.isProtected = false;
 				else {					
 					channelToUpdate.isProtected = true;
-					if (channelOptionsDto.password)
+					if (channelOptionsDto.password) {
+						console.log("Updating password to ", channelOptionsDto.password);
 						channelToUpdate.password = await this.hashChannelPassword(channelOptionsDto.password)
+					}
 				}
 
 				await this.conversationRepository.save(channelToUpdate);
+				return true;
 			}
 		}
 
-		return ;
+		return false;
 	}
 
 	/***					USER CHANNEL OPTIONS				***/
@@ -362,7 +364,7 @@ export class ChatService {
 	}
 
 	// aussi penser a emit pour leave la room
-	async updateUserBanStatusFromConversation(banUserDto: UserOptionsDto) {
+	async updateUserBanStatusFromConversation(banUserDto: UserOptionsDto): Promise<boolean> {
 
 		const userToBan : User = await this.usersRepository.findOne({
 			where: { username: banUserDto.username },
@@ -379,11 +381,17 @@ export class ChatService {
 			if (!groupToUpdate.isOwner) {
 				if (groupToUpdate) {
 	
-					if (banUserDto.state)
+					if (banUserDto.state) {
 						groupToUpdate.isBan = false;
-					else
+						await this.groupMemberRepository.save(groupToUpdate);
+						return false;
+
+					}
+					else {
 						groupToUpdate.isBan = true;
-					await this.groupMemberRepository.save(groupToUpdate);
+						await this.groupMemberRepository.save(groupToUpdate);
+						return true;
+					}
 				}
 			}
 

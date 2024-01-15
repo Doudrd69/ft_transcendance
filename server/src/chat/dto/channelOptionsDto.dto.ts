@@ -31,9 +31,9 @@ export class ChannelOptionsDto {
 
     // @IsNotEmpty()
 	// @Length(6, 20)
-	// @IsAscii()
-	// @IsAlpha()
-	// @IsString()
-	// @Matches(/^[^"';%()|<>\\]*$/)
+	@IsAscii()
+	@IsAlpha()
+	@IsString()
+	@Matches(/^[^"';%()|<>\\]*$/)
     password?: string;
 }

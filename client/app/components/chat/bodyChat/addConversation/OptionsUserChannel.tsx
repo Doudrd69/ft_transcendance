@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Socket } from 'socket.io-client';
 import { useChat } from '../../ChatContext';
+import { toast } from 'react-toastify';
 import './AddConversation.css';
 
 interface user {
@@ -25,7 +26,12 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ name,  title, u
 
 	const handleMute = async() => {
 
-		const userOptionDto = {conversationID: Number(state.currentConversationID), username: user.login , state: user.isMute}
+		const userOptionDto = {
+			conversationID: Number(state.currentConversationID),
+			username: user.login,
+			state: user.isMute
+		}
+
 		const response = await fetch(`http://localhost:3001/chat/muteUser`, {
 			method: 'POST',
 			headers: {
@@ -46,7 +52,12 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ name,  title, u
 	
 	const handleBan = async() => {
 
-		const userOptionDto = {conversationID: Number(state.currentConversationID), username: user.login, state : user.isBan}
+		const userOptionDto = {
+			conversationID: Number(state.currentConversationID),
+			username: user.login,
+			state : user.isBan
+		}
+
 		const response = await fetch(`http://localhost:3001/chat/banUser`, {
 			method: 'POST',
 			headers: {
@@ -57,23 +68,29 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ name,  title, u
 		});
 	
 		if (response.ok) {
+			const status = await response.json();
 			user.isBan = !user.isBan;
-			console.log("ban status: ", user.isBan);
-			if (user.isBan)
-				userSocket.emit('leaveRoom', { roomName: state.currentConversation, roomID: state.currentConversationID } );
+			console.log("Ban status: ", user.isBan);
+			console.log("User to ban/unban: ", user.login);
+			if (status) {
+				userSocket.emit('banUser', { userToBan: user.login, roomName: state.currentConversation, roomID: state.currentConversationID } );
+			}
 			else
-				userSocket.emit('joinRoom', { roomName: state.currentConversation, roomID: state.currentConversationID } );
+				userSocket.emit('unbanUser', { userToUnban: user.login, roomName: state.currentConversation, roomID: state.currentConversationID } );
 		}
 		else {
 			console.error("Fatal error");
 		}
 	}
-		
+	
 	const handleAdmin = async() => {
+		
+		const userOptionDto = {
+			conversationID: Number(state.currentConversationID),
+			username: name,
+			state : user.isAdmin
+		}
 
-		console.log("Name: ", name);
-
-		const userOptionDto = {conversationID: Number(state.currentConversationID), username: name, state : user.isAdmin}
 		console.log("DTO --> ", userOptionDto);
 		const response = await fetch(`http://localhost:3001/chat/adminUser`, {
 			method: 'POST',
@@ -95,19 +112,21 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ name,  title, u
 
 	const handleCancel = () => {
 		dispatch({ type: 'DISABLE', payload: 'showOptionsUserChannel' });
+		dispatch({ type: 'ACTIVATE', payload: 'showBackComponent' });
+		
 		setFormValue('');
 	};
-
+	
 	useEffect(() => {
 		const handleEscape = (event: KeyboardEvent) => {
 			if (event.key === 'Escape') {
-			handleCancel();
+				handleCancel();
 			}
 		};
 	
 		document.addEventListener('keydown', handleEscape);
 		return () => {
-		  document.removeEventListener('keydown', handleEscape);
+			document.removeEventListener('keydown', handleEscape);
 		};
 	}, []);
 	

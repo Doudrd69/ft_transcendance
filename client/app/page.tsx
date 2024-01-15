@@ -19,6 +19,7 @@ import BodyComponent from './components/body/Body';
 import SetComponent from './components/Avatar/SetAvatar';
 import { totalmem } from 'os';
 import GameHeader from './components/game/GameHeader';
+// import { useChat } from './components/chat/ChatContext';
 
 interface FriendRequestDto {
 	recipientID: number,
@@ -39,6 +40,8 @@ export default function Home() {
 	const [showLogin, setShowLogin] = useState(true);
 	const [show2FAForm, setShow2FAForm] = useState(false);
 	const [authValidated, setAuthValidated] = useState(false);
+
+	// const dispatch = useChat();
 
 	const searchParams = useSearchParams();
 	const code = searchParams.get('code');
@@ -168,11 +171,30 @@ export default function Home() {
 			userSocket.emit('joinRoom',  { roomName: convName, roomID: convID });
 		});
 
+		userSocket.on('userIsBan', ( data: { roomName: string, roomID: string } ) => {
+			const { roomName, roomID } = data; 
+			if (roomName && roomID) {
+				// dispatch({ type: 'DISABLE', payload: 'showChannel' });
+				userSocket.emit('leaveRoom', { roomName: roomName, roomID: roomID });
+				toast.warn(`You are ban from ${roomName}`);
+			}
+		});
+
+		userSocket.on('userIsUnban', ( data: { roomName: string, roomID: string } ) => {
+			const { roomName, roomID } = data; 
+			if (roomName && roomID) {
+				userSocket.emit('joinRoom', { roomName: roomName, roomID: roomID });
+				toast.warn(`You are unban from ${roomName}`);
+			}
+		});
+
 		return () => {
 			userSocket.off('friendRequest');
 			userSocket.off('friendRequestAcceptedNotif');
 			userSocket.off('userJoinedRoom');
 			userSocket.off('userAddedToFriendRoom');
+			userSocket.off('userIsUnban');
+			userSocket.off('userIsBan');
 		}
 	}, [userSocket]);
 
