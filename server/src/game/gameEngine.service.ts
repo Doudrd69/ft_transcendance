@@ -41,7 +41,7 @@ export class GameEngineService {
 			gameID : game.gameId,
 			ball : { 	
 						position: {x: 153, y: 50},
-						speed: {x: 0, y: 0},
+						speed: {x: 0.5 * 16/9, y: 0.35},
 						r: 1,
 			},
 			player1_score : 0,

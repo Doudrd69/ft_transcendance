@@ -135,7 +135,7 @@ const PongComponent = (socket: { socket: Socket }) => {
             if (!blurGame) {
                 gameSocket.emit('GameBackUpdate', { gameID: gameID });
             }
-        }, 1000);
+        }, 16);
 
         return () => {
             gameSocket.off('Game_Start');
