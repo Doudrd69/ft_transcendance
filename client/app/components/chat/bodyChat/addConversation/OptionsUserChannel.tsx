@@ -13,26 +13,24 @@ interface user {
 }
 
 interface OptionsUserChannelProps {
-	name: string | null;
-	title: string | null;
 	user: user
 	userSocket: Socket,
 }
 
-const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ name,  title, user, userSocket }) => {
+const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user, userSocket }) => {
 
 	const [formValue, setFormValue] = useState('');
 	const { state, dispatch } = useChat();
 	const [admin, setAdmin] = useState<boolean>(user.isAdmin);
 	const [mute, setMute] = useState<boolean>(user.isMute);
 	const [ban, setBan] = useState<boolean>(user.isBan);
-
 	const handleMute = async() => {
 
 		const userOptionDto = {
 			conversationID: Number(state.currentConversationID),
 			username: user.login,
-			state: user.isMute
+			state: user.isMute,
+			from: Number(sessionStorage.getItem("currentUserID"))
 		}
 
 		const response = await fetch(`http://localhost:3001/chat/muteUser`, {
@@ -46,7 +44,8 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ name,  title, u
 	
 		if (response.ok) {
 			const responseData = await response.json();
-			setAdmin(responseData);
+			setMute(responseData);
+
 			console.log("Mute");
 		}
 		else {
@@ -59,7 +58,8 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ name,  title, u
 		const userOptionDto = {
 			conversationID: Number(state.currentConversationID),
 			username: user.login,
-			state : user.isBan
+			state : user.isBan,
+			from: Number(sessionStorage.getItem("currentUserID"))
 		}
 
 		const response = await fetch(`http://localhost:3001/chat/banUser`, {
@@ -74,6 +74,7 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ name,  title, u
 		if (response.ok) {
 			const status = await response.json();
 			user.isBan = !user.isBan;
+			setBan(user.isBan);
 			console.log("Ban status: ", user.isBan);
 			console.log("User to ban/unban: ", user.login);
 			if (status) {
@@ -92,7 +93,8 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ name,  title, u
 		const userOptionDto = {
 			conversationID: Number(state.currentConversationID),
 			username: name,
-			state : user.isAdmin
+			state : user.isAdmin,
+			from: Number(sessionStorage.getItem("currentUserID"))
 		}
 
 		const response = await fetch(`http://localhost:3001/chat/adminUser`, {
@@ -106,10 +108,9 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ name,  title, u
 	
 		if (response.ok) {
 			const responseData = await response.json();
+			console.log("Admin", responseData);
 			setAdmin(responseData);
-			console.log("userisAdmin", user.login);
-			console.log("userisAdmin", user.isAdmin);
-			console.log("Admin", admin);
+			user.isAdmin = responseData;
 		}
 		else {
 			console.error("Fatal error");
@@ -118,6 +119,8 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ name,  title, u
 
 	const handleCancel = () => {
 		dispatch({ type: 'DISABLE', payload: 'showOptionsUserChannel' });
+		dispatch({ type: 'DISABLE', payload: 'showOptionsUserChannelOwner' });
+
 		dispatch({ type: 'ACTIVATE', payload: 'showBackComponent' });		
 		setFormValue('');
 	};
@@ -134,13 +137,12 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ name,  title, u
 			document.removeEventListener('keydown', handleEscape);
 		};
 	}, []);
-	
 	return (
 		<>
 		<div className="blur-background"></div>
 			<img className="add_button_cancel" src='./close.png'  onClick={handleCancel}/>
 			<div className="add_container">
-				<h2 className="add__title">{title}</h2>	
+				<h2 className="add__title">{user.login}</h2>	
 				<div className="option-block">
 					{admin ?
 						<img className="option-image" src="crown.png" onClick={handleAdmin}/>

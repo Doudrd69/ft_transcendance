@@ -115,6 +115,10 @@
 	margin: 10px;
 	opacity: 0.5;
   }
+  .option-image-opacity:hover{
+	transform: scale(1.2);
+	transition: transform 0.3s ease;
+}
   .option-image-opacity{
 	width: 50px;
 	height: auto;
