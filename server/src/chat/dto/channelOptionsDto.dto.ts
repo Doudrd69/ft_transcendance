@@ -29,8 +29,8 @@ export class ChannelOptionsDto {
 	@IsBoolean()
 	state: boolean;
 
-    // @IsNotEmpty()
-	// @Length(6, 20)
+    @IsNotEmpty()
+	@Length(6, 20)
 	@IsAscii()
 	@IsAlpha()
 	@IsString()

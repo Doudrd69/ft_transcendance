@@ -12,9 +12,7 @@ const ImageComponent: React.FC<ImageProps> = ({ className }) => {
 	const [avatarURL, setAvatarURL] = useState('http://localhost:3000/avatars/avatar.png');
 		const fetchAvatar = async () => {
 			try {
-				console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
 				console.log(sessionStorage.getItem('currentUserID'));
-				console.log('test1');
 
 				const response = await fetch(`http://localhost:3001/users/getAvatar/${sessionStorage.getItem('currentUserID')}`,{
 					method: 'GET',
@@ -25,7 +23,6 @@ const ImageComponent: React.FC<ImageProps> = ({ className }) => {
 					console.log('setAvatarURL en cas de fetch reussie', avatarURL);
 				} else {
 					setAvatarURL('test')
-				console.log('test2');
 					console.error('Error fetching Avatar URL:', response.statusText);
 				}
 			} catch (error) {

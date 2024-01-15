@@ -44,12 +44,12 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 	const handleProtected = async() => {
 
 		// error Error: Missing getServerSnapshot, which is required for server-rendered content. Will revert to client rendering.
-
 			const channelOptionDto = {
 				conversationID: Number(state.currentConversationID),
 				userID: Number(sessionStorage.getItem("currentUserID")),
 				state: state.currentConversationIsProtected,
 				password: formValue,
+		
 			}
 
 			const response = await fetch(`http://localhost:3001/chat/updateIsProtected`, {
@@ -110,11 +110,12 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 						:
 						<img className="option-image" src="public.png" onClick={handlePrivate}/>
 					}
-					<img className="option-image" src="upload-password.png"  onClick={() => { 
-								dispatch({ type: 'ACTIVATE', payload: 'showPasswordChange' });
-								dispatch({ type: 'DISABLE', payload: 'showOptionChannel' });
+						<img className="option-image" src="upload-password.png"  onClick={() => { 
+								if (state.currentConversationIsProtected)
+									dispatch({ type: 'ACTIVATE', payload: 'showPasswordChange' });
+									dispatch({ type: 'DISABLE', payload: 'showOptionChannel' });
 
-							}}/>
+								}}/>
 					{state.currentConversationIsProtected ?
 						<img className="option-image" src="password.png" onClick={handleProtected}/>
 						:
