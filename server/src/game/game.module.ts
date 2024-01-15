@@ -17,6 +17,7 @@ import { Ball } from './entities/ball.entity';
 import { BallService } from './gameObject/ball.service';
 import { Vector } from './entities/vector.entity';
 import { VectorService } from './gameObject/vector.service';
+import { GameEngineService } from './gameEngine.service';
 
 @Module({
   imports: [
@@ -29,7 +30,7 @@ import { VectorService } from './gameObject/vector.service';
       TypeOrmModule.forFeature([Vector]),
   ],
   controllers: [GameController],
-  providers: [GameService, MatchmakingService, PaddleService, BallService, VectorService],
+  providers: [GameService, MatchmakingService, PaddleService, BallService, VectorService, GameEngineService],
   exports: [GameService],
 })
 export class GameModule {

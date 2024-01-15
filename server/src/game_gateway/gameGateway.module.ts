@@ -30,9 +30,17 @@ import { Vector } from 'src/game/entities/vector.entity';
 		TypeOrmModule.forFeature([Paddle]),
 		TypeOrmModule.forFeature([Ball]),
 		TypeOrmModule.forFeature([Vector]),
-	],
-    controllers: [GameController],
-  	providers: [GameGateway, GameService, MatchmakingService, GameEngineService, PaddleService, BallService, VectorService],
-  	exports: [GameService],
-})
-export class GameGatewayModule {}
+	  ],
+	  controllers: [GameController],
+	  providers: [
+		GameGateway,
+		GameService,
+		MatchmakingService,
+		GameEngineService,
+		PaddleService,
+		BallService,
+		VectorService,
+	  ],
+	  exports: [GameService],
+	})
+	export class GameGatewayModule {}

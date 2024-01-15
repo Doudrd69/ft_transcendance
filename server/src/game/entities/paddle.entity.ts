@@ -9,6 +9,12 @@ export class Paddle {
     @Column()
     width: number;
 
+    @Column({ default: false})
+    up: boolean;
+
+    @Column({ default: false})
+    down: boolean;
+
     @Column()
     height: number;
 

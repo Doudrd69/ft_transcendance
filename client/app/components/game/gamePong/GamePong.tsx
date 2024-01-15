@@ -28,26 +28,48 @@ const PongComponent = (socket: { socket: Socket }) => {
 
     const [inCountdown, setInCountdown] = useState<boolean>(true);
     const [gameID, setGameID] = useState<number | null>(null);
-    
-    
-    interface gameState {
-        BallPosition: { x: number, y: number, r: number} | null,
-        paddleOne: { x: number, y: number } | null,
-        paddleTwo: { x: number, y: number } | null,
+    const [inputState, setInputState] = useState<inputState>({ up: false, down: false });
+
+
+    interface inputState {
+        up: boolean,
+        down: boolean
+    }
+
+    const keyState = {
+        ArrowUp: false,
+        ArrowDown: false,
+        W: false,
+        S: false,
+    };
+
+    interface gameBallState {
+        BallPosition: { x: number, y: number } | null,
         scoreOne: number,
         scoreTwo: number
     }
-    
-    const defaultGameState: gameState = {
-        BallPosition: { x: 50, y: 50, r: 5 },
+
+    interface gamePaddleState {
+        paddleOne: { x: number, y: number } | null,
+        paddleTwo: { x: number, y: number } | null,
+    }
+
+
+    const defaultGamePaddleState: gamePaddleState = {
         paddleOne: { x: 0, y: 50 },
         paddleTwo: { x: 306, y: 50 },
+    };
+
+    const defaultGameBallState: gameBallState = {
+        BallPosition: { x: 153, y: 50 },
         scoreOne: 0,
         scoreTwo: 0,
     };
 
-    const [gameState, setGameState] = useState<gameState>(defaultGameState);
-    
+    const [gameBallState, setGameBallState] = useState<gameBallState>(defaultGameBallState);
+
+    const [gamePaddleState, setGamePaddleState] = useState<gamePaddleState>(defaultGamePaddleState);
+
     interface inputState {
         up: boolean,
         down: boolean
@@ -57,82 +79,24 @@ const PongComponent = (socket: { socket: Socket }) => {
         gameId: number;
         playerOneID: string;
         playerTwoID: string;
+        playerOneLogin: string,
+        playerTwoLogin: string,
         scoreOne: number;
         scoreTwo: number;
     }
 
+    const defaultGame: Game = {
+        gameId: 1234,
+        playerOneID: "Mattheo",
+        playerTwoID: "Edouard",
+        playerOneLogin: "Mattheo",
+        playerTwoLogin: "Edouard",
+        scoreOne: 0,
+        scoreTwo: 0,
+    };
 
-    useEffect(() => {
-        gameSocket.on('Game_Start', (Game: Game) => {
-            setGameID(Game.gameId);
-            gameId: Game.gameId;
-            playerOneID: Game.playerOneID;
-            playerTwoID: Game.playerTwoID;
-            scoreOne: Game.scoreOne;
-            scoreTwo: Game.scoreTwo;
-        })
+    const [Game, setGame] = useState<Game>(defaultGame);
 
-        gameSocket.on('Game_Update', (gameState: gameState) => {
-            setGameState((prevState) => ({
-                ...prevState,
-                BallPosition: { x: gameState.BallPosition!.x / (16 / 9), y: gameState.BallPosition!.y, r: gameState.BallPosition!.r },
-                paddleOne: { x: gameState.paddleOne!.x / (16 / 9), y: gameState.paddleOne!.y},
-                paddleTwo: { x: gameState.paddleTwo!.x / (16 / 9), y: gameState.paddleTwo!.y },
-                scoreOne: gameState.scoreOne,
-                scoreTwo: gameState.scoreTwo,
-            }));
-        })
-    });
-
-    const updateBallPosition = () => { //a changer pour le back
-        if (!blurGame) {
-            setBallX((prevBallX) => prevBallX + ballSpeedX + ballSpeed);
-            setBallY((prevBallY) => prevBallY + ballSpeedY + ballSpeed);
-
-            if (ballX <= 26) {
-                setBallX(50);
-                setBallY(50);
-                setScorePlayer2((prevScore) => prevScore + 1);
-                setBallSpeedX((prevSpeedX) => -prevSpeedX);
-            }
-            else if (ballX >= 98) {
-                setBallX(50);
-                setBallY(50);
-                setScorePlayer1((prevScore) => prevScore + 1);
-                setBallSpeedX((prevSpeedX) => -prevSpeedX);
-            }
-
-            if (ballY <= 10) {
-                setBallY(11);
-                setBallSpeedY((prevSpeedY) => -prevSpeedY);
-            }
-            else if (ballY >= 97) {
-                setBallY(96);
-                setBallSpeedY((prevSpeedY) => -prevSpeedY);
-            }
-
-            if (ballX <= 29 && ballY >= paddleY && ballY <= paddleY + 20 && ballSpeedX < 0) {
-                setBallSpeedX((prevSpeedX) => -prevSpeedX);
-            }
-            if (ballX >= 95 && ballY >= paddleY1 && ballY <= paddleY1 + 20 && ballSpeedX > 0) {
-                setBallSpeedX((prevSpeedX) => -prevSpeedX);
-            }
-        }
-    }
-
-    const gameLoopRef = useRef<NodeJS.Timeout | null>(null);
-
-    useEffect(() => {
-        gameLoopRef.current = setInterval(() => {
-            if (!blurGame) {
-                updateBallPosition();
-            }
-        }, 16);
-
-        return () => {
-            clearInterval(gameLoopRef.current!); // Use the interval ID from the ref
-        };
-    }, [blurGame]);
 
     useEffect(() => {
         const startCountdown = () => {
@@ -153,78 +117,130 @@ const PongComponent = (socket: { socket: Socket }) => {
 
     }, []);
 
-    const handleKeyDown = (e: KeyboardEvent) => {
-        if (e.key === 'ArrowUp') {
-            setIsKeyUpPressed(true);
-            gameSocket.emit('Game_Input', {input: "ArrowUp", gameID: gameID});
-        } else if (e.key === 'ArrowDown') {
-            setIsKeyDownPressed(true);
-            gameSocket.emit('Game_Input', { input: "ArrowDown", gameID: gameID });
-        }
-    };
+    useEffect(() => {
 
-    const handleKeyUp = (e: KeyboardEvent) => {
-        if (e.key === 'ArrowUp') {
-            setIsKeyUpPressed(false);
-        } else if (e.key === 'ArrowDown') {
-            setIsKeyDownPressed(false);
-        }
-    };
+        gameSocket.on('Game_Start', (Game: Game) => {
+            setGameID(Game.gameId);
+            setGame((prevState) => ({
+                ...prevState,
+                gameId: Game.gameId,
+                playerOneID: Game.playerOneID,
+                playerTwoID: Game.playerTwoID,
+                scoreOne: Game.scoreOne,
+                scoreTwo: Game.scoreTwo,
+            }));
+        });
 
-    const handleKeyS = (e: KeyboardEvent) => {
-        if (e.key === 'w') {
-            setIsWKeyPressed(true);
-            gameSocket.emit('Game_Input', { input: "ArrowUp", gameID: gameID});
-        } else if (e.key === 's') {
-            setIsSKeyPressed(true);
-            gameSocket.emit('Game_Input', { input: "ArrowDown", gameID: gameID });
-        }
-    };
+        const gameLoop = setInterval(() => {
+            if (!blurGame) {
+                gameSocket.emit('GameBackUpdate', { gameID: gameID });
+            }
+        }, 16);
 
-    const handleKeyW = (e: KeyboardEvent) => {
-        if (e.key === 'w') {
-            setIsWKeyPressed(false);
-        } else if (e.key === 's') {
-            setIsSKeyPressed(false);
-        }
-    };
+        return () => {
+            gameSocket.off('Game_Start');
+            clearInterval(gameLoop);
+        };
+    }, [blurGame, gameID, gameSocket]);
 
     useEffect(() => {
+
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === 'ArrowUp') {
+                if (inputState.up === false) {
+                    console.log()
+                    gameSocket.emit('Game_Input', { input: "ArrowUp", gameID: gameID });
+                }
+                setInputState((prevState) => ({
+                    ...prevState,
+                    up: true
+                }));
+            } else if (e.key === 'ArrowDown') {
+                if (inputState.down === false) {
+                    gameSocket.emit('Game_Input', { input: "ArrowDown", gameID: gameID });
+                }
+                setInputState((prevState) => ({
+                    ...prevState,
+                    down: true
+                }));
+            }
+        };
+
+        const handleKeyUp = (e: KeyboardEvent) => {
+            if (e.key === 'ArrowUp') {
+                if (inputState.up === true) {
+                    gameSocket.emit('Game_Input', { input: "ArrowUp", gameID: gameID });
+                }
+                setInputState((prevState) => ({
+                    ...prevState,
+                    up: false
+                }));
+            } else if (e.key === 'ArrowDown') {
+                if (inputState.down === true) {
+                    gameSocket.emit('Game_Input', { input: "ArrowDown", gameID: gameID });
+                }
+                setInputState((prevState) => ({
+                    ...prevState,
+                    down: false
+                }));
+            }
+        };
+
         window.addEventListener('keydown', handleKeyDown);
         window.addEventListener('keyup', handleKeyUp);
-        window.addEventListener('keyup', handleKeyW);
-        window.addEventListener('keydown', handleKeyS);
-
-        const gameLoop = setInterval(updateBallPosition, 16);
 
 
         return () => {
-            clearInterval(gameLoop);
             window.removeEventListener('keydown', handleKeyDown);
             window.removeEventListener('keyup', handleKeyUp);
-            window.removeEventListener('keyup', handleKeyW);
-            window.removeEventListener('keydown', handleKeyS);
         };
-    }, [ballX, ballY, ballSpeedX, ballSpeedY, ballSpeed, paddleY, paddleY1, isSKeyPressed, isWKeyPressed]);
+    });
+
+    useEffect(() => {
+
+        gameSocket.on('GamePaddleUpdate', (gamePaddleState: gamePaddleState) => {
+            const newGamePaddleState: gamePaddleState = {
+                paddleOne: { x: gamePaddleState.paddleOne!.x / (16 / 9), y: gamePaddleState.paddleOne!.y },
+                paddleTwo: { x: gamePaddleState.paddleTwo!.x / (16 / 9), y: gamePaddleState.paddleTwo!.y },
+            }
+            setGamePaddleState(newGamePaddleState);
+        });
+
+        gameSocket.on('GameBallUpdate', (gameBallState: gameBallState) => {
+            console.log(`New BallPosition: ${gameBallState.BallPosition!.x}`);
+            const newGameBallState: gameBallState = {
+                BallPosition: { x: gameBallState.BallPosition!.x / (16 / 9) || 153, y: gameBallState.BallPosition!.y || 50 },
+                scoreOne: gameBallState.scoreOne,
+                scoreTwo: gameBallState.scoreTwo,
+            }
+            setGameBallState(newGameBallState);
+        });
+
+        return () => {
+            gameSocket.off('GameBallUpdate');
+            gameSocket.off('GamePaddleUpdate');
+        };
+    }, [gameSocket]);
+
 
     return (
         <div className={`pong-container ${blurGame ? 'game-blur' : ''}`} tabIndex={0}>
             {countdown > 0 && (
-                <div className="countdown-container">{countdown}</div>
+                <div className="countdown-container" style={{ filter: 'none' }}>{countdown}</div>
             )}
             <div className="scoreboard">
                 <div className="col-heading">
-                    <h1>Player 1</h1>
-                    <div className="col-display" id="scoreHome">{scorePlayer1}</div>
+                    <h1>{Game.playerOneLogin}</h1>
+                    <div className="col-display" id={Game.playerOneLogin}>{gameBallState.scoreOne}</div>
                 </div>
                 <div className="col-heading">
-                    <h1>Player 2</h1>
-                    <div className="col-display" id="scoreGuest">{scorePlayer2}</div>
+                    <h1>{Game.playerTwoLogin}</h1>
+                    <div className="col-display" id={Game.playerTwoLogin}>{gameBallState.scoreTwo}</div>
                 </div>
             </div>
-            <div className="ball" style={{ left: `${ballX}%`, top: `${ballY}%` }}></div>
-            <div className="pongpaddle" style={{ top: `${gameState!.paddleOne!.y}%`, left: `${gameState!.paddleOne!.x}%` }}></div>
-            <div className="pongpaddle" style={{ left: `${gameState!.paddleTwo!.x}%`, top: `${gameState!.paddleTwo!.y}%` }}></div>
+            <div className="ball" style={{ left: `${gameBallState!.BallPosition!.x}%`, top: `${gameBallState!.BallPosition!.y}%` }}></div>
+            <div className="pongpaddle" style={{ top: `${gamePaddleState!.paddleOne!.y}%`, left: `${gamePaddleState!.paddleOne!.x}%` }}></div>
+            <div className="pongpaddle" style={{ left: `${gamePaddleState!.paddleTwo!.x}%`, top: `${gamePaddleState!.paddleTwo!.y}%` }}></div>
         </div>
     );
 };
