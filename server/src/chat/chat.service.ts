@@ -342,16 +342,15 @@ export class ChatService {
 			where: { username: muteUserDto.username },
 			relations: ["groups"],
 		});
-
+		const user = await this.usersRepository.findOne({ where: { id: muteUserDto.from } });
 		const conversation = await this.conversationRepository.findOne({ where: { id: muteUserDto.conversationID } });
+		const userGroup = await this.getRelatedGroup(user, conversation);
 
-		if (userToMute && conversation) {
-
+		if (userToMute && conversation && userGroup) {
 			const groupToUpdate = await this.getRelatedGroup(userToMute, conversation);
 
-			// If userToMute is the owner == error
-			if (!groupToUpdate.isOwner || !groupToUpdate.isAdmin) {
-				if (groupToUpdate) {
+			if (userGroup.isOwner || userGroup.isAdmin) {
+				if (groupToUpdate && !groupToUpdate.isOwner || !groupToUpdate.isAdmin) {
 	
 					if (muteUserDto.state) {
 						groupToUpdate.isMute = false;
@@ -370,23 +369,21 @@ export class ChatService {
 		}
 	}
 
-	// aussi penser a emit pour leave la room
 	async updateUserBanStatusFromConversation(banUserDto: UserOptionsDto): Promise<boolean> {
 
 		const userToBan : User = await this.usersRepository.findOne({
 			where: { username: banUserDto.username },
 			relations: ["groups"],
 		});
-
+		const user = await this.usersRepository.findOne({ where: { id: banUserDto.from } });
 		const conversation = await this.conversationRepository.findOne({ where: { id: banUserDto.conversationID } });
+		const userGroup = await this.getRelatedGroup(user, conversation);
 
-		if (userToBan && conversation) {
-
+		if (userToBan && conversation && userGroup) {
 			const groupToUpdate = await this.getRelatedGroup(userToBan, conversation);
-			console.log("group to update: ", groupToUpdate);
-			// If userToBan is the owner == error
-			if (!groupToUpdate.isOwner || !groupToUpdate.isAdmin) {
-				if (groupToUpdate) {
+
+			if (userGroup.isOwner || userGroup.isAdmin) {
+				if (groupToUpdate && !groupToUpdate.isOwner || !groupToUpdate.isAdmin) {
 	
 					if (banUserDto.state) {
 						groupToUpdate.isBan = false;
@@ -412,15 +409,16 @@ export class ChatService {
 			where: { username: promoteUserToAdminDto.username },
 			relations: ['groups'],
 		});
-
+		const user = await this.usersRepository.findOne({ where: { id: promoteUserToAdminDto.from } });
 		const conversation = await this.conversationRepository.findOne({ where: { id: promoteUserToAdminDto.conversationID } });
-	
-		if (userToPromote && conversation) {
+		const userGroup = await this.getRelatedGroup(user, conversation);
 
+	
+		if (userToPromote && conversation && userGroup) {
 			const groupToUpdate = await this.getRelatedGroup(userToPromote, conversation);
-			// If userToMute is the owner == error
-			if (!groupToUpdate.isOwner || !groupToUpdate.isAdmin) {
-				if (groupToUpdate) {
+
+			if (userGroup.isOwner || userGroup.isAdmin) {
+				if (groupToUpdate && !groupToUpdate.isOwner || !groupToUpdate.isAdmin) {
 	
 					if (promoteUserToAdminDto.state) {
 						groupToUpdate.isAdmin = false;
@@ -463,7 +461,8 @@ export class ChatService {
 		else {
 			// si aucun membre pour etre owner, ou pas de membrs: on supprime le group et a conversation
 			const allGroups = await this.groupMemberRepository.find();
-			allGroups.filter((groups: GroupMember[]) => groups != relatedGroups);
+			// ca c'est de la merde
+			// allGroups.filter((groups: GroupMember[]) => groups != relatedGroups);
 			await this.groupMemberRepository.save(allGroups);
 			console.log("all groups after filter: ", allGroups);
 
