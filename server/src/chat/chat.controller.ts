@@ -63,14 +63,14 @@ export class ChatController {
 	@UseGuards(AuthGuard)
 	@HttpCode(HttpStatus.OK)
 	@Post('muteUser')
-	muteUserFromConversation(@Body() userOptionsDto: UserOptionsDto) {
+	muteUserFromConversation(@Body() userOptionsDto: UserOptionsDto): Promise<boolean> {
 		return this.chatService.updateUserMuteStatusFromConversation(userOptionsDto);
 	}
 
 	@UseGuards(AuthGuard)
 	@HttpCode(HttpStatus.OK)
 	@Post('adminUser')
-	adminUserFromConversation(@Body() userOptionsDto: UserOptionsDto) {
+	adminUserFromConversation(@Body() userOptionsDto: UserOptionsDto): Promise<boolean> {
 		return this.chatService.updateUserAdminStatusFromConversation(userOptionsDto);
 	}
 

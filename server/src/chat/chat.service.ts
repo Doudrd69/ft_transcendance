@@ -14,7 +14,9 @@ import { GroupMember } from './entities/group_member.entity';
 import { Message } from './entities/message.entity';
 import { group } from 'console';
 import { ChannelOptionsDto } from './dto/channelOptionsDto.dto';
+import { QuitConversationDto } from './dto/quitConversationDto.dto';
 import { FormatInputPathObject } from 'path';
+import { GroupDto } from './dto/group.dto';
 
 @Injectable()
 export class ChatService {
@@ -49,7 +51,7 @@ export class ChatService {
 		user.groups.forEach((userGroup: GroupMember) => {
 			groupList.forEach((group: GroupMember) => {
 				if (userGroup.id == group.id) {
-					console.log("Foumd ", group.id);
+					console.log("Found ", group.id);
 					groupFound = group;
 				}
 			});
@@ -334,7 +336,7 @@ export class ChatService {
 	}
 
 	/***					USER CHANNEL OPTIONS				***/
-	async updateUserMuteStatusFromConversation(muteUserDto: UserOptionsDto) {
+	async updateUserMuteStatusFromConversation(muteUserDto: UserOptionsDto): Promise<boolean> {
 
 		const userToMute : User = await this.usersRepository.findOne({
 			where: { username: muteUserDto.username },
@@ -348,14 +350,19 @@ export class ChatService {
 			const groupToUpdate = await this.getRelatedGroup(userToMute, conversation);
 
 			// If userToMute is the owner == error
-			if (!groupToUpdate.isOwner) {
+			if (!groupToUpdate.isOwner || !groupToUpdate.isAdmin) {
 				if (groupToUpdate) {
 	
-					if (muteUserDto.state)
+					if (muteUserDto.state) {
 						groupToUpdate.isMute = false;
-					else
+						await this.groupMemberRepository.save(groupToUpdate);
+						return false;
+					}
+					else {
 						groupToUpdate.isMute = true;
-					await this.groupMemberRepository.save(groupToUpdate);
+						await this.groupMemberRepository.save(groupToUpdate);
+						return true;	
+					}
 				}
 			}
 
@@ -378,7 +385,7 @@ export class ChatService {
 			const groupToUpdate = await this.getRelatedGroup(userToBan, conversation);
 			console.log("group to update: ", groupToUpdate);
 			// If userToBan is the owner == error
-			if (!groupToUpdate.isOwner) {
+			if (!groupToUpdate.isOwner || !groupToUpdate.isAdmin) {
 				if (groupToUpdate) {
 	
 					if (banUserDto.state) {
@@ -399,7 +406,7 @@ export class ChatService {
 		}
 	}
 
-	async updateUserAdminStatusFromConversation(promoteUserToAdminDto: UserOptionsDto) {
+	async updateUserAdminStatusFromConversation(promoteUserToAdminDto: UserOptionsDto): Promise<boolean> {
 
 		const userToPromote : User = await this.usersRepository.findOne({
 			where: { username: promoteUserToAdminDto.username },
@@ -412,14 +419,19 @@ export class ChatService {
 
 			const groupToUpdate = await this.getRelatedGroup(userToPromote, conversation);
 			// If userToMute is the owner == error
-			if (!groupToUpdate.isOwner) {
+			if (!groupToUpdate.isOwner || !groupToUpdate.isAdmin) {
 				if (groupToUpdate) {
 	
-					if (promoteUserToAdminDto.state)
+					if (promoteUserToAdminDto.state) {
 						groupToUpdate.isAdmin = false;
-					else
+						await this.groupMemberRepository.save(groupToUpdate);
+						return false;
+					}
+					else {
 						groupToUpdate.isAdmin = true;
-					await this.groupMemberRepository.save(groupToUpdate);
+						await this.groupMemberRepository.save(groupToUpdate);
+						return true;
+					}
 				}
 			}
 
@@ -431,12 +443,77 @@ export class ChatService {
 	/***					CONVERSATION						***/
 	/**************************************************************/
 	
-	async eraseConversation(conversationDto: ConversationDto) {
-		
-		const conversationToRemove = await this.conversationRepository.findOne({ where: {name: conversationDto.name }});
-		await this.conversationRepository.remove(conversationToRemove);
+	async promoteNewOwner(conversation: Conversation): Promise<boolean> {
+
+		let groupToPromote : GroupMember;
+		const relatedGroups: GroupMember[] = await this.groupMemberRepository.find({ where: { conversation: conversation} });
+		// On a au moins un membre
+		if (relatedGroups) {
+			relatedGroups.forEach((group: GroupMember) => {
+				if (!group.isBan) {
+					groupToPromote = group;
+					return ;
+				}
+			});
+			groupToPromote.isOwner = true;
+			await this.groupMemberRepository.save(groupToPromote);
+
+			return true;
+		}
+		else {
+			// si aucun membre pour etre owner, ou pas de membrs: on supprime le group et a conversation
+			const allGroups = await this.groupMemberRepository.find();
+			allGroups.filter((groups: GroupMember[]) => groups != relatedGroups);
+			await this.groupMemberRepository.save(allGroups);
+			console.log("all groups after filter: ", allGroups);
+
+			await this.conversationRepository.delete(conversation);
+
+			return false;
+		}
+	}
+
+	async quitConversation(quiConversationDto: QuitConversationDto): Promise<boolean> {
+
+		const user : User = await this.usersRepository.findOne({
+			where: { id: quiConversationDto.userID },
+			relations: ["groups", "groups.conversation"],
+		});
+
+		const conversation : Conversation = await this.conversationRepository.findOne({
+			where: { id: quiConversationDto.conversationID },
+		});
+
+		if (user && conversation) {
+
+			
+			const groupToRemove = await this.getRelatedGroup(user, conversation);
+			const isOwnerStatus = await this.getGroupIsOwnerStatus(user, conversation);
+			
+			if (groupToRemove) {
+				console.log("Before: ", user.groups);
+				user.groups.filter((group: GroupMember) => group.id != groupToRemove.id);
+				await this.usersRepository.save(user);
+				console.log("After: ", user.groups);
+
+				if (isOwnerStatus) {
+					const status = await this.promoteNewOwner(conversation);
+					console.log(status);
+				}
+
+				return ;
+			}
+		}
+
 		return ;
 	}
+
+	// async eraseConversation(conversationDto: ConversationDto) {
+		
+	// 	const conversationToRemove = await this.conversationRepository.findOne({ where: {name: conversationDto.name }});
+	// 	await this.conversationRepository.remove(conversationToRemove);
+	// 	return ;
+	// }
 	
 	async addUserToConversation(addUserToConversationDto: AddUserToConversationDto): Promise<Conversation | { error: string }> {
 		

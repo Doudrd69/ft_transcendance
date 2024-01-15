@@ -91,7 +91,6 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ name,  title, u
 			state : user.isAdmin
 		}
 
-		console.log("DTO --> ", userOptionDto);
 		const response = await fetch(`http://localhost:3001/chat/adminUser`, {
 			method: 'POST',
 			headers: {

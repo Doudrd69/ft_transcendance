@@ -24,6 +24,7 @@ interface userList {
 }
 
 const ReceiveBoxChannelComponent: React.FC<ReceiveBoxChannelComponentProps> = ({ userSocket }) => {
+
 	const { state, dispatch } = useChat();
 	const socketInUse = userSocket;
 	const [messages, setMessages] = useState<Message[]>([]);
