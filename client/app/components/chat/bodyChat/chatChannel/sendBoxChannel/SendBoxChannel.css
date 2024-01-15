@@ -2,6 +2,7 @@
 	display: flex;
 	justify-content: space-between;
 	resize: none;
+	width: 100%;
 	
 }
 .input-chat-channel{
@@ -15,23 +16,18 @@
 	padding: 10px;
 	resize: none;
 }
-.button-send-channel{
-		/* scroll-behavior: auto; */
-		box-sizing: border-box;
-		/* border: 3px solid #333; */
-		margin: 0px 10px 10px 0px;
-		width: 10%;
-		border-radius:10px;
-		background-color: transparent;
-		overflow: scroll;
-		color: #000000;
-		background-image: url('send.png');
-		border: none;
-		background-size: contain;
-		background-repeat: no-repeat;
-		background-position: center center;
-		transition: transform 0.2s ease;
+
+.img-enter{
+	width: 50px;
+	height: auto;
+	margin: 0px 10px 10px 0px;
 }
-.button-send-channel:hover {
+.img-enter:hover{
+	transition: transform 0.2s ease;
 	transform: scale(1.2);
+}
+.bloc-chat-enter{
+	display: flex;
+	flex-direction: row;
+	flex:1;
 }

@@ -77,7 +77,6 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 	useEffect(() => {
 		const handleEscape = (event: KeyboardEvent) => {
 			if (event.key === 'Escape') {
-				console.log("HHHHEEEEEEEEELLLLLLLLLPPPPPPPP ");
 				handleCancel();
 			}
 		};

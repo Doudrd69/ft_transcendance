@@ -21,6 +21,11 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ name,  title, u
 
 	const [formValue, setFormValue] = useState('');
 	const { state, dispatch } = useChat();
+	const [admin, setAdmin] = useState<boolean>(user.isAdmin);
+	const [mute, setMute] = useState<boolean>(user.isMute);
+	const [ban, setBan] = useState<boolean>(user.isBan);
+
+
 	const handleMute = async() => {
 
 		const userOptionDto = {conversationID: Number(state.currentConversationID), username: user.login , state: user.isMute}
@@ -34,7 +39,8 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ name,  title, u
 		});
 	
 		if (response.ok) {
-			user.isMute = !user.isMute;
+			const responseData = await response.json();
+			setAdmin(responseData);
 			console.log("Mute");
 		}
 		else {
@@ -79,8 +85,11 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ name,  title, u
 		});
 	
 		if (response.ok) {
-			user.isAdmin = !user.isAdmin;
-			console.log("admin");
+			const responseData = await response.json();
+			setAdmin(responseData);
+			console.log("userisAdmin", user.login);
+			console.log("userisAdmin", user.isAdmin);
+			console.log("Admin", admin);
 		}
 		else {
 			console.error("Fatal error");
@@ -90,15 +99,12 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ name,  title, u
 	const handleCancel = () => {
 		dispatch({ type: 'DISABLE', payload: 'showOptionsUserChannel' });
 		dispatch({ type: 'ACTIVATE', payload: 'showBackComponent' });
-
 		setFormValue('');
 	};
 	
 	useEffect(() => {
 		const handleEscape = (event: KeyboardEvent) => {
 			if (event.key === 'Escape') {
-				console.log("HHHHEEEEEEEEELLLLLLLLLPPPPPPPP ");
-
 				handleCancel();
 			}
 		};
@@ -116,17 +122,17 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ name,  title, u
 			<div className="add_container">
 				<h2 className="add__title">{title}</h2>	
 				<div className="option-block">
-					{user.isAdmin ?
+					{admin ?
 						<img className="option-image" src="crown.png" onClick={handleAdmin}/>
 						:
 						<img className="option-image-opacity" src="crown.png" onClick={handleAdmin}/>
 					}
-					{user.isMute ?
+					{mute ?
 						<img className="option-image" src="volume-mute.png" onClick={handleMute}/>
 						:
 						<img className="option-image-opacity" src="volume-mute.png" onClick={handleMute}/>
 					}
-					{user.isBan ?
+					{ban ?
 						<img className="option-image" src="interdit.png" onClick={handleBan}/>
 						:
 						<img className="option-image-opacity" src="interdit.png" onClick={handleBan}/>

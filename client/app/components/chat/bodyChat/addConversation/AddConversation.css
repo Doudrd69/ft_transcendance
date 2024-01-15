@@ -129,3 +129,12 @@
 	justify-content: space-between;
 	/* align-items: center; */
 }
+.img-enter-conversation{
+	width: 50px;
+	height: auto;
+}
+
+.img-enter-conversation:hover{
+	transition: transform 0.2s ease;
+	transform: scale(1.2);
+}

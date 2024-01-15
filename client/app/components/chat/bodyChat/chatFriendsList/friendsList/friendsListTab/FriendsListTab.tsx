@@ -75,6 +75,7 @@ const FriendsListTabComponent:  React.FC<FriendsListTabComponentProps> = ({ user
 					dispatch({ type: 'SET_CURRENT_CONVERSATION', payload: userLogin});
 					dispatch({ type: 'SET_CURRENT_ROOM', payload: roomName});
 					dispatch({ type: 'SET_CURRENT_CONVERSATION_ID', payload: roomID});
+					dispatch({ type: 'ACTIVATE', payload: 'showBackComponent' });
 				}}/>
 				<button className='tab2' onClick={() => handleTabClick(`Etes vous sur de vouloir défier ${userLogin} ?`, gameInvite)} />
 				<button className='tab3' onClick={() => dispatch({ type: 'ACTIVATE', payload: 'showListChannelAdd' })} />
