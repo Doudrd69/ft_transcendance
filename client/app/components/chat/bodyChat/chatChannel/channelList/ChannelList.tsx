@@ -54,6 +54,7 @@ const ChannelListComponent: React.FC<ChanneListComponentProps> = ({ userSocket }
 			if (isAdmin)
 				setIsAdmin([...isAdmin]);
 			if (usersList ) {
+				console.log(userList);
 				setUserList([...usersList]);
 			}	
 		}

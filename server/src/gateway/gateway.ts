@@ -32,7 +32,7 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	private connectedUsers: { [userId: string]: Socket } = {};
 
 	private  async userRejoinsRooms(client: Socket, userID: number) {
-		const conversations = await this.chatService.getConversations(userID);
+		const conversations = await this.chatService.getAllConversations(userID);
 		if (conversations) {
 			let ids = <number[]>[];
 			conversations.forEach(function (value) {
@@ -54,7 +54,7 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	}
 
 	private async userLeavesRooms(client: Socket, userID: number) {
-		const conversations = await this.chatService.getConversations(userID);
+		const conversations = await this.chatService.getAllConversations(userID);
 		if (conversations) {
 			let ids = <number[]>[];
 			conversations.forEach(function (value) {

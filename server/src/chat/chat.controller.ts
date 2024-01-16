@@ -146,13 +146,13 @@ export class ChatController {
 	@UseGuards(AuthGuard)
 	@Get('getConversations/:userID')
 	getConversationsFromUser(@Param('userID') userID: number): Promise<Conversation[]> {
-		return this.chatService.getConversations(userID);
+		return this.chatService.getAllChannelsFromUser(userID);
 	}
 
 	@UseGuards(AuthGuard)
-	@Get('getFriendConversations/:userID')
-	getFriendConversationsFromUser(@Param('userID') userID: number): Promise<Conversation[]> {
-		return this.chatService.getFriendConversations(userID);
+	@Get('getDMsConversations/:userID')
+	getDMsConversationsFromUser(@Param('userID') userID: number): Promise<Conversation[]> {
+		return this.chatService.getDMsConversationsFromUser(userID);
 	}
 
 	@UseGuards(AuthGuard)
