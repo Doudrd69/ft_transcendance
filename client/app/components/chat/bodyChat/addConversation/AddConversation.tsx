@@ -17,6 +17,7 @@ const AddConversationComponent: React.FC<AddConversationComponentProps> = ({ use
 	const { state, dispatch } = useChat();
 	const [isPassword, setIsPassowrd] = useState(false);
 	const [isPublic, setIsPublic] = useState(true);
+
 	const handleConversationCreation = async (e: React.FormEvent) => {
 
 		e.preventDefault();
@@ -29,6 +30,8 @@ const AddConversationComponent: React.FC<AddConversationComponentProps> = ({ use
 			isProtected: isPassword,
 			password: !isPassword ? '' : passwordValue,
 		}
+
+		console.log("DTO conv --> ", conversationDto);
 
 		const response = await fetch('http://localhost:3001/chat/newConversation', {
 			method: 'POST',
@@ -84,6 +87,7 @@ const AddConversationComponent: React.FC<AddConversationComponentProps> = ({ use
 		document.removeEventListener('keydown', handleEscape);
 		};
 	}, []);
+
 	const handleImageClick = (e: React.MouseEvent<HTMLImageElement>) => {
 		// Call the function you want to execute when the image is clicked
 		// For example, you can call handleConversationCreation here

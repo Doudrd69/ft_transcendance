@@ -6,7 +6,6 @@ import AddFriendComponent from '../../addConversation/AddFriends';
 import { Socket } from 'socket.io-client';
 import AvatarImageComponent from '@/app/components/Avatar/Avatar';
 
-
 interface FriendShip {
 	id: number;
 	isAccepted: true;
@@ -25,7 +24,7 @@ interface Conversation {
 	name: string;
 	is_channel:boolean;
 }
-  
+
 const FriendsListComponent: React.FC<FriendsListComponentProps> = ({ userSocket }) => {
 
 	const [showTabFriendsList, setTabFriendsList] = useState(false);
@@ -103,15 +102,15 @@ const FriendsListComponent: React.FC<FriendsListComponentProps> = ({ userSocket 
 			<div className="tab-and-userclicked" key={id}>
 				<div className="bloc-button-friendslist">
 						<img
-							src={`http://localhost:3001/users/getAvatarByLogin/${friend.friend ? friend.friend.login : friend.initiator ? friend.initiator.login : 'Unknown User'}/${timestamp}`}
+							src={`http://localhost:3001/users/getAvatarByLogin/${friend.friend ? friend.friend.username : friend.initiator ? friend.initiator.username : 'Unknown User'}/${timestamp}`}
 							className={`profil-friendslist ${friend.isActive ? 'on' : 'off'}`}
 							alt="User Avatar"
 						/>
 						<div className={`amies ${activeIndex === id ? 'active' : ''}`} onClick={() => activateTabFriendsList(id)}>
-							{friend.friend ? friend.friend.login : friend.initiator ? friend.initiator.login : 'Unknown User'}
+							{friend.friend ? friend.friend.username : friend.initiator ? friend.initiator.username : 'Unknown User'}
 						</div>
 				</div>
-				{activeIndex === id && <FriendsListTabComponent userSocket={userSocket} userLogin={friend.friend ? friend.friend.login : friend.initiator ? friend.initiator.login : 'Unknown User'} roomName={friend.roomName}  roomID= {friend.roomID}/>}
+				{activeIndex === id && <FriendsListTabComponent userSocket={userSocket} userLogin={friend.friend ? friend.friend.username : friend.initiator ? friend.initiator.username : 'Unknown User'} roomName={friend.roomName}  roomID= {friend.roomID}/>}
 			</div>
 		  ))}
 		</div>

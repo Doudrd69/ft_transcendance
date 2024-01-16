@@ -82,12 +82,12 @@ const ChatListComponent: React.FC<ChannelListComponentProps> = ({ userSocket }) 
 			{friendList.map((friend: FriendShip, id: number) => (
 				<div key={friend.id} className="bloc-button-discussion-list">
 				<img
-						src={`http://localhost:3001/users/getAvatarByLogin/${friend.friend ? friend.friend.login : friend.initiator ? friend.initiator.login : 'Unknown User'}/${timestamp}`}
+						src={`http://localhost:3001/users/getAvatarByLogin/${friend.friend ? friend.friend.username : friend.initiator ? friend.initiator.username : 'Unknown User'}/${timestamp}`}
 					className={`profil-discussion-list ${friend.isActive ? 'on' : 'off'}`}
 					alt="User Avatar"
 					/>
 			  		<div className={`amies ${activeIndex === id ? 'active' : ''}`} onClick={() => {
-						  dispatch({ type: 'SET_CURRENT_CONVERSATION', payload: friend.friend ? friend.friend.login : friend.initiator ? friend.initiator.login : 'Unknown User'});
+						  dispatch({ type: 'SET_CURRENT_CONVERSATION', payload: friend.friend ? friend.friend.username : friend.initiator ? friend.initiator.username : 'Unknown User'});
 						  dispatch({ type: 'SET_CURRENT_ROOM', payload: friend.roomName});
 						  dispatch({ type: 'SET_CURRENT_CONVERSATION_ID', payload: friend.roomID});
 						  dispatch({ type: 'DISABLE', payload: 'showChatList' });
@@ -95,7 +95,7 @@ const ChatListComponent: React.FC<ChannelListComponentProps> = ({ userSocket }) 
 						  dispatch(setCurrentComponent('showChatList'));
 
 						}}>
-						{friend.friend ? friend.friend.login : friend.initiator ? friend.initiator.login : 'Unknown User'}
+						{friend.friend ? friend.friend.username : friend.initiator ? friend.initiator.username : 'Unknown User'}
 					</div>
 				</div>
 			))}

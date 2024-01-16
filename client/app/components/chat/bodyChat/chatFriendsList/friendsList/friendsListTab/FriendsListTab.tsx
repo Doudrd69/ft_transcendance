@@ -6,9 +6,6 @@ import ListMyChannelComponent from '../../../listMyChannel/ListMyChannel';
 import { Socket } from 'socket.io-client';
 import { handleWebpackExternalForEdgeRuntime } from 'next/dist/build/webpack/plugins/middleware-plugin';
 
-
-
-
 interface FriendsListTabComponentProps {
 	userSocket: Socket; 
 	userLogin : any;
@@ -22,9 +19,7 @@ const FriendsListTabComponent:  React.FC<FriendsListTabComponentProps> = ({ user
 	const [confirmationText, setConfirmationText] = useState('');
 	const [showConfirmation, setShowConfirmation] = useState(false);
 	const [funtionToExecute, setFunctionToExecute] = useState<() => void>(() => {});
-	console.log("userLogin --> ", userLogin);
-	console.log("roomName --> ", roomName);
-	console.log("roomID --> ", roomID);
+
 	const handleTabClick = (text: string, functionToExecute: any) => {
 		setConfirmationText(text);
 		setFunctionToExecute(() => functionToExecute);
@@ -42,7 +37,7 @@ const FriendsListTabComponent:  React.FC<FriendsListTabComponentProps> = ({ user
 			recipientLogin:  userLogin,
 		}
 
-		const response = await fetch('http://localhost:3001/users/blockUser', {
+		const response = await fetch('http://localhost:3001/users/removeFriend', {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',

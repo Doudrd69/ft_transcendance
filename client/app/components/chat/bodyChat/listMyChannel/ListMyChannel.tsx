@@ -38,7 +38,6 @@ const ListMyChannelComponent: React.FC<ListMyChannelComponentProps> = ({ userSoc
 		dispatch({ type: 'DISABLE', payload: 'showAddCreateChannel' });
 	};
 
-
 	const loadDiscussions = async () => {
 
 		const response = await fetch(`http://localhost:3001/chat/getConversationsWithStatus/${userID}`, {
@@ -97,7 +96,7 @@ const ListMyChannelComponent: React.FC<ListMyChannelComponentProps> = ({ userSoc
 			const conversation = await response.json();
 			if (conversation.id) {
 				if (userSocket.connected) {
-					userSocket.emit('joinRoom', { roomName: conversation.name, roomID: conversation.id });
+					userSocket.emit('addUserToRoom', { convID: conversation.id, convName: conversation.name, friend: user});
 				}
 				console.log("Friend has been successfully added!");
 				dispatch({ type: 'TOGGLEX', payload: 'showAddCreateChannel' });

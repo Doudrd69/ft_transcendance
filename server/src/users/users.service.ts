@@ -297,7 +297,7 @@ export class UsersService {
 		return ;
 	}
 
-	async blockUser(blockUserDto: BlockUserDto): Promise<Conversation | Friendship> {
+	async removeFriend(blockUserDto: BlockUserDto): Promise<Conversation | Friendship> {
 
 		const friendshipToUpdate = await this.updateFriendship(blockUserDto, false);
 		if (friendshipToUpdate) {
@@ -306,6 +306,36 @@ export class UsersService {
 
 		console.log("Fatal error: could not update frienship status");
 		return ;
+	}
+
+	// Pour block/unblock ne pas oublier de faire emit sur les events correspondant
+	// peut etre return l'id du user qui est bloque pour le whoBlock#ID
+	async blockUser(blockUserDto: BlockUserDto): Promise<boolean> {
+
+		const user : User = await this.usersRepository.findOne({ where: { username: blockUserDto.initiatorLogin } });
+		const userToBlock : User = await this.usersRepository.findOne({ where: {username: blockUserDto.recipientLogin } });
+
+		if (user && userToBlock) {
+			// user.blockedUsers.push(userToBlock.login);
+			await this.usersRepository.save(user);
+			return true;
+		}
+
+		return false;
+	}
+
+	async unblockUser(blockUserDto: BlockUserDto): Promise<boolean> {
+
+		const user : User = await this.usersRepository.findOne({ where: { username: blockUserDto.initiatorLogin } });
+		const userToUnblock : User = await this.usersRepository.findOne({ where: {username: blockUserDto.recipientLogin } });
+
+		if (user && userToUnblock) {
+			// user.blockedUsers.filter((user: string) => user != userToUnblock.login);
+			await this.usersRepository.save(user);
+			return true;
+		}
+
+		return false;
 	}
 
 	/**************************************************************/
@@ -321,24 +351,41 @@ export class UsersService {
 		return await this.usersRepository.findOne({ where: { login: loginToSearch} });
 	}
 
+	async getBlockedUserList(userID: number) {
+
+		const user = await this.usersRepository.findOne({ where: { id: userID } });
+		if (user) {
+			// return user.blockedUsers;
+		}
+
+		return [];
+	}
+
 	async getFriendships(username: string): Promise<Friendship[]> {
 
 		console.log(username, "friend list loading...");
 
-		const user : User = await this.usersRepository.findOne({
-			where: { username: username },
-			relations: ["initiatedFriendships.friend", "acceptedFriendships.initiator"],
-		});
+		const initiatedfriends = await this.friendshipRepository
+			.createQueryBuilder('friendship')
+			.leftJoinAndSelect('friendship.initiator', 'initiator')
+			.where('initiator.username != :username', { username })
+			.andWhere('friendship.isAccepted = true')
+			.getMany();
+			
+		// console.log("--------------> ", initiatedfriends);
+		
+		const acceptedfriends = await this.friendshipRepository
+			.createQueryBuilder('friendship')
+			.leftJoinAndSelect('friendship.friend', 'friend')
+			.where('friend.username != :username', { username })
+			.andWhere('friendship.isAccepted = true')
+			.getMany();
+		
+		// console.log("===============> ",acceptedfriends);
+		const friendships = [...initiatedfriends, ...acceptedfriends];
 
-		if (user) {
-			let initiatedfriends = await user.initiatedFriendships.filter((friendship: Friendship) => friendship.isAccepted);
-			let acceptedfriends = await user.acceptedFriendships.filter((friendship: Friendship) => friendship.isAccepted);
-			const friends = [...initiatedfriends, ...acceptedfriends];
-
-			console.log(friends)
-			return friends;
-		}
-		return [];
+		// console.log(friendships);
+		return friendships;
 	}
 
 	async getPendingFriendships(username: string): Promise<Friendship[]> {
