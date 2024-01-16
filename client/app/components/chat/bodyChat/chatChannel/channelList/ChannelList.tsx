@@ -134,7 +134,11 @@ const ChannelListComponent: React.FC<ChanneListComponentProps> = ({ userSocket }
 					<button
 					key={index}
 					className="button-channel-list"
-					onClick={() => {handleConv(conversation, userList[index], index);}}>
+					onClick={() => {
+							handleConv(conversation, userList[index], index);
+							if(isAdmin[index])
+								state.currentIsAdmin = true;
+						}}>
 					{isAdmin[index] && <img className="icon-admin-channel" src='./crown.png' alt="private" />}
 					{conversation.isProtected &&  <img className="icon-password-channel" src='./password.png' alt="private" />}
 					{!conversation.isPublic && <img className="icon-private-channel" src='./private.png' alt="private" />}

@@ -11,7 +11,7 @@ import {
 	Max
 } from 'class-validator';
 
-export class ChannelOptionsDto {
+export class UpdateProtectFalseDto {
    
     @IsNotEmpty()
 	@IsPositive()
@@ -28,13 +28,5 @@ export class ChannelOptionsDto {
 	@IsNotEmpty()
 	@IsBoolean()
 	state: boolean;
-
-    @IsNotEmpty()
-	@Length(6, 20)
-	@IsAscii()
-	@IsAlpha()
-	@IsString()
-	@Matches(/^[^"';%()|<>\\]*$/)
-	password?: string;
 }
 

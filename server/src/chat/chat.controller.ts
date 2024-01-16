@@ -12,6 +12,8 @@ import { Message } from './entities/message.entity';
 import { GroupMember } from './entities/group_member.entity';
 import { ChannelOptionsDto } from './dto/channelOptionsDto.dto';
 import { QuitConversationDto } from './dto/quitConversationDto.dto';
+import { UpdateIsPublicDto } from './dto/updateIsPublicDto.dto';
+import { UpdateProtectFalseDto } from './dto/updateProtectFalseDto.dto';
 
 @Controller('chat')
 export class ChatController {
@@ -108,19 +110,19 @@ export class ChatController {
 	@UseGuards(AuthGuard)
 	@HttpCode(HttpStatus.OK)
 	@Post('updateIsPublicTrue')
-	updateChannelIsPublicStatusTrue(@Req() req, @Body() channelOptionsDto: ChannelOptionsDto){
+	updateChannelIsPublicStatusTrue(@Req() req, @Body() updateIsPublicDto: UpdateIsPublicDto){
 		const { user } = req;
 		console.log("TEST DU CONTROLLER MDR ", user);
-		return this.chatService.updateChannelPublicStatusToTrue(channelOptionsDto, user);
+		return this.chatService.updateChannelPublicStatusToTrue(updateIsPublicDto, user);
 	}
 
 	@UseGuards(AuthGuard)
 	@HttpCode(HttpStatus.OK)
 	@Post('updateIsPublicFalse')
-	updateChannelIsPublicStatusFalse(@Req() req, @Body() channelOptionsDto: ChannelOptionsDto){
+	updateChannelIsPublicStatusFalse(@Req() req, @Body() updateIsPublicDto: UpdateIsPublicDto){
 		const { user } = req;
 		console.log("TEST DU CONTROLLER MDR ", user);
-		return this.chatService.updateChannelPublicStatusToFalse(channelOptionsDto, user);
+		return this.chatService.updateChannelPublicStatusToFalse(updateIsPublicDto, user);
 	}
 
 	@UseGuards(AuthGuard)
@@ -133,8 +135,8 @@ export class ChatController {
 	@UseGuards(AuthGuard)
 	@HttpCode(HttpStatus.OK)
 	@Post('updateIsProtectedFalse')
-	updateChannelIsprotectedStatusFalse(@Body() channelOptionsDto: ChannelOptionsDto): Promise<boolean> {
-		return this.chatService.updateChannelIsProtectedStatusToFalse(channelOptionsDto);
+	updateChannelIsprotectedStatusFalse(@Body() updateProtectFalseDto: UpdateProtectFalseDto): Promise<boolean> {
+		return this.chatService.updateChannelIsProtectedStatusToFalse(updateProtectFalseDto);
 	}
 
 

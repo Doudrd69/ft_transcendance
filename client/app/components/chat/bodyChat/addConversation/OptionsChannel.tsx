@@ -24,17 +24,18 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 	const { state, dispatch } = useChat();
 	const me = state.currentUserList.filter((user: userList) => user.login === sessionStorage.getItem("currentUserLogin"));
 	const isAdmin = me[0].isAdmin;
+	const isOwner = me[0].isOwner;
 
-	const handlePrivate = async() => {
+
+	const updateIsPublicTrue = async() => {
 
 			const channelOptionDto = {
 				conversationID: Number(state.currentConversationID),
 				userID: Number(sessionStorage.getItem("currentUserID")),
-				state: state.currentConversationIsPrivate,
 			}
 			console.log("HANDLE PRIVATE: ", channelOptionDto);
 
-			const response = await fetch(`http://localhost:3001/chat/updateIsPublic`, {
+			const response = await fetch(`http://localhost:3001/chat/updateIsPublicTrue`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
@@ -44,15 +45,40 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 			});
 
 			if (response.ok) {
-				dispatch({ type: 'TOGGLEX', payload: 'currentConversationIsPrivate' });
+				dispatch({ type: 'ACTIVATE', payload: 'currentConversationIsPrivate' });
 				console.log("Updated status");
 			}
 			else {
 				console.log("Fatal error");
 			}
 	}
+	const updateIsPublicFalse = async() => {
 
-	const handleleaveChannel = async() => {
+		const channelOptionDto = {
+			conversationID: Number(state.currentConversationID),
+			userID: Number(sessionStorage.getItem("currentUserID")),
+		}
+		console.log("HANDLE PRIVATE: ", channelOptionDto);
+
+		const response = await fetch(`http://localhost:3001/chat/updateIsPublicFalse`, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
+			},
+			body: JSON.stringify(channelOptionDto),
+		});
+
+		if (response.ok) {
+			dispatch({ type: 'DISABLE', payload: 'currentConversationIsPrivate' });
+			console.log("Updated status");
+		}
+		else {
+			console.log("Fatal error");
+		}
+}
+
+	const deleteChannel = async() => {
 
 		const channelOptionDto = {
 			conversationID: Number(state.currentConversationID),
@@ -60,7 +86,6 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 			state: state.currentConversationIsPrivate,
 		}
 
-		console.log("HANDLE PRIVATE: ", channelOptionDto);
 		const response = await fetch(`http://localhost:3001/chat/updateIsPublic`, {
 			method: 'POST',
 			headers: {
@@ -78,9 +103,7 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 			console.log("Fatal error");
 		}
 }
-	const handleProtected = async() => {
-
-		// error Error: Missing getServerSnapshot, which is required for server-rendered content. Will revert to client rendering.
+	const updateIsProtectedTrue = async() => {
 			const channelOptionDto = {
 				conversationID: Number(state.currentConversationID),
 				userID: Number(sessionStorage.getItem("currentUserID")),
@@ -89,7 +112,7 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 		
 			}
 
-			const response = await fetch(`http://localhost:3001/chat/updateIsProtected`, {
+			const response = await fetch(`http://localhost:3001/chat/updateIsProtectedTrue`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
@@ -102,7 +125,43 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 				const status = await response.json();
 				console.log(status);
 				if (status) {
-					dispatch({ type: 'TOGGLEX', payload: 'currentConversationIsProtected' });
+					dispatch({ type: 'ACTIVATE', payload: 'currentConversationIsProtected' });
+					console.log("Password updated");
+				}
+				else {
+					console.log("User is not admin on this channel");
+				}
+			}
+			else {
+				console.log("Fatal error");
+			}
+
+			return ;
+	}
+
+	const updateIsProtectedFalse = async() => {
+
+		// error Error: Missing getServerSnapshot, which is required for server-rendered content. Will revert to client rendering.
+			const channelOptionDto = {
+				conversationID: Number(state.currentConversationID),
+				userID: Number(sessionStorage.getItem("currentUserID")),
+				state: state.currentConversationIsProtected,
+			}
+
+			const response = await fetch(`http://localhost:3001/chat/updateIsProtectedFalse`, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
+				},
+				body: JSON.stringify(channelOptionDto),
+			});
+	
+			if (response.ok) {
+				const status = await response.json();
+				console.log(status);
+				if (status) {
+					dispatch({ type: 'DISABLE', payload: 'currentConversationIsProtected' });
 					console.log("Password updated");
 				}
 				else {
@@ -144,9 +203,9 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 					{isAdmin ?
 						<>
 							{state.currentConversationIsPrivate ?
-								<img className="option-image" src="private.png"  onClick={handlePrivate}/>
+								<img className="option-image" src="private.png"  onClick={updateIsPublicFalse}/>
 								:
-								<img className="option-image" src="public.png" onClick={handlePrivate}/>
+								<img className="option-image" src="public.png" onClick={updateIsPublicTrue}/>
 							}
 							<img className="option-image" src="upload-password.png"  onClick={() => { 
 									if (state.currentConversationIsProtected)
@@ -154,9 +213,9 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 										dispatch({ type: 'DISABLE', payload: 'showOptionChannel' });
 							}}/>
 							{state.currentConversationIsProtected ?
-								<img className="option-image" src="password.png" onClick={handleProtected}/>
+								<img className="option-image" src="password.png" onClick={updateIsProtectedFalse}/>
 								:
-								<img className="option-image" src="no-password.png" 
+								<img className="option-image" src="no-password.png"
 								onClick={() => { 
 										dispatch({ type: 'ACTIVATE', payload: 'showPasswordChange' });
 										dispatch({ type: 'DISABLE', payload: 'showOptionChannel' });
@@ -165,11 +224,13 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 						:
 						null
 					}
-					<img className="option-image" src="logoutred.png" onClick={() => { 
-								{handleleaveChannel}
+					
+					{isOwner &&
+					<img className="option-image" src="closered.png" onClick={() => { 
+								{deleteChannel}
 								dispatch({ type: 'DISABLE', payload: 'showOptionUseChannel' });
 
-					}}/>
+					}}/>}
 				</div>
 			</div>
 		</>
