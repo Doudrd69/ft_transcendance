@@ -23,6 +23,7 @@ interface userList {
 	isBan: boolean;
 	isOwner: boolean;
 	isBlock: boolean;
+	id: number;
 }
 
 const ReceiveBoxChannelComponent: React.FC<ReceiveBoxChannelComponentProps> = ({ userSocket }) => {

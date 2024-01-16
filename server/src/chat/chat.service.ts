@@ -149,6 +149,7 @@ export class ChatService {
 							if (group.conversation.id == userGroup.conversation.id) {
 								if (group.conversation.is_channel)
 									userListForThisGroup.push({
+										id: user_.id,
 										login: user_.login,
 										avatarURL: user_.avatarURL,
 										isOwner: group.isOwner,
@@ -624,10 +625,10 @@ export class ChatService {
 			const isOwnerStatus = await this.getGroupIsOwnerStatus(user, conversation);
 			
 			if (groupToRemove) {
-				console.log("Before: ", user.groups);
-				user.groups.filter((group: GroupMember) => group.id != groupToRemove.id);
+				const newGroups = user.groups.filter((group: GroupMember) => group.id != groupToRemove.id);
+				user.groups = newGroups;
+				console.log(newGroups);
 				await this.usersRepository.save(user);
-				console.log("After: ", user.groups);
 
 				if (isOwnerStatus) {
 					const status = await this.promoteNewOwner(conversation);
