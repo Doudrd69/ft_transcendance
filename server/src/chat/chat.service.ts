@@ -37,7 +37,6 @@ export class ChatService {
 
 	/***					PRIVATE STATUS GETTERS				***/
 
-	// le user foit avoir charge la relation groups.conversation pour toutes ces fonctions
 	private async getRelatedGroup(user: User, conversation: Conversation): Promise<GroupMember> {
 
 		// Groups linked to the conversation
@@ -45,8 +44,6 @@ export class ChatService {
 			where: { conversation: conversation },
 		});
 
-		// Now we need to find the good one which is related our user
-		// const group = user.groups.filter((group: GroupMember) => group.id == groupToSearch.id);
 		let groupFound;
 		user.groups.forEach((userGroup: GroupMember) => {
 			groupList.forEach((group: GroupMember) => {
@@ -230,6 +227,8 @@ export class ChatService {
 		return [];
 	}
 
+
+
 	/**************************************************************/
 	/***					CHANNEL PASSWORD					***/
 	/**************************************************************/
@@ -270,6 +269,7 @@ export class ChatService {
 		group.conversation = conversation;
 		return await this.groupMemberRepository.save(group);
 	}
+
 
 
 	/**************************************************************/
@@ -378,6 +378,8 @@ export class ChatService {
 
 		return false;
 	}
+
+
 
 	/**************************************************************/
 	/***					USER CHANNEL OPTIONS				***/
@@ -537,6 +539,8 @@ export class ChatService {
 		return false;
 	}
 
+
+
 	/**************************************************************/
 	/***					CONVERSATION						***/
 	/**************************************************************/
@@ -553,24 +557,23 @@ export class ChatService {
 					return ;
 				}
 			});
-			groupToPromote.isOwner = true;
-			await this.groupMemberRepository.save(groupToPromote);
-
-			return true;
+			if (groupToPromote) {
+				groupToPromote.isOwner = true;
+				await this.groupMemberRepository.save(groupToPromote);
+	
+				return true;
+			}
 		}
-		else {
-			// si aucun membre pour etre owner, ou pas de membres: on supprime le group et a conversation
-			const allGroups = await this.groupMemberRepository.find();
-			console.log("all groups before filter: ", allGroups);
-			// ca c'est de la merde
-			allGroups.filter((group: GroupMember) => group.id != relatedGroups[group.id].id);
-			await this.groupMemberRepository.save(allGroups);
-			console.log("all groups after filter: ", allGroups);
+		// si aucun membre pour etre owner, ou pas de membres: on supprime le group et la conversation
+		const allGroups = await this.groupMemberRepository.find();
+		console.log("all groups before filter: ", allGroups);
+		allGroups.filter((group: GroupMember) => group.id != relatedGroups[group.id].id);
+		await this.groupMemberRepository.save(allGroups);
+		console.log("all groups after filter: ", allGroups);
 
-			await this.conversationRepository.delete(conversation);
+		await this.conversationRepository.delete(conversation);
 
-			return false;
-		}
+		return false;
 	}
 
 	async quitConversation(quiConversationDto: QuitConversationDto): Promise<boolean> {
@@ -740,6 +743,8 @@ export class ChatService {
 		return ;
 	}
 
+
+
 	/**************************************************************/
 	/***						MESSAGE							***/
 	/**************************************************************/
@@ -772,6 +777,8 @@ export class ChatService {
 		console.error("Fatal error: message could not be created");
 		return ;
 	}
+
+
 
 	/**************************************************************/
 	/***						GETTERS							***/
