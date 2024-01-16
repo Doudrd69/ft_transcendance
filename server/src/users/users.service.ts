@@ -316,7 +316,7 @@ export class UsersService {
 		const userToBlock : User = await this.usersRepository.findOne({ where: {username: blockUserDto.recipientLogin } });
 
 		if (user && userToBlock) {
-			user.blockedUser.push(userToBlock.login);
+			// user.blockedUsers.push(userToBlock.login);
 			await this.usersRepository.save(user);
 			return true;
 		}
@@ -330,7 +330,7 @@ export class UsersService {
 		const userToUnblock : User = await this.usersRepository.findOne({ where: {username: blockUserDto.recipientLogin } });
 
 		if (user && userToUnblock) {
-			user.blockedUser.filter((user: string) => user != userToUnblock.login);
+			// user.blockedUsers.filter((user: string) => user != userToUnblock.login);
 			await this.usersRepository.save(user);
 			return true;
 		}
@@ -355,7 +355,7 @@ export class UsersService {
 
 		const user = await this.usersRepository.findOne({ where: { id: userID } });
 		if (user) {
-			return user.blockedUser;
+			// return user.blockedUsers;
 		}
 
 		return [];
