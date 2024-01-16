@@ -175,7 +175,7 @@ export class UsersController {
 
 	@UseGuards(AuthGuard)
 	@HttpCode(HttpStatus.OK)
-	@Post('blockUser')
+	@Post('removeFriend')
 	removeFriend(@Body() blockUserDto: BlockUserDto): Promise<Conversation | Friendship> {
 		return this.usersService.removeFriend(blockUserDto);
 	}
