@@ -82,7 +82,7 @@ const ChatListComponent: React.FC<ChannelListComponentProps> = ({ userSocket }) 
 			{friendList.map((friend: FriendShip, id: number) => (
 				<div key={friend.id} className="bloc-button-discussion-list">
 				<img
-						src={`http://localhost:3001/users/getAvatarByLogin/${friend.friend ? friend.friend.username : friend.initiator ? friend.initiator.username : 'Unknown User'}/${timestamp}`}
+						src={`http://localhost:3001/users/getAvatarByLogin/${friend.friend ? friend.friend.login : friend.initiator ? friend.initiator.login : 'Unknown User'}/${timestamp}`}
 					className={`profil-discussion-list ${friend.isActive ? 'on' : 'off'}`}
 					alt="User Avatar"
 					/>

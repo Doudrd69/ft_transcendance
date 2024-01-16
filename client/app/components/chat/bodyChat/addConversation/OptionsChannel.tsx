@@ -21,8 +21,8 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 				userID: Number(sessionStorage.getItem("currentUserID")),
 				state: state.currentConversationIsPrivate,
 			}
-
 			console.log("HANDLE PRIVATE: ", channelOptionDto);
+
 			const response = await fetch(`http://localhost:3001/chat/updateIsPublic`, {
 				method: 'POST',
 				headers: {
