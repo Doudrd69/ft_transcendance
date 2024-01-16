@@ -22,6 +22,8 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 
 	const [formValue, setFormValue] = useState('');
 	const { state, dispatch } = useChat();
+	const me = state.currentUserList.filter((user: userList) => user.login === sessionStorage.getItem("currentUserLogin"));
+	const isAdmin = me[0].isAdmin;
 
 	const handlePrivate = async() => {
 
@@ -132,12 +134,6 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 			document.removeEventListener('keydown', handleEscape);
 		};
 	}, []);
-
-	const me = state.currentUserList.filter((user: userList) => user.login === sessionStorage.getItem("currentUserLogin"));
-	const isAdmin = me[0].isAdmin;
-	console.log("me: ", me);
-	console.log("me.isAdmin: ", me[0].isAdmin);
-
 	return (
 		<>
 		<div className="blur-background"></div>
@@ -171,7 +167,7 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 					}
 					<img className="option-image" src="logoutred.png" onClick={() => { 
 								{handleleaveChannel}
-								dispatch({ type: 'DISABLE', payload: 'showOptionChannel' });
+								dispatch({ type: 'DISABLE', payload: 'showOptionUseChannel' });
 
 					}}/>
 				</div>
