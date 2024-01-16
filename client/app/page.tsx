@@ -199,6 +199,7 @@ export default function Home() {
 			userSocket.off('userIsUnban');
 			userSocket.off('userIsBan');
 		}
+
 	}, [userSocket]);
 
 	// Connection - Deconnection useEffect

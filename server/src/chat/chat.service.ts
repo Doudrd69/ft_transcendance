@@ -271,9 +271,11 @@ export class ChatService {
 				if (conversationToAdd)
 					return true;
 			}
+
+			throw new Error("wrong password");
 		}
 
-		return false;
+		throw new Error("Fatal error");
 	}
 
 
@@ -301,7 +303,6 @@ export class ChatService {
 
 	async updateChannelPublicStatusToTrue(channelOptionsDto: ChannelOptionsDto, _user: User): Promise<boolean> {
 
-		console.log(_user);
 		const user : User = await this.usersRepository.findOne({
 			where: { id: channelOptionsDto.userID },
 			relations: ["groups", "groups.conversation"],
@@ -320,14 +321,15 @@ export class ChatService {
 				await this.conversationRepository.save(channelToUpdate);
 				return true;
 			}
+
+			throw new Error("Fatal error");
 		}
 
-		return false;
+		throw new Error(`${user.username} is not admin`)
 	}
 
 	async updateChannelPublicStatusToFalse(channelOptionsDto: ChannelOptionsDto, _user: User): Promise<boolean> {
 
-		console.log(_user);
 		const user : User = await this.usersRepository.findOne({
 			where: { id: channelOptionsDto.userID },
 			relations: ["groups", "groups.conversation"],
@@ -346,9 +348,11 @@ export class ChatService {
 				await this.conversationRepository.save(channelToUpdate);
 				return true;
 			}
+
+			throw new Error("Fatal error");
 		}
 
-		return false;
+		throw new Error(`${user.username} is not admin`)
 	}
 
 
@@ -370,11 +374,13 @@ export class ChatService {
 				channelToUpdate.isProtected = true;
 				channelToUpdate.password = await this.hashChannelPassword(channelOptionsDto.password)
 				await this.conversationRepository.save(channelToUpdate);
-				}
 				return true;
-			}
+				}
 
-		return false;
+				throw new Error("Fatal error");
+			}
+	
+			throw new Error(`${user.username} is not admin`)
 	}
 
 	async updateChannelIsProtectedStatusToFalse(channelOptionsDto: ChannelOptionsDto): Promise<boolean> {
@@ -395,11 +401,13 @@ export class ChatService {
 				channelToUpdate.isProtected = false;
 				channelToUpdate.password = "";
 				await this.conversationRepository.save(channelToUpdate);
-				}
 				return true;
+				}
+
+				throw new Error("Fatal error");
 			}
 
-		return false;
+			throw new Error(`${user.username} is not admin`)
 	}
 
 
@@ -427,10 +435,14 @@ export class ChatService {
 					await this.groupMemberRepository.save(groupToUpdate);
 					return true;	
 				}
+
+				throw new Error(`${userToMute.username} has higher privilege`);
 			}
+
+			throw new Error(`${user.username} is not owner or admin`);
 		}
 
-		return false;
+		throw new Error("Fatal error");
 	}
 
 	async updateUserUnmuteStatusFromConversation(muteUserDto: UserOptionsDto): Promise<boolean> {
@@ -452,10 +464,14 @@ export class ChatService {
 					await this.groupMemberRepository.save(groupToUpdate);
 					return true;	
 				}
+
+				throw new Error(`${userToMute.username} has higher privilege`);
 			}
+
+			throw new Error(`${user.username} is not owner or admin`);
 		}
 
-		return false;
+		throw new Error("Fatal error");
 	}
 
 	async updateUserBanStatusFromConversation(banUserDto: UserOptionsDto): Promise<boolean> {
@@ -464,6 +480,7 @@ export class ChatService {
 			where: { username: banUserDto.username },
 			relations: ["groups"],
 		});
+
 		const user = await this.usersRepository.findOne({ where: { id: banUserDto.from } });
 		const conversation = await this.conversationRepository.findOne({ where: { id: banUserDto.conversationID } });
 		const userGroup = await this.getRelatedGroup(user, conversation);
@@ -477,16 +494,19 @@ export class ChatService {
 					await this.groupMemberRepository.save(groupToUpdate);
 					return true;
 				}
+
+				throw new Error(`${userToBan.username} has higher privilege`);
 			}
 
+			throw new Error(`${user.username} is not owner or admin`);
 		}
 
-		return false;
+		throw new Error("Fatal error");
 	}
 
 	async updateUserUnbanStatusFromConversation(banUserDto: UserOptionsDto): Promise<boolean> {
 
-		const userToBan : User = await this.usersRepository.findOne({
+		const userToUnban : User = await this.usersRepository.findOne({
 			where: { username: banUserDto.username },
 			relations: ["groups"],
 		});
@@ -494,8 +514,8 @@ export class ChatService {
 		const conversation = await this.conversationRepository.findOne({ where: { id: banUserDto.conversationID } });
 		const userGroup = await this.getRelatedGroup(user, conversation);
 
-		if (userToBan && conversation && userGroup) {
-			const groupToUpdate = await this.getRelatedGroup(userToBan, conversation);
+		if (userToUnban && conversation && userGroup) {
+			const groupToUpdate = await this.getRelatedGroup(userToUnban, conversation);
 
 			if (userGroup.isOwner || userGroup.isAdmin) {
 				if (groupToUpdate && !groupToUpdate.isOwner || !groupToUpdate.isAdmin) {
@@ -503,11 +523,14 @@ export class ChatService {
 					await this.groupMemberRepository.save(groupToUpdate);
 					return true;
 				}
+
+				throw new Error(`${userToUnban.username} has higher privilege`);
 			}
 
+			throw new Error(`${user.username} is not owner or admin`);
 		}
 
-		return false;
+		throw new Error("Fatal error");
 	}
 
 	async updateUserAdminStatusFromConversationTrue(promoteUserToAdminDto: UserOptionsDto): Promise<boolean> {
@@ -538,11 +561,14 @@ export class ChatService {
 					await this.groupMemberRepository.save(groupToUpdate);
 					return true;
 				}
+
+				throw new Error(`${userToPromote.username} has higher privilege`);
 			}
 
+			throw new Error(`${user.username} is not owner or admin`);
 		}
 
-		return false;
+		throw new Error("Fatal error");
 	}
 
 	async updateUserAdminStatusFromConversationFalse(promoteUserToAdminDto: UserOptionsDto): Promise<boolean> {
@@ -551,24 +577,28 @@ export class ChatService {
 			where: { username: promoteUserToAdminDto.username },
 			relations: ['groups'],
 		});
+
 		const user = await this.usersRepository.findOne({ where: { id: promoteUserToAdminDto.from } });
 		const conversation = await this.conversationRepository.findOne({ where: { id: promoteUserToAdminDto.conversationID } });
 		const userGroup = await this.getRelatedGroup(user, conversation);
-		console.log("user: ", user);
+
 		if (userToPromote && conversation && userGroup) {
 			const groupToUpdate = await this.getRelatedGroup(userToPromote, conversation);
-			console.log("groupToUpdate: ", groupToUpdate);
+
 			if (userGroup.isOwner || userGroup.isAdmin) {
 				if (groupToUpdate && !groupToUpdate.isOwner || !groupToUpdate.isAdmin) {
 					groupToUpdate.isAdmin = false;
 					await this.groupMemberRepository.save(groupToUpdate);
 					return true;
 				}
+
+				throw new Error(`${userToPromote.username} has higher privilege`);
 			}
 
+			throw new Error(`${user.username} is not owner or admin`);
 		}
 
-		return false;
+		throw new Error("Fatal error");
 	}
 
 
@@ -583,6 +613,7 @@ export class ChatService {
 		const relatedGroups: GroupMember[] = await this.groupMemberRepository.find({ where: { conversation: conversation} });
 		// On a au moins un membre
 		if (relatedGroups) {
+			console.log("found related group");
 			relatedGroups.forEach((group: GroupMember) => {
 				if (!group.isBan) {
 					groupToPromote = group;
@@ -600,9 +631,9 @@ export class ChatService {
 		// si aucun membre pour etre owner, ou pas de membres: on supprime le group et la conversation
 		const allGroups = await this.groupMemberRepository.find();
 		console.log("all groups before filter: ", allGroups);
-		allGroups.filter((group: GroupMember) => group.id != relatedGroups[group.id].id);
-		await this.groupMemberRepository.save(allGroups);
-		console.log("all groups after filter: ", allGroups);
+		const filter = allGroups.filter((group: GroupMember) => group.id != relatedGroups[group.id].id);
+		await this.groupMemberRepository.save(filter);
+		console.log("all groups after filter: ", filter);
 
 		await this.conversationRepository.delete(conversation);
 
@@ -636,14 +667,14 @@ export class ChatService {
 					console.log("Promote status: ", status);
 				}
 
-				return ;
+				return true;
 			}
 		}
 
-		return ;
+		throw new Error("Fatal error");
 	}
 	
-	async addUserToConversation(addUserToConversationDto: AddUserToConversationDto): Promise<Conversation | { error: string }> {
+	async addUserToConversation(addUserToConversationDto: AddUserToConversationDto): Promise<Conversation> {
 		
 		const userToAdd = await this.usersRepository.findOne({
 			where: { username: addUserToConversationDto.userToAdd },
@@ -656,13 +687,11 @@ export class ChatService {
 
 		const isGroupInUsersArray = await this.getRelatedGroup(userToAdd, conversationToAdd);
 		if (isGroupInUsersArray) {
-			console.log("User has already joined", isGroupInUsersArray.conversation.name );
-			return { error: "User has already joined this discussion" };
+			throw new Error("User has already joined this discussion");
 		}
 
 		if (await this.getGroupIsBanStatus(userToAdd, conversationToAdd)) {
-			console.log("Fatal error: user is ban from this channel");
-			return { error: "User is banned from this discussion" };
+			throw new Error("User is banned from this discussion");
 		}
 		
 		if (conversationToAdd && userToAdd) {
@@ -680,7 +709,7 @@ export class ChatService {
 			}
 		}
 		
-		return { error: "Fatal error" };
+		throw new Error("Fatal error");
 	}
 	
 	async createFriendsConversation(initiator: User, friend: User): Promise<Conversation> {
@@ -739,10 +768,10 @@ export class ChatService {
 				return await this.conversationRepository.save(conversationToUpdate);
 			}
 			
-			return ;
+			throw new Error("user is not admin");
 		}
 		
-		return ;
+		throw new Error("Fatal error");
 	}
 	
 	async createConversation(conversationDto: ConversationDto): Promise<Conversation> {
@@ -774,7 +803,7 @@ export class ChatService {
 			return conv;
 		}
 
-		return ;
+		throw new Error("Fatal error: user not found");
 	}
 
 
@@ -784,7 +813,7 @@ export class ChatService {
 	/**************************************************************/
 	
 	// need to check muteStatus here or in front?
-	async createMessage(messageDto: MessageDto): Promise<Message | boolean> {
+	async createMessage(messageDto: MessageDto): Promise<Message> {
 		
 		const conversation : Conversation = await this.conversationRepository.findOne({ where: {id: messageDto.conversationID} });
 		const sender : User = await this.usersRepository.findOne({
@@ -797,12 +826,12 @@ export class ChatService {
 
 		if (isMuteStatus) {
 			console.error("User is mute");
-			return false;
+			throw new Error("user is muted");
 		}
 
 		if (isBanStatus) {
 			console.error("User is ban");
-			return false;
+			throw new Error('user is banned');
 		}
 
 		if (conversation) {
@@ -815,8 +844,7 @@ export class ChatService {
 			return await this.messageRepository.save(newMessage);
 		}
 
-		console.error("Fatal error: message could not be created");
-		return ;
+		throw new Error("Fatal error");
 	}
 
 
@@ -835,7 +863,7 @@ export class ChatService {
 			return publicConversations;
 		}
 
-		throw Error("No conversations found");
+		throw new Error("No conversations found");
 	}
 	
 	async getAllPrivateConversations(): Promise<Conversation[]> {
@@ -848,7 +876,7 @@ export class ChatService {
 			return publicConversations;
 		}
 
-		throw Error("No conversations found");
+		throw new Error("No conversations found");
 	}
 	
 
@@ -862,8 +890,8 @@ export class ChatService {
 		if (conversation) {
 			return conversation;
 		}
-		console.log("Fatal error: conversation not found");
-		return ;
+
+		throw new Error("Conversation not found");
 	}
 
 	async getConversationByName(name: string): Promise<Conversation> {
@@ -872,8 +900,8 @@ export class ChatService {
 		if (conversation) {
 			return conversation;
 		}
-		console.log("Fatal error: conversation not found (getConversationByName)");
-		return ;
+
+		throw new Error("Conversation not found");
 	}
 
 	async getConversationArrayByID(IDs: number[]): Promise<Conversation[]> {
@@ -901,7 +929,6 @@ export class ChatService {
 
 	async getAllChannelsFromUser(userID: number): Promise<Conversation[]> {
 
-		// get ALL CHANNELS
 		const allConversations = await this.getAllChannels(userID);
 		if (!allConversations) {
 			console.error("Fatal error: conversations not found");
@@ -938,7 +965,6 @@ export class ChatService {
 					isAdminArray.push(group.isAdmin);
 			});
 
-			// get ALL CHANNELS
 			const conversationList = await this.getAllChannels(userID);
 			const usersList = await this.getUserListFromConversations(user, conversationList);
 			if (conversationList && usersList) {
@@ -972,6 +998,7 @@ export class ChatService {
 					&& conversation.isPublic == true 
 					&& conversation.is_channel == true);
 		});
+
 		return conversations;
 	}
 }
