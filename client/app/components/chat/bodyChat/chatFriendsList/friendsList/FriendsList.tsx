@@ -15,6 +15,7 @@ interface FriendShip {
 	roomName?: string;
 	roomID?: string;
 }
+
 interface FriendsListComponentProps {
 	userSocket: Socket;
 }

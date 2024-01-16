@@ -317,7 +317,7 @@ export class UsersService {
 		const userToBlock : User = await this.usersRepository.findOne({ where: {username: blockUserDto.recipientLogin } });
 
 		if (user && userToBlock) {
-			// user.blockedUsers.push(userToBlock.login);
+			user.blockedUsers.push(userToBlock.login);
 			await this.usersRepository.save(user);
 			return true;
 		}
@@ -331,7 +331,7 @@ export class UsersService {
 		const userToUnblock : User = await this.usersRepository.findOne({ where: {username: blockUserDto.recipientLogin } });
 
 		if (user && userToUnblock) {
-			// user.blockedUsers.filter((user: string) => user != userToUnblock.login);
+			user.blockedUsers.filter((user: string) => user != userToUnblock.login);
 			await this.usersRepository.save(user);
 			return true;
 		}
@@ -356,7 +356,7 @@ export class UsersService {
 
 		const user = await this.usersRepository.findOne({ where: { id: userID } });
 		if (user) {
-			// return user.blockedUsers;
+			return user.blockedUsers;
 		}
 
 		return [];
@@ -383,7 +383,18 @@ export class UsersService {
 			.getMany();
 		
 		// console.log("===============> ",acceptedfriends);
+ 
+		let array = [];
 		const friendships = [...initiatedfriends, ...acceptedfriends];
+		// friendships.forEach((element: Friendship) => {
+		// 	array.push({
+		// 		id: element.friend ? element.friend.id : element.initiator ? element.initiator.id : -1,
+		// 		username: element.friend ? element.friend.username : element.initiator ? element.initiator.username : 'unknown user',
+		// 	});
+		// });
+
+		// console.log(array);
+		
 
 		// console.log(friendships);
 		return friendships;
