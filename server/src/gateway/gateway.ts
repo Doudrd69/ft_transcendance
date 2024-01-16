@@ -83,7 +83,6 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		client.on('joinPersonnalRoom', (personnalRoom: string, userID: number) => {
 			client.join(personnalRoom);
 			console.log("Client ", client.id, " has joined ", personnalRoom, " room");
-			const blockedUsers = this.userService.getBlockedUserList(userID);
 			this.userRejoinsRooms(client, userID);
 			this.userService.updateUserStatus(userID, true);
 
