@@ -10,6 +10,7 @@ interface user {
 	isAdmin: boolean;
 	isMute: boolean;
 	isBan: boolean;
+	isBlock: boolean;
 }
 
 interface OptionsUserChannelProps {
@@ -24,31 +25,60 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user, userSocke
 	const [admin, setAdmin] = useState<boolean>(user.isAdmin);
 	const [mute, setMute] = useState<boolean>(user.isMute);
 	const [ban, setBan] = useState<boolean>(user.isBan);
+	const [block, setBlock] = useState<boolean>(user.isBlock);
 
-	const muteUser = async() => {
 
-		const userOptionDto = {
-			conversationID: Number(state.currentConversationID),
-			username: user.login,
-			state: true,
-			from: Number(sessionStorage.getItem("currentUserID"))
+	const blockUser = async() => {
+
+		const BlockUserDto = {
+			initiatorLogin: sessionStorage.getItem("currentUserLogin"),
+			recipientLogin: user.login,
 		}
 
-		const response = await fetch(`http://localhost:3001/chat/muteUser`, {
+		console.log("dto++> ", BlockUserDto);
+
+		const response = await fetch(`http://localhost:3001/users/blockUser`, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
 				'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
 			},
-			body: JSON.stringify(userOptionDto),
+			body: JSON.stringify(BlockUserDto),
 		});
 	
 		if (response.ok) {
-			user.isMute = !user.isMute;
+			user.isBlock = !user.isBlock;
+			setBlock(true);
 
-			setMute(true);
+			console.log("block");
+		}
+		else {
+			console.error("Fatal error");
+		}
+	}
+	
+	const unblockUser = async() => {
 
-			console.log("Mute");
+		const BlockUserDto = {
+			initiatorLogin: sessionStorage.getItem("currentUserLogin"),
+			recipientLogin: user.login,
+		}
+
+		const response = await fetch(`http://localhost:3001/users/unblockUser`, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
+			},
+			body: JSON.stringify(BlockUserDto),
+		});
+	
+		if (response.ok) {
+			user.isBlock = !user.isBlock;
+
+			setBlock(false);
+
+			console.log("unblock");
 		}
 		else {
 			console.error("Fatal error");
@@ -83,6 +113,34 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user, userSocke
 		}
 	}
 	
+	const muteUser = async() => {
+
+		const userOptionDto = {
+			conversationID: Number(state.currentConversationID),
+			username: user.login,
+			state: true,
+			from: Number(sessionStorage.getItem("currentUserID"))
+		}
+
+		const response = await fetch(`http://localhost:3001/chat/muteUser`, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
+			},
+			body: JSON.stringify(userOptionDto),
+		});
+	
+		if (response.ok) {
+			user.isMute = !user.isMute;
+			setMute(true);
+			console.log("Mute");
+		}
+		else {
+			console.error("Fatal error");
+		}
+	}
+
 	const banUser = async() => {
 
 		const userOptionDto = {
@@ -231,6 +289,7 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user, userSocke
 			document.removeEventListener('keydown', handleEscape);
 		};
 	}, []);
+
 	return (
 		<>
 		<div className="blur-background"></div>
@@ -252,6 +311,11 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user, userSocke
 						<img className="option-image" src="interdit.png" onClick={unbanUser}/>
 						:
 						<img className="option-image-opacity" src="interdit.png" onClick={banUser}/>
+					}
+					{block ?
+						<img className="option-image" src="block.png" onClick={unblockUser}/>
+						:
+						<img className="option-image-opacity" src="block.png" onClick={blockUser}/>
 					}
 				</div>
 			</div>
