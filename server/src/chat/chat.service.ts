@@ -192,7 +192,7 @@ export class ChatService {
 			let conversationArray : Conversation[] = [];
 			if (userToFind.groups && Array.isArray(userToFind.groups)) {
 				userToFind.groups.forEach((group: GroupMember) => {
-					if (group.conversation.is_channel && !group.isBan)
+					if (!group.isBan)
 						conversationArray.push(group.conversation)
 				})
 				return conversationArray;

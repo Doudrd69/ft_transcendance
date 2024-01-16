@@ -6,7 +6,6 @@ import AddFriendComponent from '../../addConversation/AddFriends';
 import { Socket } from 'socket.io-client';
 import AvatarImageComponent from '@/app/components/Avatar/Avatar';
 
-
 interface FriendShip {
 	id: number;
 	isAccepted: true;
@@ -25,7 +24,7 @@ interface Conversation {
 	name: string;
 	is_channel:boolean;
 }
-  
+
 const FriendsListComponent: React.FC<FriendsListComponentProps> = ({ userSocket }) => {
 
 	const [showTabFriendsList, setTabFriendsList] = useState(false);
