@@ -590,6 +590,7 @@ export class ChatService {
 			});
 			if (groupToPromote) {
 				groupToPromote.isOwner = true;
+				groupToPromote.isAdmin = true;
 				await this.groupMemberRepository.save(groupToPromote);
 	
 				return true;
@@ -771,6 +772,7 @@ export class ChatService {
 			
 			return conv;
 		}
+
 		return ;
 	}
 
@@ -790,8 +792,15 @@ export class ChatService {
 		});
 
 		const isMuteStatus = await this.getGroupIsMuteStatus(sender, conversation);
+		const isBanStatus = await this.getGroupIsBanStatus(sender, conversation);
+
 		if (isMuteStatus) {
 			console.error("User is mute");
+			return false;
+		}
+
+		if (isBanStatus) {
+			console.error("User is ban");
 			return false;
 		}
 

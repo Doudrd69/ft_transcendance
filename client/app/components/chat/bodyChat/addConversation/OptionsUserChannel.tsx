@@ -35,8 +35,6 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user, userSocke
 			recipientLogin: user.login,
 		}
 
-		console.log("dto++> ", BlockUserDto);
-
 		const response = await fetch(`http://localhost:3001/users/blockUser`, {
 			method: 'POST',
 			headers: {
@@ -49,6 +47,8 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user, userSocke
 		if (response.ok) {
 			user.isBlock = !user.isBlock;
 			setBlock(true);
+
+			userSocket.emit('joinRoom', { roomName: `whoblocked${user.login}`, roomID: '' } );
 
 			console.log("block");
 		}
@@ -75,8 +75,9 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user, userSocke
 	
 		if (response.ok) {
 			user.isBlock = !user.isBlock;
-
 			setBlock(false);
+
+			userSocket.emit('leaveRoom', { roomName: `whoblocked${user.login}`, roomID: '' } );
 
 			console.log("unblock");
 		}
@@ -165,11 +166,7 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user, userSocke
 			const status = await response.json();
 			user.isBan = !user.isBan;
 			setBan(true);
-			if (status) {
-				userSocket.emit('banUser', { userToBan: user.login, roomName: state.currentConversation, roomID: state.currentConversationID } );
-			}
-			else
-				userSocket.emit('unbanUser', { userToUnban: user.login, roomName: state.currentConversation, roomID: state.currentConversationID } );
+			userSocket.emit('banUser', { userToBan: user.login, roomName: state.currentConversation, roomID: state.currentConversationID } );
 		}
 		else {
 			console.error("Fatal error");
@@ -200,11 +197,7 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user, userSocke
 			const status = await response.json();
 			user.isBan = !user.isBan;
 			setBan(false);
-			if (status) {
-				userSocket.emit('banUser', { userToBan: user.login, roomName: state.currentConversation, roomID: state.currentConversationID } );
-			}
-			else
-				userSocket.emit('unbanUser', { userToUnban: user.login, roomName: state.currentConversation, roomID: state.currentConversationID } );
+			userSocket.emit('unbanUser', { userToUnban: user.login, roomName: state.currentConversation, roomID: state.currentConversationID } );
 		}
 		else {
 			console.error("Fatal error");

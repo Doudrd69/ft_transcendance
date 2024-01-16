@@ -41,8 +41,6 @@ export class User {
 	@Column({ default: false })
 	isActive: boolean;
 
-    // @Column("string", { array: true })
-    // blockedUsers: string[];
 	@Column("varchar", {
 		array: true,
 		default: null,

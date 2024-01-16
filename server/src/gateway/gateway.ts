@@ -79,15 +79,19 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 
 		console.log(`---> GeneralGtw client connected    : ${client.id}`);
 		this.connectedUsers[client.id] = client;
-
+		
 		client.on('joinPersonnalRoom', (personnalRoom: string, userID: number) => {
 			client.join(personnalRoom);
 			console.log("Client ", client.id, " has joined ", personnalRoom, " room");
 			this.userRejoinsRooms(client, userID);
 			this.userService.updateUserStatus(userID, true);
+			// Pour emit aux amis, il faut recup la liste et emit chaque room? 
+			// sinon faire join une friend room (voir les etats etc)
+			this.server.except(personnalRoom).emit('newConnection', `${personnalRoom} is online`);
 
 			client.on('disconnect', () => {
 				console.log("===> Disconnecting user ", personnalRoom, " with ID ", userID);
+				this.server.except(personnalRoom).emit('newDeconnection', `${personnalRoom} is now offline`);
 				client.leave(personnalRoom);
 				console.log("Client ", client.id, " has left ", personnalRoom, " room");
 				this.userLeavesRooms(client, userID);
@@ -109,7 +113,11 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		console.log("==== joinRoom Event ====");
 		console.log("Add ", client.id," to room : ", roomName + roomID);
 
-		client.join(roomName + roomID);
+		if (roomID)
+			client.join(roomName + roomID);
+		else
+			client.join(roomName);
+
 		this.server.to(roomName + roomID).emit('userJoinedRoom', `User has joined ${roomName}${roomID}`);
 
 		return ;
@@ -122,7 +130,10 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		console.log("==== leaveRoom Event ====");
 		console.log("Remove ", client.id," from room : ", roomName + roomID);
 
-		client.leave(roomName + roomID);
+		if (roomID)
+			client.leave(roomName + roomID);
+		else
+			client.leave(roomName);
 		return ;
 	}
 
