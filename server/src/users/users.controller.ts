@@ -40,12 +40,10 @@ export class UsersController {
 	// }
 
 
+	@UseGuards(AuthGuard)
 	@HttpCode(HttpStatus.OK)
 	@Post('upload-avatar/:userId')
-	@UseInterceptors(FileInterceptor('avatar', {
-		storage: diskStorage({
-		destination: path.join(__dirname, 'avatars'),
-		filename: async (req, file, callback) => {
+	@UseInterceptors(FileInterceptor('avatar', { storage: diskStorage({ destination: path.join(__dirname, 'avatars'), filename: async (req, file, callback) => {
 			const randomName = randomBytes(16).toString('hex');
 			const fileExtension = extname(file.originalname);
 			const newFilename = `${randomName}${fileExtension}`;
@@ -53,95 +51,81 @@ export class UsersController {
 		},
 		}),
 	}))
+
+	@UseGuards(AuthGuard)
 	async uploadAvatar(@UploadedFile() avatar: Express.Multer.File, @Param('userId') userId: number) {
+
 		if (!avatar) {
-			return { error: "Aucun fichier d'avatar fourni." };
+			throw new Error("No files uploaded");
 		}
+
 		const avatarURL = `/avatars/${avatar.filename}`;
 		await this.usersService.uploadAvatarURL(avatarURL, userId);
 		return { avatarURL };
-	} 
+	}
 
+	@UseGuards(AuthGuard)
 	@Get('getAvatar/:userId/:timestamp')
 	async getUserAvatar(@Param('userId') userId: number, @Param('timestamp') timestamp: string, @Res() res: ExpressResponse) {
 		try {
 			const avatarURL = await this.usersService.getAvatar(userId);
 			if (!avatarURL) {
-				res.status(404).send('Avatar not foundi');
-				return null;
+				throw new Error("Avatar not found");
 			}
 			res.setHeader('Content-Type', 'image/*'); 
 			res.redirect(301, avatarURL);
 			return avatarURL
 		} catch (error) {
-			console.error('Error retrieving avatar:', error);
-			res.status(500).send('Internal Server Error');
+			throw error;
 		}
 	}
-	
-	// @Get('getUserFriendships/:login')
-	// async getUser(@Param('login') login: string, @Res() res: ExpressResponse) {
-	// 	try {
-	// 		const avatarURL = await this.usersService.getUserFriendships(login);
-	// 		if (!avatarURL) {
-	// 			res.status(404).send('Avatar not foundi');
-	// 			return null;
-	// 		}
-	// 		return avatarURL
-	// 	} catch (error) {
-	// 		console.error('Error retrieving avatar:', error);
-	// 		res.status(500).send('Internal Server Error');
-	// 	}
-	// }
 
+	@UseGuards(AuthGuard)
 	@Get('getAvatarByLogin/:login/:timestamp')
 	async getUserAvatarbyUsername(@Param('login') login: string, @Param('timestamp') timestamp: string, @Res() res: ExpressResponse) {
 		try {
 			const avatarURL = await this.usersService.getAvatarbyLogin(login);
 			if (!avatarURL) {
-				res.status(404).send('Avatar not foundi');
-				return null;
+				throw new Error("Avatar not found");
 			}
 			res.setHeader('Content-Type', 'image/*'); 
 			res.redirect(301, avatarURL);
 			return avatarURL
 		} catch (error) {
-			console.error('Error retrieving avatar:', error);
-			res.status(500).send('Internal Server Error');
+			throw error;
 		}
 	}
+
+	@UseGuards(AuthGuard)
 	@Get('getAvatarByLogin/:login')
 	async getUserAvatarbyUsernamebis(@Param('login') login: string, @Res() res: ExpressResponse) {
 		try {
 			const avatarURL = await this.usersService.getAvatarbyLogin(login);
 			if (!avatarURL) {
-				res.status(404).send('Avatar not foundi');
-				return null;
+				throw new Error("Avatar not found");
 			}
 			res.setHeader('Content-Type', 'image/*'); 
 			res.redirect(301, avatarURL);
 			return avatarURL
 		} catch (error) {
-			console.error('Error retrieving avatar:', error);
-			res.status(500).send('Internal Server Error');
+			throw error;
 		}
 	}
 
+	@UseGuards(AuthGuard)
 	@Get('getAvatar/:userId')
 	async getUserAvatarAccess(@Param('userId') userId: number, @Param('timestamp') timestamp: string, @Res() res: ExpressResponse) {
 		try {
 			const avatarURL = await this.usersService.getAvatar(userId);
 			if (!avatarURL) {
 				console.log('getUserAvatar erreur');
-				res.status(404).send('Avatar not foundi');
-				return null;
+				throw new Error("Avatar not found");
 			}
 			res.setHeader('Content-Type', 'image/*'); 
 			res.redirect(301, avatarURL);
 			return avatarURL
 		} catch (error) {
-			console.error('Error retrieving avatar:', error);
-			res.status(500).send('Internal Server Error');
+			throw error;
 		}
 	}
 
