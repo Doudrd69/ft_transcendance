@@ -41,12 +41,17 @@ export class User {
 	@Column({ default: false })
 	isActive: boolean;
 
-    // @Column("string", { array: true })
-    // blockedUsers: string[];
-    @Column("simple-array", {
+    // // @Column("string", { array: true })
+    // // blockedUsers: string[];
+    // @Column("simple-array", {
+	// 	default: null,
+	// })
+    // blockedUsers: string[]
+	@Column('varchar', {
+		array: true,
 		default: null,
 	})
-    blockedUsers: string[]
+	blockedUsers: string[];
 
 	@ManyToMany(type => GroupMember, {
 		eager: true,
