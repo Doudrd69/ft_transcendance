@@ -68,7 +68,6 @@ const SendBoxChannelComponent: React.FC<SendBoxComponentProps> = ({ userSocket }
 				<form className="bloc-send-chat-channel" onSubmit={handleMessage}>
 					<input className="input-chat-channel" placeholder="message..." value={messageValue} onChange={handleMessageInput}></input>
 				</form>
-				<img className= "img-enter" src="enter.png" alt="entrer" />
 			</div>
 	)
 };

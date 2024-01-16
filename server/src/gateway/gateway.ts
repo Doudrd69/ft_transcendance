@@ -113,7 +113,11 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		console.log("==== joinRoom Event ====");
 		console.log("Add ", client.id," to room : ", roomName + roomID);
 
-		client.join(roomName + roomID);
+		if (roomID)
+			client.join(roomName + roomID);
+		else
+			client.join(roomName);
+
 		this.server.to(roomName + roomID).emit('userJoinedRoom', `User has joined ${roomName}${roomID}`);
 
 		return ;
@@ -126,7 +130,10 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		console.log("==== leaveRoom Event ====");
 		console.log("Remove ", client.id," from room : ", roomName + roomID);
 
-		client.leave(roomName + roomID);
+		if (roomID)
+			client.leave(roomName + roomID);
+		else
+			client.leave(roomName);
 		return ;
 	}
 

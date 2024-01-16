@@ -313,13 +313,20 @@ export class UsersService {
 	// peut etre return l'id du user qui est bloque pour le whoBlock#ID
 	async blockUser(blockUserDto: BlockUserDto): Promise<boolean> {
 
+		console.log("coucou1");
 		const user : User = await this.usersRepository.findOne({ where: { username: blockUserDto.initiatorLogin } });
 		const userToBlock : User = await this.usersRepository.findOne({ where: {username: blockUserDto.recipientLogin } });
-
+		
+		console.log("coucou2");
 		if (user && userToBlock) {
-			user.blockedUsers.push(userToBlock.login);
-			await this.usersRepository.save(user);
-			return true;
+			console.log("coucou3");
+			// if (Array.isArray(user.blockedUsers)) {
+				console.log("coucou4");
+				// user.blockedUsers.push(userToBlock.login);
+				await this.usersRepository.save(user);
+				return true;
+			// }
+			console.log("coucou5");
 		}
 
 		return false;
@@ -331,7 +338,7 @@ export class UsersService {
 		const userToUnblock : User = await this.usersRepository.findOne({ where: {username: blockUserDto.recipientLogin } });
 
 		if (user && userToUnblock) {
-			user.blockedUsers.filter((user: string) => user != userToUnblock.login);
+			// user.blockedUsers.filter((user: string) => user != userToUnblock.login);
 			await this.usersRepository.save(user);
 			return true;
 		}
@@ -356,7 +363,7 @@ export class UsersService {
 
 		const user = await this.usersRepository.findOne({ where: { id: userID } });
 		if (user) {
-			return user.blockedUsers;
+			// return user.blockedUsers;
 		}
 
 		return [];
