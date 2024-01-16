@@ -4,7 +4,7 @@ import { Socket } from 'socket.io-client';
 import { useChat } from '../../ChatContext';
 
 interface PasswordComponentProps {
-userSocket: Socket;
+	userSocket: Socket;
 }
 
 const PasswordChangeComponent: React.FC<PasswordComponentProps> = ({ userSocket }) => {
@@ -29,7 +29,7 @@ const PasswordChangeComponent: React.FC<PasswordComponentProps> = ({ userSocket 
 				password: password,
 			}
 
-			const response = await fetch(`http://localhost:3001/chat/updateIsProtected`, {
+			const response = await fetch(`http://localhost:3001/chat/updateIsProtectedTrue`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
@@ -39,7 +39,7 @@ const PasswordChangeComponent: React.FC<PasswordComponentProps> = ({ userSocket 
 			});
 	
 			if (response.ok) {
-				dispatch({ type: 'TOGGLEX', payload: 'currentConversationIsProtected' });
+				dispatch({ type: 'ACTIVATE', payload: 'currentConversationIsProtected' });
 				console.log("Update PASSWORD");
 			}
 			} catch (error) {

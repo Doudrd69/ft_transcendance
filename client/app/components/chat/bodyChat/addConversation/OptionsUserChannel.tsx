@@ -3,6 +3,7 @@ import { Socket } from 'socket.io-client';
 import { useChat } from '../../ChatContext';
 import { toast } from 'react-toastify';
 import './AddConversation.css';
+import { RSC } from 'next/dist/client/components/app-router-headers';
 
 interface user {
 	login: string;

@@ -110,29 +110,18 @@ const ReceiveBoxChannelComponent: React.FC<ReceiveBoxChannelComponentProps> = ({
 		<div className='bloc-owner-user'>
 			<div className='list-users-channel-owner'>
 				<div className='user-list-item'>
-						{ownerUsers.isAdmin && 
-							<div className='avatar-container'>
-								<img className='admin-user' src='./crown.png' alt='user' />
-								<img
-								className='img-list-users-channel-admin'
-								src={`http://localhost:3001${ownerUsers.avatarURL}`}
-								onClick={() => {
-									dispatch({ type: 'ACTIVATE', payload: 'dontcandcel' });
-									dispatch({ type: 'ACTIVATE', payload: 'showOptionsUserChannelOwner' });
-									dispatch({ type: 'SET_CURRENT_OPTION_CHANNEL_NAME', payload: ownerUsers.login});
-									dispatch({ type: 'DISABLE', payload: 'showBackComponent' });
-							}}/>
-							</div>}
-						{!ownerUsers.isAdmin && 
+						<div className='avatar-container'>
+							<img className='admin-user' src='./crown.png' alt='user' />
 							<img
-								className='img-list-users-channel'
-								src={`http://localhost:3001${ownerUsers.avatarURL}`}
-								onClick={() => {
-									dispatch({ type: 'ACTIVATE', payload: 'dontcandcel' });
-									dispatch({ type: 'ACTIVATE', payload: 'showOptionsUserChannelOwner' });
-									dispatch({ type: 'SET_CURRENT_OPTION_CHANNEL_NAME', payload: ownerUsers.login});
-									dispatch({ type: 'DISABLE', payload: 'showBackComponent' });
-							}}/>}
+							className='img-list-users-channel-admin'
+							src={`http://localhost:3001${ownerUsers.avatarURL}`}
+							onClick={() => {
+								dispatch({ type: 'ACTIVATE', payload: 'dontcandcel' });
+								dispatch({ type: 'ACTIVATE', payload: 'showOptionsUserChannelOwner' });
+								dispatch({ type: 'SET_CURRENT_OPTION_CHANNEL_NAME', payload: ownerUsers.login});
+								dispatch({ type: 'DISABLE', payload: 'showBackComponent' });
+						}}/>
+						</div>
 					{state.showOptionsUserChannelOwner && 
 						<OptionsUserChannel user={ownerUsers}
 											userSocket={userSocket}/>
