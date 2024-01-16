@@ -178,8 +178,7 @@ export class ChatService {
 		return messages;
 	}
 
-	
-	private async getAllConversations(userID: number): Promise<Conversation[]> {
+	private async getAllChannels(userID: number): Promise<Conversation[]> {
 		
 		
 		const userToFind : User = await this.usersRepository.findOne({
@@ -192,7 +191,7 @@ export class ChatService {
 			let conversationArray : Conversation[] = [];
 			if (userToFind.groups && Array.isArray(userToFind.groups)) {
 				userToFind.groups.forEach((group: GroupMember) => {
-					if (!group.isBan)
+					if (group.conversation.is_channel && !group.isBan)
 						conversationArray.push(group.conversation)
 				})
 				return conversationArray;
@@ -203,7 +202,7 @@ export class ChatService {
 		return [];
 	}
 
-	private async getAllFriendConversations(userID: number): Promise<Conversation[]> {
+	private async getDMsConversations(userID: number): Promise<Conversation[]> {
 		
 		
 		const userToFind : User = await this.usersRepository.findOne({
@@ -217,6 +216,29 @@ export class ChatService {
 			if (userToFind.groups && Array.isArray(userToFind.groups)) {
 				userToFind.groups.forEach((group: GroupMember) => {
 					if (!group.conversation.is_channel)
+						conversationArray.push(group.conversation)
+				})
+				return conversationArray;
+			}
+			return [];
+		}
+		console.error("Fatal error: user not found");
+		return [];
+	}
+
+	async getAllConversations(userID: number): Promise<Conversation[]> {
+		
+		const userToFind : User = await this.usersRepository.findOne({
+			where: { id: userID },
+			relations: ["groups", "groups.conversation"],
+		});
+		
+		if (userToFind) {
+			
+			let conversationArray : Conversation[] = [];
+			if (userToFind.groups && Array.isArray(userToFind.groups)) {
+				userToFind.groups.forEach((group: GroupMember) => {
+					if (!group.isBan)
 						conversationArray.push(group.conversation)
 				})
 				return conversationArray;
@@ -858,9 +880,10 @@ export class ChatService {
 		return allMessages;
 	}
 
-	async getConversations(userID: number): Promise<Conversation[]> {
+	async getAllChannelsFromUser(userID: number): Promise<Conversation[]> {
 
-		const allConversations = await this.getAllConversations(userID);
+		// get ALL CHANNELS
+		const allConversations = await this.getAllChannels(userID);
 		if (!allConversations) {
 			console.error("Fatal error: conversations not found");
 			return [];
@@ -869,9 +892,9 @@ export class ChatService {
 		return allConversations;
 	}
 
-	async getFriendConversations(userID: number): Promise<Conversation[]> {
+	async getDMsConversationsFromUser(userID: number): Promise<Conversation[]> {
 
-		const allFriendConversations = await this.getAllFriendConversations(userID);
+		const allFriendConversations = await this.getDMsConversations(userID);
 		if (!allFriendConversations) {
 			console.error("Fatal error: conversations not found");
 			return [];
@@ -896,7 +919,8 @@ export class ChatService {
 					isAdminArray.push(group.isAdmin);
 			});
 
-			const conversationList = await this.getAllConversations(userID);
+			// get ALL CHANNELS
+			const conversationList = await this.getAllChannels(userID);
 			const usersList = await this.getUserListFromConversations(user, conversationList);
 			if (conversationList && usersList) {
 

@@ -72,8 +72,11 @@ const ReceiveBoxChannelComponent: React.FC<ReceiveBoxChannelComponentProps> = ({
 			console.log(error);
 		}
 	};
-	const ownerUsers_array = state.currentUserList.filter((user: userList) => user.isOwner === true);
+
+	// gerer le cas ou la liste est vide
+ 	const ownerUsers_array = state.currentUserList.filter((user: userList) => user.isOwner === true);
 	const ownerUsers = ownerUsers_array[0];
+
 	useEffect(() => {
 		socketInUse.on('userJoinedRoom', (notification: string) => {
 		console.log("Channel log: ", notification);
