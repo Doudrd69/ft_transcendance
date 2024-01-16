@@ -41,8 +41,8 @@ export class User {
 	@Column({ default: false })
 	isActive: boolean;
 
-	@Column({ default: null })
-	blockedUser: string[];
+    // @Column("simple-array")
+    // blockedUsers: string[]
 
 	@ManyToMany(type => GroupMember, {
 		eager: true,
