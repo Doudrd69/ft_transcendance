@@ -11,6 +11,7 @@ import { Conversation } from './entities/conversation.entity';
 import { Message } from './entities/message.entity';
 import { GroupMember } from './entities/group_member.entity';
 import { ChannelOptionsDto } from './dto/channelOptionsDto.dto';
+import { QuitConversationDto } from './dto/quitConversationDto.dto';
 
 @Controller('chat')
 export class ChatController {
@@ -49,6 +50,13 @@ export class ChatController {
 	@Post('checkPassword')
 	checkuserInputToPassword(@Body() checkPasswordDto: CheckPasswordDto): Promise<boolean> {
 		return this.chatService.compareChannelPassword(checkPasswordDto);
+	}
+
+	@UseGuards(AuthGuard)
+	@HttpCode(HttpStatus.OK)
+	@Post('quitConversation')
+	userQuitsConversation(@Body() quitConversationDto: QuitConversationDto): Promise<boolean> {
+		return this.chatService.quitConversation(quitConversationDto);
 	}
 
 	/******		USER OPTIONS ON CHANNEL		******/
