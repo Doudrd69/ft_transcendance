@@ -43,10 +43,11 @@ export class User {
 
     // @Column("string", { array: true })
     // blockedUsers: string[];
-    @Column("simple-array", {
+	@Column("varchar", {
+		array: true,
 		default: null,
 	})
-    blockedUsers: string[]
+	blockedUsers: string[];
 
 	@ManyToMany(type => GroupMember, {
 		eager: true,

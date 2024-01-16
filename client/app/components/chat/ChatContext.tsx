@@ -8,6 +8,7 @@ interface userList {
 	isAdmin: boolean;
 	isMute: boolean;
 	isBan: boolean;
+	isBlock: boolean;
 }
 
 type ActionType =
