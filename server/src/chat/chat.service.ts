@@ -17,6 +17,8 @@ import { ChannelOptionsDto } from './dto/channelOptionsDto.dto';
 import { QuitConversationDto } from './dto/quitConversationDto.dto';
 import { FormatInputPathObject } from 'path';
 import { GroupDto } from './dto/group.dto';
+import { UpdateIsPublicDto } from './dto/updateIsPublicDto.dto';
+import { UpdateProtectFalseDto } from './dto/updateProtectFalseDto.dto';
 
 @Injectable()
 export class ChatService {
@@ -299,21 +301,21 @@ export class ChatService {
 	/***						CHANNEL OPTIONS					***/
 	/**************************************************************/
 
-	async updateChannelPublicStatusToTrue(channelOptionsDto: ChannelOptionsDto, _user: User): Promise<boolean> {
+	async updateChannelPublicStatusToTrue(updateIsPublicDto: UpdateIsPublicDto, _user: User): Promise<boolean> {
 
 		console.log(_user);
 		const user : User = await this.usersRepository.findOne({
-			where: { id: channelOptionsDto.userID },
+			where: { id: updateIsPublicDto.userID },
 			relations: ["groups", "groups.conversation"],
 		});
 
 		const channelToUpdate : Conversation = await this.conversationRepository.findOne({
-			where: { id: channelOptionsDto.conversationID },
+			where: { id: updateIsPublicDto.conversationID },
 		});
 
 		const isUserIsAdmin = await this.getGroupIsAdminStatus(user, channelToUpdate);
 
-		console.log(channelOptionsDto);
+		console.log(updateIsPublicDto);
 		if (isUserIsAdmin) {
 			if (channelToUpdate) {
 				channelToUpdate.isPublic = true;
@@ -325,21 +327,21 @@ export class ChatService {
 		return false;
 	}
 
-	async updateChannelPublicStatusToFalse(channelOptionsDto: ChannelOptionsDto, _user: User): Promise<boolean> {
+	async updateChannelPublicStatusToFalse(updateIsPublicDto: UpdateIsPublicDto, _user: User): Promise<boolean> {
 
 		console.log(_user);
 		const user : User = await this.usersRepository.findOne({
-			where: { id: channelOptionsDto.userID },
+			where: { id: updateIsPublicDto.userID },
 			relations: ["groups", "groups.conversation"],
 		});
 
 		const channelToUpdate : Conversation = await this.conversationRepository.findOne({
-			where: { id: channelOptionsDto.conversationID },
+			where: { id: updateIsPublicDto.conversationID },
 		});
 
 		const isUserIsAdmin = await this.getGroupIsAdminStatus(user, channelToUpdate);
 
-		console.log(channelOptionsDto);
+		console.log(updateIsPublicDto);
 		if (isUserIsAdmin) {
 			if (channelToUpdate) {
 				channelToUpdate.isPublic = false;
@@ -377,15 +379,14 @@ export class ChatService {
 		return false;
 	}
 
-	async updateChannelIsProtectedStatusToFalse(channelOptionsDto: ChannelOptionsDto): Promise<boolean> {
+	async updateChannelIsProtectedStatusToFalse( updateProtectFalseDto: UpdateProtectFalseDto): Promise<boolean> {
 
 		const user : User = await this.usersRepository.findOne({
-			where: { id: channelOptionsDto.userID},
+			where: { id: updateProtectFalseDto.userID},
 			relations: ["groups", "groups.conversation"],
 		});
-
 		const channelToUpdate : Conversation = await this.conversationRepository.findOne({
-			where: { id: channelOptionsDto.conversationID },
+			where: { id: updateProtectFalseDto.conversationID },
 		});
 
 		const isUserIsAdmin = await this.getGroupIsAdminStatus(user, channelToUpdate);
@@ -521,6 +522,8 @@ export class ChatService {
 			relations: ['groups'],
 		});
 		const user = await this.usersRepository.findOne({ where: { id: promoteUserToAdminDto.from } });
+		console.log("user: ", user.id);
+		console.log("userToPromote: ", userToPromote.id);
 
 		if (user.id == userToPromote.id) {
 			return false;
