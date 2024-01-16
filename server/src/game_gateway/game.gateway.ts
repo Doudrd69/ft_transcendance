@@ -19,6 +19,8 @@ export interface ball_instance {
     speed: vector_instance;
     r: number;
     alive: boolean;
+    elasticity: number;
+
 }
 
 export interface paddle_instance {
@@ -27,6 +29,10 @@ export interface paddle_instance {
     speed: number;
     up: boolean;
     down: boolean;
+    is_a_paddle: boolean;
+    length: number;
+    start: vector_instance;
+    end: vector_instance;
 }
 
 export interface Game_instance {
@@ -137,11 +143,17 @@ export class GameGateway {
         return (playerLogin);
     }
 
+
     @SubscribeMessage('leave-matchmaking')
     handleLeaveMatchmaking(@ConnectedSocket() client: Socket, playerLogin: string): string {
         console.log("leaveMATCHMAKING");
         this.MatchmakingService.leave(playerLogin);
         return (playerLogin);
+    }
+
+    @SubscribeMessage('GameWidthHeigth')
+    handleGameWidthHeigth(@ConnectedSocket() client: Socket, @MessageBody() data: { gameID: number, gameWidth: number, gameHeigth: number }) {
+
     }
 
     @SubscribeMessage('Game_Input')

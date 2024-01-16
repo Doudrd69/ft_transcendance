@@ -55,13 +55,14 @@ const PongComponent = (socket: { socket: Socket }) => {
     }
 
 
+
     const defaultGamePaddleState: gamePaddleState = {
         paddleOne: { x: 0, y: 50 },
-        paddleTwo: { x: 306, y: 50 },
+        paddleTwo: { x: 300, y: 50 },
     };
 
     const defaultGameBallState: gameBallState = {
-        BallPosition: { x: 153, y: 50 },
+        BallPosition: { x: 150, y: 50 },
         scoreOne: 0,
         scoreTwo: 0,
     };
@@ -95,6 +96,29 @@ const PongComponent = (socket: { socket: Socket }) => {
         scoreTwo: 0,
     };
 
+    const [containerWidth, setContainerWidth] = useState<number>(0);
+    const [containerHeight, setContainerHeight] = useState<number>(0);
+
+    useEffect(() => {
+        const pongContainer = document.querySelector('.pong-container');
+        if (pongContainer) {
+            const handleResize = () => {
+                setContainerWidth(pongContainer.clientWidth);
+                setContainerHeight(pongContainer.clientHeight);
+            };
+            // Mettez à jour les dimensions du conteneur lorsqu'il est redimensionné
+            window.addEventListener('resize', handleResize);
+            
+            handleResize();
+            console.log(`pongcontainer size`,pongContainer.clientWidth);
+            // Initialisez les dimensions du conteneur au chargement initial
+
+            return () => {
+                window.removeEventListener('resize', handleResize);
+            };
+        }
+    }, []);
+
     const [Game, setGame] = useState<Game>(defaultGame);
 
 
@@ -117,7 +141,9 @@ const PongComponent = (socket: { socket: Socket }) => {
 
     }, []);
 
+
     useEffect(() => {
+
 
         gameSocket.on('Game_Start', (Game: Game) => {
             setGameID(Game.gameId);
@@ -130,6 +156,7 @@ const PongComponent = (socket: { socket: Socket }) => {
                 scoreTwo: Game.scoreTwo,
             }));
         });
+
 
         const gameLoop = setInterval(() => {
             if (!blurGame) {
@@ -197,19 +224,17 @@ const PongComponent = (socket: { socket: Socket }) => {
     });
 
     useEffect(() => {
-
         gameSocket.on('GamePaddleUpdate', (gamePaddleState: gamePaddleState) => {
             const newGamePaddleState: gamePaddleState = {
-                paddleOne: { x: gamePaddleState.paddleOne!.x / (16 / 9), y: gamePaddleState.paddleOne!.y },
-                paddleTwo: { x: gamePaddleState.paddleTwo!.x / (16 / 9), y: gamePaddleState.paddleTwo!.y },
+                paddleOne: { x: gamePaddleState.paddleOne!.x * containerWidth / (16 / 9), y: gamePaddleState.paddleOne!.y * containerHeight },
+                paddleTwo: { x: gamePaddleState.paddleTwo!.x * containerWidth / (16 / 9), y: gamePaddleState.paddleTwo!.y * containerHeight },
             }
             setGamePaddleState(newGamePaddleState);
         });
 
         gameSocket.on('GameBallUpdate', (gameBallState: gameBallState) => {
-            console.log(`New BallPosition: ${gameBallState.BallPosition!.x}`);
             const newGameBallState: gameBallState = {
-                BallPosition: { x: gameBallState.BallPosition!.x / (16 / 9) || 153, y: gameBallState.BallPosition!.y || 50 },
+                BallPosition: { x: gameBallState.BallPosition!.x * containerWidth / (16 / 9) || 153, y: gameBallState.BallPosition!.y * containerHeight || 50 },
                 scoreOne: gameBallState.scoreOne,
                 scoreTwo: gameBallState.scoreTwo,
             }
@@ -220,7 +245,7 @@ const PongComponent = (socket: { socket: Socket }) => {
             gameSocket.off('GameBallUpdate');
             gameSocket.off('GamePaddleUpdate');
         };
-    }, [gameSocket]);
+    }, [gameSocket, containerWidth, containerHeight]);
 
 
     return (
@@ -238,9 +263,9 @@ const PongComponent = (socket: { socket: Socket }) => {
                     <div className="col-display" id={Game.playerTwoLogin}>{gameBallState.scoreTwo}</div>
                 </div>
             </div>
-            <div className="ball" style={{ left: `${gameBallState!.BallPosition!.x}%`, top: `${gameBallState!.BallPosition!.y}%` }}></div>
-            <div className="pongpaddle" style={{ top: `${gamePaddleState!.paddleOne!.y}%`, left: `${gamePaddleState!.paddleOne!.x}%` }}></div>
-            <div className="pongpaddle" style={{ left: `${gamePaddleState!.paddleTwo!.x}%`, top: `${gamePaddleState!.paddleTwo!.y}%` }}></div>
+            <div className="ball" style={{ left: `${gameBallState!.BallPosition!.x}px`, top: `${gameBallState!.BallPosition!.y}px` }}></div>
+            <div className="pongpaddle" style={{ top: `${gamePaddleState!.paddleOne!.y}px`, left: `${gamePaddleState!.paddleOne!.x}px` }}></div>
+            <div className="pongpaddle" style={{ left: `${gamePaddleState!.paddleTwo!.x}px`, top: `${gamePaddleState!.paddleTwo!.y}px` }}></div>
         </div>
     );
 };

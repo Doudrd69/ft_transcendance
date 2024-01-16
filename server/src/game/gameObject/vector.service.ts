@@ -34,6 +34,30 @@ export class VectorService {
         return (this.createAndSaveVector(vector, vector.x * scalar, vector.y * scalar));
     }
 
+	sub(other: vector_instance, vector: vector_instance) {
+		const newVector: vector_instance = {
+			x: vector.x - other.x,
+			y: vector.y - other.y,
+		}
+		return (newVector);
+	}
+
+	mag(vector: vector_instance) {
+		return Math.sqrt(vector.x * vector.x + vector.y * vector.y);
+	}
+
+	normalize(vector: vector_instance) {
+		const newVector: vector_instance = { x: 0, y: 0}
+		if (this.mag(vector) === 0)
+			return (newVector)
+		const neueVector = { x:vector.x / this.mag(vector), y: vector.y / this.mag(vector)}
+		return (neueVector);
+	}
+
+	dot(v1: vector_instance, v2: vector_instance) {
+		return (v1.x * v2.x + v1.y * v2.y);
+	}
+
 	getCreateAndSaveVector(vector: vector_instance, x: number, y: number) {
 		return (this.createAndSaveVector(vector, x, y));
 	}
