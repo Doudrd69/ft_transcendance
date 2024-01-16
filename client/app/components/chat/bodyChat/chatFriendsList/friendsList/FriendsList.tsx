@@ -55,7 +55,7 @@ const FriendsListComponent: React.FC<FriendsListComponentProps> = ({ userSocket 
 		if (response.ok) {
 			const friends = await response.json();
 
-			const requestDms = await fetch(`http://localhost:3001/chat/getConversations/${sessionStorage.getItem("currentUserID")}`, {
+			const requestDms = await fetch(`http://localhost:3001/chat/getDMsConversations/${sessionStorage.getItem("currentUserID")}`, {
 				method: 'GET',
 				headers: {
 					'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
