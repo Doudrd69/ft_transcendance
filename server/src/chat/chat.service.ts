@@ -487,11 +487,20 @@ export class ChatService {
 
 	async updateUserAdminStatusFromConversationTrue(promoteUserToAdminDto: UserOptionsDto): Promise<boolean> {
 
+		// if (promoteUserToAdminDto.from === promoteUserToAdminDto.username) {
+
+		// }
+
 		const userToPromote : User = await this.usersRepository.findOne({
 			where: { username: promoteUserToAdminDto.username },
 			relations: ['groups'],
 		});
 		const user = await this.usersRepository.findOne({ where: { id: promoteUserToAdminDto.from } });
+
+		if (user.id == userToPromote.id) {
+			return false;
+		}
+
 		const conversation = await this.conversationRepository.findOne({ where: { id: promoteUserToAdminDto.conversationID } });
 		const userGroup = await this.getRelatedGroup(user, conversation);
 	
@@ -520,10 +529,10 @@ export class ChatService {
 		const user = await this.usersRepository.findOne({ where: { id: promoteUserToAdminDto.from } });
 		const conversation = await this.conversationRepository.findOne({ where: { id: promoteUserToAdminDto.conversationID } });
 		const userGroup = await this.getRelatedGroup(user, conversation);
-	
+		console.log("user: ", user);
 		if (userToPromote && conversation && userGroup) {
 			const groupToUpdate = await this.getRelatedGroup(userToPromote, conversation);
-
+			console.log("groupToUpdate: ", groupToUpdate);
 			if (userGroup.isOwner || userGroup.isAdmin) {
 				if (groupToUpdate && !groupToUpdate.isOwner || !groupToUpdate.isAdmin) {
 					groupToUpdate.isAdmin = false;

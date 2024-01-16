@@ -9,6 +9,15 @@ interface OptionsChannelProps {
 	title: string;
 }
 
+interface userList {
+	login: string;
+	avatarURL: string;
+	isAdmin: boolean;
+	isMute: boolean;
+	isBan: boolean;
+	isOwner: boolean;
+}
+
 const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 
 	const [formValue, setFormValue] = useState('');
@@ -41,6 +50,32 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 			}
 	}
 
+	const handleleaveChannel = async() => {
+
+		const channelOptionDto = {
+			conversationID: Number(state.currentConversationID),
+			userID: Number(sessionStorage.getItem("currentUserID")),
+			state: state.currentConversationIsPrivate,
+		}
+
+		console.log("HANDLE PRIVATE: ", channelOptionDto);
+		const response = await fetch(`http://localhost:3001/chat/updateIsPublic`, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
+			},
+			body: JSON.stringify(channelOptionDto),
+		});
+
+		if (response.ok) {
+			dispatch({ type: 'TOGGLEX', payload: 'currentConversationIsPrivate' });
+			console.log("Updated status");
+		}
+		else {
+			console.log("Fatal error");
+		}
+}
 	const handleProtected = async() => {
 
 		// error Error: Missing getServerSnapshot, which is required for server-rendered content. Will revert to client rendering.
@@ -98,6 +133,11 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 		};
 	}, []);
 
+	const me = state.currentUserList.filter((user: userList) => user.login === sessionStorage.getItem("currentUserLogin"));
+	const isAdmin = me[0].isAdmin;
+	console.log("me: ", me);
+	console.log("me.isAdmin: ", me[0].isAdmin);
+
 	return (
 		<>
 		<div className="blur-background"></div>
@@ -105,27 +145,35 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 			<div className="add_container">
 				<h2 className="add__title">{title}</h2>	
 				<div className="option-block">
-					{state.currentConversationIsPrivate ?
-						<img className="option-image" src="private.png"  onClick={handlePrivate}/>
+					{isAdmin ?
+						<>
+							{state.currentConversationIsPrivate ?
+								<img className="option-image" src="private.png"  onClick={handlePrivate}/>
+								:
+								<img className="option-image" src="public.png" onClick={handlePrivate}/>
+							}
+							<img className="option-image" src="upload-password.png"  onClick={() => { 
+									if (state.currentConversationIsProtected)
+										dispatch({ type: 'ACTIVATE', payload: 'showPasswordChange' });
+										dispatch({ type: 'DISABLE', payload: 'showOptionChannel' });
+							}}/>
+							{state.currentConversationIsProtected ?
+								<img className="option-image" src="password.png" onClick={handleProtected}/>
+								:
+								<img className="option-image" src="no-password.png" 
+								onClick={() => { 
+										dispatch({ type: 'ACTIVATE', payload: 'showPasswordChange' });
+										dispatch({ type: 'DISABLE', payload: 'showOptionChannel' });
+							}}/>}
+						</> 
 						:
-						<img className="option-image" src="public.png" onClick={handlePrivate}/>
+						null
 					}
-						<img className="option-image" src="upload-password.png"  onClick={() => { 
-								if (state.currentConversationIsProtected)
-									dispatch({ type: 'ACTIVATE', payload: 'showPasswordChange' });
-									dispatch({ type: 'DISABLE', payload: 'showOptionChannel' });
-
-								}}/>
-					{state.currentConversationIsProtected ?
-						<img className="option-image" src="password.png" onClick={handleProtected}/>
-						:
-						<img className="option-image" src="no-password.png" 
-						onClick={() => { 
-								dispatch({ type: 'ACTIVATE', payload: 'showPasswordChange' });
+					<img className="option-image" src="logoutred.png" onClick={() => { 
+								{handleleaveChannel}
 								dispatch({ type: 'DISABLE', payload: 'showOptionChannel' });
 
-							}}/>
-					}
+					}}/>
 				</div>
 			</div>
 		</>

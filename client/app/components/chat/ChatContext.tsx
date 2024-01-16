@@ -59,6 +59,7 @@ interface ChatState {
 	currentRoom: string | null;
 	currentUserList: any;
 	isAdmin: boolean;
+	currentIsAdmin: boolean;
 	showAddCreateChannel:boolean;
 	showOptionsChannel:boolean;
 	currentOptionChannelName:string | null;
@@ -95,6 +96,7 @@ const initialState: ChatState = {
 	showAvatar: false,
 	showConfirmation:false,
 	showListChannelAdd:false,
+	currentIsAdmin: false,
 	refreshChannel:false,
 	refreshFriendsList:false,
 	currentConversation: null,

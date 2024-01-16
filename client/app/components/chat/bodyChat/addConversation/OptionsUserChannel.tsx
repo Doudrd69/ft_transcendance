@@ -24,12 +24,13 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user, userSocke
 	const [admin, setAdmin] = useState<boolean>(user.isAdmin);
 	const [mute, setMute] = useState<boolean>(user.isMute);
 	const [ban, setBan] = useState<boolean>(user.isBan);
-	const handleMute = async() => {
+
+	const muteUser = async() => {
 
 		const userOptionDto = {
 			conversationID: Number(state.currentConversationID),
 			username: user.login,
-			state: user.isMute,
+			state: true,
 			from: Number(sessionStorage.getItem("currentUserID"))
 		}
 
@@ -43,8 +44,9 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user, userSocke
 		});
 	
 		if (response.ok) {
-			const responseData = await response.json();
-			setMute(responseData);
+			user.isMute = !user.isMute;
+
+			setMute(true);
 
 			console.log("Mute");
 		}
@@ -52,13 +54,41 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user, userSocke
 			console.error("Fatal error");
 		}
 	}
-	
-	const handleBan = async() => {
+
+	const unmuteUser = async() => {
 
 		const userOptionDto = {
 			conversationID: Number(state.currentConversationID),
 			username: user.login,
-			state : user.isBan,
+			state: false,
+			from: Number(sessionStorage.getItem("currentUserID"))
+		}
+
+		const response = await fetch(`http://localhost:3001/chat/unmuteUser`, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
+			},
+			body: JSON.stringify(userOptionDto),
+		});
+	
+		if (response.ok) {
+			user.isMute = !user.isMute;
+			setMute(false);
+			console.log("unMute");
+		}
+		else {
+			console.error("Fatal error");
+		}
+	}
+	
+	const banUser = async() => {
+
+		const userOptionDto = {
+			conversationID: Number(state.currentConversationID),
+			username: user.login,
+			state : true,
 			from: Number(sessionStorage.getItem("currentUserID"))
 		}
 
@@ -72,11 +102,46 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user, userSocke
 		});
 	
 		if (response.ok) {
+			console.log("ban");
+
 			const status = await response.json();
 			user.isBan = !user.isBan;
-			setBan(user.isBan);
-			console.log("Ban status: ", user.isBan);
-			console.log("User to ban/unban: ", user.login);
+			setBan(true);
+			if (status) {
+				userSocket.emit('banUser', { userToBan: user.login, roomName: state.currentConversation, roomID: state.currentConversationID } );
+			}
+			else
+				userSocket.emit('unbanUser', { userToUnban: user.login, roomName: state.currentConversation, roomID: state.currentConversationID } );
+		}
+		else {
+			console.error("Fatal error");
+		}
+	}
+
+	const unbanUser = async() => {
+
+		const userOptionDto = {
+			conversationID: Number(state.currentConversationID),
+			username: user.login,
+			state : false,
+			from: Number(sessionStorage.getItem("currentUserID"))
+		}
+
+		const response = await fetch(`http://localhost:3001/chat/unbanUser`, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
+			},
+			body: JSON.stringify(userOptionDto),
+		});
+	
+		if (response.ok) {
+			console.log("unban");
+
+			const status = await response.json();
+			user.isBan = !user.isBan;
+			setBan(false);
 			if (status) {
 				userSocket.emit('banUser', { userToBan: user.login, roomName: state.currentConversation, roomID: state.currentConversationID } );
 			}
@@ -88,16 +153,17 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user, userSocke
 		}
 	}
 	
-	const handleAdmin = async() => {
+	
+	const promoteAdminUser = async() => {
 		
 		const userOptionDto = {
 			conversationID: Number(state.currentConversationID),
-			username: name,
-			state : user.isAdmin,
+			username: user.login,
+			state : true,
 			from: Number(sessionStorage.getItem("currentUserID"))
 		}
 
-		const response = await fetch(`http://localhost:3001/chat/adminUser`, {
+		const response = await fetch(`http://localhost:3001/chat/promoteAdminUser`, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
@@ -107,10 +173,39 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user, userSocke
 		});
 	
 		if (response.ok) {
-			const responseData = await response.json();
-			console.log("Admin", responseData);
-			setAdmin(responseData);
-			user.isAdmin = responseData;
+			user.isAdmin = !user.isAdmin;
+			console.log("Promote");
+			setAdmin(true);
+		}
+		else {
+			console.error("Fatal error");
+		}
+	}
+
+	const demoteAdminUser = async() => {
+		
+		const userOptionDto = {
+			conversationID: Number(state.currentConversationID),
+			username: user.login,
+			state : false,
+			from: Number(sessionStorage.getItem("currentUserID"))
+		}
+
+		const response = await fetch(`http://localhost:3001/chat/demoteAdminUser`, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
+			},
+			body: JSON.stringify(userOptionDto),
+		});
+	
+		if (response.ok) {
+			console.log("demote");
+
+			user.isAdmin = !user.isAdmin;
+
+			setAdmin(false);
 		}
 		else {
 			console.error("Fatal error");
@@ -120,7 +215,6 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user, userSocke
 	const handleCancel = () => {
 		dispatch({ type: 'DISABLE', payload: 'showOptionsUserChannel' });
 		dispatch({ type: 'DISABLE', payload: 'showOptionsUserChannelOwner' });
-
 		dispatch({ type: 'ACTIVATE', payload: 'showBackComponent' });		
 		setFormValue('');
 	};
@@ -145,19 +239,19 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user, userSocke
 				<h2 className="add__title">{user.login}</h2>	
 				<div className="option-block">
 					{admin ?
-						<img className="option-image" src="crown.png" onClick={handleAdmin}/>
+						<img className="option-image" src="crown.png" onClick={demoteAdminUser}/>
 						:
-						<img className="option-image-opacity" src="crown.png" onClick={handleAdmin}/>
+						<img className="option-image-opacity" src="crown.png" onClick={promoteAdminUser}/>
 					}
 					{mute ?
-						<img className="option-image" src="volume-mute.png" onClick={handleMute}/>
+						<img className="option-image" src="volume-mute.png" onClick={unmuteUser}/>
 						:
-						<img className="option-image-opacity" src="volume-mute.png" onClick={handleMute}/>
+						<img className="option-image" src="unmute.png" onClick={muteUser}/>
 					}
 					{ban ?
-						<img className="option-image" src="interdit.png" onClick={handleBan}/>
+						<img className="option-image" src="interdit.png" onClick={unbanUser}/>
 						:
-						<img className="option-image-opacity" src="interdit.png" onClick={handleBan}/>
+						<img className="option-image-opacity" src="interdit.png" onClick={banUser}/>
 					}
 				</div>
 			</div>
