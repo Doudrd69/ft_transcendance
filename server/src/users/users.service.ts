@@ -204,8 +204,6 @@ export class UsersService {
 
 	async createFriendship(friendRequestDto: FriendRequestDto): Promise<boolean> {
 
-		console.log("FRDto: ", friendRequestDto);
-
 		if (friendRequestDto.initiatorLogin === friendRequestDto.recipientLogin) {
 			console.log("Fatal error: user can't add himself as friend");
 			return false;
@@ -238,6 +236,9 @@ export class UsersService {
 				newFriendship.initiator = initiator;
 				newFriendship.friend = recipient;
 				await this.friendshipRepository.save(newFriendship);
+				return true;
+			}
+			else if (friendshipAlreadyExists && !friendshipAlreadyExists.isAccepted) {
 				return true;
 			}
 
