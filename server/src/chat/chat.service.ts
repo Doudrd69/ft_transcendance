@@ -611,9 +611,7 @@ export class ChatService {
 
 		let groupToPromote : GroupMember;
 		const relatedGroups: GroupMember[] = await this.groupMemberRepository.find({ where: { conversation: conversation} });
-		// On a au moins un membre
 		if (relatedGroups) {
-			console.log("found related group");
 			relatedGroups.forEach((group: GroupMember) => {
 				if (!group.isBan) {
 					groupToPromote = group;
@@ -621,6 +619,7 @@ export class ChatService {
 				}
 			});
 			if (groupToPromote) {
+				console.log("promote group ", groupToPromote.id);
 				groupToPromote.isOwner = true;
 				groupToPromote.isAdmin = true;
 				await this.groupMemberRepository.save(groupToPromote);
@@ -628,14 +627,13 @@ export class ChatService {
 				return true;
 			}
 		}
-		// si aucun membre pour etre owner, ou pas de membres: on supprime le group et la conversation
-		const allGroups = await this.groupMemberRepository.find();
-		console.log("all groups before filter: ", allGroups);
-		const filter = allGroups.filter((group: GroupMember) => group.id != relatedGroups[group.id].id);
-		await this.groupMemberRepository.save(filter);
-		console.log("all groups after filter: ", filter);
 
-		await this.conversationRepository.delete(conversation);
+		await this.conversationRepository
+			.createQueryBuilder()
+			.delete()
+			.from(Conversation)
+			.where("id = :id", { id: conversation.id })
+			.execute()
 
 		return false;
 	}
@@ -659,8 +657,14 @@ export class ChatService {
 			if (groupToRemove) {
 				const newGroups = user.groups.filter((group: GroupMember) => group.id != groupToRemove.id);
 				user.groups = newGroups;
-				console.log(newGroups);
 				await this.usersRepository.save(user);
+
+				await this.groupMemberRepository
+					.createQueryBuilder()
+					.delete()
+					.from(GroupMember)
+					.where("id = :id", { id: groupToRemove.id })
+					.execute()
 
 				if (isOwnerStatus) {
 					const status = await this.promoteNewOwner(conversation);
