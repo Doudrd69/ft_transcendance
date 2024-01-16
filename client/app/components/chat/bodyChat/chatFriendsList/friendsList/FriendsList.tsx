@@ -102,7 +102,7 @@ const FriendsListComponent: React.FC<FriendsListComponentProps> = ({ userSocket 
 			<div className="tab-and-userclicked" key={id}>
 				<div className="bloc-button-friendslist">
 						<img
-							src={`http://localhost:3001/users/getAvatarByLogin/${friend.friend ? friend.friend.username : friend.initiator ? friend.initiator.username : 'Unknown User'}/${timestamp}`}
+							src={`http://localhost:3001/users/getAvatarByLogin/${friend.friend ? friend.friend.login : friend.initiator ? friend.initiator.login : 'Unknown User'}/${timestamp}`}
 							className={`profil-friendslist ${friend.isActive ? 'on' : 'off'}`}
 							alt="User Avatar"
 						/>
