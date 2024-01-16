@@ -22,15 +22,17 @@ const IdDiscussionComponent: React.FC<IdDiscussionProps>= ({ userSocket }) => {
 	return (
 		<div className='bloc-id'>
 			<p className="id">{id}</p>
-			<img
-				className='image-id'
-				src='settings.png'
-				onClick={() => { 
-					dispatch({ type: 'ACTIVATE', payload: 'dontcandcel' });
-					dispatch({ type: 'ACTIVATE', payload: 'showOptionChannel' });
-					dispatch({ type: 'DISABLE', payload: 'showBackComponent' });
-				}}
-			/>
+			{state.currentIsAdmin &&
+				<img
+					className='image-id'
+					src='settings.png'
+					onClick={() => { 
+						dispatch({ type: 'ACTIVATE', payload: 'dontcandcel' });
+						dispatch({ type: 'ACTIVATE', payload: 'showOptionChannel' });
+						dispatch({ type: 'DISABLE', payload: 'showBackComponent' });
+					}}
+				/>
+			}
 			{state.showPasswordChange && <PasswordChangeComponent userSocket={userSocket}/>}
 			{state.showOptionChannel && <OptionsChannel title="CHANNEL OPTION"/>}
 		</div>

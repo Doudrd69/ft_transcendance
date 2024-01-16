@@ -11,12 +11,14 @@ interface user {
 	isMute: boolean;
 	isBan: boolean;
 	isBlock: boolean;
+	id: number;
 }
 
 interface OptionsUserChannelProps {
 	user: user
 	userSocket: Socket,
 }
+
 
 const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user, userSocket }) => {
 
@@ -290,6 +292,30 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user, userSocke
 		};
 	}, []);
 
+	const handleLeaveChannel = async() => {
+		const quitlConversationDto = {
+				conversationID: Number(state.currentConversationID),
+				userID: user.id,
+		}
+
+		const response = await fetch(`http://localhost:3001/chat/quitConversation`, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
+			},
+			body: JSON.stringify(quitlConversationDto),
+		});
+
+		if (response.ok) {
+			dispatch({ type: 'ACTIVATE', payload: 'showBackComponent' });
+			dispatch({ type: 'DISABLE', payload: 'showOptionsUserChannel' });
+			console.log("Updated status");
+		}
+		else {
+			console.log("Fatal error");
+		}
+}
 	return (
 		<>
 		<div className="blur-background"></div>
@@ -317,6 +343,7 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user, userSocke
 						:
 						<img className="option-image-opacity" src="block.png" onClick={blockUser}/>
 					}
+					<img className="option-image" src="logoutred.png" onClick={handleLeaveChannel}/>
 				</div>
 			</div>
 		</>
