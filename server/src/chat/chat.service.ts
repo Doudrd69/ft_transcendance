@@ -590,6 +590,7 @@ export class ChatService {
 			});
 			if (groupToPromote) {
 				groupToPromote.isOwner = true;
+				groupToPromote.isAdmin = true;
 				await this.groupMemberRepository.save(groupToPromote);
 	
 				return true;
