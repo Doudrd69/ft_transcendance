@@ -209,14 +209,24 @@ export default function Home() {
 			const personnalRoom = sessionStorage.getItem("currentUserLogin");
 			userSocket.emit('joinPersonnalRoom', personnalRoom, sessionStorage.getItem("currentUserID"));
 		})
-
+		
 		userSocket.on('disconnect', () => {
 			console.log('UserSocket disconnected from the server : ', userSocket.id);
+		})
+
+		userSocket.on('newConnection', (notif: string) => {
+			toast(notif);
+		})
+
+		userSocket.on('newDeconnection', (notif: string) => {
+			toast(notif);
 		})
 
 		return () => {
 			userSocket.off('connect');
 			userSocket.off('disconnect');
+			userSocket.off('newConnection');
+			userSocket.off('newDeconnection');
 		}
 
 	}, [userSocket])
