@@ -27,14 +27,14 @@ export class ChatController {
 	@UseGuards(AuthGuard)
 	@HttpCode(HttpStatus.OK)
 	@Post('newMessage')
-	createNewMessage(@Body() messageDto: MessageDto): Promise<Message | boolean> {
+	createNewMessage(@Body() messageDto: MessageDto): Promise<Message> {
 		return this.chatService.createMessage(messageDto);
 	}
 
 	@UseGuards(AuthGuard)
 	@HttpCode(HttpStatus.OK)
 	@Post('addUserToConversation')
-	addUserToConversation(@Body() addUserToConversationDto: AddUserToConversationDto): Promise<Conversation | { error: string }> {
+	addUserToConversation(@Body() addUserToConversationDto: AddUserToConversationDto): Promise<Conversation> {
 		return this.chatService.addUserToConversation(addUserToConversationDto);
 	}
 
