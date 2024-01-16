@@ -365,20 +365,27 @@ export class UsersService {
 
 		console.log(username, "friend list loading...");
 
-		const user : User = await this.usersRepository.findOne({
-			where: { username: username },
-			relations: ["initiatedFriendships.friend", "acceptedFriendships.initiator"],
-		});
+		const initiatedfriends = await this.friendshipRepository
+			.createQueryBuilder('friendship')
+			.leftJoinAndSelect('friendship.initiator', 'initiator')
+			.where('initiator.username != :username', { username })
+			.andWhere('friendship.isAccepted = true')
+			.getMany();
+			
+		// console.log("--------------> ", initiatedfriends);
+		
+		const acceptedfriends = await this.friendshipRepository
+			.createQueryBuilder('friendship')
+			.leftJoinAndSelect('friendship.friend', 'friend')
+			.where('friend.username != :username', { username })
+			.andWhere('friendship.isAccepted = true')
+			.getMany();
+		
+		// console.log("===============> ",acceptedfriends);
+		const friendships = [...initiatedfriends, ...acceptedfriends];
 
-		if (user) {
-			let initiatedfriends = await user.initiatedFriendships.filter((friendship: Friendship) => friendship.isAccepted);
-			let acceptedfriends = await user.acceptedFriendships.filter((friendship: Friendship) => friendship.isAccepted);
-			const friends = [...initiatedfriends, ...acceptedfriends];
-
-			console.log(friends)
-			return friends;
-		}
-		return [];
+		// console.log(friendships);
+		return friendships;
 	}
 
 	async getPendingFriendships(username: string): Promise<Friendship[]> {
