@@ -2,6 +2,7 @@ import './ReceiveBox.css'
 import React, { useState , useEffect, useRef } from 'react';
 import { Socket } from 'socket.io-client'
 import { useChat } from '../../../ChatContext';
+import { useGlobal } from '@/app/GlobalContext';
 
 interface Message {
 	from: string;
@@ -10,13 +11,10 @@ interface Message {
 	conversationName: string;
 }
 
-interface ReceiveBoxComponentProps {
-	userSocket: Socket;
-}
-
-const ReceiveBoxComponent: React.FC<ReceiveBoxComponentProps> = ({ userSocket }) => {
+const ReceiveBoxComponent: React.FC = () => {
 
 	const { state } = useChat();
+	const { globalState } = useGlobal()
 	const [messages, setMessages] = useState<Message[]>([]);
 	const messagesContainerRef = useRef<HTMLDivElement>(null);
 	
@@ -69,17 +67,17 @@ const ReceiveBoxComponent: React.FC<ReceiveBoxComponentProps> = ({ userSocket })
 	// Here we retreive the last sent message and we "insert" it in the messages array
 	useEffect(() => {
 
-		userSocket.on('onMessage', (message: Message) => {
+		globalState.userSocket?.on('onMessage', (message: Message) => {
 			if (message) {
 				setMessages((prevMessages: Message[]) => [...prevMessages, message]);
 			}
 		});
 		
 		return () => {
-			userSocket.off('onMessage')
+			globalState.userSocket?.off('onMessage')
 		}
 
-	}, [userSocket]);
+	}, [globalState?.userSocket]);
 	
 	// Loading the conversation (retrieving all messages on component rendering)
 	useEffect(() => {

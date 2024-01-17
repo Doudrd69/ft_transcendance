@@ -27,8 +27,9 @@ interface FriendRequestDto {
 
 const GeneralComponent = () => {
 
-    const { state, dispatch } = useGlobal();
+    const { globalState, dispatch } = useGlobal();
 
+	// faire comme le usersocket
 	const gameSocket = io('http://localhost:3001/game', {
 		autoConnect: false,
 	})
@@ -57,10 +58,9 @@ const GeneralComponent = () => {
 
 		if (response.ok) {
 			const conversationData = await response.json();
-			console.log("convData: ", conversationData);
-			if (state.userSocket) {
-				state.userSocket.emit('friendRequestAccepted', {roomName: conversationData.name, roomID: conversationData.id, initiator: friendRequestDto.initiatorLogin, recipient: friendRequestDto.recipientLogin});
-				state.userSocket.emit('joinRoom', {roomName: conversationData.name, roomID: conversationData.id} );
+			if (globalState.userSocket?.connected) {
+				globalState.userSocket?.emit('friendRequestAccepted', {roomName: conversationData.name, roomID: conversationData.id, initiator: friendRequestDto.initiatorLogin, recipient: friendRequestDto.recipientLogin});
+				globalState.userSocket?.emit('joinRoom', {roomName: conversationData.name, roomID: conversationData.id} );
 			}
 		}
 		else {
@@ -104,6 +104,14 @@ const GeneralComponent = () => {
 	const handleAccessToken = async (code: any): Promise<boolean> => {
 
 		if (sessionStorage.getItem("jwt")) {
+			const userSocket = io('http://localhost:3001/user', {
+				autoConnect: false,
+				auth: {
+					token: sessionStorage.getItem("jwt"),
+				}
+			});
+			userSocket.connect();
+			dispatch({ type: 'SET_SOCKET', payload: userSocket });
 			setAuthValidated(true);
 			return true;
 		}
@@ -118,19 +126,20 @@ const GeneralComponent = () => {
 
 		if (response.ok) {
 
-			console.log("-- Access granted --");
 			const token = await response.json();
 			sessionStorage.setItem("jwt", token.access_token);
 			const jwt = sessionStorage.getItem("jwt");
 			if (jwt) {
 				await setUserSession(jwt);
+				const userSocket = io('http://localhost:3001/user', {
+					autoConnect: false,
+					auth: {
+						token: jwt,
+					}
+				});
+				userSocket.connect();
+				dispatch({ type: 'SET_SOCKET', payload: userSocket });
 				setAuthValidated(true);
-                const userSocket = io('http://localhost:3001/user', {
-	            	auth: {
-	            		token: jwt,
-	            	}
-	            });
-                dispatch({ type: 'SET_SOCKET', payload: userSocket });
 				// Attention a la 2fa
 				return true;
 			}
@@ -148,89 +157,84 @@ const GeneralComponent = () => {
 	// Multi-purpose useEffect for socket handling
 	useEffect(() => {
 		
-		if (state.userSocket) {
-			console.log(state.userSocket);
-			state.userSocket.on('friendRequest', (friendRequestDto: FriendRequestDto) => {
+			globalState.userSocket?.on('friendRequest', (friendRequestDto: FriendRequestDto) => {
 				toast(<FriendRequestReceived friendRequestDto={friendRequestDto}/>);
 			});
 	
-			state.userSocket.on('friendRequestAcceptedNotif', (data: { roomName: string, roomID: string, initiator: string, recipient: string }) => {
+			globalState.userSocket?.on('friendRequestAcceptedNotif', (data: { roomName: string, roomID: string, initiator: string, recipient: string }) => {
 				const { roomName, roomID, initiator, recipient } = data;
 				toast(<FriendRequestAccepted friend={recipient}/>);
-				state.userSocket.emit('joinRoom', {roomName: roomName, roomID: roomID});
+				globalState.userSocket?.emit('joinRoom', {roomName: roomName, roomID: roomID});
 			})
 	
-			state.userSocket.on('userJoinedRoom', (notification: string) => {
-				console.log("User socket in main: ", state.userSocket.id);
+			globalState.userSocket?.on('userJoinedRoom', (notification: string) => {
+				console.log("User socket in main: ", globalState.userSocket?.id);
 				console.log("Notif from server: ", notification);
 				// on peut toast ici ou gerer autrement
 			});
 	
-			state.userSocket.on('userAddedToFriendRoom', (data: {convID: number, convName: string}) => {
+			globalState.userSocket?.on('userAddedToFriendRoom', (data: {convID: number, convName: string}) => {
 				const { convID, convName } = data;
-				state.userSocket.emit('joinRoom',  { roomName: convName, roomID: convID });
+				globalState.userSocket?.emit('joinRoom',  { roomName: convName, roomID: convID });
 			});
 	
-			state.userSocket.on('userIsBan', ( data: { roomName: string, roomID: string } ) => {
+			globalState.userSocket?.on('userIsBan', ( data: { roomName: string, roomID: string } ) => {
 				const { roomName, roomID } = data; 
 				if (roomName && roomID) {
 					// dispatch({ type: 'DISABLE', payload: 'showChannel' });
-					state.userSocket.emit('leaveRoom', { roomName: roomName, roomID: roomID });
+					globalState.userSocket?.emit('leaveRoom', { roomName: roomName, roomID: roomID });
 					toast.warn(`You are ban from ${roomName}`);
 				}
 			});
 	
-			state.userSocket.on('userIsUnban', ( data: { roomName: string, roomID: string } ) => {
+			globalState.userSocket?.on('userIsUnban', ( data: { roomName: string, roomID: string } ) => {
 				const { roomName, roomID } = data; 
 				if (roomName && roomID) {
-					state.userSocket.emit('joinRoom', { roomName: roomName, roomID: roomID });
+					globalState.userSocket?.emit('joinRoom', { roomName: roomName, roomID: roomID });
 					toast.warn(`You are unban from ${roomName}`);
 				}
 			});
 	
 			return () => {
-				state.userSocket.off('friendRequest');
-				state.userSocket.off('friendRequestAcceptedNotif');
-				state.userSocket.off('userJoinedRoom');
-				state.userSocket.off('userAddedToFriendRoom');
-				state.userSocket.off('userIsUnban');
-				state.userSocket.off('userIsBan');
-			}
+				globalState.userSocket?.off('friendRequest');
+				globalState.userSocket?.off('friendRequestAcceptedNotif');
+				globalState.userSocket?.off('userJoinedRoom');
+				globalState.userSocket?.off('userAddedToFriendRoom');
+				globalState.userSocket?.off('userIsUnban');
+				globalState.userSocket?.off('userIsBan');
 		}
 
-	}, [state.userSocket]);
+	}, [globalState?.userSocket]);
 
 	// Connection - Deconnection useEffect
 	useEffect(() => {
 		
-		if (state.userSocket) {
-			state.userSocket.on('connect', () => {
-				console.log("UserSocket new connection : ", state.userSocket.id);
+			globalState.userSocket?.on('connect', () => {
+				console.log("UserSocket new connection : ", globalState.userSocket?.id);
 				const personnalRoom = sessionStorage.getItem("currentUserLogin");
-				state.userSocket.emit('joinPersonnalRoom', personnalRoom, sessionStorage.getItem("currentUserID"));
+				globalState.userSocket?.emit('joinPersonnalRoom', personnalRoom, sessionStorage.getItem("currentUserID"));
 			})
 			
-			state.userSocket.on('disconnect', () => {
-				console.log('UserSocket disconnected from the server : ', state.userSocket.id);
+			globalState.userSocket?.on('disconnect', () => {
+				console.log('UserSocket disconnected from the server : ', globalState.userSocket?.id);
 			})
 	
-			state.userSocket.on('newConnection', (notif: string) => {
+			globalState.userSocket?.on('newConnection', (notif: string) => {
 				toast(notif);
 			})
 	
-			state.userSocket.on('newDeconnection', (notif: string) => {
+			globalState.userSocket?.on('newDeconnection', (notif: string) => {
 				toast(notif);
 			})
 	
 			return () => {
-				state.userSocket.off('connect');
-				state.userSocket.off('disconnect');
-				state.userSocket.off('newConnection');
-				state.userSocket.off('newDeconnection');
-			}
+				globalState.userSocket?.off('connect');
+				globalState.userSocket?.off('disconnect');
+				globalState.userSocket?.off('newConnection');
+				globalState.userSocket?.off('newDeconnection');
 		}
 
-	}, [state.userSocket])
+	}, [globalState?.userSocket])
 
 	// Game socket handler
 	useEffect(() => {
@@ -277,7 +281,7 @@ const GeneralComponent = () => {
                         <>
                         {/* <SetComponent/> */}
                         <Header/>
-                        <BodyComponent userSocket={state.userSocket} gameSocket={gameSocket}/>
+                        <BodyComponent gameSocket={gameSocket}/>
                     </>
                     )}	
             </>      

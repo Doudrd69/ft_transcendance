@@ -2,14 +2,12 @@ import './SendBoxChannel.css'
 import React, { useState } from 'react';
 import { Socket } from 'socket.io-client'
 import { useChat } from '../../../ChatContext'
+import { useGlobal } from '@/app/GlobalContext';
 
-interface SendBoxComponentProps {
-	userSocket: Socket;
-}
-
-const SendBoxChannelComponent: React.FC<SendBoxComponentProps> = ({ userSocket }) => {
+const SendBoxChannelComponent: React.FC = () => {
 
 	const { state } = useChat();
+	const { globalState } = useGlobal();
 	const [messageValue, setMessageValue] = useState('');
 
 	const handleMessageInput = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -38,8 +36,8 @@ const SendBoxChannelComponent: React.FC<SendBoxComponentProps> = ({ userSocket }
 			});
 	
 			if (response.ok) {
-				if (userSocket.connected) {
-					userSocket.emit('message', { dto: messageDto, conversationName: state.currentConversation });
+				if (globalState.userSocket?.connected) {
+					globalState.userSocket?.emit('message', { dto: messageDto, conversationName: state.currentConversation });
 				}
 				else {
 					console.log("Client is not connected");

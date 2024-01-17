@@ -8,7 +8,8 @@ interface AvatarImageProps {
 }
 
 const AvatarImageComponent: React.FC<AvatarImageProps> = ({ className, refresh, name}) => {
-	const { state, dispatch } = useGlobal();
+
+	const { globalState, dispatch } = useGlobal();
 	const defaultAvatar = 'https://uxwing.com/wp-content/themes/uxwing/download/peoples-avatars/corporate-user-icon.png';
 
 	const [isDefault, setDefault] = useState(true);
@@ -53,7 +54,7 @@ const AvatarImageComponent: React.FC<AvatarImageProps> = ({ className, refresh, 
 
 	useEffect(() => {
 		fetchAvatar();
-	}, [state.showUploadAvatar]);
+	}, [globalState.showUploadAvatar]);
 	return (
 					<img src={url} className={className} alt="User Avatar" />	
 	);

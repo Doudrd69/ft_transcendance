@@ -5,14 +5,11 @@ import { useChat } from '../../ChatContext';
 import FriendsListComponent from './friendsList/FriendsList';
 import { Socket } from 'socket.io-client'
 
-interface ChatFriendsListComponentProps {
-	userSocket: Socket;
-}
-const ChatFriendsListComponent:  React.FC<ChatFriendsListComponentProps> = ({ userSocket }) => {
+const ChatFriendsListComponent:  React.FC = () => {
 
   return (
 	<div className="chat-friends-list">
-		<FriendsListComponent userSocket={userSocket}/>
+		<FriendsListComponent />
 	</div>
   );
 };

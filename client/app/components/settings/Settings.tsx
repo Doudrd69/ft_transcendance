@@ -5,12 +5,9 @@ import BodySettingsComponent from './bodySettings/BodySettings';
 import { useGlobal } from '@/app/GlobalContext';
 import { Socket } from 'socket.io-client'
 
-interface SettingsComponentProps {
-	userSocket: Socket;
-}
+const SettingsComponent: React.FC = () => {
 
-const SettingsComponent: React.FC<SettingsComponentProps> = ({ userSocket }) => {
-	const {dispatch} = useGlobal();
+	const { dispatch } = useGlobal();
 
 	useEffect(() => {
 		const handleEscape = (event: KeyboardEvent) => {
@@ -23,7 +20,7 @@ const SettingsComponent: React.FC<SettingsComponentProps> = ({ userSocket }) => 
 			return () => {
 			  document.removeEventListener('keydown', handleEscape);
 			};
-		  }, []);
+	}, []);
 
 	const handleCloseSettings = () => {
 		dispatch({ type: 'DISABLE' , payload: 'showSettings' });
@@ -36,7 +33,7 @@ const SettingsComponent: React.FC<SettingsComponentProps> = ({ userSocket }) => 
 			<img className="add_button_cancel" src='./close.png'  onClick={handleCloseSettings}/>
 			<div className="window-settings">
 				<HeaderSettingsComponent></HeaderSettingsComponent>
-				<BodySettingsComponent userSocket={userSocket}></BodySettingsComponent>
+				<BodySettingsComponent></BodySettingsComponent>
 			</div>
 		</div>
 	);
