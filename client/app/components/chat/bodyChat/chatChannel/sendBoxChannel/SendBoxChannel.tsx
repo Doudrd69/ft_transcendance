@@ -2,14 +2,12 @@ import './SendBoxChannel.css'
 import React, { useState } from 'react';
 import { Socket } from 'socket.io-client'
 import { useChat } from '../../../ChatContext'
+import { useGlobal } from '@/app/GlobalContext';
 
-interface SendBoxComponentProps {
-	userSocket: Socket;
-}
-
-const SendBoxChannelComponent: React.FC<SendBoxComponentProps> = ({ userSocket }) => {
+const SendBoxChannelComponent: React.FC = () => {
 
 	const { state } = useChat();
+	const { globalState } = useGlobal();
 	const [messageValue, setMessageValue] = useState('');
 
 	const handleMessageInput = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -41,15 +39,14 @@ const SendBoxChannelComponent: React.FC<SendBoxComponentProps> = ({ userSocket }
 			console.log(data);
 			// c'est misereux, a revoir
 			if (data) {
-				if (userSocket.connected) {
-					userSocket.emit('message', { dto: messageDto, conversationName: state.currentConversation });
-				}
-				else {
-					console.log("Client is not connected");
-				}
+				// if (globalState.userSocket?.connected) {
+					globalState.userSocket?.emit('message', { dto: messageDto, conversationName: state.currentConversation });
+				// }
+				// else {
+				// 	console.log("Client is not connected");
+				// }
 			}
 			else {
-				// ce serait bien de recuperer le bon message d'erreur mdrrr
 				console.log("Fatal error");
 			}
 			setMessageValue('');
@@ -57,10 +54,10 @@ const SendBoxChannelComponent: React.FC<SendBoxComponentProps> = ({ userSocket }
 		else {
 			const error = await response.json();
 			if (Array.isArray(error.message))
-			console.log("Error: ", error.message[0]);
-		else
-		console.log("Error: ", error.message);
-}
+				console.log("Error: ", error.message[0]);
+			else
+				console.log("Error: ", error.message);
+		}
 	}
 
 	return (

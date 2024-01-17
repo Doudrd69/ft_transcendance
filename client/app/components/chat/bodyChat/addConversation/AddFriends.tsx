@@ -2,17 +2,18 @@ import React, { useState, useEffect } from 'react';
 import { Socket } from 'socket.io-client';
 import { useChat } from '../../ChatContext';
 import './AddConversation.css';
+import { useGlobal } from '@/app/GlobalContext';
 
 interface AddFriendComponentProps {
-	userSocket: Socket;
 	updateFriends: () => void;
 	title: string;
 }
 
-const AddFriendComponent: React.FC<AddFriendComponentProps> = ({ userSocket, updateFriends, title }) => {
+const AddFriendComponent: React.FC<AddFriendComponentProps> = ({ updateFriends, title }) => {
 
 	const [formValue, setFormValue] = useState('');
 	const { state, dispatch } = useChat();
+	const { globalState } = useGlobal();
 
 	const handleFriendRequest = async (e: React.FormEvent) => {
 
@@ -48,8 +49,8 @@ const AddFriendComponent: React.FC<AddFriendComponentProps> = ({ userSocket, upd
 			dispatch({ type: 'DISABLE', payload: 'showAddUser' });
 			dispatch({ type: 'DISABLE', payload: 'showAddFriend' });
 
-			if (userSocket.connected) {
-				userSocket.emit('addFriend', friendRequestDto);
+			if (globalState.userSocket?.connected) {
+				globalState.userSocket?.emit('addFriend', friendRequestDto);
 			}
 		}
 		else {

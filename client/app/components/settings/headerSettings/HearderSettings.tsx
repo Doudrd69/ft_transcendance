@@ -3,11 +3,13 @@ import './HeaderSettings.css';
 import React, {useState, useEffect} from 'react';
 
 const HeaderSettingsComponent: React.FC = () => {
-  const {state,  dispatch } = useGlobal();
+
+  const { globalState,  dispatch } = useGlobal();
+
   return (
 	<div className="bloc-header-settings">
 		<button
-		className={`header-settings-button ${state.showProfilsSettings ? 'clicked' : ''}`}
+		className={`header-settings-button ${globalState.showProfilsSettings ? 'clicked' : ''}`}
 		onClick={() => {
 		dispatch({ type: 'ACTIVATE', payload: 'showProfilsSettings' });
 		dispatch({ type: 'DISABLE', payload: 'showGameSettings' });
@@ -18,7 +20,7 @@ const HeaderSettingsComponent: React.FC = () => {
 		</button>
 
 		<button
-		className={`header-settings-button ${state.showGeneralSettings ? 'clicked' : ''}`}
+		className={`header-settings-button ${globalState.showGeneralSettings ? 'clicked' : ''}`}
 		onClick={() => {
 		dispatch({ type: 'ACTIVATE', payload: 'showGeneralSettings' });
 		dispatch({ type: 'DISABLE', payload: 'showGameSettings' });
@@ -28,7 +30,7 @@ const HeaderSettingsComponent: React.FC = () => {
 		</button>
 
 		<button
-		className={`header-settings-button ${state.showGameSettings ? 'clicked' : ''}`}
+		className={`header-settings-button ${globalState.showGameSettings ? 'clicked' : ''}`}
 		onClick={() => {
 		dispatch({ type: 'ACTIVATE', payload: 'showGameSettings' });
 		dispatch({ type: 'DISABLE', payload: 'showProfilsSettings' });

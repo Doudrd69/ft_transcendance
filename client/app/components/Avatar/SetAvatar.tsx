@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useGlobal } from '@/app/GlobalContext';
 
 const SetComponent : React.FC = () => {
-	const { state, dispatch } = useGlobal();
+	const { globalState, dispatch } = useGlobal();
 	const [testAvatar, setTestAvatar] = useState(false);
 	const [isComponentMounted, setIsComponentMounted] = useState(false);
 	const AvatarURL = `http://localhost:3001/users/getAvatar/${sessionStorage.getItem('currentUserID')}`;
@@ -34,9 +34,9 @@ const SetComponent : React.FC = () => {
 
 	useEffect(() => {
 			fetchData();
-	}, [state.showAvatar, state.showUploadAvatar]);
+	}, [globalState.showAvatar, globalState.showUploadAvatar]);
 
-	console.log('etat dans useEffect', state);
+	console.log('etat dans useEffect', globalState);
 	return null;
 	};
 

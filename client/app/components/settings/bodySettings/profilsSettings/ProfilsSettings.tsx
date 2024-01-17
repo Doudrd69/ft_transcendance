@@ -8,15 +8,11 @@ import FileDropZoneComponent from './fileDropZone/FileDropZone';
 import AvatarImageComponent from '@/app/components/Avatar/Avatar';
 import { Socket } from 'socket.io-client'
 
-interface ProfileSettingsComponentProps {
-	userSocket: Socket;
-}
-
-const ProfilsSettingsComponent: React.FC<ProfileSettingsComponentProps> = ({ userSocket }) => {
+const ProfilsSettingsComponent: React.FC = () => {
 
 	const [newImage, setNewImage] = useState<File | null>(null);
 	const [username, setUsername] = useState('');
-	const { state, dispatch } = useGlobal();
+	const { globalState, dispatch } = useGlobal();
 
 	const notify = (flag: number) => {
 
@@ -64,8 +60,7 @@ const ProfilsSettingsComponent: React.FC<ProfileSettingsComponentProps> = ({ use
 				}
 				else {
 					sessionStorage.setItem("currentUserLogin", newUsername);
-					// emit pour update la room du user
-					userSocket.emit('joinRoom',  { roomName: sessionStorage.getItem("currentUserLogin"), roomID: sessionStorage.getItem("currentUserID") });
+					globalState.userSocket?.emit('joinRoom',  { roomName: sessionStorage.getItem("currentUserLogin"), roomID: sessionStorage.getItem("currentUserID") });
 					notify(1);
 				}
 			} else {

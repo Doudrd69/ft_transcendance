@@ -2,16 +2,14 @@ import './Password.css';
 import React, { useState, useEffect } from 'react';
 import { Socket } from 'socket.io-client';
 import { useChat } from '../../ChatContext';
+import { useGlobal } from '@/app/GlobalContext';
 
-interface PasswordComponentProps {
-userSocket: Socket;
-}
-
-const PasswordComponent: React.FC<PasswordComponentProps> = ({ userSocket }) => {
+const PasswordComponent: React.FC = () => {
 
 	const [password, setPassword] = useState('');
 
 	const { state, dispatch } = useChat();
+	const { globalState } = useGlobal();
 
 	console.log("Password: ", password);
 
@@ -42,8 +40,8 @@ const PasswordComponent: React.FC<PasswordComponentProps> = ({ userSocket }) => 
 			const passwordValidated = await response.json();
 			console.log("--> passwordValidated: ", passwordValidated);
 			dispatch({ type: 'DISABLE', payload: 'showPassword' });
-			if (userSocket.connected) {
-				userSocket.emit('joinRoom', { roomName: state.currentConversation, roomID: state.currentConversationID });
+			if (globalState.userSocket?.connected) {
+				globalState.userSocket?.emit('joinRoom', { roomName: state.currentConversation, roomID: state.currentConversationID });
 			}
 		}
 		else {

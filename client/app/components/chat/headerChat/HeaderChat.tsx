@@ -10,11 +10,7 @@ import ChannelButtonComponent from './channelButton/ChannelButton';
 import ChatButtonComponent from './chatButton/ChatButton';
 import { Socket } from 'socket.io-client';
 
-interface HeaderChatProps {
-	userSocket: Socket;
-}
-
-const HeaderChatComponent: React.FC<HeaderChatProps>= ({userSocket}) => {
+const HeaderChatComponent: React.FC = () => {
 
 	const { state, dispatch } = useChat();
 	const renderComponent = (component: React.ReactNode, condition: boolean) =>
@@ -22,7 +18,7 @@ const HeaderChatComponent: React.FC<HeaderChatProps>= ({userSocket}) => {
 
 	return (
 		<div className="bloc-btn">
-			{renderComponent(<IdDiscussionComponent userSocket={userSocket} />, state.showChat || state.showChannel)}
+			{renderComponent(<IdDiscussionComponent />, state.showChat || state.showChannel)}
 			{renderComponent(<BackComponent />, (state.showChat || state.showChannel) && state.showBackComponent)}
 			{renderComponent(<ChatButtonComponent />, !state.showChat && !state.showChannel)}
 			{renderComponent(<ChannelButtonComponent />, !state.showChat && !state.showChannel)}

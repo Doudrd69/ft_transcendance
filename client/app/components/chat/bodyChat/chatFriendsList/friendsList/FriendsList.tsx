@@ -16,23 +16,19 @@ interface FriendShip {
 	roomID?: string;
 }
 
-interface FriendsListComponentProps {
-	userSocket: Socket;
-}
-
 interface Conversation {
 	id: string,
 	name: string;
 	is_channel:boolean;
 }
 
-const FriendsListComponent: React.FC<FriendsListComponentProps> = ({ userSocket }) => {
-
+const FriendsListComponent: React.FC = () => {
+	
+	const {state, dispatch} = useChat();
 	const [showTabFriendsList, setTabFriendsList] = useState(false);
 	const [activeIndex, setActiveIndex] = useState<number | null>(null);
 	const [friendList, setFriendList] = useState<FriendShip[]>([]);
 	const username = sessionStorage.getItem("currentUserLogin");
-	const {state, dispatch} = useChat();
 
 	const disableTabFriendsList = () => setTabFriendsList(false);
 
@@ -98,7 +94,7 @@ const FriendsListComponent: React.FC<FriendsListComponentProps> = ({ userSocket 
 			>
 			+
 			</button>
-			{state.showAddFriend && <AddFriendComponent userSocket={userSocket} updateFriends={loadFriendList} title="ADD NEW FRIEND"/>}
+			{state.showAddFriend && <AddFriendComponent updateFriends={loadFriendList} title="ADD NEW FRIEND"/>}
 			{friendList.map((friend: FriendShip, id: number) => (
 			<div className="tab-and-userclicked" key={id}>
 				<div className="bloc-button-friendslist">
@@ -111,7 +107,7 @@ const FriendsListComponent: React.FC<FriendsListComponentProps> = ({ userSocket 
 							{friend.friend ? friend.friend.username : friend.initiator ? friend.initiator.username : 'Unknown User'}
 						</div>
 				</div>
-				{activeIndex === id && <FriendsListTabComponent userSocket={userSocket} userLogin={friend.friend ? friend.friend.username : friend.initiator ? friend.initiator.username : 'Unknown User'} roomName={friend.roomName}  roomID= {friend.roomID}/>}
+				{activeIndex === id && <FriendsListTabComponent userLogin={friend.friend ? friend.friend.username : friend.initiator ? friend.initiator.username : 'Unknown User'} roomName={friend.roomName}  roomID= {friend.roomID}/>}
 			</div>
 		  ))}
 		</div>
