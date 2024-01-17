@@ -11,8 +11,8 @@ RUN npm install && \
 	npm install -y react-toastify && \
 	npm install @types/express && \
 	npm install @types/socket.io-client && \
-	npm install class-validator class-transformer
-
+	npm install class-validator class-transformer && \
+	npm install zustand
 COPY . .
 
 RUN npm run build

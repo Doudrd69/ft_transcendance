@@ -8,7 +8,8 @@ import {
 	Length,
 	Matches,
 	IsInt,
-	Max
+	Max,
+	IsAlphanumeric
 } from 'class-validator';
 
 export class ChannelOptionsDto {
@@ -32,7 +33,7 @@ export class ChannelOptionsDto {
     @IsNotEmpty()
 	@Length(6, 20)
 	@IsAscii()
-	@IsAlpha()
+	@IsAlphanumeric()
 	@IsString()
 	@Matches(/^[^"';%()|<>\\]*$/)
 	password?: string;

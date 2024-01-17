@@ -32,33 +32,36 @@ const FriendsListTabComponent:  React.FC<FriendsListTabComponentProps> = ({ user
 
 	const blockUser = async () => {
 
-		const blockUserDto = {
-			initiatorLogin: sessionStorage.getItem("currentUserLogin"),
-			recipientLogin:  userLogin,
-		}
+		try {
 
-		const response = await fetch('http://localhost:3001/users/removeFriend', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-				'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`
-			},
-			body: JSON.stringify(blockUserDto),
-		})
-
-		if (response.ok) {
-
-			const data = await response.json();
-
-			if (!data.isAccepted) {
-				return ;
+			const blockUserDto = {
+				initiatorLogin: sessionStorage.getItem("currentUserLogin"),
+				recipientLogin:  userLogin,
 			}
-			else {
-				console.log("Fatal error");
+	
+			const response = await fetch('http://localhost:3001/users/removeFriend', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`
+				},
+				body: JSON.stringify(blockUserDto),
+			})
+	
+			if (response.ok) {
+	
+				const data = await response.json();
+	
+				if (!data.isAccepted) {
+					return ;
+				}
+				else {
+					console.log("Fatal error");
+				}
 			}
 		}
-		else {
-			console.log("Fatal error: failed request");
+		catch (error) {
+			console.error(error);
 		}
 	}
 	

@@ -45,39 +45,38 @@ const FriendsListComponent: React.FC<FriendsListComponentProps> = ({ userSocket 
 	};
 	
 	const loadFriendList = async () => {
-
-		const response = await fetch(`http://localhost:3001/users/getFriends/${username}`, {
-			method: 'GET',
-			headers: {
-				'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
-			}
-		});
-		
-		if (response.ok) {
-			const friends = await response.json();
-
-			const requestDms = await fetch(`http://localhost:3001/chat/getDMsConversations/${sessionStorage.getItem("currentUserID")}`, {
+		try {
+			const response = await fetch(`http://localhost:3001/users/getFriends/${username}`, {
 				method: 'GET',
 				headers: {
 					'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
-				},
+				}
 			});
-
-			if (requestDms.ok) {
-				const conversations = await requestDms.json();
-				const DMs = conversations.filter((conversation: Conversation) => !conversation.is_channel);
-
-				friends.forEach((friend: FriendShip) => {
-					DMs.forEach((dm: Conversation) => {
-						friend.roomName = dm.name;
-						friend.roomID = dm.id;
-					});
+			
+			if (response.ok) {
+				const friends = await response.json();
+				const requestDms = await fetch(`http://localhost:3001/chat/getDMsConversations/${sessionStorage.getItem("currentUserID")}`, {
+					method: 'GET',
+					headers: {
+						'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
+					},
 				});
-				setFriendList([...friends]);
+				if (requestDms.ok) {
+					const conversations = await requestDms.json();
+					const DMs = conversations.filter((conversation: Conversation) => !conversation.is_channel);
+	
+					friends.forEach((friend: FriendShip) => {
+						DMs.forEach((dm: Conversation) => {
+							friend.roomName = dm.name;
+							friend.roomID = dm.id;
+						});
+					});
+					setFriendList([...friends]);
+				}
 			}
 		}
-		else {
-			console.log("Fatal error");
+		catch (error) {
+			console.error(error);
 		}
 	}
 

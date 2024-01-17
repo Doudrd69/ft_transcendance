@@ -39,27 +39,30 @@ const ChannelListComponent: React.FC<ChanneListComponentProps> = ({ userSocket }
 
 	const loadDiscussions = async () => {
 
-		const response = await fetch(`http://localhost:3001/chat/getConversationsWithStatus/${userID}`, {
-			method: 'GET',
-			headers: {
-				'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
-			}
-		});
+		try{
 
-		if (response.ok) {
-			const responseData = await response.json();
-			const { conversationList, isAdmin, usersList } = responseData;
-			if (conversationList)
-				setConversations([...conversationList]);
-			if (isAdmin)
-				setIsAdmin([...isAdmin]);
-			if (usersList ) {
-				console.log(userList);
-				setUserList([...usersList]);
-			}	
+			const response = await fetch(`http://localhost:3001/chat/getConversationsWithStatus/${userID}`, {
+				method: 'GET',
+				headers: {
+					'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
+				}
+			});
+	
+			if (response.ok) {
+				const responseData = await response.json();
+				const { conversationList, isAdmin, usersList } = responseData;
+				if (conversationList)
+					setConversations([...conversationList]);
+				if (isAdmin)
+					setIsAdmin([...isAdmin]);
+				if (usersList ) {
+					console.log(userList);
+					setUserList([...usersList]);
+				}	
+			}
 		}
-		else {
-			console.log("Fatal error");
+		catch (error) {
+			console.error(error);
 		}
 	};
 

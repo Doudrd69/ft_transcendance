@@ -25,34 +25,33 @@ const SendBoxComponent: React.FC<SendBoxComponentProps> = ({ userSocket }) => {
 
 	const handleMessage = async (e: React.FormEvent) => {
 
-		e.preventDefault();
+		try {
 
-		console.log("DTO --> ", messageDto);
-
-		const response = await fetch('http://localhost:3001/chat/newMessage', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-				'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
-			},
-			body: JSON.stringify(messageDto),
-		});
-		
-		if (response.ok) {
-			console.log("Message sent and created in DB");
-			if (userSocket.connected) {
-				userSocket.emit('message', { dto: messageDto, conversationName: state.currentRoom } , () => {
-					console.log("Message sent to gateway");
-				});
+			e.preventDefault();
+	
+			console.log("DTO --> ", messageDto);
+	
+			const response = await fetch('http://localhost:3001/chat/newMessage', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
+				},
+				body: JSON.stringify(messageDto),
+			});
+			
+			if (response.ok) {
+				console.log("Message sent and created in DB");
+				if (userSocket.connected) {
+					userSocket.emit('message', { dto: messageDto, conversationName: state.currentRoom } , () => {
+						console.log("Message sent to gateway");
+					});
+				}
+				setMessageValue('');
 			}
-			else {
-				console.log("Client is not connected");
-			}
-			setMessageValue('');
 		}
-		else {
-			const error = await response.json();
-			console.log("Error: ", error.message);
+		catch (error) {
+			console.error(error);
 		}
 	}
 

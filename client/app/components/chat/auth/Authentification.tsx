@@ -12,23 +12,28 @@ const Authentificationcomponent = () => {
 
 	const userRegister = async (e: React.FormEvent) => {
 
-		e.preventDefault();
-
-		console.log("Username : ", username);
-
-		const response = await fetch('http://localhost:3001/users/signup', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-			},
-			body: JSON.stringify({username}),
-		});
-
-		if (response.ok) {
-			console.log("User successfully created");
-			sessionStorage.setItem("currentUserLogin", username);
-		} else {
-			console.log("User creation failed");
+		try{
+			e.preventDefault();
+	
+			console.log("Username : ", username);
+	
+			const response = await fetch('http://localhost:3001/users/signup', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({username}),
+			});
+	
+			if (response.ok) {
+				console.log("User successfully created");
+				sessionStorage.setItem("currentUserLogin", username);
+			} else {
+				console.log("User creation failed");
+			}
+		}
+		catch(error){
+			console.log(error);
 		}
 	}
 
