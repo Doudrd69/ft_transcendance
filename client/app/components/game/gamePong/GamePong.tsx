@@ -39,7 +39,6 @@ const PongComponent = (socket: { socket: Socket }) => {
     const [containerWidth, setContainerWidth] = useState<number>(0);
     const [containerHeight, setContainerHeight] = useState<number>(0);
 
-
     let countdownInterval: NodeJS.Timeout;
 
     useEffect(() => {
@@ -145,7 +144,8 @@ const PongComponent = (socket: { socket: Socket }) => {
 
         const gameLoop: NodeJS.Timeout = setInterval(() => {
             if (!blurGame) {
-                gameSocket.emit('GameBackUpdate', { gameID: gameID });
+                console.log(`BALL`);
+                gameSocket.emit('GameBackUpdate', { gameID: gameID});
             }
         }, 50);
 

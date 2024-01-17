@@ -75,6 +75,7 @@ export class GameEngineService {
 	}
 
 	async game_input(input: string, gameInstance: Game_instance, playerID: string) {
+		console.log("Input detected");
 		if (playerID === gameInstance.players[0]) {
 			this.PaddleService.process_input(gameInstance.paddles[0], input);
 			this.paddleLeftInput(input, gameInstance);

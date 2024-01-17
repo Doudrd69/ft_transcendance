@@ -32,6 +32,7 @@ export class PaddleService {
 			if (paddle.y > 1 - paddle.length)
 				paddle.y = 1 - paddle.length;
 		}
+		console.log(`paddle y: ${paddle.y}`);
 	}
 
 	wallUnit(paddle: paddle_instance) {
