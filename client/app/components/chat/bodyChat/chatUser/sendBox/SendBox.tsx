@@ -2,14 +2,12 @@ import './SendBox.css'
 import React, { useState, useEffect } from 'react';
 import { Socket } from 'socket.io-client'
 import { useChat } from '../../../ChatContext';
+import { useGlobal } from '@/app/GlobalContext';
 
-interface SendBoxComponentProps {
-	userSocket: Socket;
-}
-
-const SendBoxComponent: React.FC<SendBoxComponentProps> = ({ userSocket }) => {
+const SendBoxComponent: React.FC = () => {
 
 	const { state } = useChat();
+	const { globalState } = useGlobal();
 	const [messageValue, setMessageValue] = useState('');
 
 	const handleMessageInput = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -40,8 +38,8 @@ const SendBoxComponent: React.FC<SendBoxComponentProps> = ({ userSocket }) => {
 		
 		if (response.ok) {
 			console.log("Message sent and created in DB");
-			if (userSocket.connected) {
-				userSocket.emit('message', { dto: messageDto, conversationName: state.currentRoom } , () => {
+			if (globalState.userSocket?.connected) {
+				globalState.userSocket?.emit('message', { dto: messageDto, conversationName: state.currentRoom } , () => {
 					console.log("Message sent to gateway");
 				});
 			}

@@ -3,16 +3,13 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Socket } from 'socket.io-client';
 import { useChat } from '../../../ChatContext';
 import OptionsUserChannel from '../../addConversation/OptionsUserChannel';
+import { useGlobal } from '@/app/GlobalContext';
 
 interface Message {
 	from: string;
 	content: string;
 	post_datetime: string;
 	conversationID: number;
-}
-
-interface ReceiveBoxChannelComponentProps {
-	userSocket: Socket;
 }
 
 interface userList {
@@ -26,10 +23,10 @@ interface userList {
 	id: number;
 }
 
-const ReceiveBoxChannelComponent: React.FC<ReceiveBoxChannelComponentProps> = ({ userSocket }) => {
+const ReceiveBoxChannelComponent: React.FC = () => {
 
 	const { state, dispatch } = useChat();
-	const socketInUse = userSocket;
+	const { globalState } = useGlobal();
 	const [messages, setMessages] = useState<Message[]>([]);
 	const messagesContainerRef = useRef<HTMLDivElement>(null);
 
@@ -80,20 +77,20 @@ const ReceiveBoxChannelComponent: React.FC<ReceiveBoxChannelComponentProps> = ({
 	const ownerUsers = ownerUsers_array[0];
 
 	useEffect(() => {
-		socketInUse.on('userJoinedRoom', (notification: string) => {
+		globalState.userSocket?.on('userJoinedRoom', (notification: string) => {
 		console.log("Channel log: ", notification);
 		});
 
-		socketInUse.on('onMessage', (message: Message) => {
+		globalState.userSocket?.on('onMessage', (message: Message) => {
 		if (message)
 			setMessages((prevMessages: Message[]) => [...prevMessages, message]);
 		});
 
 		return () => {
-			socketInUse.off('userJoinedRoom');
-			socketInUse.off('onMessage');
+			globalState.userSocket?.off('userJoinedRoom');
+			globalState.userSocket?.off('onMessage');
 		};
-	}, [socketInUse]);
+	}, [globalState?.userSocket]);
 
 	useEffect(() => {
 		console.log("Loading conversation...");
@@ -123,8 +120,7 @@ const ReceiveBoxChannelComponent: React.FC<ReceiveBoxChannelComponentProps> = ({
 						}}/>
 						</div>
 					{state.showOptionsUserChannelOwner && 
-						<OptionsUserChannel user={ownerUsers}
-											userSocket={userSocket}/>
+						<OptionsUserChannel user={ownerUsers} />
 					}
 				</div>
 			</div>
@@ -156,9 +152,7 @@ const ReceiveBoxChannelComponent: React.FC<ReceiveBoxChannelComponentProps> = ({
 									dispatch({ type: 'DISABLE', payload: 'showBackComponent'});
 							}}/>}
 					{state.showOptionsUserChannel && !userList.isOwner &&
-						(<OptionsUserChannel 
-							user={userList}
-							userSocket={userSocket}/>)
+						(<OptionsUserChannel user={userList} />)
 					}
 				</div>
 				))}

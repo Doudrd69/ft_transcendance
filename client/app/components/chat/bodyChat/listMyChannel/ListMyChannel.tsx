@@ -2,9 +2,9 @@ import './ListMyChannel.css';
 import React, { useState, useEffect } from 'react';
 import { useChat } from '../../ChatContext';
 import { Socket } from 'socket.io-client';
+import { useGlobal } from '@/app/GlobalContext';
 
 interface ListMyChannelComponentProps {
-	userSocket: Socket; // Assurez-vous d'avoir la bonne importation pour le type Socket
 	user: string;
 	isAdd?: boolean;
 	title?: string;
@@ -17,14 +17,15 @@ interface Conversation {
 	isProtected: boolean;
 }
 
-const ListMyChannelComponent: React.FC<ListMyChannelComponentProps> = ({ userSocket, user, isAdd, title}) => {
+const ListMyChannelComponent: React.FC<ListMyChannelComponentProps> = ({ user, isAdd, title}) => {
 	
 	const { state, dispatch } = useChat();
+	const { globalState } = useGlobal();
+
 	const [conversations, setConversations] = useState<Conversation[]>([]);
 	const userID = sessionStorage.getItem("currentUserID");
 	const userLogin = sessionStorage.getItem("currentUserLogin") || 'no-user';
 	const [showPassword, setShowPassword] = useState<boolean>(false);
-	
 	const [password, setPassword] = useState('');
 	
 	const handlePasswordSubmit = (password: string) => {
@@ -69,7 +70,6 @@ const ListMyChannelComponent: React.FC<ListMyChannelComponentProps> = ({ userSoc
 			const conversationPublic = await response.json();
 			if (conversationPublic)
 				setConversations((prevConversations: Conversation[]) => [...prevConversations, ...conversationPublic]);
-				// console.log(responseData);
 		}
 		else {
 			console.log("Fatal error");
@@ -95,8 +95,8 @@ const ListMyChannelComponent: React.FC<ListMyChannelComponentProps> = ({ userSoc
 		if (response.ok) {
 			const conversation = await response.json();
 			if (conversation.id) {
-				if (userSocket.connected) {
-					userSocket.emit('addUserToRoom', { convID: conversation.id, convName: conversation.name, friend: user});
+				if (globalState.userSocket?.connected) {
+					globalState.userSocket?.emit('addUserToRoom', { convID: conversation.id, convName: conversation.name, friend: user});
 				}
 				console.log("Friend has been successfully added!");
 				dispatch({ type: 'TOGGLEX', payload: 'showAddCreateChannel' });
@@ -130,7 +130,7 @@ const ListMyChannelComponent: React.FC<ListMyChannelComponentProps> = ({ userSoc
 			return () => {
 			  document.removeEventListener('keydown', handleEscape);
 			};
-		  }, []);
+	}, []);
 
 	return (
 		<div className='blur-background'>

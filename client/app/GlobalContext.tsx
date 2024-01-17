@@ -14,7 +14,7 @@ type ActionType =
 // Définir l'interface de l'action
 interface Action {
   type: ActionType;
-  payload?: boolean |string | null | { avatar: string } | Socket | undefined; // Utilisé pour les actions qui ont un payload
+  payload?: boolean | string | null | { avatar: string } | Socket | undefined | any; // Utilisé pour les actions qui ont un payload
 }
 
 // Définir l'interface de l'état
@@ -31,8 +31,8 @@ interface GlobalState {
 	showRefresh:boolean;
 	showIsDefault:boolean;
 	avatar:string;
-	userSocket: Socket;
-	[key: string]: boolean | string | Socket | null;
+	userSocket: Socket | undefined;
+	[key: string]: boolean | string | Socket | undefined | null;
 }
 
 // État initial
@@ -49,7 +49,7 @@ const initialState: GlobalState = {
 	showRefresh:false,
 	showIsDefault:false,
 	avatar:"",
-	userSocket: Socket.prototype,
+	userSocket: undefined,
 };
 
 // Réducteur
@@ -76,28 +76,32 @@ const chatReducer = (state: GlobalState, action: Action): GlobalState => {
 			}
 			// Gérer le cas où action.payload n'est ni un objet ni une chaîne
 			return state;
+		case 'SET_SOCKET':
+			console.log("usersocket ---> ", action.payload);
+			return { ...state, userSocket: action.payload || null };
 	  default:
 		return state;
 	}
   };
 // Contexte
 const GlobalContext = createContext<{
-  state: GlobalState;
+  globalState: GlobalState;
   dispatch: React.Dispatch<Action>;
 } | undefined>(undefined);
 
 // Fournisseur de contexte
-export const GlobalProvider: React.FC<{ children: React.ReactNode }> = ({children,}) => {
-	const [state, dispatch] = useReducer(chatReducer, initialState);
+export const GlobalProvider: React.FC<{ children: React.ReactNode }> = ({children}) => {
+
+	const [globalState, dispatch] = useReducer(chatReducer, initialState);
 	
 	return (
-		<GlobalContext.Provider value={{ state, dispatch }}>
+		<GlobalContext.Provider value={{ globalState, dispatch }}>
 			{children}
 		</GlobalContext.Provider>
 	);
 };
 
-export const setSocket = (payload: Socket | null): Action => ({
+export const setSocket = (payload: Socket | undefined): Action => ({
 	type: 'SET_SOCKET',
 	payload,
 });

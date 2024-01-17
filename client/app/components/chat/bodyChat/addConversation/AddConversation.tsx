@@ -2,15 +2,17 @@ import React, { useState, useEffect } from 'react';
 import { Socket } from 'socket.io-client';
 import { useChat } from '../../ChatContext';
 import './AddConversation.css';
+import { useGlobal } from '@/app/GlobalContext';
 
 interface AddConversationComponentProps {
-	userSocket: Socket;
 	loadDiscussions: () => void;
 	title: string;
 	isChannel: boolean;
 }
 
-const AddConversationComponent: React.FC<AddConversationComponentProps> = ({ userSocket, loadDiscussions, title, isChannel}) => {
+const AddConversationComponent: React.FC<AddConversationComponentProps> = ({ loadDiscussions, title, isChannel}) => {
+
+	const { globalState } = useGlobal();
 
 	const [formValue, setFormValue] = useState('');
 	const [passwordValue, setPasswordValue] = useState('');
@@ -46,8 +48,8 @@ const AddConversationComponent: React.FC<AddConversationComponentProps> = ({ use
 
 			const data = await response.json();
 
-			if (userSocket.connected) {
-				userSocket.emit('joinRoom', { roomName: data.name, roomID: data.id }, () => {
+			if (globalState.userSocket?.connected) {
+				globalState.userSocket?.emit('joinRoom', { roomName: data.name, roomID: data.id }, () => {
 					console.log("Room creation loading...");
 				});
 			}

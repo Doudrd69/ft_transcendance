@@ -4,6 +4,7 @@ import { useChat } from '../../ChatContext';
 import { toast } from 'react-toastify';
 import './AddConversation.css';
 import { RSC } from 'next/dist/client/components/app-router-headers';
+import { useGlobal } from '@/app/GlobalContext';
 
 interface user {
 	login: string;
@@ -17,14 +18,14 @@ interface user {
 
 interface OptionsUserChannelProps {
 	user: user
-	userSocket: Socket,
 }
 
 
-const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user, userSocket }) => {
+const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user }) => {
 
-	const [formValue, setFormValue] = useState('');
 	const { state, dispatch } = useChat();
+	const { globalState } = useGlobal();
+	const [formValue, setFormValue] = useState('');
 	const [admin, setAdmin] = useState<boolean>(user.isAdmin);
 	const [mute, setMute] = useState<boolean>(user.isMute);
 	const [ban, setBan] = useState<boolean>(user.isBan);
@@ -51,7 +52,7 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user, userSocke
 			user.isBlock = !user.isBlock;
 			setBlock(true);
 
-			userSocket.emit('joinRoom', { roomName: `whoblocked${user.login}`, roomID: '' } );
+			globalState.userSocket?.emit('joinRoom', { roomName: `whoblocked${user.login}`, roomID: '' } );
 
 			console.log("block");
 		}
@@ -80,7 +81,7 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user, userSocke
 			user.isBlock = !user.isBlock;
 			setBlock(false);
 
-			userSocket.emit('leaveRoom', { roomName: `whoblocked${user.login}`, roomID: '' } );
+			globalState.userSocket?.emit('leaveRoom', { roomName: `whoblocked${user.login}`, roomID: '' } );
 
 			console.log("unblock");
 		}
@@ -169,7 +170,7 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user, userSocke
 			const status = await response.json();
 			user.isBan = !user.isBan;
 			setBan(true);
-			userSocket.emit('banUser', { userToBan: user.login, roomName: state.currentConversation, roomID: state.currentConversationID } );
+			globalState.userSocket?.emit('banUser', { userToBan: user.login, roomName: state.currentConversation, roomID: state.currentConversationID } );
 		}
 		else {
 			console.error("Fatal error");
@@ -200,7 +201,7 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user, userSocke
 			const status = await response.json();
 			user.isBan = !user.isBan;
 			setBan(false);
-			userSocket.emit('unbanUser', { userToUnban: user.login, roomName: state.currentConversation, roomID: state.currentConversationID } );
+			globalState.userSocket?.emit('unbanUser', { userToUnban: user.login, roomName: state.currentConversation, roomID: state.currentConversationID } );
 		}
 		else {
 			console.error("Fatal error");
@@ -309,7 +310,8 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user, userSocke
 		else {
 			console.log("Fatal error");
 		}
-}
+	}
+
 	return (
 		<>
 		<div className="blur-background"></div>

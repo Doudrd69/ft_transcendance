@@ -7,22 +7,18 @@ import ChatUserComponent from './chatUser/ChatUser';
 import ChatChannelComponent from './chatChannel/ChatChannel';
 import ChatFriendsListComponent from './chatFriendsList/ChatFriendsList';
 
-interface BodyChatComponentProps {
-	userSocket: Socket;
-}
+const BodyChatComponent: React.FC = () => {
 
-const BodyChatComponent: React.FC<BodyChatComponentProps> = ({ userSocket }) => {
-
-	const { state, dispatch } = useChat();
+	const { state } = useChat();
 
 	const renderComponent = (component: React.ReactNode, condition: boolean) =>
 	  condition ? component : null;
 
 	return (
 		<div className="powerlifter">
-			{renderComponent(<ChatUserComponent userSocket={userSocket} />, state.showChat || state.showChatList)}
-			{renderComponent(<ChatChannelComponent userSocket={userSocket}/>, state.showChannel || state.showChannelList)}
-			{renderComponent(<ChatFriendsListComponent userSocket={userSocket}/>, state.showFriendsList)}
+			{renderComponent(<ChatUserComponent />, state.showChat || state.showChatList)}
+			{renderComponent(<ChatChannelComponent />, state.showChannel || state.showChannelList)}
+			{renderComponent(<ChatFriendsListComponent />, state.showFriendsList)}
 		</div>
 	)
 };

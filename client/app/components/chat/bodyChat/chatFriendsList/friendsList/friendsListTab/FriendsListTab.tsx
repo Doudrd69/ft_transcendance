@@ -7,13 +7,12 @@ import { Socket } from 'socket.io-client';
 import { handleWebpackExternalForEdgeRuntime } from 'next/dist/build/webpack/plugins/middleware-plugin';
 
 interface FriendsListTabComponentProps {
-	userSocket: Socket; 
 	userLogin : any;
 	roomName : any;
 	roomID : any;
 }
 
-const FriendsListTabComponent:  React.FC<FriendsListTabComponentProps> = ({ userSocket, userLogin, roomName, roomID }) => {
+const FriendsListTabComponent:  React.FC<FriendsListTabComponentProps> = ({ userLogin, roomName, roomID }) => {
 	
 	const {state, dispatch} = useChat();
 	const [confirmationText, setConfirmationText] = useState('');
@@ -82,7 +81,7 @@ const FriendsListTabComponent:  React.FC<FriendsListTabComponentProps> = ({ user
 			<ConfirmationComponent phrase={confirmationText} functionToExecute={funtionToExecute}/>
 			)}
 			{state.showListChannelAdd && (
-				<ListMyChannelComponent userSocket={userSocket} user={userLogin}  title={`INVITE ${userLogin} TO MY CHANNEL`}/>
+				<ListMyChannelComponent user={userLogin}  title={`INVITE ${userLogin} TO MY CHANNEL`}/>
 			)}
 		</>
 	);
