@@ -3,6 +3,8 @@ import React, { useState, useEffect } from 'react';
 import { Socket } from 'socket.io-client';
 import { useChat } from '../../ChatContext';
 
+
+
 interface PasswordComponentProps {
 	userSocket: Socket;
 }
@@ -16,7 +18,8 @@ const PasswordChangeComponent: React.FC<PasswordComponentProps> = ({ userSocket 
 	console.log("Password: ", password);
 
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setPassword(e.target.value);
+		const newPassword = e.target.value;
+		setPassword(newPassword);
 	};
 
 	const handleProtected = async() => {
@@ -28,6 +31,7 @@ const PasswordChangeComponent: React.FC<PasswordComponentProps> = ({ userSocket 
 				state: state.currentConversationIsProtected,
 				password: password,
 			}
+			console.log("HANDLE PROTECTED: ", channelOptionDto);
 
 			const response = await fetch(`http://localhost:3001/chat/updateIsProtectedTrue`, {
 				method: 'POST',
@@ -40,9 +44,10 @@ const PasswordChangeComponent: React.FC<PasswordComponentProps> = ({ userSocket 
 	
 			if (response.ok) {
 				dispatch({ type: 'ACTIVATE', payload: 'currentConversationIsProtected' });
-				console.log("Update PASSWORD");
-			}
-			} catch (error) {
+				dispatch({ type: 'ACTIVATE', payload: 'showOptionUseChannel' });
+				dispatch({ type: 'DISABLE', payload: 'showPasswordChange' });
+			};} 
+			catch (error) {
 			console.log(error);
 			}
 	}

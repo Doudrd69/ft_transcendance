@@ -399,12 +399,11 @@ export class ChatService {
 
 		if (isUserIsAdmin) {
 			if (channelToUpdate) {
-				channelToUpdate.isProtected = false;
-				channelToUpdate.password = "";
-				await this.conversationRepository.save(channelToUpdate);
-				return true;
+						channelToUpdate.isProtected = false;
+						channelToUpdate.password = "";
+						await this.conversationRepository.save(channelToUpdate);
+						return true;
 				}
-
 				throw new Error("Fatal error");
 			}
 
