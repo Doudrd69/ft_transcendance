@@ -191,11 +191,14 @@ export class ChatService {
 		
 		if (userToFind) {
 			
-			let conversationArray : Conversation[] = [];
+			let conversationArray = [];
 			if (userToFind.groups && Array.isArray(userToFind.groups)) {
 				userToFind.groups.forEach((group: GroupMember) => {
 					if (group.conversation.is_channel && !group.isBan)
-						conversationArray.push(group.conversation)
+						conversationArray.push({
+							conversation: group.conversation,
+							isAdmin: group.isAdmin,
+						})
 				})
 				return conversationArray;
 			}
@@ -953,6 +956,36 @@ export class ChatService {
 		}
 
 		return allFriendConversations;
+	}
+
+	async getUserListFromConversation(conversationID: number) {
+
+		const conversation = await this.conversationRepository.findOne({ id: conversationID });
+		const users = await this.usersRepository.find({
+			relations: ['groups', 'groups.conversation'],
+		});
+
+		let userList = [];
+		users.forEach((user: User) => {
+			let userData = [];
+			user.groups.forEach((usergroup: GroupMember) => {
+				if (usergroup.conversation.id == conversation.id) {
+					userData.push({
+						id: user.id,
+						username: user.username,
+						avatar: user.avatarURL,
+						isOwner: usergroup.isOwner,
+						isAdmin: usergroup.isAdmin,
+						isBan: usergroup.isBan,
+						isMute: usergroup.isMute,
+					});
+					return ;
+				}
+			});
+			userList.push(user);
+		});
+
+		return userList;
 	}
 
 	// return un array d'array d'objets "user" : login, avatarURL
