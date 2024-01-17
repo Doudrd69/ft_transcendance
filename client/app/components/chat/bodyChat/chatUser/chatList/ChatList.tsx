@@ -7,10 +7,6 @@ import AvatarImageComponent from '@/app/components/Avatar/Avatar';
 import AvatarImageBisComponent from '@/app/components/Avatar/AvatarBis';
 import { setCurrentComponent } from '../../../ChatContext';
 
-interface ChannelListComponentProps {
-	userSocket: Socket; // Assurez-vous d'avoir la bonne importation pour le type Socketg;
-}
-
 interface FriendShip {
 	id: number;
 	isAccepted: true;
@@ -27,7 +23,7 @@ interface Conversation {
 	is_channel:boolean;
 }
 
-const ChatListComponent: React.FC<ChannelListComponentProps> = ({ userSocket }) => {
+const ChatListComponent: React.FC = () => {
 
 	const { state, dispatch } = useChat();
 	const username = sessionStorage.getItem("currentUserLogin");

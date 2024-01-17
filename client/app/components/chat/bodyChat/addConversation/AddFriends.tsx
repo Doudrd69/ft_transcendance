@@ -2,17 +2,18 @@ import React, { useState, useEffect } from 'react';
 import { Socket } from 'socket.io-client';
 import { useChat } from '../../ChatContext';
 import './AddConversation.css';
+import { useGlobal } from '@/app/GlobalContext';
 
 interface AddFriendComponentProps {
-	userSocket: Socket;
 	updateFriends: () => void;
 	title: string;
 }
 
-const AddFriendComponent: React.FC<AddFriendComponentProps> = ({ userSocket, updateFriends, title }) => {
+const AddFriendComponent: React.FC<AddFriendComponentProps> = ({ updateFriends, title }) => {
 
 	const [formValue, setFormValue] = useState('');
 	const { state, dispatch } = useChat();
+	const { globalState } = useGlobal();
 
 	const handleFriendRequest = async (e: React.FormEvent) => {
 		try{
@@ -53,12 +54,8 @@ const AddFriendComponent: React.FC<AddFriendComponentProps> = ({ userSocket, upd
 					userSocket.emit('addFriend', friendRequestDto);
 				}
 			}
-			else {
-				console.log("Fatal error: friend request failed");
-				const error = await response.json();
-				if (error.message) {
-					console.log(error.message[0]);
-				}
+			if (globalState.userSocket?.connected) {
+				globalState.userSocket?.emit('addFriend', friendRequestDto);
 			}
 
 		}

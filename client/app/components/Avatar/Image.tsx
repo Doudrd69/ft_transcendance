@@ -8,7 +8,7 @@ interface ImageProps {
 
 const ImageComponent: React.FC<ImageProps> = ({ className }) => {
 
-	const { state } = useGlobal();
+	const { globalState } = useGlobal();
 	const [avatarURL, setAvatarURL] = useState('http://localhost:3000/avatars/avatar.png');
 		const fetchAvatar = async () => {
 			try {
@@ -33,7 +33,10 @@ const ImageComponent: React.FC<ImageProps> = ({ className }) => {
 
 		useEffect(() => {
 			fetchAvatar();
-		}, [state.showRefresh]);
+			console.log(avatarURL);
+			console.log('test3');
+
+		}, [globalState.showRefresh]);
 		
 	return (
 				<img src={avatarURL} className={className} />

@@ -3,19 +3,10 @@ import React, { useState, useEffect } from 'react';
 import { Socket } from 'socket.io-client';
 import { useChat } from '../../ChatContext';
 
-
-
-interface PasswordComponentProps {
-	userSocket: Socket;
-}
-
-const PasswordChangeComponent: React.FC<PasswordComponentProps> = ({ userSocket }) => {
+const PasswordChangeComponent: React.FC = () => {
 
 	const [password, setPassword] = useState('');
-
 	const { state, dispatch } = useChat();
-
-	console.log("Password: ", password);
 
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const newPassword = e.target.value;

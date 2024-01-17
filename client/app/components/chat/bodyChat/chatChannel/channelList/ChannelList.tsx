@@ -7,10 +7,6 @@ import ListMyChannelComponent from '../../listMyChannel/ListMyChannel';
 import PasswordComponent from '../../listMyChannel/Password';
 import { setCurrentComponent } from '../../../ChatContext';
 
-interface ChanneListComponentProps {
-	userSocket: Socket;
-}
-
 interface Conversation {
 	id: string;
 	name: string;
@@ -24,7 +20,7 @@ interface userList {
 	avatarURL: string;
 }
 
-const ChannelListComponent: React.FC<ChanneListComponentProps> = ({ userSocket }) => {
+const ChannelListComponent: React.FC = () => {
 
 	const { state, dispatch } = useChat();
 
@@ -87,7 +83,7 @@ const ChannelListComponent: React.FC<ChanneListComponentProps> = ({ userSocket }
 			return () => {
 			  document.removeEventListener('keydown', handleEscape);
 			};
-		  }, []);
+	}, []);
 
 	const handleConv = (conversation: Conversation, userList: userList, index: number) => {
 		dispatch({ type: 'SET_CURRENT_CONVERSATION', payload: conversation.name });
@@ -104,6 +100,7 @@ const ChannelListComponent: React.FC<ChanneListComponentProps> = ({ userSocket }
 		dispatch({ type: 'ACTIVATE', payload: 'showChannel' });
 	
 	}
+
 	return (
 		<div className="bloc-channel-list">
 			<button
@@ -128,9 +125,9 @@ const ChannelListComponent: React.FC<ChanneListComponentProps> = ({ userSocket }
 						</div>
 					</div>
 					: null}
-				{state.showPassword ? <PasswordComponent userSocket={userSocket}/> : null}
-				{state.showAddChannel ? <ListMyChannelComponent userSocket={userSocket} user={userName || 'no-user'} isAdd={true} title="JOIN CHANNEL"/> : null}
-				{state.showCreateChannel ? <AddConversationComponent userSocket={userSocket} loadDiscussions={loadDiscussions} title="CREATE CHANNEL" isChannel={true} /> : null}
+				{state.showPassword ? <PasswordComponent /> : null}
+				{state.showAddChannel ? <ListMyChannelComponent user={userName || 'no-user'} isAdd={true} title="JOIN CHANNEL"/> : null}
+				{state.showCreateChannel ? <AddConversationComponent loadDiscussions={loadDiscussions} title="CREATE CHANNEL" isChannel={true} /> : null}
 			</div>
 			{conversations.map((conversation, index) => (
 					conversation.is_channel && (

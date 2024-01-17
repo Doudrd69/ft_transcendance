@@ -7,23 +7,19 @@ import ReceiveBoxChannelComponent from './receiveBoxChannel/ReceiveBoxChannel';
 import SendBoxChannelComponent from './sendBoxChannel/SendBoxChannel';
 import { Socket } from 'socket.io-client'
 
-interface BodyChatComponentProps {
-	userSocket: Socket;
-}
+const ChatChannelComponent: React.FC = () => {
 
-const ChatChannelComponent: React.FC<BodyChatComponentProps> = ({ userSocket }) => {
-  const { state, dispatch } = useChat();
+  const { state } = useChat();
 
   	const renderComponent = (component: React.ReactNode, condition: boolean) =>
     condition ? component : null;
 
-
   return (
     <div className="chat-channel">
 		
-		{renderComponent(<ChannelListComponent userSocket={userSocket} />, state.showChannelList)}
-		{renderComponent(<ReceiveBoxChannelComponent userSocket={userSocket} />, state.showChannel)}
-		{renderComponent(<SendBoxChannelComponent userSocket={userSocket}/>, state.showChannel)}
+		{renderComponent(<ChannelListComponent />, state.showChannelList)}
+		{renderComponent(<ReceiveBoxChannelComponent />, state.showChannel)}
+		{renderComponent(<SendBoxChannelComponent />, state.showChannel)}
     </div>
   );
 };

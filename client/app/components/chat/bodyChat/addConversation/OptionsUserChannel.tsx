@@ -4,6 +4,7 @@ import { useChat } from '../../ChatContext';
 import { toast } from 'react-toastify';
 import './AddConversation.css';
 import { RSC } from 'next/dist/client/components/app-router-headers';
+import { useGlobal } from '@/app/GlobalContext';
 
 interface user {
 	login: string;
@@ -17,14 +18,14 @@ interface user {
 
 interface OptionsUserChannelProps {
 	user: user
-	userSocket: Socket,
 }
 
 
-const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user, userSocket }) => {
+const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user }) => {
 
-	const [formValue, setFormValue] = useState('');
 	const { state, dispatch } = useChat();
+	const { globalState } = useGlobal();
+	const [formValue, setFormValue] = useState('');
 	const [admin, setAdmin] = useState<boolean>(user.isAdmin);
 	const [mute, setMute] = useState<boolean>(user.isMute);
 	const [ban, setBan] = useState<boolean>(user.isBan);
@@ -48,11 +49,11 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user, userSocke
 				body: JSON.stringify(BlockUserDto),
 			});
 		
-			if (response.ok) {
-				user.isBlock = !user.isBlock;
-				setBlock(true);
-				userSocket.emit('joinRoom', { roomName: `whoblocked${user.login}`, roomID: '' } );
-			}
+		if (response.ok) {
+			user.isBlock = !user.isBlock;
+			setBlock(true);
+
+			globalState.userSocket?.emit('joinRoom', { roomName: `whoblocked${user.login}`, roomID: '' } );
 		}
 		catch (error) {
 			console.error(error);
@@ -67,8 +68,7 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user, userSocke
 				initiatorLogin: sessionStorage.getItem("currentUserLogin"),
 				recipientLogin: user.login,
 			}
-	
-			const response = await fetch(`http://localhost:3001/users/unblockUser`, {
+				const response = await fetch(`http://localhost:3001/users/unblockUser`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
@@ -77,14 +77,13 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user, userSocke
 				body: JSON.stringify(BlockUserDto),
 			});
 		
-			if (response.ok) {
-				user.isBlock = !user.isBlock;
-				setBlock(false);
-	
-				userSocket.emit('leaveRoom', { roomName: `whoblocked${user.login}`, roomID: '' } );
-	
-				console.log("unblock");
-			}
+		if (response.ok) {
+			user.isBlock = !user.isBlock;
+			setBlock(false);
+
+			globalState.userSocket?.emit('leaveRoom', { roomName: `whoblocked${user.login}`, roomID: '' } );
+
+			console.log("unblock");
 		}
 		catch (error) {
 			console.error(error);
@@ -175,11 +174,10 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user, userSocke
 				console.log("ban");
 	
 				const status = await response.json();
-				user.isBan = !user.isBan;
-				setBan(true);
-				userSocket.emit('banUser', { userToBan: user.login, roomName: state.currentConversation, roomID: state.currentConversationID } );
+        user.isBan = !user.isBan;
+        setBan(true);
+        globalState.userSocket?.emit('banUser', { userToBan: user.login, roomName: state.currentConversation, roomID: state.currentConversationID } );
 			}
-
 		}
 		catch (error) {
 			console.error(error);
@@ -208,14 +206,11 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user, userSocke
 		
 			if (response.ok) {
 				console.log("unban");
-	
-				const status = await response.json();
-				user.isBan = !user.isBan;
-				setBan(false);
-				userSocket.emit('unbanUser', { userToUnban: user.login, roomName: state.currentConversation, roomID: state.currentConversationID } );
+        const status = await response.json();
+        user.isBan = !user.isBan;
+        setBan(false);
+        globalState.userSocket?.emit('unbanUser', { userToUnban: user.login, roomName: state.currentConversation, roomID: state.currentConversationID } );
 			}
-
-
 		}
 		catch (error) {
 			console.error(error);
@@ -329,6 +324,7 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user, userSocke
 			console.log(error);
 		}
 	}
+  
 	return (
 		<>
 		<div className="blur-background"></div>

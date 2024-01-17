@@ -5,9 +5,8 @@ import OptionsChannel from '../../bodyChat/addConversation/OptionsChannel';
 import { Socket } from 'socket.io-client';
 import PasswordChangeComponent from './PasswordChange';
 
-interface IdDiscussionProps {
-	userSocket: Socket;
-	}
+const IdDiscussionComponent: React.FC = () => {
+
 
 interface user{
 	id: number;
@@ -15,9 +14,11 @@ interface user{
 	isAdmin: boolean;
 	isOwner: boolean;
 }
+  
 const IdDiscussionComponent: React.FC<IdDiscussionProps>= ({ userSocket }) => {
 	const { state, dispatch } = useChat();
 	var id;
+
 	if (state.currentChannelBool)
 	{
 		id = `${state.currentConversation}#${state.currentConversationID}`;
@@ -40,8 +41,8 @@ const IdDiscussionComponent: React.FC<IdDiscussionProps>= ({ userSocket }) => {
 					}}
 				/>
 			}
-			{state.showPasswordChange && <PasswordChangeComponent userSocket={userSocket}/>}
-			{state.showOptionChannel  && <OptionsChannel title="CHANNEL OPTION"/>}
+			{state.showPasswordChange && <PasswordChangeComponent />}
+			{state.showOptionChannel && <OptionsChannel title="CHANNEL OPTION"/>}
 		</div>
 		);
 };
