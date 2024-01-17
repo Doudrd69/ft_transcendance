@@ -103,42 +103,6 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 			console.log("Fatal error");
 		}
 }
-	const updateIsProtectedTrue = async() => {
-			const channelOptionDto = {
-				conversationID: Number(state.currentConversationID),
-				userID: Number(sessionStorage.getItem("currentUserID")),
-				state: state.currentConversationIsProtected,
-				password: formValue,
-		
-			}
-
-			const response = await fetch(`http://localhost:3001/chat/updateIsProtectedTrue`, {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-					'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
-				},
-				body: JSON.stringify(channelOptionDto),
-			});
-	
-			if (response.ok) {
-				const status = await response.json();
-				console.log(status);
-				if (status) {
-					dispatch({ type: 'ACTIVATE', payload: 'currentConversationIsProtected' });
-					console.log("Password updated");
-				}
-				else {
-					console.log("User is not admin on this channel");
-				}
-			}
-			else {
-				console.log("Fatal error");
-			}
-
-			return ;
-	}
-
 	const updateIsProtectedFalse = async() => {
 
 		// error Error: Missing getServerSnapshot, which is required for server-rendered content. Will revert to client rendering.

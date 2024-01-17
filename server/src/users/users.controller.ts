@@ -40,7 +40,7 @@ export class UsersController {
 	// }
 
 
-	@UseGuards(AuthGuard)
+	// @UseGuards(AuthGuard)
 	@HttpCode(HttpStatus.OK)
 	@Post('upload-avatar/:userId')
 	@UseInterceptors(FileInterceptor('avatar', { storage: diskStorage({ destination: path.join(__dirname, 'avatars'), filename: async (req, file, callback) => {
@@ -52,7 +52,7 @@ export class UsersController {
 		}),
 	}))
 
-	@UseGuards(AuthGuard)
+	// @UseGuards(AuthGuard)
 	async uploadAvatar(@UploadedFile() avatar: Express.Multer.File, @Param('userId') userId: number) {
 
 		if (!avatar) {
@@ -64,7 +64,7 @@ export class UsersController {
 		return { avatarURL };
 	}
 
-	@UseGuards(AuthGuard)
+	// @UseGuards(AuthGuard)
 	@Get('getAvatar/:userId/:timestamp')
 	async getUserAvatar(@Param('userId') userId: number, @Param('timestamp') timestamp: string, @Res() res: ExpressResponse) {
 		try {
@@ -80,7 +80,7 @@ export class UsersController {
 		}
 	}
 
-	@UseGuards(AuthGuard)
+	// @UseGuards(AuthGuard)
 	@Get('getAvatarByLogin/:login/:timestamp')
 	async getUserAvatarbyUsername(@Param('login') login: string, @Param('timestamp') timestamp: string, @Res() res: ExpressResponse) {
 		try {
@@ -96,7 +96,7 @@ export class UsersController {
 		}
 	}
 
-	@UseGuards(AuthGuard)
+	// @UseGuards(AuthGuard)
 	@Get('getAvatarByLogin/:login')
 	async getUserAvatarbyUsernamebis(@Param('login') login: string, @Res() res: ExpressResponse) {
 		try {
@@ -112,7 +112,7 @@ export class UsersController {
 		}
 	}
 
-	@UseGuards(AuthGuard)
+	// @UseGuards(AuthGuard)
 	@Get('getAvatar/:userId')
 	async getUserAvatarAccess(@Param('userId') userId: number, @Param('timestamp') timestamp: string, @Res() res: ExpressResponse) {
 		try {
