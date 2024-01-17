@@ -34,49 +34,49 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user }) => {
 
 	const blockUser = async() => {
 
-		const BlockUserDto = {
-			initiatorLogin: sessionStorage.getItem("currentUserLogin"),
-			recipientLogin: user.login,
-		}
-
-		const response = await fetch(`http://localhost:3001/users/blockUser`, {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-				'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
-			},
-			body: JSON.stringify(BlockUserDto),
-		});
+		try {
+			const BlockUserDto = {
+				initiatorLogin: sessionStorage.getItem("currentUserLogin"),
+				recipientLogin: user.login,
+			}
 	
+			const response = await fetch(`http://localhost:3001/users/blockUser`, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
+				},
+				body: JSON.stringify(BlockUserDto),
+			});
+		
 		if (response.ok) {
 			user.isBlock = !user.isBlock;
 			setBlock(true);
 
 			globalState.userSocket?.emit('joinRoom', { roomName: `whoblocked${user.login}`, roomID: '' } );
-
-			console.log("block");
 		}
-		else {
-			console.error("Fatal error");
+		catch (error) {
+			console.error(error);
 		}
 	}
 	
 	const unblockUser = async() => {
 
-		const BlockUserDto = {
-			initiatorLogin: sessionStorage.getItem("currentUserLogin"),
-			recipientLogin: user.login,
-		}
+		try {
 
-		const response = await fetch(`http://localhost:3001/users/unblockUser`, {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-				'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
-			},
-			body: JSON.stringify(BlockUserDto),
-		});
-	
+			const BlockUserDto = {
+				initiatorLogin: sessionStorage.getItem("currentUserLogin"),
+				recipientLogin: user.login,
+			}
+				const response = await fetch(`http://localhost:3001/users/unblockUser`, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
+				},
+				body: JSON.stringify(BlockUserDto),
+			});
+		
 		if (response.ok) {
 			user.isBlock = !user.isBlock;
 			setBlock(false);
@@ -85,185 +85,196 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user }) => {
 
 			console.log("unblock");
 		}
-		else {
-			console.error("Fatal error");
+		catch (error) {
+			console.error(error);
 		}
 	}
 
 	const unmuteUser = async() => {
 
-		const userOptionDto = {
-			conversationID: Number(state.currentConversationID),
-			username: user.login,
-			state: false,
-			from: Number(sessionStorage.getItem("currentUserID"))
-		}
-
-		const response = await fetch(`http://localhost:3001/chat/unmuteUser`, {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-				'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
-			},
-			body: JSON.stringify(userOptionDto),
-		});
+		try {
+			const userOptionDto = {
+				conversationID: Number(state.currentConversationID),
+				username: user.login,
+				state: false,
+				from: Number(sessionStorage.getItem("currentUserID"))
+			}
 	
-		if (response.ok) {
-			user.isMute = !user.isMute;
-			setMute(false);
-			console.log("unMute");
+			const response = await fetch(`http://localhost:3001/chat/unmuteUser`, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
+				},
+				body: JSON.stringify(userOptionDto),
+			});
+		
+			if (response.ok) {
+				user.isMute = !user.isMute;
+				setMute(false);
+			}
 		}
-		else {
-			console.error("Fatal error");
+		catch (error) {
+			console.error(error);
 		}
 	}
 	
 	const muteUser = async() => {
 
-		const userOptionDto = {
-			conversationID: Number(state.currentConversationID),
-			username: user.login,
-			state: true,
-			from: Number(sessionStorage.getItem("currentUserID"))
-		}
-
-		const response = await fetch(`http://localhost:3001/chat/muteUser`, {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-				'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
-			},
-			body: JSON.stringify(userOptionDto),
-		});
+		try{
+			const userOptionDto = {
+				conversationID: Number(state.currentConversationID),
+				username: user.login,
+				state: true,
+				from: Number(sessionStorage.getItem("currentUserID"))
+			}
 	
-		if (response.ok) {
-			user.isMute = !user.isMute;
-			setMute(true);
-			console.log("Mute");
+			const response = await fetch(`http://localhost:3001/chat/muteUser`, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
+				},
+				body: JSON.stringify(userOptionDto),
+			});
+		
+			if (response.ok) {
+				user.isMute = !user.isMute;
+				setMute(true);
+				console.log("Mute");
+			}
 		}
-		else {
-			console.error("Fatal error");
+		catch (error) {
+			console.error(error);
 		}
 	}
 
 	const banUser = async() => {
 
-		const userOptionDto = {
-			conversationID: Number(state.currentConversationID),
-			username: user.login,
-			state : true,
-			from: Number(sessionStorage.getItem("currentUserID"))
-		}
+		try{
 
-		const response = await fetch(`http://localhost:3001/chat/banUser`, {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-				'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
-			},
-			body: JSON.stringify(userOptionDto),
-		});
+
+			const userOptionDto = {
+				conversationID: Number(state.currentConversationID),
+				username: user.login,
+				state : true,
+				from: Number(sessionStorage.getItem("currentUserID"))
+			}
 	
-		if (response.ok) {
-			console.log("ban");
-
-			const status = await response.json();
-			user.isBan = !user.isBan;
-			setBan(true);
-			globalState.userSocket?.emit('banUser', { userToBan: user.login, roomName: state.currentConversation, roomID: state.currentConversationID } );
+			const response = await fetch(`http://localhost:3001/chat/banUser`, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
+				},
+				body: JSON.stringify(userOptionDto),
+			});
+		
+			if (response.ok) {
+				console.log("ban");
+	
+				const status = await response.json();
+        user.isBan = !user.isBan;
+        setBan(true);
+        globalState.userSocket?.emit('banUser', { userToBan: user.login, roomName: state.currentConversation, roomID: state.currentConversationID } );
+			}
 		}
-		else {
-			console.error("Fatal error");
+		catch (error) {
+			console.error(error);
 		}
 	}
 
 	const unbanUser = async() => {
 
-		const userOptionDto = {
-			conversationID: Number(state.currentConversationID),
-			username: user.login,
-			state : false,
-			from: Number(sessionStorage.getItem("currentUserID"))
-		}
+		try {
 
-		const response = await fetch(`http://localhost:3001/chat/unbanUser`, {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-				'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
-			},
-			body: JSON.stringify(userOptionDto),
-		});
+			const userOptionDto = {
+				conversationID: Number(state.currentConversationID),
+				username: user.login,
+				state : false,
+				from: Number(sessionStorage.getItem("currentUserID"))
+			}
 	
-		if (response.ok) {
-			console.log("unban");
-
-			const status = await response.json();
-			user.isBan = !user.isBan;
-			setBan(false);
-			globalState.userSocket?.emit('unbanUser', { userToUnban: user.login, roomName: state.currentConversation, roomID: state.currentConversationID } );
+			const response = await fetch(`http://localhost:3001/chat/unbanUser`, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
+				},
+				body: JSON.stringify(userOptionDto),
+			});
+		
+			if (response.ok) {
+				console.log("unban");
+        const status = await response.json();
+        user.isBan = !user.isBan;
+        setBan(false);
+        globalState.userSocket?.emit('unbanUser', { userToUnban: user.login, roomName: state.currentConversation, roomID: state.currentConversationID } );
+			}
 		}
-		else {
-			console.error("Fatal error");
+		catch (error) {
+			console.error(error);
 		}
 	}
 	
 	
 	const promoteAdminUser = async() => {
 		
-		const userOptionDto = {
-			conversationID: Number(state.currentConversationID),
-			username: user.login,
-			state : true,
-			from: Number(sessionStorage.getItem("currentUserID"))
-		}
-
-		const response = await fetch(`http://localhost:3001/chat/promoteAdminUser`, {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-				'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
-			},
-			body: JSON.stringify(userOptionDto),
-		});
+		try {
+			const userOptionDto = {
+				conversationID: Number(state.currentConversationID),
+				username: user.login,
+				state : true,
+				from: Number(sessionStorage.getItem("currentUserID"))
+			}
 	
-		if (response.ok) {
-			user.isAdmin = !user.isAdmin;
-			console.log("Promote");
-			setAdmin(true);
+			const response = await fetch(`http://localhost:3001/chat/promoteAdminUser`, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
+				},
+				body: JSON.stringify(userOptionDto),
+			});
+		
+			if (response.ok) {
+				user.isAdmin = !user.isAdmin;
+				console.log("Promote");
+				setAdmin(true);
+			}
 		}
-		else {
-			console.error("Fatal error");
+		catch (error) {
+			console.error(error);
 		}
 	}
 
 	const demoteAdminUser = async() => {
 		
-		const userOptionDto = {
-			conversationID: Number(state.currentConversationID),
-			username: user.login,
-			state : false,
-			from: Number(sessionStorage.getItem("currentUserID"))
-		}
+		try{
 
-		const response = await fetch(`http://localhost:3001/chat/demoteAdminUser`, {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-				'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
-			},
-			body: JSON.stringify(userOptionDto),
-		});
+			const userOptionDto = {
+				conversationID: Number(state.currentConversationID),
+				username: user.login,
+				state : false,
+				from: Number(sessionStorage.getItem("currentUserID"))
+			}
 	
-		if (response.ok) {
-			console.log("demote");
-
-			user.isAdmin = !user.isAdmin;
-
-			setAdmin(false);
+			const response = await fetch(`http://localhost:3001/chat/demoteAdminUser`, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
+				},
+				body: JSON.stringify(userOptionDto),
+			});
+			if (response.ok) {
+				console.log("demote");
+				user.isAdmin = !user.isAdmin;
+				setAdmin(false);
+			}
 		}
-		else {
-			console.error("Fatal error");
+		catch (error) {
+			console.error(error);
 		}
 	}
 
@@ -288,30 +299,32 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user }) => {
 	}, []);
 
 	const handleLeaveChannel = async() => {
-		const quitlConversationDto = {
-				conversationID: Number(state.currentConversationID),
-				userID: user.id,
+		try {
+			const quitlConversationDto = {
+					conversationID: Number(state.currentConversationID),
+					userID: user.id,
+			}
+	
+			const response = await fetch(`http://localhost:3001/chat/quitConversation`, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
+				},
+				body: JSON.stringify(quitlConversationDto),
+			});
+	
+			if (response.ok) {
+				dispatch({ type: 'ACTIVATE', payload: 'showBackComponent' });
+				dispatch({ type: 'DISABLE', payload: 'showOptionsUserChannel' });
+				console.log("Updated status");
+			}
 		}
-
-		const response = await fetch(`http://localhost:3001/chat/quitConversation`, {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-				'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
-			},
-			body: JSON.stringify(quitlConversationDto),
-		});
-
-		if (response.ok) {
-			dispatch({ type: 'ACTIVATE', payload: 'showBackComponent' });
-			dispatch({ type: 'DISABLE', payload: 'showOptionsUserChannel' });
-			console.log("Updated status");
-		}
-		else {
-			console.log("Fatal error");
+		catch (error) {
+			console.log(error);
 		}
 	}
-
+  
 	return (
 		<>
 		<div className="blur-background"></div>

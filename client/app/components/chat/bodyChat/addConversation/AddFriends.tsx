@@ -16,49 +16,52 @@ const AddFriendComponent: React.FC<AddFriendComponentProps> = ({ updateFriends, 
 	const { globalState } = useGlobal();
 
 	const handleFriendRequest = async (e: React.FormEvent) => {
+		try{
 
-		e.preventDefault();
-
-		const friendRequestDto = {
-			initiatorLogin: sessionStorage.getItem("currentUserLogin"),
-			recipientLogin: formValue,
-		};
-
-		const response = await fetch('http://localhost:3001/users/addfriend', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-				'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
-			},
-			body: JSON.stringify(friendRequestDto),
-		});
-
-		if (response.ok) {
-
-			dispatch({ type: 'TOGGLEX', payload: 'refreshFriendsList'});
-			
-
-			const data = await response.json();
-			console.log("Return ", data);
-			if (!data) {
-				console.log("Request denied, please enter a valid username");
-				return ;
+			e.preventDefault();
+	
+			const friendRequestDto = {
+				initiatorLogin: sessionStorage.getItem("currentUserLogin"),
+				recipientLogin: formValue,
+			};
+	
+			const response = await fetch('http://localhost:3001/users/addfriend', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
+				},
+				body: JSON.stringify(friendRequestDto),
+			});
+	
+			if (response.ok) {
+	
+				dispatch({ type: 'TOGGLEX', payload: 'refreshFriendsList'});
+				
+	
+				const data = await response.json();
+				console.log("Return ", data);
+				if (!data) {
+					console.log("Request denied, please enter a valid username");
+					return ;
+				}
+	
+				dispatch({ type: 'DISABLE', payload: 'showAddChannel' });
+				dispatch({ type: 'DISABLE', payload: 'showAddUser' });
+				dispatch({ type: 'DISABLE', payload: 'showAddFriend' });
+	
+				if (userSocket.connected) {
+					userSocket.emit('addFriend', friendRequestDto);
+				}
 			}
-
-			dispatch({ type: 'DISABLE', payload: 'showAddChannel' });
-			dispatch({ type: 'DISABLE', payload: 'showAddUser' });
-			dispatch({ type: 'DISABLE', payload: 'showAddFriend' });
-
 			if (globalState.userSocket?.connected) {
 				globalState.userSocket?.emit('addFriend', friendRequestDto);
 			}
+
 		}
-		else {
-			console.log("Fatal error: friend request failed");
-			const error = await response.json();
-			if (error.message) {
-				console.log(error.message[0]);
-			}
+		catch(error)
+		{	
+			console.log(error);
 		}
 	};
 

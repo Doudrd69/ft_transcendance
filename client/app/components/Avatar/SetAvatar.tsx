@@ -10,25 +10,20 @@ const SetComponent : React.FC = () => {
 
 	const fetchData = async () => {
 		try {
-		const response = await fetch(`http://localhost:3001/users/getAvatar/${sessionStorage.getItem('currentUserID')}`);
+			const response = await fetch(`http://localhost:3001/users/getAvatar/${sessionStorage.getItem('currentUserID')}`);
 
-		if (response.ok) {
-			dispatch({ type: 'ACTIVATE', payload: 'showAvatar' });
-			setTestAvatar(true);
-			console.log('-- fetch réussie -- ');
-		} else {
-			console.error('Error fetching Avatar URL:', response.statusText);
+			if (response.ok) {
+				dispatch({ type: 'ACTIVATE', payload: 'showAvatar' });
+				setTestAvatar(true);
+			}
+		} 
+		catch (error) {
+			console.error(error);
 		}
-		} catch (error) {
-		console.error('Error fetching Avatar URL:', error);
-		}
-
-		console.log('État de mon testAVATAR ------->', testAvatar);
-
 		if (testAvatar) {
-		dispatch({ type: 'SET', payload: AvatarURL });
+			dispatch({ type: 'SET', payload: AvatarURL });
 		} else {
-		dispatch({ type: 'SET', payload: defaultAvatar });
+			dispatch({ type: 'SET', payload: defaultAvatar });
 		}
 	};
 

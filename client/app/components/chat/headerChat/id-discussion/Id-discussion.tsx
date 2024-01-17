@@ -7,6 +7,15 @@ import PasswordChangeComponent from './PasswordChange';
 
 const IdDiscussionComponent: React.FC = () => {
 
+
+interface user{
+	id: number;
+	login : string;
+	isAdmin: boolean;
+	isOwner: boolean;
+}
+  
+const IdDiscussionComponent: React.FC<IdDiscussionProps>= ({ userSocket }) => {
 	const { state, dispatch } = useChat();
 	var id;
 
@@ -16,7 +25,8 @@ const IdDiscussionComponent: React.FC = () => {
 	}
 	else
 		id = state.currentConversation;
-
+	const me = state.currentUserList.find((user : user) => user.id === Number(sessionStorage.getItem("currentUserID")));
+	console.log("ME: ", me);
 	return (
 		<div className='bloc-id'>
 			<p className="id">{id}</p>

@@ -18,36 +18,36 @@ const PasswordComponent: React.FC = () => {
 	};
 
 	const handlePasswordSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-
-		e.preventDefault();
-
-		const checkPasswordDto = {
-			conversationID: state.currentConversationID,
-			userInput: password,
-			username: sessionStorage.getItem("currentUserLogin"),
-		}
-	
-		const response = await fetch('http://localhost:3001/chat/checkPassword', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-				'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`
-			},
-			body: JSON.stringify(checkPasswordDto),
-		});
-	
-		if (response.ok) {
-			const passwordValidated = await response.json();
-			console.log("--> passwordValidated: ", passwordValidated);
-			dispatch({ type: 'DISABLE', payload: 'showPassword' });
+		try {
+			e.preventDefault();
+			const checkPasswordDto = {
+				conversationID: state.currentConversationID,
+				userInput: password,
+				username: sessionStorage.getItem("currentUserLogin"),
+			}
+		
+			const response = await fetch('http://localhost:3001/chat/checkPassword', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`
+				},
+				body: JSON.stringify(checkPasswordDto),
+			});
+		
+			if (response.ok) {
+				const passwordValidated = await response.json();
+				console.log("--> passwordValidated: ", passwordValidated);
+				dispatch({ type: 'DISABLE', payload: 'showPassword' });
 			if (globalState.userSocket?.connected) {
 				globalState.userSocket?.emit('joinRoom', { roomName: state.currentConversation, roomID: state.currentConversationID });
 			}
+	
+		} 
+		catch (error) {
+		console.log(error);
 		}
-		else {
-			console.log("Fatal error");
-		}
-	};
+	}
 
 	const handleClosePassword = () => {
 		dispatch({ type: 'DISABLE', payload: 'showPassword' });

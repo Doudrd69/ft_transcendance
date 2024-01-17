@@ -23,40 +23,30 @@ const SendBoxChannelComponent: React.FC = () => {
 
 	const handleMessage = async (e: React.FormEvent) => {
 		
-		e.preventDefault();
-		
-		const response = await fetch('http://localhost:3001/chat/newMessage', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-				'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
-			},
-			body: JSON.stringify(messageDto),
-		});
-
-		if (response.ok) {
-			const data = await response.json();
-			console.log(data);
-			// c'est misereux, a revoir
-			if (data) {
-				// if (globalState.userSocket?.connected) {
+		try {
+			e.preventDefault();
+			
+			const response = await fetch('http://localhost:3001/chat/newMessage', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
+				},
+				body: JSON.stringify(messageDto),
+			});
+	
+			if (response.ok) {
+				if (globalState.connected) {
 					globalState.userSocket?.emit('message', { dto: messageDto, conversationName: state.currentConversation });
-				// }
-				// else {
-				// 	console.log("Client is not connected");
-				// }
+				}
+				else {
+					console.log("Client is not connected");
+				}
+				setMessageValue('');
 			}
-			else {
-				console.log("Fatal error");
-			}
-			setMessageValue('');
 		}
-		else {
-			const error = await response.json();
-			if (Array.isArray(error.message))
-				console.log("Error: ", error.message[0]);
-			else
-				console.log("Error: ", error.message);
+		catch (error) {
+			console.error(error);
 		}
 	}
 

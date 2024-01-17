@@ -21,6 +21,7 @@ const AddConversationComponent: React.FC<AddConversationComponentProps> = ({ loa
 	const [isPublic, setIsPublic] = useState(true);
 
 	const handleConversationCreation = async (e: React.FormEvent) => {
+		try{
 
 		e.preventDefault();
 
@@ -52,17 +53,19 @@ const AddConversationComponent: React.FC<AddConversationComponentProps> = ({ loa
 				globalState.userSocket?.emit('joinRoom', { roomName: data.name, roomID: data.id }, () => {
 					console.log("Room creation loading...");
 				});
-			}
-
-			console.log("Conversation successfully created");
-			dispatch({ type: 'DISABLE', payload: 'showCreateChannel' });
-			dispatch({ type: 'DISABLE', payload: 'showAddCreateChannel' });
-
-			dispatch({ type: 'TOGGLEX', payload: 'refreshChannel'});
+				}
+	
+				console.log("Conversation successfully created");
+				dispatch({ type: 'DISABLE', payload: 'showCreateChannel' });
+				dispatch({ type: 'DISABLE', payload: 'showAddCreateChannel' });
+	
+				dispatch({ type: 'TOGGLEX', payload: 'refreshChannel'});
 			
-		} else {
-			const error = await response.json();
-			console.log("Error: ", error.message);
+			}
+			}
+		catch(error)
+		{
+			console.log(error);
 		}
 	};
 	const handleCancel = () => {

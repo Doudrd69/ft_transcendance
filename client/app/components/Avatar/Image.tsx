@@ -27,9 +27,7 @@ const ImageComponent: React.FC<ImageProps> = ({ className }) => {
 				}
 			} catch (error) {
 				setAvatarURL('test')
-				console.log('test3');
-
-				console.error('Error fetching Avatar URL:', error);
+				console.error(error);
 			}
 		};
 

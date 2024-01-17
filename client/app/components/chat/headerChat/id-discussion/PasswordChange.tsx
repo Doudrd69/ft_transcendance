@@ -13,7 +13,8 @@ const PasswordChangeComponent: React.FC = () => {
 		setPassword(newPassword);
 	};
 
-	const handleProtected = async() => {
+	const handleProtected = async(e: React.FormEvent<HTMLFormElement>) => {
+		e.preventDefault();
 		try {
 
 			const channelOptionDto = {
@@ -36,6 +37,7 @@ const PasswordChangeComponent: React.FC = () => {
 			if (response.ok) {
 				dispatch({ type: 'ACTIVATE', payload: 'currentConversationIsProtected' });
 				dispatch({ type: 'ACTIVATE', payload: 'showOptionUseChannel' });
+				dispatch({ type: 'ACTIVATE', payload: 'showBackComponent' });
 				dispatch({ type: 'DISABLE', payload: 'showPasswordChange' });
 			};} 
 			catch (error) {
