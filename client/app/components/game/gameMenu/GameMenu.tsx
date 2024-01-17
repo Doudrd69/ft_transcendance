@@ -24,13 +24,9 @@ const Menu = (socket: { socket: Socket }) => {
         const currentUserID = sessionStorage.getItem("currentUserID");
 
         if (gameSocket.connected) {
-            console.log("GameSocket connecté")
             // gameSocket.emit('linkSocketWithUser', sessionStorage.getItem("currentUserLogin"));
             gameSocket.emit('join-matchmaking', currentUserID);
             await gameSocket.on('joinGame', (game: Game) => {
-                console.log("Join Game recieve !");
-                console.log(`${game.playerOneID} enter in the Game`);
-                console.log(`${game.playerTwoID} enter in the Game`);
                 dispatch({
                     type: 'TOGGLE',
                     payload: 'showGame',
@@ -54,8 +50,8 @@ const Menu = (socket: { socket: Socket }) => {
             </div>
             <div className="background-game">
                 <button className={`buttonclass ${state.showGameMatchmaking ? 'clicked' : ''}`} onClick={() => { handleStartClick(); dispatch({ type: 'TOGGLE', payload: 'showGameMatchmaking' }); }}>START GAME</button>
-                <button className="buttonclass" >PROFILE</button>
-                <button className={`buttonclass ${state.showGameSettings ? 'clicked' : ''}`} onClick={() => dispatch({ type: 'TOGGLE', payload: 'showGameSettings' })}>SETTINGS</button>
+                {/* <button className="buttonclass" >PROFILE</button> */}
+                {/* <button className={`buttonclass ${state.showGameSettings ? 'clicked' : ''}`} onClick={() => dispatch({ type: 'TOGGLE', payload: 'showGameSettings' })}>SETTINGS</button> */}
             </div>
         </div>
     );

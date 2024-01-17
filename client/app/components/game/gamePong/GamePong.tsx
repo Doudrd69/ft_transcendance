@@ -10,38 +10,21 @@ const PongComponent = (socket: { socket: Socket }) => {
 
     const [countdown, setCountdown] = useState<number>(3);
     const [blurGame, setBlurGame] = useState<boolean>(true);
-    const [ballX, setBallX] = useState<number>(50);
-    const [ballY, setBallY] = useState<number>(50);
-    const [ballSpeedX, setBallSpeedX] = useState<number>(0.5);
-    const [ballSpeedY, setBallSpeedY] = useState<number>(0.5);
-    const [paddleY, setPaddleY] = useState<number>(50);
-    const [paddleY1, setPaddleY1] = useState<number>(50);
-    const paddleSpeed = 2;
-    const [ballSpeed, setBallSpeed] = useState<number>(0.0);
-
-    const [scorePlayer1, setScorePlayer1] = useState<number>(0);
-    const [scorePlayer2, setScorePlayer2] = useState<number>(0);
-    const [isKeyDownPressed, setIsKeyDownPressed] = useState<boolean>(false);
-    const [isKeyUpPressed, setIsKeyUpPressed] = useState<boolean>(false);
-    const [isSKeyPressed, setIsSKeyPressed] = useState<boolean>(false);
-    const [isWKeyPressed, setIsWKeyPressed] = useState<boolean>(false);
 
     const [inCountdown, setInCountdown] = useState<boolean>(true);
     const [gameID, setGameID] = useState<number | null>(null);
     const [inputState, setInputState] = useState<inputState>({ up: false, down: false });
-
+    const [keyState, setkeyState] = useState<keyState>({ ArrowUp: inputState, ArrowDown: inputState });
 
     interface inputState {
         up: boolean,
         down: boolean
     }
 
-    const keyState = {
-        ArrowUp: false,
-        ArrowDown: false,
-        W: false,
-        S: false,
-    };
+    interface keyState {
+        ArrowUp: inputState,
+        ArrowDown: inputState
+    }
 
     interface gameBallState {
         BallPosition: { x: number, y: number } | null,
@@ -54,27 +37,42 @@ const PongComponent = (socket: { socket: Socket }) => {
         paddleTwo: { x: number, y: number } | null,
     }
 
+    const [containerWidth, setContainerWidth] = useState<number>(0);
+    const [containerHeight, setContainerHeight] = useState<number>(0);
 
+    useEffect(() => {
+        const pongContainer = document.querySelector('.pong-container');
+        if (pongContainer) {
+            const handleResize = () => {
+                setContainerWidth(pongContainer.clientWidth);
+                setContainerHeight(pongContainer.clientHeight);
+                console.log(`pongcontainer size, x:${pongContainer.clientWidth}, y: ${pongContainer.clientHeight}`);
+            };
+            // Mettez à jour les dimensions du conteneur lorsqu'il est redimensionné
+            window.addEventListener('resize', handleResize);
+
+            handleResize();
+            // Initialisez les dimensions du conteneur au chargement initial
+            return () => {
+                window.removeEventListener('resize', handleResize);
+            };
+        }
+    }, [blurGame]);
 
     const defaultGamePaddleState: gamePaddleState = {
-        paddleOne: { x: 0, y: 50 },
-        paddleTwo: { x: 300, y: 50 },
+        paddleOne: { x: 0, y: 0.5 * containerHeight },
+        paddleTwo: { x: 0.9 * containerWidth, y: 0.5 * containerHeight },
     };
 
     const defaultGameBallState: gameBallState = {
-        BallPosition: { x: 150, y: 50 },
+        BallPosition: { x: 0.5 * containerWidth, y: 0.5 * containerHeight },
         scoreOne: 0,
         scoreTwo: 0,
     };
 
     const [gameBallState, setGameBallState] = useState<gameBallState>(defaultGameBallState);
-
     const [gamePaddleState, setGamePaddleState] = useState<gamePaddleState>(defaultGamePaddleState);
 
-    interface inputState {
-        up: boolean,
-        down: boolean
-    }
 
     interface Game {
         gameId: number;
@@ -96,29 +94,6 @@ const PongComponent = (socket: { socket: Socket }) => {
         scoreTwo: 0,
     };
 
-    const [containerWidth, setContainerWidth] = useState<number>(0);
-    const [containerHeight, setContainerHeight] = useState<number>(0);
-
-    useEffect(() => {
-        const pongContainer = document.querySelector('.pong-container');
-        if (pongContainer) {
-            const handleResize = () => {
-                setContainerWidth(pongContainer.clientWidth);
-                setContainerHeight(pongContainer.clientHeight);
-            };
-            // Mettez à jour les dimensions du conteneur lorsqu'il est redimensionné
-            window.addEventListener('resize', handleResize);
-            
-            handleResize();
-            console.log(`pongcontainer size`,pongContainer.clientWidth);
-            // Initialisez les dimensions du conteneur au chargement initial
-
-            return () => {
-                window.removeEventListener('resize', handleResize);
-            };
-        }
-    }, []);
-
     const [Game, setGame] = useState<Game>(defaultGame);
 
 
@@ -138,12 +113,9 @@ const PongComponent = (socket: { socket: Socket }) => {
 
         setBlurGame(true); // Apply the blur effect initially
         startCountdown();
-
     }, []);
 
-
     useEffect(() => {
-
 
         gameSocket.on('Game_Start', (Game: Game) => {
             setGameID(Game.gameId);
@@ -152,100 +124,82 @@ const PongComponent = (socket: { socket: Socket }) => {
                 gameId: Game.gameId,
                 playerOneID: Game.playerOneID,
                 playerTwoID: Game.playerTwoID,
+                playerOneLogin: Game.playerOneLogin,
+                playerTwoLogin: Game.playerTwoLogin,
                 scoreOne: Game.scoreOne,
                 scoreTwo: Game.scoreTwo,
             }));
         });
 
-
         const gameLoop = setInterval(() => {
             if (!blurGame) {
-                gameSocket.emit('GameBackUpdate', { gameID: gameID });
+                console.log(`BALL`);
+                gameSocket.emit('GameBackUpdate', { gameID: gameID});
             }
         }, 16);
 
-        return () => {
-            gameSocket.off('Game_Start');
-            clearInterval(gameLoop);
-        };
-    }, [blurGame, gameID, gameSocket]);
-
-    useEffect(() => {
-
-        const handleKeyDown = (e: KeyboardEvent) => {
-            if (e.key === 'ArrowUp') {
-                if (inputState.up === false) {
-                    console.log()
-                    gameSocket.emit('Game_Input', { input: "ArrowUp", gameID: gameID });
-                }
-                setInputState((prevState) => ({
-                    ...prevState,
-                    up: true
-                }));
-            } else if (e.key === 'ArrowDown') {
-                if (inputState.down === false) {
-                    gameSocket.emit('Game_Input', { input: "ArrowDown", gameID: gameID });
-                }
-                setInputState((prevState) => ({
-                    ...prevState,
-                    down: true
-                }));
-            }
-        };
-
-        const handleKeyUp = (e: KeyboardEvent) => {
-            if (e.key === 'ArrowUp') {
-                if (inputState.up === true) {
-                    gameSocket.emit('Game_Input', { input: "ArrowUp", gameID: gameID });
-                }
-                setInputState((prevState) => ({
-                    ...prevState,
-                    up: false
-                }));
-            } else if (e.key === 'ArrowDown') {
-                if (inputState.down === true) {
-                    gameSocket.emit('Game_Input', { input: "ArrowDown", gameID: gameID });
-                }
-                setInputState((prevState) => ({
-                    ...prevState,
-                    down: false
-                }));
-            }
-        };
-
-        window.addEventListener('keydown', handleKeyDown);
-        window.addEventListener('keyup', handleKeyUp);
-
-
-        return () => {
-            window.removeEventListener('keydown', handleKeyDown);
-            window.removeEventListener('keyup', handleKeyUp);
-        };
-    });
-
-    useEffect(() => {
         gameSocket.on('GamePaddleUpdate', (gamePaddleState: gamePaddleState) => {
             const newGamePaddleState: gamePaddleState = {
-                paddleOne: { x: gamePaddleState.paddleOne!.x * containerWidth / (16 / 9), y: gamePaddleState.paddleOne!.y * containerHeight },
-                paddleTwo: { x: gamePaddleState.paddleTwo!.x * containerWidth / (16 / 9), y: gamePaddleState.paddleTwo!.y * containerHeight },
+                paddleOne: { x: gamePaddleState.paddleOne!.x * containerWidth, y: gamePaddleState.paddleOne!.y * containerHeight },
+                paddleTwo: { x: gamePaddleState.paddleTwo!.x * containerWidth, y: gamePaddleState.paddleTwo!.y * containerHeight },
             }
             setGamePaddleState(newGamePaddleState);
         });
 
         gameSocket.on('GameBallUpdate', (gameBallState: gameBallState) => {
             const newGameBallState: gameBallState = {
-                BallPosition: { x: gameBallState.BallPosition!.x * containerWidth / (16 / 9) || 153, y: gameBallState.BallPosition!.y * containerHeight || 50 },
+                BallPosition: { x: gameBallState.BallPosition!.x * containerWidth || 153, y: gameBallState.BallPosition!.y * containerHeight || 50 },
                 scoreOne: gameBallState.scoreOne,
                 scoreTwo: gameBallState.scoreTwo,
             }
             setGameBallState(newGameBallState);
         });
 
+        let inputLoop: NodeJS.Timeout;
+
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (keyState.ArrowDown.down !== true && keyState.ArrowUp.down !== true) {
+                inputLoop = setInterval(() => {
+                    if (e.key === 'ArrowUp') {
+                        keyState.ArrowUp.down = true;
+                        gameSocket.emit('Game_Input', { input: "ArrowUp", gameID: gameID });
+
+                    } else if (e.key === 'ArrowDown') {
+                        keyState.ArrowUp.down = true;
+                        gameSocket.emit('Game_Input', { input: "ArrowDown", gameID: gameID });
+                    }
+                }, 16);
+            }
+        };
+
+        const handleKeyUp = (e: KeyboardEvent) => {
+            if (e.key === 'ArrowUp') {
+                if (keyState.ArrowUp.down === true) {
+                    clearInterval(inputLoop);
+                    keyState.ArrowUp.down = false
+                }
+            }
+            else if (e.key === 'ArrowDown') {
+                if (keyState.ArrowDown.down === true) {
+                    clearInterval(inputLoop);
+                    keyState.ArrowDown.down = false
+                }
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        window.addEventListener('keyup', handleKeyUp);
+
         return () => {
             gameSocket.off('GameBallUpdate');
             gameSocket.off('GamePaddleUpdate');
+            gameSocket.off('Game_Start');
+            clearInterval(gameLoop);
+            clearInterval(inputLoop);
+            window.removeEventListener('keydown', handleKeyDown);
+            window.removeEventListener('keyup', handleKeyUp);
         };
-    }, [gameSocket, containerWidth, containerHeight]);
+    }, [gameID, gameSocket, containerWidth, containerHeight, inCountdown]);
 
 
     return (

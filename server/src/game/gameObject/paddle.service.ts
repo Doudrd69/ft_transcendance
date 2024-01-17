@@ -32,9 +32,10 @@ export class PaddleService {
 		}
 		else if (paddle.down) {
 			paddle.y -= (paddle.speed * -1);
-			if (paddle.y > 82)
-				paddle.y = 82;
+			if (paddle.y > 1 - paddle.length)
+				paddle.y = 1 - paddle.length;
 		}
+		console.log(`paddle y: ${paddle.y}`);
 	}
 
 	wallUnit(paddle: paddle_instance) {

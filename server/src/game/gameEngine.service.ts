@@ -53,8 +53,8 @@ export class GameEngineService {
 			game_has_ended: false,
 			gameID: game.gameId,
 			ball: {
-				position: { x: 0.5 * 16 / 9, y: 0.35 },
-				speed: { x: (signe/120) * 16/9, y: (Math.random() - 0.5) * Math.random()/60},
+				position: { x: 0.5, y: 0.5 },
+				speed: { x: (signe/120) * 16/9 / 4, y: (Math.random() - 0.5 ) * Math.random()/60 / 4},
 				r: 0.04,
 				alive: true,
 				elasticity: 1.02,
@@ -67,15 +67,16 @@ export class GameEngineService {
 			victory_condition: 5,
 			paddles: [
 				{ x: 0, y: 0.415, speed: 1 / 60, up: false, down: false, end: { x: 0.025, y: 0.585 }, start: { x: 0.025, y: 0.415 }, is_a_paddle: true, length: this.VectorService.mag(this.VectorService.sub(paddleOneEnd, paddleOneStart)) },
-				{ x: 16 / 9 - 0.025, y: 0.415, speed: 1 / 60, up: false, down: false, end: { x: 16 / 9 - 0.025, y: 50 }, start: { x: 16 / 9 - 0.025, y: 0.415 }, is_a_paddle: true, length: this.VectorService.mag(this.VectorService.sub(paddleTwoEnd, paddleTwoStart)) },
-				{ x: 0, y: 0, speed: 0, up: false, down: false, end: { x: 16 / 9, y: 0 }, start: { x: 0, y: 0 }, is_a_paddle: false, length: this.VectorService.mag(this.VectorService.sub(paddleThreeEnd, paddleThreeStart)) },
-				{ x: 0, y: 1, speed: 0, up: false, down: false, end: { x: 16 / 9, y: 1 }, start: { x: 0, y: 1 }, is_a_paddle: false, length: this.VectorService.mag(this.VectorService.sub(paddleFourEnd, paddleFourStart)) },
+				{ x: 1 - 0.025, y: 0.415, speed: 1 / 60, up: false, down: false, end: { x: 1 - 0.025, y: 0.585 }, start: { x: 1 - 0.025, y: 0.415 }, is_a_paddle: true, length: this.VectorService.mag(this.VectorService.sub(paddleTwoEnd, paddleTwoStart)) },
+				{ x: 0, y: 0, speed: 0, up: false, down: false, end: { x: 1, y: 0 }, start: { x: 0, y: 0 }, is_a_paddle: false, length: this.VectorService.mag(this.VectorService.sub(paddleThreeEnd, paddleThreeStart)) },
+				{ x: 0, y: 1, speed: 0, up: false, down: false, end: { x: 1, y: 1 }, start: { x: 0, y: 1 }, is_a_paddle: false, length: this.VectorService.mag(this.VectorService.sub(paddleFourEnd, paddleFourStart)) },
 			],
 		}
 		return newGame;
 	}
 
 	async game_input(input: string, gameInstance: Game_instance, playerID: string) {
+		console.log("Input detected");
 		if (playerID === gameInstance.players[0]) {
 			this.PaddleService.process_input(gameInstance.paddles[0], input);
 			this.paddleLeftInput(input, gameInstance);

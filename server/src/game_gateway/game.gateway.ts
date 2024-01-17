@@ -20,7 +20,6 @@ export interface ball_instance {
     r: number;
     alive: boolean;
     elasticity: number;
-
 }
 
 export interface paddle_instance {
@@ -129,15 +128,17 @@ export class GameGateway {
                     scoreOne: this.game.scoreOne,
                     scoreTwo: this.game.scoreTwo,
                 });
-                this.server.to(socketIDs).emit('Game_Start', {
-                    gameId: this.game.gameId,
-                    playerOneID: this.game.playerOneID,
-                    playerTwoID: this.game.playerTwoID,
-                    scoreOne: this.game.scoreOne,
-                    scoreTwo: this.game.scoreTwo,
-                });
-
-
+                setTimeout(() => {
+                    this.server.to(socketIDs).emit('Game_Start', {
+                        gameId: this.game.gameId,
+                        playerOneID: this.game.playerOneID,
+                        playerTwoID: this.game.playerTwoID,
+                        playerOneLogin: this.game.playerOneLogin,
+                        playerTwoLogin: this.game.playerTwoLogin,
+                        scoreOne: this.game.scoreOne,
+                        scoreTwo: this.game.scoreTwo,
+                    });
+                }, 1000);
             }
         }
         return (playerLogin);
@@ -151,24 +152,16 @@ export class GameGateway {
         return (playerLogin);
     }
 
-    @SubscribeMessage('GameWidthHeigth')
-    handleGameWidthHeigth(@ConnectedSocket() client: Socket, @MessageBody() data: { gameID: number, gameWidth: number, gameHeigth: number }) {
-
-    }
-
     @SubscribeMessage('Game_Input')
-    async handlePaddleMove(@ConnectedSocket() client: Socket, @MessageBody() data: { input: string, gameID: number }) {
+    async handlePaddleMove(@ConnectedSocket() client: Socket, @MessageBody() data: { input: string, gameID: number, width: number, heigth: number }) {
         for (let i = 0; i < this.game_instance.length; i++) {
             gameInstance = this.game_instance[i];
             if (gameInstance.gameID === data.gameID) {
-                // console.log("==");
-                // console.log(`pgameID === ${gameInstance.gameID}`);
-                // console.log(`pgameID2 === ${data.gameID}`);
-                // console.log("==");
+                // enter for the 1st player and the 2scd i think
                 this.GameEnginceService.game_input(data.input, gameInstance, client.id);
                 this.server.to([gameInstance.players[0], gameInstance.players[1]]).emit('GamePaddleUpdate', {
-                    paddleOne: { x: gameInstance.paddles[0].x / (16 / 9), y: gameInstance.paddles[0].y },
-                    paddleTwo: { x: gameInstance.paddles[1].x / (16 / 9), y: gameInstance.paddles[1].y },
+                    paddleOne: { x: gameInstance.paddles[0].x, y: gameInstance.paddles[0].y },
+                    paddleTwo: { x: gameInstance.paddles[1].x, y: gameInstance.paddles[1].y },
                 })
                 break;
             }
@@ -176,18 +169,14 @@ export class GameGateway {
     }
 
     @SubscribeMessage('GameBackUpdate')
-    async handleGameUpdate(client: Socket, @MessageBody() data: { gameID: number }) {
+    async handleGameUpdate(client: Socket, @MessageBody() data: { gameID: number, width: number, heigth: number }) {
+        // console.log(`BALL`);
         for (let i = 0; i < this.game_instance.length; i++) {
             gameInstance = this.game_instance[i];
             if (gameInstance.gameID === data.gameID) {
-                // console.log("==");
-                // console.log(`bgameID === ${gameInstance.gameID}`);
-                // console.log(`bgameID2 === ${data.gameID}`);
-                // console.log("==");
                 this.GameEnginceService.updateGameEngine(gameInstance);
-                console.log(`ball y position : ${gameInstance.ball.position.y}`);
                 this.server.to([gameInstance.players[0], gameInstance.players[1]]).emit('GameBallUpdate', {
-                    BallPosition: { x: gameInstance.ball.position.x / (16 / 9), y: gameInstance.ball.position.y },
+                    BallPosition: { x: gameInstance.ball.position.x, y: gameInstance.ball.position.y },
                     scoreOne: gameInstance.player1_score,
                     scoreTwo: gameInstance.player2_score,
                 })

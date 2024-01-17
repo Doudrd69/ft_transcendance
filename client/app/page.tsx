@@ -234,6 +234,7 @@ export default function Home() {
 			console.log('Unregistering events...');
 			gameSocket.off('connect');
 			gameSocket.off('disconnect');
+			gameSocket.off('Game_Start');
 		}
 	}, [gameSocket])
 
