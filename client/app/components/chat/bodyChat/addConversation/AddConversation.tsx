@@ -19,48 +19,50 @@ const AddConversationComponent: React.FC<AddConversationComponentProps> = ({ use
 	const [isPublic, setIsPublic] = useState(true);
 
 	const handleConversationCreation = async (e: React.FormEvent) => {
-
-		e.preventDefault();
-
-		const conversationDto = {
-			name: formValue,
-			userID: Number(sessionStorage.getItem("currentUserID")),
-			is_channel: isChannel,
-			isPublic: isPublic,
-			isProtected: isPassword,
-			password: !isPassword ? '' : passwordValue,
-		}
-
-		console.log("DTO conv --> ", conversationDto);
-
-		const response = await fetch('http://localhost:3001/chat/newConversation', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-				'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`
-			},
-			body: JSON.stringify(conversationDto),
-		});
-
-		if (response.ok) {
-
-			const data = await response.json();
-
-			if (userSocket.connected) {
-				userSocket.emit('joinRoom', { roomName: data.name, roomID: data.id }, () => {
-					console.log("Room creation loading...");
-				});
+		try{
+			e.preventDefault();
+	
+			const conversationDto = {
+				name: formValue,
+				userID: Number(sessionStorage.getItem("currentUserID")),
+				is_channel: isChannel,
+				isPublic: isPublic,
+				isProtected: isPassword,
+				password: !isPassword ? '' : passwordValue,
 			}
+	
+			console.log("DTO conv --> ", conversationDto);
+	
+			const response = await fetch('http://localhost:3001/chat/newConversation', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`
+				},
+				body: JSON.stringify(conversationDto),
+			});
 
-			console.log("Conversation successfully created");
-			dispatch({ type: 'DISABLE', payload: 'showCreateChannel' });
-			dispatch({ type: 'DISABLE', payload: 'showAddCreateChannel' });
+			if (response.ok) {
 
-			dispatch({ type: 'TOGGLEX', payload: 'refreshChannel'});
+				const data = await response.json();
+	
+				if (userSocket.connected) {
+					userSocket.emit('joinRoom', { roomName: data.name, roomID: data.id }, () => {
+						console.log("Room creation loading...");
+					});
+				}
+	
+				console.log("Conversation successfully created");
+				dispatch({ type: 'DISABLE', payload: 'showCreateChannel' });
+				dispatch({ type: 'DISABLE', payload: 'showAddCreateChannel' });
+	
+				dispatch({ type: 'TOGGLEX', payload: 'refreshChannel'});
 			
-		} else {
-			const error = await response.json();
-			console.log("Error: ", error.message);
+			}
+			}
+		catch(error)
+		{
+			console.log(error);
 		}
 	};
 	const handleCancel = () => {

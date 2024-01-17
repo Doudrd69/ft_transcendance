@@ -27,17 +27,12 @@ const ImageComponent: React.FC<ImageProps> = ({ className }) => {
 				}
 			} catch (error) {
 				setAvatarURL('test')
-				console.log('test3');
-
-				console.error('Error fetching Avatar URL:', error);
+				console.error(error);
 			}
 		};
 
 		useEffect(() => {
 			fetchAvatar();
-			console.log(avatarURL);
-			console.log('test3');
-
 		}, [state.showRefresh]);
 		
 	return (

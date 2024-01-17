@@ -13,30 +13,30 @@ const TFAComponent: React.FC<TFAComponentProps>  = ({ on2FADone　}) => {
 		setAuthenticatorCodeInput(e.target.value);
 	};
 
-	// Function to check Authenticator Code
 	const checkAuthenticatorCode = async (e: React.FormEvent) => {
-		
-		e.preventDefault();
-
-		const dto = {
-			userID: Number(sessionStorage.getItem("currentUserID")),
-			code: authenticatorCodeInput,
+		try {
+			e.preventDefault();
+	
+			const dto = {
+				userID: Number(sessionStorage.getItem("currentUserID")),
+				code: authenticatorCodeInput,
+			}
+	
+			const response = await fetch('http://localhost:3001/auth/checkAuthenticatorCode', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify(dto),
+			});
+	
+			if (response.ok) {
+				console.log("-- Code OK, 2FA ENABLED --");
+				on2FADone();
+			}
 		}
-
-		const response = await fetch('http://localhost:3001/auth/checkAuthenticatorCode', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-			},
-			body: JSON.stringify(dto),
-		});
-
-		if (response.ok) {
-			console.log("-- Code OK, 2FA ENABLED --");
-			on2FADone();
-		}
-		else {
-			console.log("-- 2FA activation FAILED --");
+		catch (error) {
+			console.error(error);
 		}
 	}
 

@@ -12,84 +12,94 @@ const GlobalSettingsComponent: React.FC = () => {
 	const [activeUrlImg, setActiveUrlImg] = useState(false);
 
 	const desactivate2FA = async () => {
-
-		const tfaDto = {
-			userID: Number(sessionStorage.getItem("currentUserID")),
+		try{
+			const tfaDto = {
+				userID: Number(sessionStorage.getItem("currentUserID")),
+			}
+		
+			const response = await fetch('http://localhost:3001/auth/desactivate2fa', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
+				},
+				body: JSON.stringify(tfaDto),
+			});
+		
+			if (response.ok) {
+				setActiveUrlImg(false);
+				toast.warn("2fa is now disabled");
 		}
-	
-		const response = await fetch('http://localhost:3001/auth/desactivate2fa', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-				'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
-			},
-			body: JSON.stringify(tfaDto),
-		});
-	
-		if (response.ok) {
-			setActiveUrlImg(false);
-			toast.warn("2fa is now disabled");
-
-		} else {
-			const error = await response.json();
-			console.log(error.message);
+		}
+		catch (error) {
+			console.error(error);
 		}
 	}
 
 	const activate2FA = async () => {
 
-		const tfaDto = {
-			userID: Number(sessionStorage.getItem("currentUserID")),
+		try {
+			const tfaDto = {
+				userID: Number(sessionStorage.getItem("currentUserID")),
+			}
+	
+			const response = await fetch('http://localhost:3001/auth/request2fa', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
+				},
+				body: JSON.stringify(tfaDto),
+			});
+	
+			if (response.ok) {
+				const qrcode = await response.json();
+				// console.log("2FA QRCode => ", qrcode.qrcodeURL);
+				setUrlQrCode(qrcode.qrcodeURL);
+				setActiveUrlImg(true);
+			} else {
+			const error = await response.json();
+			console.log("Fatal error: ", error.message);
+			}
+			console.log("activateUrlImage: ", activeUrlImg);
 		}
+		catch (error) {
+				console.error(error);
+		}
+	}
 
-		const response = await fetch('http://localhost:3001/auth/request2fa', {
+	const checkAuthenticatorCode = async (e: React.FormEvent) => {
+		try{
+
+			e.preventDefault();
+	
+			const dto = {
+			userID: Number(sessionStorage.getItem("currentUserID")),
+			code: authenticatorCodeInput,
+			}
+	
+			const response = await fetch('http://localhost:3001/auth/checkAuthenticatorCode', {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
 				'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
 			},
-			body: JSON.stringify(tfaDto),
-		});
-
-		if (response.ok) {
-			const qrcode = await response.json();
-			// console.log("2FA QRCode => ", qrcode.qrcodeURL);
-			setUrlQrCode(qrcode.qrcodeURL);
-			setActiveUrlImg(true);
-		} else {
-		const error = await response.json();
-		console.log("Fatal error: ", error.message);
+			body: JSON.stringify(dto),
+			});
+	
+			if (response.ok) {
+				toast.success('2FA is now enabled');
+				sessionStorage.setItem("2faEnabled", "true");
+			} else {
+			const error = await response.json();
+			if (Array.isArray(error.message))
+				toast.warn(error.message[0]);
+			else
+				toast.warn(error.message);
+			}
 		}
-		console.log("activateUrlImage: ", activeUrlImg);
-
-	}
-
-	const checkAuthenticatorCode = async (e: React.FormEvent) => {
-		e.preventDefault();
-
-		const dto = {
-		userID: Number(sessionStorage.getItem("currentUserID")),
-		code: authenticatorCodeInput,
-		}
-
-		const response = await fetch('http://localhost:3001/auth/checkAuthenticatorCode', {
-		method: 'POST',
-		headers: {
-			'Content-Type': 'application/json',
-			'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
-		},
-		body: JSON.stringify(dto),
-		});
-
-		if (response.ok) {
-			toast.success('2FA is now enabled');
-			sessionStorage.setItem("2faEnabled", "true");
-		} else {
-		const error = await response.json();
-		if (Array.isArray(error.message))
-			toast.warn(error.message[0]);
-		else
-			toast.warn(error.message);
+		catch (error) {
+			console.error(error);
 		}
 	}
 

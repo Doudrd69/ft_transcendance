@@ -29,6 +29,7 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 
 	const updateIsPublicTrue = async() => {
 
+		try {
 			const channelOptionDto = {
 				conversationID: Number(state.currentConversationID),
 				userID: Number(sessionStorage.getItem("currentUserID")),
@@ -46,14 +47,15 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 
 			if (response.ok) {
 				dispatch({ type: 'ACTIVATE', payload: 'currentConversationIsPrivate' });
-				console.log("Updated status");
 			}
-			else {
-				console.log("Fatal error");
-			}
+		}
+		catch (error) {
+			console.error(error);
+		}
 	}
 	const updateIsPublicFalse = async() => {
 
+		try {
 		const channelOptionDto = {
 			conversationID: Number(state.currentConversationID),
 			userID: Number(sessionStorage.getItem("currentUserID")),
@@ -73,39 +75,43 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 			dispatch({ type: 'DISABLE', payload: 'currentConversationIsPrivate' });
 			console.log("Updated status");
 		}
-		else {
-			console.log("Fatal error");
+		}
+		catch (error) {
+			console.error(error);
 		}
 }
 
 	const deleteChannel = async() => {
 
-		const channelOptionDto = {
-			conversationID: Number(state.currentConversationID),
-			userID: Number(sessionStorage.getItem("currentUserID")),
-			state: state.currentConversationIsPrivate,
+		try{
+			const channelOptionDto = {
+				conversationID: Number(state.currentConversationID),
+				userID: Number(sessionStorage.getItem("currentUserID")),
+				state: state.currentConversationIsPrivate,
+			}
+	
+			const response = await fetch(`http://localhost:3001/chat/updateIsPublic`, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
+				},
+				body: JSON.stringify(channelOptionDto),
+			});
+	
+			if (response.ok) {
+				dispatch({ type: 'TOGGLEX', payload: 'currentConversationIsPrivate' });
+				console.log("Updated status");
+			}
 		}
-
-		const response = await fetch(`http://localhost:3001/chat/updateIsPublic`, {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-				'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
-			},
-			body: JSON.stringify(channelOptionDto),
-		});
-
-		if (response.ok) {
-			dispatch({ type: 'TOGGLEX', payload: 'currentConversationIsPrivate' });
-			console.log("Updated status");
-		}
-		else {
-			console.log("Fatal error");
+		catch (error) {
+			console.error(error);
 		}
 }
 	const updateIsProtectedFalse = async() => {
 
-		// error Error: Missing getServerSnapshot, which is required for server-rendered content. Will revert to client rendering.
+
+		try{
 			const channelOptionDto = {
 				conversationID: Number(state.currentConversationID),
 				userID: Number(sessionStorage.getItem("currentUserID")),
@@ -131,12 +137,12 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 				else {
 					console.log("User is not admin on this channel");
 				}
-			}
-			else {
-				console.log("Fatal error");
-			}
 
-			return ;
+		}
+		}
+		catch (error) {
+			console.error(error);
+		}
 	}
 
 	const handleCancel = () => {

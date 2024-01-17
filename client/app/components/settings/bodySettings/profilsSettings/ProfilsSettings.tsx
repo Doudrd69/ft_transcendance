@@ -79,28 +79,26 @@ const ProfilsSettingsComponent: React.FC<ProfileSettingsComponentProps> = ({ use
 	};
 
 	const handleImage = async () => {
-	try {
-		const formData = new FormData();
-		if (newImage && newImage instanceof File) {
-			formData.append('avatar', newImage, newImage.name);
-			}
-		
-			const response = await fetch(`http://localhost:3001/users/upload-Avatar/${sessionStorage.getItem('currentUserID')}`, {
-			method: 'POST',
-			body: formData,
-	});
-		if (response.ok){
-			console.log('Image envoyée avec succès au backend');
-			dispatch({ type: 'ACTIVATE', payload: 'showAvatar' });
-			dispatch({ type: 'DISABLE', payload: 'showUploadAvatar' });
-			dispatch({ type: 'TOGGLEX', payload: 'showRefresh'});
+		try {
+			const formData = new FormData();
+			if (newImage && newImage instanceof File) {
+				formData.append('avatar', newImage, newImage.name);
+				}
 			
-		}
-		else
-		console.error('Échec de l\'envoi de l\'image au backend');
-} 
+				const response = await fetch(`http://localhost:3001/users/upload-Avatar/${sessionStorage.getItem('currentUserID')}`, {
+				method: 'POST',
+				body: formData,
+			});
+			if (response.ok){
+				console.log('Image envoyée avec succès au backend');
+				dispatch({ type: 'ACTIVATE', payload: 'showAvatar' });
+				dispatch({ type: 'DISABLE', payload: 'showUploadAvatar' });
+				dispatch({ type: 'TOGGLEX', payload: 'showRefresh'});
+				
+			}
+		} 
 		catch (error) {
-			console.error('Erreur lors de l\'envoi de l\'image au backend :', error);
+			console.error(error);
 		}
 	};
 
