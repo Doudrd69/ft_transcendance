@@ -55,6 +55,7 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user }) => {
 
 			globalState.userSocket?.emit('joinRoom', { roomName: `whoblocked${user.login}`, roomID: '' } );
 		}
+		}
 		catch (error) {
 			console.error(error);
 		}
@@ -84,6 +85,7 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user }) => {
 			globalState.userSocket?.emit('leaveRoom', { roomName: `whoblocked${user.login}`, roomID: '' } );
 
 			console.log("unblock");
+		}
 		}
 		catch (error) {
 			console.error(error);

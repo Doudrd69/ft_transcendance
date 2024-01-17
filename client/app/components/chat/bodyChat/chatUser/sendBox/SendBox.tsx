@@ -43,7 +43,6 @@ const SendBoxComponent: React.FC = () => {
 				globalState.userSocket?.emit('message', { dto: messageDto, conversationName: state.currentRoom } , () => {
 					console.log("Message sent to gateway");
 				});
-					});
 				}
 				setMessageValue('');
 			}
