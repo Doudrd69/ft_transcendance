@@ -2,7 +2,7 @@
 import React, { createContext, useContext, useReducer } from 'react';
 
 // Définir les types d'action
-interface userList {
+interface user {
 	login: string;
 	avatarURL: string;
 	isAdmin: boolean;
@@ -18,24 +18,36 @@ type ActionType =
   | 'SET'
   | 'TOGGLEX'
   | 'SET_CURRENT_CONVERSATION_NAME'
-  | 'SET_CURRENT_CONVERSATION'
   | 'SET_CURRENT_CHANNEL'
   | 'SET_CURRENT_ROOM'
-  | 'SET_CURRENT_USER_LIST'
   | 'SET_CURRENT_CONVERSATION_ID'
   | 'SET_CURRENT_OPTION_CHANNEL_NAME'
   | 'SET_CURRENT_FRIEND'
   |	'SET_CURRENT_CONVERSATION_IS_PRIVATE'
   | 'SET_CURRENT_CONVERSATION_IS_PROTECTED'
-  | 'SET_CURRENT_COMPONENT';
+  | 'SET_CURRENT_COMPONENT'
+  | 'SET_CONVERSATIONS_USERS'
+  | 'SET_CURRENT_USER_LIST'
+  /*CURRENT_CHANNEL*/
+  | 'SET_CURRENT_CHANNEL_USER_LIST'
+  | 'SET_CURRENT_CONVERSATION'
+  /*FRIENDSLIST*/
+  | 'SET_FRIENDS_LIST'
+  /*CONVERSATIONSLIST*/
+  | 'SET_CONVERSATIONS_LIST'
+  /*CHANNELLIST*/
+  | 'SET_CHANNEL_LIST';
 // Définir l'interface de l'action
 interface Action {
   type: ActionType;
-  payload?: string | any | null | undefined; // Utilisé pour les actions qui ont un payload
+  payload?: string | any |  null | undefined; // Utilisé pour les actions qui ont un payload
 }
 
 // Définir l'interface de l'état
+
 interface ChatState {
+
+	/*Affichage des composants*/
 	showFriendsList: boolean;
 	showAdd: boolean;
 	showChatList: boolean;
@@ -51,40 +63,58 @@ interface ChatState {
 	showAvatar: boolean;
 	showCreateChannel: boolean;
 	showListChannelAdd:boolean,
+	showPassword: boolean;
+	showOptionsUserChannel: boolean;
+	showOptionsUserChannelOwner: boolean;
+	showOptionsChannel:boolean;
+	showAddCreateChannel:boolean;
+	showPasswordChange:boolean;
+	showBackComponent: boolean;
+	showAdmin: boolean;
+	
+	/*refresh*/
 	refreshChannel:boolean,
 	refreshFriendsList:boolean,
+
+	/*FRIENDSLIST*/
+	friendlist : any;
+
+	/*CONVERSATIONS*/
 	currentConversation: string | null;
 	currentConversationName: string | null;
 	currentConversationID: number | null;
 	currentChannel: string | null;
 	currentRoom: string | null;
-	currentUserList: any;
-	isAdmin: boolean;
-	currentIsAdmin: boolean;
-	showAddCreateChannel:boolean;
-	showOptionsChannel:boolean;
 	currentOptionChannelName:string | null;
-	currentFriend: string | null;
-	currentChannelBool: boolean;
-	showPassword: boolean;
-	showOptionsUserChannel: boolean;
-	showOptionsUserChannelOwner: boolean;
-	showAdmin: boolean;
 	currentConversationIsProtected: boolean;
 	currentConversationIsPrivate: boolean;
+	currentChannelBool: boolean;
+
+	/*CONVERSATIONSLIST */
+	conversationsList: any;
+
+	/*USERSLIST in CHANNEL*/
+	currentUserList: any;
+
+	/*USER: TARGET*/
+	targetUser: any;
+	isAdmin: boolean;
+	currentIsAdmin: boolean;
+	currentFriend: string | null;
 	currentComponent: string | null;
-	showPasswordChange:boolean;
-	dontcancel:boolean;
-	showBackComponent: boolean;
+	
+	/*CURRENTU_USER*/
+	currentUser: any;
+
 	[key: string]: boolean  |number | string | null;
 }
 
 // État initial
 const initialState: ChatState = {
-	currentConversationIsPrivate: false,
-	currentConversationIsProtected: false,
-	showFriendsList: false,
+
+	/*Affichage des composants*/
 	showChatList: false,
+	showFriendsList: false,
 	showChannelList: true,
 	showAddChannel: false,
 	showAddUser: false,
@@ -97,32 +127,50 @@ const initialState: ChatState = {
 	showAvatar: false,
 	showConfirmation:false,
 	showListChannelAdd:false,
-	currentIsAdmin: false,
+	showCreateChannel: false,
+	showAddCreateChannel:false,
+	showOptionsChannel:false,
+	showOptionsUserChannelOwner: false,
+	showOptionsUserChannel: false,
+	showPasswordChange:false,
+	showBackComponent: true,
+	showPassword: false,
+	showAdmin: false,
+
+	/*refresh*/
 	refreshChannel:false,
 	refreshFriendsList:false,
+
+	/*FRIENDSLIST*/
+	friendlist : null,
+
+	/*CONVERSATIONSLIST */
+	conversationsList: null,
+
+	/*CONVERSATIONS*/
+	currentConversationIsPrivate: false,
+	currentConversationIsProtected: false,
 	currentConversation: null,
 	currentConversationID: null,
 	currentConversationName: null,
 	currentChannel: null,
-	showCreateChannel: false,
-	showAddCreateChannel:false,
-	showOptionsChannel:false,
 	currentRoom: null,
-	currentUserList: null,
-	currentFriend: null,
 	currentConvID: null,
-	showPassword: false,
-	showAdmin: false,
-	isAdmin: false,
 	currentOptionChannelName:'',
-	showOptionsUserChannelOwner: false,
-	showOptionsUserChannel: false,
-	showPasswordChange:false,
-	currentComponent: '',
-	dontcancel:false,
-	showBackComponent: true,
 	currentChannelBool: false,
+	
+	/*USERSLIST in CHANNEL*/
+	currentUserList: null,
+	
+	/*USER: TARGET*/
+	targetUser: null,
+	isAdmin: false,
+	currentComponent: '',
+	currentIsAdmin: false,
+	currentFriend: null,
 
+	/*CURRENTU_USER*/
+	currentUser: null,
 };
 
 // Réducteur
@@ -191,11 +239,11 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({children}
 };
 
 export const setCurrentConversation = (payload: string | null): Action => ({
-	type: 'SET_CURRENT_CONVERSATION',
+	type: 'SET_CURRENT_CONVERSATION', 
 	payload,
 });
 
-export const setCurrentConversationName = (payload: string | null): Action => ({
+export const setCurrentConversationName = (payload: any | null): Action => ({
 	type: 'SET_CURRENT_CONVERSATION',
 	payload,
 });
