@@ -1,5 +1,6 @@
 // ChatContext.tsx
 import React, { createContext, useContext, useReducer } from 'react';
+import { io, Socket } from 'socket.io-client'
 
 // Définir les types d'action
 type ActionType =
@@ -8,11 +9,12 @@ type ActionType =
   | 'TOGGLE'
   | 'SET'
   | 'TOGGLEX'
+  | 'SET_SOCKET'
 
 // Définir l'interface de l'action
 interface Action {
   type: ActionType;
-  payload?: boolean |string | null | { avatar: string } |undefined; // Utilisé pour les actions qui ont un payload
+  payload?: boolean |string | null | { avatar: string } | Socket | undefined; // Utilisé pour les actions qui ont un payload
 }
 
 // Définir l'interface de l'état
@@ -28,8 +30,9 @@ interface GlobalState {
 	showUploadAvatar:boolean;
 	showRefresh:boolean;
 	showIsDefault:boolean;
-	avatar:string
-	[key: string]: boolean | string | null;
+	avatar:string;
+	userSocket: Socket;
+	[key: string]: boolean | string | Socket | null;
 }
 
 // État initial
@@ -46,6 +49,7 @@ const initialState: GlobalState = {
 	showRefresh:false,
 	showIsDefault:false,
 	avatar:"",
+	userSocket: Socket.prototype,
 };
 
 // Réducteur
@@ -92,6 +96,11 @@ export const GlobalProvider: React.FC<{ children: React.ReactNode }> = ({childre
 		</GlobalContext.Provider>
 	);
 };
+
+export const setSocket = (payload: Socket | null): Action => ({
+	type: 'SET_SOCKET',
+	payload,
+});
 
 // Hook personnalisé pour utiliser le contexte
 export const useGlobal = () => {
