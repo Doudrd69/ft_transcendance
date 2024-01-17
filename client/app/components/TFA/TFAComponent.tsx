@@ -4,7 +4,7 @@ interface TFAComponentProps {
 	on2FADone: () => void; // Define the on2FADone prop as a function
   }
 
-const TFAComponent: React.FC<TFAComponentProps>  = ({ on2FADone　}) => {
+const TFAComponent: React.FC<TFAComponentProps>  = ({ on2FADone }) => {
 
 
 	const [authenticatorCodeInput, setAuthenticatorCodeInput] = useState('');

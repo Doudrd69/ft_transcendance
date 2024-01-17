@@ -14,7 +14,6 @@ interface Conversation {
 	isPublic: boolean;
 	isProtected: boolean;
 }
-
 interface userList {
 	login: string;
 	avatarURL: string;
@@ -54,7 +53,8 @@ const ChannelListComponent: React.FC = () => {
 				if (usersList ) {
 					console.log(userList);
 					setUserList([...usersList]);
-				}	
+					dispatch({ type: 'SET_CONVERSATIONS_LIST', payload: conversationList});
+				}
 			}
 		}
 		catch (error) {
@@ -86,7 +86,13 @@ const ChannelListComponent: React.FC = () => {
 	}, []);
 
 	const handleConv = (conversation: Conversation, userList: userList, index: number) => {
-		dispatch({ type: 'SET_CURRENT_CONVERSATION', payload: conversation.name });
+		/*NEW*/
+		dispatch({ type: 'SET_CURRENT_CONVERSATION', payload: conversation });
+		dispatch({ type: 'ACTIVATE', payload: 'showChannel' });
+		dispatch({ type: 'DISABLE', payload: 'showChannelList' });
+
+		/*OLD*/
+		dispatch({ type: 'SET_CURRENT_OPTION_CHANNEL_NAME', payload: conversation.name });
 		dispatch(setCurrentComponent('showChannelList'));
 		dispatch({ type: 'SET_CURRENT_CONVERSATION_ID', payload: conversation.id });
 		dispatch({ type: 'SET_CURRENT_CONVERSATION_IS_PRIVATE', payload: conversation.isPublic });
@@ -96,9 +102,6 @@ const ChannelListComponent: React.FC = () => {
 		if(isAdmin[index])
 			dispatch({ type: 'ACTIVATE', payload: 'showAdmin' });
 		dispatch({ type: 'SET_CURRENT_USER_LIST', payload: userList });
-		dispatch({ type: 'DISABLE', payload: 'showChannelList' });
-		dispatch({ type: 'ACTIVATE', payload: 'showChannel' });
-	
 	}
 
 	return (
