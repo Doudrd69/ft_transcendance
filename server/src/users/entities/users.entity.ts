@@ -2,7 +2,7 @@ import { Entity, Column, PrimaryGeneratedColumn, ManyToMany, OneToMany, JoinTabl
 import { Friendship } from './friendship.entity';
 import { GroupMember } from 'src/chat/entities/group_member.entity';
 import { Conversation } from 'src/chat/entities/conversation.entity';
-import { Game } from 'src/game/entities/game.entity';
+import { Game } from 'src/game/entities/games.entity';
 
 @Entity()
 export class User {
@@ -75,7 +75,7 @@ export class User {
 		},
 		inverseJoinColumn: {
 			name: "game",
-			referencedColumnName: "id"
+			referencedColumnName: "gameId"
 		}
 	})
 	games: Game[];

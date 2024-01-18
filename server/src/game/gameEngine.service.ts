@@ -2,7 +2,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { User } from "src/users/entities/users.entity";
-import { Game } from "./entities/game.entity";
+import { Game } from "./entities/games.entity";
 import { GameEngine } from "./entities/gameEngine.entity";
 import { Paddle } from './entities/paddle.entity';
 import { PaddleService } from './gameObject/paddle.service';
@@ -34,7 +34,7 @@ export class GameEngineService {
 	) { }
 
 
-	createGameInstance(game: Game) {
+	createGameInstance(game: GameEngine) {
 		const newGame: Game_instance = {
 			game_has_started : true,
 			game_has_ended : false,
@@ -117,7 +117,7 @@ export class GameEngineService {
 		gameEngine.playerTwoID = player2ID;
 		gameEngine.scoreOne = 0;
 		gameEngine.scoreTwo = 0;
-		gameEngine.gameID = game.gameId;
+		gameEngine.gameId = game.gameId;
 		await this.gameEngineRepository.save(gameEngine);
 		return (gameEngine);
 	}
@@ -147,8 +147,8 @@ export class GameEngineService {
 		return paddle;
 	}
 
-	async getGameEngine(gameID: number): Promise<GameEngine> {
-		const gameEngine: GameEngine = await this.gameEngineRepository.findOne({ where: { gameID: gameID } })
+	async getGameEngine(gameId: number): Promise<GameEngine> {
+		const gameEngine: GameEngine = await this.gameEngineRepository.findOne({ where: { gameId: gameId } })
 		return (gameEngine);
 	}
 

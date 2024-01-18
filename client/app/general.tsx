@@ -29,7 +29,7 @@ const GeneralComponent = () => {
 
     const { globalState, dispatch } = useGlobal();
 
-	// faire comme le usersocket
+	// faire comme le userSocket
 	const gameSocket = io('http://localhost:3001/game', {
 		autoConnect: false,
 	})
@@ -90,7 +90,6 @@ const GeneralComponent = () => {
 			const payload = JSON.parse(atob(jwtArray[1]));
 			sessionStorage.setItem("currentUserID", payload.sub);
 			sessionStorage.setItem("2fa", payload.tfa_enabled);
-			console.log("Username: ", payload.username);
 			if (payload.username === payload.login)
 				sessionStorage.setItem("currentUserLogin", payload.login);
 			else
@@ -101,53 +100,55 @@ const GeneralComponent = () => {
 		}
 	}
 
-	const handleAccessToken = async (code: any): Promise<boolean> => {
+	const handleAccessToken = async (code: string): Promise<boolean> => {
 
-		if (sessionStorage.getItem("jwt")) {
-			const userSocket = io('http://localhost:3001/user', {
-				autoConnect: false,
-				auth: {
-					token: sessionStorage.getItem("jwt"),
-				}
-			});
-			userSocket.connect();
-			dispatch({ type: 'SET_SOCKET', payload: userSocket });
-			setAuthValidated(true);
-			return true;
-		}
 
-		const response = await fetch('http://localhost:3001/auth/access', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-			},
-			body: JSON.stringify({code}),
-		});
+		try {
 
-		if (response.ok) {
-
-			const token = await response.json();
-			sessionStorage.setItem("jwt", token.access_token);
-			const jwt = sessionStorage.getItem("jwt");
-			if (jwt) {
-				await setUserSession(jwt);
+			if (sessionStorage.getItem("jwt")) {
 				const userSocket = io('http://localhost:3001/user', {
 					autoConnect: false,
 					auth: {
-						token: jwt,
+						token: sessionStorage.getItem("jwt"),
 					}
 				});
 				userSocket.connect();
 				dispatch({ type: 'SET_SOCKET', payload: userSocket });
 				setAuthValidated(true);
-				// Attention a la 2fa
 				return true;
 			}
-			else
-				return false;
+	
+			const response = await fetch('http://localhost:3001/auth/access', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({code}),
+			});
+	
+			if (response.ok) {
+	
+				const token = await response.json();
+				sessionStorage.setItem("jwt", token.access_token);
+				if (token.access_token) {
+					setUserSession(token.access_token);
+					const userSocket = io('http://localhost:3001/user', {
+						autoConnect: false,
+						auth: {
+							token: token.access_token,
+						}
+					});
+					userSocket.connect();
+					dispatch({ type: 'SET_SOCKET', payload: userSocket });
+					setAuthValidated(true);
+					// Attention a la 2fa
+				}
+			}
+		} catch (error) {
+			console.log(error);
 		}
 
-		return false;
+		return true;
 	}
 
 	const handle2FADone = () => {
@@ -249,7 +250,6 @@ const GeneralComponent = () => {
 		})
 
 		return () => {
-			console.log('Unregistering events...');
 			gameSocket.off('connect');
 			gameSocket.off('disconnect');
 		}

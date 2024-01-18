@@ -208,29 +208,33 @@ export class ChatService {
 		return [];
 	}
 
-	private async getDMsConversations(userID: number): Promise<Conversation[]> {
+	// private async getDMsConversations(userID: number) {
 		
 		
-		const userToFind : User = await this.usersRepository.findOne({
-			where: { id: userID },
-			relations: ["groups", "groups.conversation"],
-		});
+	// 	const userToFind : User = await this.usersRepository.findOne({
+	// 		where: { id: userID },
+	// 		relations: ["groups", "groups.conversation"],
+	// 	});
 		
-		if (userToFind) {
+	// 	if (userToFind) {
 			
-			let conversationArray : Conversation[] = [];
-			if (userToFind.groups && Array.isArray(userToFind.groups)) {
-				userToFind.groups.forEach((group: GroupMember) => {
-					if (!group.conversation.is_channel)
-						conversationArray.push(group.conversation)
-				})
-				return conversationArray;
-			}
-			return [];
-		}
-		console.error("Fatal error: user not found");
-		return [];
-	}
+	// 		let conversationArray = [];
+	// 		if (userToFind.groups && Array.isArray(userToFind.groups)) {
+	// 			userToFind.groups.forEach((group: GroupMember) => {
+	// 				if (!group.conversation.is_channel)
+	// 					conversationArray.push({
+	// 						id: group.conversation.id,
+	// 						username: userToFind.username,
+	// 						avatarURL: userToFind.avatarURL,
+	// 				})
+	// 			})
+	// 			return conversationArray;
+	// 		}
+	// 		return [];
+	// 	}
+	// 	console.error("Fatal error: user not found");
+	// 	return [];
+	// }
 
 	async getAllConversations(userID: number): Promise<Conversation[]> {
 		
@@ -723,6 +727,18 @@ export class ChatService {
 	
 	async createFriendsConversation(initiator: User, friend: User): Promise<Conversation> {
 		
+		let check = false;
+		initiator.groups.forEach((friendGroup: GroupMember) => {
+			friend.groups.forEach((initiatorGroup: GroupMember) => {
+				if (!initiatorGroup.conversation.is_channel && !friendGroup.conversation.is_channel) {
+					if (initiatorGroup.conversation.id == friendGroup.conversation.id) {
+						check = true;
+						return ;
+					}
+				}
+			});
+		});
+		
 		const room = new Conversation();
 		room.name = initiator.username + friend.username;
 		room.is_channel = false;
@@ -947,16 +963,16 @@ export class ChatService {
 		return allConversations;
 	}
 
-	async getDMsConversationsFromUser(userID: number): Promise<Conversation[]> {
+	// async getDMsConversationsFromUser(userID: number) {
 
-		const allFriendConversations = await this.getDMsConversations(userID);
-		if (!allFriendConversations) {
-			console.error("Fatal error: conversations not found");
-			return [];
-		}
+	// 	const allFriendConversations = await this.getDMsConversations(userID);
+	// 	if (!allFriendConversations) {
+	// 		console.error("Fatal error: conversations not found");
+	// 		return [];
+	// 	}
 
-		return allFriendConversations;
-	}
+	// 	return allFriendConversations;
+	// }
 
 	async getUserListFromConversation(conversationID: number) {
 
@@ -986,6 +1002,47 @@ export class ChatService {
 		});
 
 		return userList;
+	}
+
+	async getUserListFromDms(userID: number) {
+
+		const user = await this.usersRepository.findOne({
+			where: { id: userID },
+			relations: ['groups', 'groups.conversation'],
+		});
+		
+		// les dms = group.conversation -->!is_channel
+		let userDMs = [];
+		user.groups.forEach((group: GroupMember) => {
+			if (!group.conversation.is_channel) {
+				userDMs.push(group.conversation);
+			}
+		});
+
+		const users = await this.usersRepository.find({
+			relations: ['groups', 'groups.conversation'],
+		});
+
+		// tout les users
+		let DMList = [];
+		users.forEach((user: User) => {
+			// tout les groups d'un user
+			user.groups.forEach((userGroup: GroupMember) => {
+				// chaque groupe du user par rapport a NOS groups de DM
+				userDMs.forEach((dm: Conversation) => {
+					// Si on a une conv privee
+					if (userGroup.conversation.id == dm.id) {
+						DMList.push({
+							id: userGroup.conversation.id,
+							username: user.username,
+							avatarURL: user.avatarURL,
+						});
+					}
+				})
+			});
+		});
+
+		return DMList;
 	}
 
 	// return un array d'array d'objets "user" : login, avatarURL
