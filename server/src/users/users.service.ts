@@ -322,6 +322,7 @@ export class UsersService {
 				friendshipToUpdate.isAccepted = flag;
 				await this.friendshipRepository.save(friendshipToUpdate);
 
+				// si la conv existe deja, pas besoin de la refaire mdr
 				if (flag) {
 					const conversation = this.chatService.createFriendsConversation(initiator, friend);
 					return conversation;

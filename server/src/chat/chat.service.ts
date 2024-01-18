@@ -430,6 +430,11 @@ export class ChatService {
 			relations: ["groups"],
 		});
 		const user = await this.usersRepository.findOne({ where: { id: muteUserDto.from } });
+
+		if (user.id == userToMute.id) {
+			throw new Error('Fatal error');
+		}
+
 		const conversation = await this.conversationRepository.findOne({ where: { id: muteUserDto.conversationID } });
 		const userGroup = await this.getRelatedGroup(user, conversation);
 
@@ -454,16 +459,21 @@ export class ChatService {
 
 	async updateUserUnmuteStatusFromConversation(muteUserDto: UserOptionsDto): Promise<boolean> {
 
-		const userToMute : User = await this.usersRepository.findOne({
+		const userToUnmute : User = await this.usersRepository.findOne({
 			where: { username: muteUserDto.username },
 			relations: ["groups"],
 		});
 		const user = await this.usersRepository.findOne({ where: { id: muteUserDto.from } });
+
+		if (user.id == userToUnmute.id) {
+			throw new Error('Fatal error');
+		}
+
 		const conversation = await this.conversationRepository.findOne({ where: { id: muteUserDto.conversationID } });
 		const userGroup = await this.getRelatedGroup(user, conversation);
 
-		if (userToMute && conversation && userGroup) {
-			const groupToUpdate = await this.getRelatedGroup(userToMute, conversation);
+		if (userToUnmute && conversation && userGroup) {
+			const groupToUpdate = await this.getRelatedGroup(userToUnmute, conversation);
 
 			if (userGroup.isOwner || userGroup.isAdmin) {
 				if (groupToUpdate && !groupToUpdate.isOwner || !groupToUpdate.isAdmin) {
@@ -472,7 +482,7 @@ export class ChatService {
 					return true;	
 				}
 
-				throw new Error(`${userToMute.username} has higher privilege`);
+				throw new Error(`${userToUnmute.username} has higher privilege`);
 			}
 
 			throw new Error(`${user.username} is not owner or admin`);
@@ -487,8 +497,12 @@ export class ChatService {
 			where: { username: banUserDto.username },
 			relations: ["groups"],
 		});
-
 		const user = await this.usersRepository.findOne({ where: { id: banUserDto.from } });
+
+		if (user.id == userToBan.id) {
+			throw new Error('Fatal error');
+		}
+
 		const conversation = await this.conversationRepository.findOne({ where: { id: banUserDto.conversationID } });
 		const userGroup = await this.getRelatedGroup(user, conversation);
 
@@ -518,6 +532,11 @@ export class ChatService {
 			relations: ["groups"],
 		});
 		const user = await this.usersRepository.findOne({ where: { id: banUserDto.from } });
+
+		if (user.id == userToUnban.id) {
+			throw new Error('Fatal error');
+		}
+
 		const conversation = await this.conversationRepository.findOne({ where: { id: banUserDto.conversationID } });
 		const userGroup = await this.getRelatedGroup(user, conversation);
 
@@ -542,20 +561,14 @@ export class ChatService {
 
 	async updateUserAdminStatusFromConversationTrue(promoteUserToAdminDto: UserOptionsDto): Promise<boolean> {
 
-		// if (promoteUserToAdminDto.from === promoteUserToAdminDto.username) {
-
-		// }
-
 		const userToPromote : User = await this.usersRepository.findOne({
 			where: { username: promoteUserToAdminDto.username },
 			relations: ['groups'],
 		});
 		const user = await this.usersRepository.findOne({ where: { id: promoteUserToAdminDto.from } });
-		console.log("user: ", user.id);
-		console.log("userToPromote: ", userToPromote.id);
 
 		if (user.id == userToPromote.id) {
-			return false;
+			throw new Error('Fatal error');
 		}
 
 		const conversation = await this.conversationRepository.findOne({ where: { id: promoteUserToAdminDto.conversationID } });
@@ -586,8 +599,12 @@ export class ChatService {
 			where: { username: promoteUserToAdminDto.username },
 			relations: ['groups'],
 		});
-
 		const user = await this.usersRepository.findOne({ where: { id: promoteUserToAdminDto.from } });
+
+		if (user.id == userToPromote.id) {
+			throw new Error('Fatal error');
+		}
+
 		const conversation = await this.conversationRepository.findOne({ where: { id: promoteUserToAdminDto.conversationID } });
 		const userGroup = await this.getRelatedGroup(user, conversation);
 
@@ -837,7 +854,6 @@ export class ChatService {
 	/***						MESSAGE							***/
 	/**************************************************************/
 	
-	// need to check muteStatus here or in front?
 	async createMessage(messageDto: MessageDto): Promise<Message> {
 		
 		const conversation : Conversation = await this.conversationRepository.findOne({ where: {id: messageDto.conversationID} });
@@ -903,11 +919,6 @@ export class ChatService {
 
 		throw new Error("No conversations found");
 	}
-	
-
-	getMessageById(idToFind: number) {
-		return this.messageRepository.findOne({ where: {id: idToFind} });
-	}
 
 	async getConversationByID(id: number): Promise<Conversation> {
 
@@ -963,17 +974,6 @@ export class ChatService {
 		return allConversations;
 	}
 
-	// async getDMsConversationsFromUser(userID: number) {
-
-	// 	const allFriendConversations = await this.getDMsConversations(userID);
-	// 	if (!allFriendConversations) {
-	// 		console.error("Fatal error: conversations not found");
-	// 		return [];
-	// 	}
-
-	// 	return allFriendConversations;
-	// }
-
 	async getUserListFromConversation(conversationID: number) {
 
 		const conversation = await this.conversationRepository.findOne({ where: { id: conversationID } });
@@ -1006,14 +1006,14 @@ export class ChatService {
 
 	async getUserListFromDms(userID: number) {
 
-		const user = await this.usersRepository.findOne({
+		const myuser = await this.usersRepository.findOne({
 			where: { id: userID },
 			relations: ['groups', 'groups.conversation'],
 		});
 		
 		// les dms = group.conversation -->!is_channel
 		let userDMs = [];
-		user.groups.forEach((group: GroupMember) => {
+		myuser.groups.forEach((group: GroupMember) => {
 			if (!group.conversation.is_channel) {
 				userDMs.push(group.conversation);
 			}
@@ -1027,19 +1027,21 @@ export class ChatService {
 		let DMList = [];
 		users.forEach((user: User) => {
 			// tout les groups d'un user
-			user.groups.forEach((userGroup: GroupMember) => {
-				// chaque groupe du user par rapport a NOS groups de DM
-				userDMs.forEach((dm: Conversation) => {
-					// Si on a une conv privee
-					if (userGroup.conversation.id == dm.id) {
-						DMList.push({
-							id: userGroup.conversation.id,
-							username: user.username,
-							avatarURL: user.avatarURL,
-						});
-					}
-				})
-			});
+			if (user.id != myuser.id) {
+				user.groups.forEach((userGroup: GroupMember) => {
+					// chaque groupe du user par rapport a NOS groups de DM
+					userDMs.forEach((dm: Conversation) => {
+						// Si on a une conv privee
+						if (userGroup.conversation.id == dm.id) {
+							DMList.push({
+								id: userGroup.conversation.id,
+								username: user.username,
+								avatarURL: user.avatarURL,
+							});
+						}
+					})
+				});
+			}
 		});
 
 		return DMList;
