@@ -111,26 +111,6 @@ export class UsersService {
 		}
 		return user.avatarURL;
 	}
-	// async deleteUserAvatar(data: Buffer, fileName:string , userID: number) {
-		
-	// 	const avatar = await this.avatarService.create(userID, data, fileName);
-	// 	if (!avatar)
-	// 		throw console.log("error");
-	// 	await this.usersRepository.update(userID, {avatarID : avatar.ID})
-	// 	return avatar;
-	// }
-
-	// async getUserAvatar(userID: number): Promise<Avatar> {
-	// 	const user = await this.usersRepository.findOne({
-	// 	  where: { id: userID },
-	// 	});
-	  
-	// 	if (!user || !user.avatarID) {
-	// 	  throw new NotFoundException(`User or avatar not found for ID ${userID}`);
-	// 	}
-
-	// 	return this.avatarService.getAvatarByID(user.avatarID);
-	//   }
 
 	// Testing purpose - Maybe future implementation
 	async createNewUser(username: string): Promise<User> {
@@ -148,14 +128,6 @@ export class UsersService {
 		}
 		throw new Error('User with this username already exists');
 	}
-
-	// async deleteUser(username: string) {
-	// 	const userToDelete = await this.usersRepository.findOne({ where: { username } });
-	// 	if (userToDelete) {
-	// 		return await this.usersRepository.delete(username);
-	// 	}
-	// 	throw new NotFoundException();
-	// }
 
 	async updateUserStatus(userID: number, flag: boolean) {
 
@@ -216,7 +188,8 @@ export class UsersService {
 		});
 
 		// la "game" est deja sauvegarde dans la table Game
-		// a voir si pas besoin de faire un group (fait chier)
+		// peut etre creer deux nouvelles instances games, avec les meme donnees comme ca pas de soucis de FK?
+		// voir systeme avec GameGroup
 		if (userOne && userTwo) {
 
 			userOne.games.push(game);

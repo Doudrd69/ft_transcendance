@@ -1,4 +1,4 @@
-import { Controller, Post, HttpCode, HttpStatus, Body, Get, UploadedFile, UseInterceptors, Param, Res, UseGuards } from '@nestjs/common';
+import { Controller, Post, HttpCode, HttpStatus, Body, Get, UploadedFile, UseInterceptors, Param, Res, Req, UseGuards } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { FriendRequestDto } from './dto/FriendRequestDto.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -184,8 +184,16 @@ export class UsersController {
 		return this.usersService.getFriendships(username);
 	}
 
+	@UseGuards(AuthGuard)
 	@Get('getPendingFriends/:username')
 	getPendingFriendsList(@Param('username') username: string): Promise<Friendship[]> {
 		return this.usersService.getPendingFriendships(username);
+	}
+
+	@UseGuards(AuthGuard)
+	@Get('getBlockedUsersList')
+	getBlockedUsersList(@Req() req) {
+		const { user } = req;
+		return this.usersService.getBlockedUserList(user.id);
 	}
 }
