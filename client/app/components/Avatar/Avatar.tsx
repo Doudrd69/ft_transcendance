@@ -30,7 +30,6 @@ const AvatarImageComponent: React.FC<AvatarImageProps> = ({ className, refresh, 
 			try {
 				let response;
 				if (userLogin) {
-					console.log("userLogin?????", userLogin);
 					response = await fetch(url, {
 						method: 'GET',
 					});

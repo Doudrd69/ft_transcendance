@@ -208,21 +208,25 @@ export class ChatService {
 		return [];
 	}
 
-	private async getDMsConversations(userID: number): Promise<Conversation[]> {
-		
-		
+	private async getDMsConversations(userID: number) {
+
+
 		const userToFind : User = await this.usersRepository.findOne({
 			where: { id: userID },
 			relations: ["groups", "groups.conversation"],
 		});
-		
+
 		if (userToFind) {
-			
-			let conversationArray : Conversation[] = [];
+
+			let conversationArray = [];
 			if (userToFind.groups && Array.isArray(userToFind.groups)) {
 				userToFind.groups.forEach((group: GroupMember) => {
 					if (!group.conversation.is_channel)
-						conversationArray.push(group.conversation)
+						conversationArray.push({
+							conversationiId: group.conversation.id,
+							username: userToFind.username,
+							avatarURL: userToFind.avatarURL,
+					})
 				})
 				return conversationArray;
 			}
@@ -947,46 +951,87 @@ export class ChatService {
 		return allConversations;
 	}
 
-	async getDMsConversationsFromUser(userID: number): Promise<Conversation[]> {
+	async getDMsConversationsFromUser(userID: number) {
 
-		const allFriendConversations = await this.getDMsConversations(userID);
+		const allFriendConversations = await this.getUserListFromDms(userID);
 		if (!allFriendConversations) {
 			console.error("Fatal error: conversations not found");
 			return [];
 		}
 
+		console.log("allConv: ", allFriendConversations);
 		return allFriendConversations;
 	}
 
-	async getUserListFromConversation(conversationID: number) {
+	async getUserListFromDms(userID: number) {
 
-		const conversation = await this.conversationRepository.findOne({ id: conversationID });
+		const myuser = await this.usersRepository.findOne({
+			where: { id: userID },
+			relations: ['groups', 'groups.conversation'],
+		});
+
+		// les dms = group.conversation -->!is_channel
+		let userDMs = [];
+		myuser.groups.forEach((group: GroupMember) => {
+			if (!group.conversation.is_channel) {
+				userDMs.push(group.conversation);
+			}
+		});
+
 		const users = await this.usersRepository.find({
 			relations: ['groups', 'groups.conversation'],
 		});
 
-		let userList = [];
+		// tout les users
+		let DMList = [];
 		users.forEach((user: User) => {
-			let userData = [];
-			user.groups.forEach((usergroup: GroupMember) => {
-				if (usergroup.conversation.id == conversation.id) {
-					userData.push({
-						id: user.id,
-						username: user.username,
-						avatar: user.avatarURL,
-						isOwner: usergroup.isOwner,
-						isAdmin: usergroup.isAdmin,
-						isBan: usergroup.isBan,
-						isMute: usergroup.isMute,
-					});
-					return ;
-				}
-			});
-			userList.push(user);
+			// tout les groups d'un user
+			if (user.id != myuser.id) {
+				user.groups.forEach((userGroup: GroupMember) => {
+					// chaque groupe du user par rapport a NOS groups de DM
+					userDMs.forEach((dm: Conversation) => {
+						// Si on a une conv privee
+						if (userGroup.conversation.id == dm.id) {
+							DMList.push({
+								id: userGroup.conversation.id,
+								username: user.username,
+								avatarURL: user.avatarURL,
+							});
+						}
+					})
+				});
+			}
 		});
 
+		return DMList;
+	}
+	async getUserListFromConversation(conversationID: number) {
+
+		console.log("conversationID: ", conversationID);
+		const conversation = await this.conversationRepository.findOne({ where: { id: conversationID } });
+		const users = await this.usersRepository.find({
+			relations: ['groups', 'groups.conversation'],
+		});
+	
+		const userList = users.flatMap((user: User) => {
+			const userData = user.groups
+				.filter((usergroup: GroupMember) => usergroup.conversation.id === conversation.id)
+				.map((usergroup: GroupMember) => ({
+					id: user.id,
+					username: user.username,
+					avatarURL: user.avatarURL,
+					isOwner: usergroup.isOwner,
+					isAdmin: usergroup.isAdmin,
+					isBan: usergroup.isBan,
+					isMute: usergroup.isMute,
+				}));
+	
+				return userData;
+			});
 		return userList;
 	}
+	
+	
 
 	// return un array d'array d'objets "user" : login, avatarURL
 	async getConversationsWithStatus(userID: number) {

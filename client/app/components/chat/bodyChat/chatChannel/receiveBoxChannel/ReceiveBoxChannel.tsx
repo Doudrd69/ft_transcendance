@@ -4,23 +4,13 @@ import { Socket } from 'socket.io-client';
 import { useChat } from '../../../ChatContext';
 import OptionsUserChannel from '../../addConversation/OptionsUserChannel';
 import { useGlobal } from '@/app/GlobalContext';
-
+import { userAgent } from 'next/server';
+import { UserChannel } from '../../../types';
 interface Message {
 	from: string;
 	content: string;
 	post_datetime: string;
 	conversationID: number;
-}
-
-interface userList {
-	login: string;
-	avatarURL: string;
-	isAdmin: boolean;
-	isMute: boolean;
-	isBan: boolean;
-	isOwner: boolean;
-	isBlock: boolean;
-	id: number;
 }
 
 const ReceiveBoxChannelComponent: React.FC = () => {
@@ -29,18 +19,21 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 	const { globalState } = useGlobal();
 	const [messages, setMessages] = useState<Message[]>([]);
 	const messagesContainerRef = useRef<HTMLDivElement>(null);
-
+	// const  owner = state.currentChannelUserList?.find((user: UserChannel) => user.username ===  sessionStorage.getItem("currentUserLogin"));
+	const owner = Array.isArray(state.currentChannelUserList)
+		? state.currentChannelUserList.find((user: UserChannel) => user.isOwner)
+		: null;
 	const isMyMessage = (message: Message): boolean => {
 		return message.from === sessionStorage.getItem("currentUserLogin");
 	};
 
+
 	const scrollToBottom = () => {
 		if (messagesContainerRef.current) {
-		const container = messagesContainerRef.current;
-		container.scrollTop = container.scrollHeight;
+			const container = messagesContainerRef.current;
+			container.scrollTop = container.scrollHeight;
 		}
 	};
-
 	const formatDateTime = (dateTimeString: string) => {
 		const options: Intl.DateTimeFormatOptions = {
 			day: 'numeric',
@@ -56,7 +49,7 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 
 	const getMessages = async () => {
 		try {
-		const response = await fetch(`http://localhost:3001/chat/getMessages/${state.currentConversationID}`, {
+		const response = await fetch(`http://localhost:3001/chat/getMessages/${state.currentChannel?.id}`, {
 			method: 'GET',
 			headers: {
 			'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
@@ -73,11 +66,8 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 	};
 
 	// gerer le cas ou la liste est vide
- 	const ownerUsers_array = state.currentUserList.filter((user: userList) => user.isOwner === true);
-	const ownerUsers = ownerUsers_array[0];
 	useEffect(() => {
 		globalState.userSocket?.on('userJoinedRoom', (notification: string) => {
-		console.log("Channel log: ", notification);
 		});
 
 		globalState.userSocket?.on('onMessage', (message: Message) => {
@@ -92,7 +82,6 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 	}, [globalState?.userSocket]);
 
 	useEffect(() => {
-		console.log("Loading conversation...");
 		getMessages();
 	}, []);
 
@@ -107,56 +96,55 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 			<div className='list-users-channel-owner'>
 				<div className='user-list-item'>
 						<div className='avatar-container'>
-							{ownerUsers &&
+							{owner &&
 								<>
 									<img className='admin-user' src='./crown.png' alt='user' />
 									<img
 									className='img-list-users-channel-admin'
-									src={`http://localhost:3001${ownerUsers.avatarURL}`}
+									src={`http://localhost:3001/users/getAvatarByLogin/${owner.username}/${timestamp}`}
 									onClick={() => {
 										dispatch({ type: 'ACTIVATE', payload: 'dontcandcel' });
 										dispatch({ type: 'ACTIVATE', payload: 'showOptionsUserChannelOwner' });
-										dispatch({ type: 'SET_CURRENT_OPTION_CHANNEL_NAME', payload: ownerUsers.login});
+										dispatch({ type: 'SET_CURRENT_OPTION_CHANNEL_NAME', payload:(owner?.username)});
 										dispatch({ type: 'DISABLE', payload: 'showBackComponent' });
-								}}/>
+									}}/>
 								</>
 							
 							}
 						</div>
-					{state.showOptionsUserChannelOwner && 
-						<OptionsUserChannel user={ownerUsers} />
+					{state.showOptionsUserChannelOwner && owner &&
+						<OptionsUserChannel user={owner} isBlock={false}/>
 					}
 				</div>
 			</div>
 			<div className='list-users-channel'>
-				{state.currentUserList && state.currentUserList.map((userList: userList, index: number) => (
+				{Array.isArray(state.currentChannelUserList) && state.currentChannelUserList?.map((user: UserChannel, index: number) => (
 				<div key={index} className='user-list-item'>
-
-						{userList.isAdmin && !userList.isOwner &&
+						{user.isAdmin && !user.isOwner &&
 							<div className='avatar-container'>
 								<img className='admin-user' src='./crown.png' alt='user' />
 								<img
 								className='img-list-users-channel-admin'
-								src={`http://localhost:3001${userList.avatarURL}`}
+								src={`http://localhost:3001/users/getAvatarByLogin/${user.username}/${timestamp}`}
 								onClick={() => {
 									dispatch({ type: 'ACTIVATE', payload: 'dontcandcel' });
 									dispatch({ type: 'ACTIVATE', payload: 'showOptionsUserChannel' });
-									dispatch({ type: 'SET_CURRENT_OPTION_CHANNEL_NAME', payload: userList.login});
+									dispatch({ type: 'SET_CURRENT_OPTION_CHANNEL_NAME', payload: user.username});
 									dispatch({ type: 'DISABLE', payload: 'showBackComponent' });
 								}}/>
 							</div>}
-						{!userList.isAdmin && !userList.isOwner &&
+						{!user.isAdmin && !user.isOwner &&
 							<img
 								className='img-list-users-channel'
-								src={`http://localhost:3001${userList.avatarURL}`}
+								src={`http://localhost:3001/users/getAvatarByLogin/${user.username}/${timestamp}`}
 								onClick={() => {
 									dispatch({ type: 'ACTIVATE', payload: 'dontcandcel' });
 									dispatch({ type: 'ACTIVATE', payload: 'showOptionsUserChannel' });
-									dispatch({ type: 'SET_CURRENT_OPTION_CHANNEL_NAME', payload: userList.login});
+									dispatch({ type: 'SET_CURRENT_OPTION_CHANNEL_NAME', payload: user.username });
 									dispatch({ type: 'DISABLE', payload: 'showBackComponent'});
 							}}/>}
-					{state.showOptionsUserChannel && !userList.isOwner &&
-						(<OptionsUserChannel user={userList} />)
+					{state.showOptionsUserChannel && !user.isOwner &&
+						(<OptionsUserChannel user={user} isBlock={false}/>)
 					}
 				</div>
 				))}
@@ -164,20 +152,20 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 		</div>
 		<div ref={messagesContainerRef} className="bloc-channel-chat">
 			{messages.map((message: Message, id: number) => (
-			<div key={id} className="bloc-contain">
-				<div className="bloc-avatar-username">
-				<img
-					src={`http://localhost:3001/users/getAvatarByLogin/${message.from}/${timestamp}`}
-					className='avatar-channel'
-					alt="User Avatar"
-				/>
-				<div className="user-name">{message.from}</div>
+				<div key={id} className="bloc-contain">
+					<div className="bloc-avatar-username">
+						<img
+							src={`http://localhost:3001/users/getAvatarByLogin/${message.from}/${timestamp}`}
+							className='avatar-channel'
+							alt="User Avatar"
+						/>
+						<div className="user-name">{message.from}</div>
+					</div>
+					<div className={`message-container ${isMyMessage(message) ? 'my-message-channel' : 'other-message-channel'}`}>
+						<p className="channel-chat-content">{message.content}</p>
+						<p className="channel-chat-date">{formatDateTime(message.post_datetime)}</p>
+					</div>
 				</div>
-				<div className={`message-container ${isMyMessage(message) ? 'my-message-channel' : 'other-message-channel'}`}>
-				<p className="channel-chat-content">{message.content}</p>
-				<p className="channel-chat-date">{formatDateTime(message.post_datetime)}</p>
-				</div>
-			</div>
 			))}
 		</div>
 		</>

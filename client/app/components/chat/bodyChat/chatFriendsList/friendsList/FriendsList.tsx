@@ -25,6 +25,7 @@ interface Conversation {
 const FriendsListComponent: React.FC = () => {
 	
 	const {state, dispatch} = useChat();
+	console.log("channel3: ", state.channelList);
 	const [showTabFriendsList, setTabFriendsList] = useState(false);
 	const [activeIndex, setActiveIndex] = useState<number | null>(null);
 	const [friendList, setFriendList] = useState<FriendShip[]>([]);

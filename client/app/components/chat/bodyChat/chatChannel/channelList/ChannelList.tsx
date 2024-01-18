@@ -1,60 +1,33 @@
 import './ChannelList.css';
 import React, { useState, useEffect } from 'react';
-import { useChat } from '../../../ChatContext';
+import {useChat, setCurrentChannelUserList, setCurrentComponent, setCurrentChannel, setCurrentUserChannel } from '../../../ChatContext';
 import AddConversationComponent from '../../addConversation/AddConversation';
 import { Socket } from 'socket.io-client';
 import ListMyChannelComponent from '../../listMyChannel/ListMyChannel';
 import PasswordComponent from '../../listMyChannel/Password';
-import { setCurrentComponent } from '../../../ChatContext';
+import { Channel, ConversationChannel, ConversationDm, UserChannel, UserDm } from '../../../types';
 
-interface Conversation {
-	id: string;
-	name: string;
-	is_channel: boolean;
-	isPublic: boolean;
-	isProtected: boolean;
-}
-interface userList {
-	login: string;
-	avatarURL: string;
-}
 
 const ChannelListComponent: React.FC = () => {
 
 	const { state, dispatch } = useChat();
-
+	const [currentChannelState, setCurrentChannelState] = useState<ConversationChannel | null>(null);
 	const userID = Number(sessionStorage.getItem("currentUserID"));
 	const userName = sessionStorage.getItem("currentUserLogin")
 
-	const [conversations, setConversations] = useState<Conversation[]>([]);
-	const [isAdmin, setIsAdmin] = useState<boolean[]>([]);
-	const [userList, setUserList] = useState<userList[]>([]);
-	const [isAdd, setIsAdd] = useState<boolean>(false);
-	
 
 	const loadDiscussions = async () => {
-
 		try{
 
-			const response = await fetch(`http://localhost:3001/chat/getConversationsWithStatus/${userID}`, {
+			const response = await fetch(`http://localhost:3001/chat/getConversations/${userID}`, {
 				method: 'GET',
 				headers: {
 					'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
 				}
 			});
-	
 			if (response.ok) {
-				const responseData = await response.json();
-				const { conversationList, isAdmin, usersList } = responseData;
-				if (conversationList)
-					setConversations([...conversationList]);
-				if (isAdmin)
-					setIsAdmin([...isAdmin]);
-				if (usersList ) {
-					console.log(userList);
-					setUserList([...usersList]);
-					dispatch({ type: 'SET_CONVERSATIONS_LIST', payload: conversationList});
-				}
+				const channelList = await response.json();
+				dispatch({ type: 'SET_CHANNEL_LIST', payload: channelList});
 			}
 		}
 		catch (error) {
@@ -85,24 +58,47 @@ const ChannelListComponent: React.FC = () => {
 			};
 	}, []);
 
-	const handleConv = (conversation: Conversation, userList: userList, index: number) => {
-		/*NEW*/
-		dispatch({ type: 'SET_CURRENT_CONVERSATION', payload: conversation });
+	const loadUserList = async (channel: ConversationChannel) => {
+		try {
+		  if (channel && channel.id) {
+			const response = await fetch(`http://localhost:3001/chat/getUserList/${channel.id}`, {
+			  method: 'GET',
+			  headers: {
+				'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
+			  },
+			});
+	  
+			if (response.ok) {
+				const userList = await response.json();
+				await dispatch(setCurrentChannelUserList(userList));
+			}
+		  }
+		} catch (error) {
+		  console.log(error);
+		}
+	}
+	useEffect(() => {
+		if (currentChannelState) {
+			handleConv(currentChannelS);
+		}
+	},[currentChannel]);
+
+	const handleConv = async (channel: ConversationChannel) => {
+		/* NEW */
+		console.log("Channel: ", channel);
+		if (channel)
+			dispatch(setCurrentChannel(channel));
+		await loadUserList(channel);
+		console.log("state.current: ", state.currentChannel);
+		const me = Array.isArray(state.currentChannelUserList) ? state.currentChannelUserList.find((user: UserChannel) => user.username ===  sessionStorage.getItem("currentUserLogin")) : null;
+		if (me)
+			dispatch(setCurrentUserChannel(me));
+		dispatch(setCurrentComponent('showChannelList'));
 		dispatch({ type: 'ACTIVATE', payload: 'showChannel' });
 		dispatch({ type: 'DISABLE', payload: 'showChannelList' });
-
-		/*OLD*/
-		dispatch({ type: 'SET_CURRENT_OPTION_CHANNEL_NAME', payload: conversation.name });
-		dispatch(setCurrentComponent('showChannelList'));
-		dispatch({ type: 'SET_CURRENT_CONVERSATION_ID', payload: conversation.id });
-		dispatch({ type: 'SET_CURRENT_CONVERSATION_IS_PRIVATE', payload: conversation.isPublic });
-		dispatch({ type: 'SET_CURRENT_CONVERSATION_IS_PROTECTED', payload: conversation.isProtected });
 		dispatch({ type: 'ACTIVATE', payload: 'currentChannelBool' });
-		dispatch({ type: 'ACTIVATE', payload: 'dontcancel' });
-		if(isAdmin[index])
-			dispatch({ type: 'ACTIVATE', payload: 'showAdmin' });
-		dispatch({ type: 'SET_CURRENT_USER_LIST', payload: userList });
-	}
+	};
+	
 
 	return (
 		<div className="bloc-channel-list">
@@ -132,20 +128,17 @@ const ChannelListComponent: React.FC = () => {
 				{state.showAddChannel ? <ListMyChannelComponent user={userName || 'no-user'} isAdd={true} title="JOIN CHANNEL"/> : null}
 				{state.showCreateChannel ? <AddConversationComponent loadDiscussions={loadDiscussions} title="CREATE CHANNEL" isChannel={true} /> : null}
 			</div>
-			{conversations.map((conversation, index) => (
-					conversation.is_channel && (
+			{state.channelList && state.channelList?.map((channel:Channel, index:number) => (
+					channel.conversation.is_channel && (
 					<button
-					key={index}
-					className="button-channel-list"
-					onClick={() => {
-							handleConv(conversation, userList[index], index);
-							if(isAdmin[index])
-								state.currentIsAdmin = true;
-						}}>
-					{isAdmin[index] && <img className="icon-admin-channel" src='./crown.png' alt="private" />}
-					{conversation.isProtected &&  <img className="icon-password-channel" src='./password.png' alt="private" />}
-					{!conversation.isPublic && <img className="icon-private-channel" src='./private.png' alt="private" />}
-					<span>{`${conversation.name}#${conversation.id}`}</span>
+						key={index}
+						className="button-channel-list"
+						onClick={() => setCurrentChannel(channel.conversation)}
+					>
+					{channel.isAdmin && <img className="icon-admin-channel" src='./crown.png' alt="private" />}
+					{channel.conversation.id &&  <img className="icon-password-channel" src='./password.png' alt="private" />}
+					{!channel.conversation.isPublic && <img className="icon-private-channel" src='./private.png' alt="private" />}
+					<span>{`${channel.conversation.name}#${channel.conversation.id}`}</span>
 				</button>
 				)
 			))}

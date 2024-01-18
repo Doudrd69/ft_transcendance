@@ -22,19 +22,15 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 
 	const [formValue, setFormValue] = useState('');
 	const { state, dispatch } = useChat();
-	const me = state.currentUserList.filter((user: userList) => user.login === sessionStorage.getItem("currentUserLogin"));
-	const isAdmin = me[0].isAdmin;
-	const isOwner = me[0].isOwner;
-
-
+	const isAdmin = state.currentUserChannel?.isAdmin ?? false;
+	const isOwner = state.currentUserChannel?.isOwner ?? false;
 	const updateIsPublicTrue = async() => {
 
 		try {
 			const channelOptionDto = {
-				conversationID: Number(state.currentConversationID),
+				conversationID: state.currentChannel?.id,
 				userID: Number(sessionStorage.getItem("currentUserID")),
 			}
-			console.log("HANDLE PRIVATE: ", channelOptionDto);
 
 			const response = await fetch(`http://localhost:3001/chat/updateIsPublicTrue`, {
 				method: 'POST',
@@ -46,7 +42,14 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 			});
 
 			if (response.ok) {
-				dispatch({ type: 'ACTIVATE', payload: 'currentConversationIsPrivate' });
+				console.log("Updated status");
+				dispatch({
+					type: 'SET_CURRENT_CHANNEL',
+					payload: {
+					  ...state.currentChannel,
+					  isPublic: true,
+					},
+				  });
 			}
 		}
 		catch (error) {
@@ -56,26 +59,31 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 	const updateIsPublicFalse = async() => {
 
 		try {
-		const channelOptionDto = {
-			conversationID: Number(state.currentConversationID),
-			userID: Number(sessionStorage.getItem("currentUserID")),
-		}
-		console.log("HANDLE PRIVATE: ", channelOptionDto);
+			const channelOptionDto = {
+				conversationID: state.currentChannel?.id,
+				userID: Number(sessionStorage.getItem("currentUserID")),
+			}
+			console.log("HANDLE PRIVATE: ", channelOptionDto);
 
-		const response = await fetch(`http://localhost:3001/chat/updateIsPublicFalse`, {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-				'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
-			},
-			body: JSON.stringify(channelOptionDto),
-		});
-
-		if (response.ok) {
-			dispatch({ type: 'DISABLE', payload: 'currentConversationIsPrivate' });
-			console.log("Updated status");
+			const response = await fetch(`http://localhost:3001/chat/updateIsPublicFalse`, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
+				},
+				body: JSON.stringify(channelOptionDto),
+			});
+			if (response.ok) {
+				dispatch({
+					type: 'SET_CURRENT_CHANNEL',
+					payload: {
+						...state.currentChannel,
+						isPublic: false,
+					},
+					});
+			}
 		}
-		}
+		
 		catch (error) {
 			console.error(error);
 		}
@@ -85,9 +93,9 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 
 		try{
 			const channelOptionDto = {
-				conversationID: Number(state.currentConversationID),
+				conversationID: state.currentChannel?.id,
 				userID: Number(sessionStorage.getItem("currentUserID")),
-				state: state.currentConversationIsPrivate,
+				state: state.currentChannel?.isPublic,
 			}
 	
 			const response = await fetch(`http://localhost:3001/chat/updateIsPublic`, {
@@ -100,8 +108,14 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 			});
 	
 			if (response.ok) {
-				dispatch({ type: 'TOGGLEX', payload: 'currentConversationIsPrivate' });
 				console.log("Updated status");
+				dispatch({
+					type: 'SET_CURRENT_CHANNEL',
+					payload: {
+						...state.currentChannel,
+						isProtected: true,
+					},
+				});
 			}
 		}
 		catch (error) {
@@ -113,7 +127,7 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 
 		try{
 			const channelOptionDto = {
-				conversationID: Number(state.currentConversationID),
+				conversationID: state.currentChannel?.id,
 				userID: Number(sessionStorage.getItem("currentUserID")),
 				state: state.currentConversationIsProtected,
 			}
@@ -129,16 +143,17 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 	
 			if (response.ok) {
 				const status = await response.json();
-				console.log(status);
 				if (status) {
-					dispatch({ type: 'DISABLE', payload: 'currentConversationIsProtected' });
-					console.log("Password updated");
+					console.log("Updated status");
+					dispatch({
+						type: 'SET_CURRENT_CHANNEL',
+						payload: {
+							...state.currentChannel,
+							isProtected: false,
+						},
+					});
 				}
-				else {
-					console.log("User is not admin on this channel");
-				}
-
-		}
+			}
 		}
 		catch (error) {
 			console.error(error);
@@ -172,22 +187,25 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 				<div className="option-block">
 					{isAdmin ?
 						<>
-							{state.currentConversationIsPrivate ?
+							{state.currentChannel?.isPublic ?
 								<img className="option-image" src="private.png"  onClick={updateIsPublicFalse}/>
 								:
 								<img className="option-image" src="public.png" onClick={updateIsPublicTrue}/>
 							}
-							<img className="option-image" src="upload-password.png"  onClick={() => { 
-									if (state.currentConversationIsProtected)
-										dispatch({ type: 'ACTIVATE', payload: 'showPasswordChange' });
-										dispatch({ type: 'DISABLE', payload: 'showOptionChannel' });
-							}}/>
-							{state.currentConversationIsProtected ?
+							{state.currentChannel?.isProtected ?
+								<img className="option-image" src="upload-password.png"  onClick={() => { 
+											dispatch({ type: 'ACTIVATE', payload: 'showPasswordChange' });
+											dispatch({ type: 'DISABLE', payload: 'showOptionChannel' });
+									}}/>
+								:
+								null
+							}
+							{state.currentChannel?.isProtected ?
 								<img className="option-image" src="password.png" onClick={updateIsProtectedFalse}/>
 								:
 								<img className="option-image" src="no-password.png"
 								onClick={() => { 
-										dispatch({ type: 'ACTIVATE', payload: 'showPasswordChange' });
+										dispatch({ type: 'ACTIVATE', payload: 'showPasswordChange'});
 										dispatch({ type: 'DISABLE', payload: 'showOptionChannel' });
 							}}/>}
 						</> 

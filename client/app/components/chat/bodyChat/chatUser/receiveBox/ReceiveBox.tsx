@@ -21,7 +21,7 @@ const ReceiveBoxComponent: React.FC = () => {
 	const isMyMessage = (message: Message): boolean => {
 		return message.from === sessionStorage.getItem("currentUserLogin");
 	};
-
+	console.log("userList dans receive.tsx: ", state.currentUserList);
 	const scrollToBottom = () => {
 		if (messagesContainerRef.current) {
 		  const container = messagesContainerRef.current;
@@ -31,40 +31,37 @@ const ReceiveBoxComponent: React.FC = () => {
 	
 	const formatDateTime = (dateTimeString: string) => {
 		const options: Intl.DateTimeFormatOptions = {
-		  day: 'numeric',
-		  month: 'numeric',
-		  year: 'numeric',
-		  hour: '2-digit',
-		  minute: '2-digit',
-		  second: '2-digit',
+			day: 'numeric',
+			month: 'numeric',
+			year: 'numeric',
+			hour: '2-digit',
+			minute: '2-digit',
+			second: '2-digit',
 		};
-	  
 		const formattedDate = new Intl.DateTimeFormat('en-GB', options).format(new Date(dateTimeString));
 		return formattedDate;
-	  };
+	};
 
-	// This function will retreive all the messages from the conversation and set the messages array for display
 	const getMessage = async () => {
 
 		try {
-			console.log("Get conversation ", state.currentConversationID);
-			const response = await fetch(`http://localhost:3001/chat/getMessages/${state.currentConversationID}`, {
+			console.log("Get conversation ", state.currentConversation.id);
+			const response = await fetch(`http://localhost:3001/chat/getMessages/${state.currentConversation.id}`, {
 				method: 'GET',
 				headers: {
 					'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
 				}
 			});
-
 			if (response.ok) {
+				
 				const messageList = await response.json();
+				console.log('message lIst', messageList)
 				setMessages((prevMessages: Message[]) => [...prevMessages, ...messageList]);
 			}
 		} catch (error) {
 			console.log(error);
 		}
 	}
-
-	// Here we retreive the last sent message and we "insert" it in the messages array
 	useEffect(() => {
 
 		globalState.userSocket?.on('onMessage', (message: Message) => {
@@ -79,7 +76,6 @@ const ReceiveBoxComponent: React.FC = () => {
 
 	}, [globalState?.userSocket]);
 	
-	// Loading the conversation (retrieving all messages on component rendering)
 	useEffect(() => {
 		console.log("Loading DM conversation...");
 		getMessage();

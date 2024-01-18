@@ -155,7 +155,7 @@ export class ChatController {
 
 	@UseGuards(AuthGuard)
 	@Get('getConversations/:userID')
-	getConversationsFromUser(@Param('userID') userID: number): Promise<Conversation[]> {
+	getConversationsFromUser(@Param('userID') userID: number) {
 		return this.chatService.getAllChannelsFromUser(userID);
 	}
 

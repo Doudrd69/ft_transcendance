@@ -5,23 +5,15 @@ import { toast } from 'react-toastify';
 import './AddConversation.css';
 import { RSC } from 'next/dist/client/components/app-router-headers';
 import { useGlobal } from '@/app/GlobalContext';
-
-interface user {
-	login: string;
-	avatarURL: string;
-	isAdmin: boolean;
-	isMute: boolean;
-	isBan: boolean;
-	isBlock: boolean;
-	id: number;
-}
+import { UserChannel } from '../../types';
 
 interface OptionsUserChannelProps {
-	user: user
+	user: UserChannel;
+	isBlock: boolean;
 }
 
 
-const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user }) => {
+const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({user, isBlock}) => {
 
 	const { state, dispatch } = useChat();
 	const { globalState } = useGlobal();
@@ -29,15 +21,13 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user }) => {
 	const [admin, setAdmin] = useState<boolean>(user.isAdmin);
 	const [mute, setMute] = useState<boolean>(user.isMute);
 	const [ban, setBan] = useState<boolean>(user.isBan);
-	const [block, setBlock] = useState<boolean>(user.isBlock);
-
 
 	const blockUser = async() => {
 
 		try {
 			const BlockUserDto = {
 				initiatorLogin: sessionStorage.getItem("currentUserLogin"),
-				recipientLogin: user.login,
+				recipientLogin: user.username,
 			}
 	
 			const response = await fetch(`http://localhost:3001/users/blockUser`, {
@@ -50,10 +40,7 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user }) => {
 			});
 		
 		if (response.ok) {
-			user.isBlock = !user.isBlock;
-			setBlock(true);
-
-			globalState.userSocket?.emit('joinRoom', { roomName: `whoblocked${user.login}`, roomID: '' } );
+			globalState.userSocket?.emit('joinRoom', { roomName: `whoblocked${user.username}`, roomID: '' } );
 		}
 		}
 		catch (error) {
@@ -67,7 +54,7 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user }) => {
 
 			const BlockUserDto = {
 				initiatorLogin: sessionStorage.getItem("currentUserLogin"),
-				recipientLogin: user.login,
+				recipientLogin: user.username,
 			}
 				const response = await fetch(`http://localhost:3001/users/unblockUser`, {
 				method: 'POST',
@@ -79,10 +66,8 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user }) => {
 			});
 		
 		if (response.ok) {
-			user.isBlock = !user.isBlock;
-			setBlock(false);
 
-			globalState.userSocket?.emit('leaveRoom', { roomName: `whoblocked${user.login}`, roomID: '' } );
+			globalState.userSocket?.emit('leaveRoom', { roomName: `whoblocked${user.username}`, roomID: ''});
 
 			console.log("unblock");
 		}
@@ -96,8 +81,8 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user }) => {
 
 		try {
 			const userOptionDto = {
-				conversationID: Number(state.currentConversationID),
-				username: user.login,
+				conversationID: Number(state.currentChannel?.id),
+				username: user.username,
 				state: false,
 				from: Number(sessionStorage.getItem("currentUserID"))
 			}
@@ -125,8 +110,8 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user }) => {
 
 		try{
 			const userOptionDto = {
-				conversationID: Number(state.currentConversationID),
-				username: user.login,
+				conversationID: Number(state.currentChannel?.id),
+				username: user.username,
 				state: true,
 				from: Number(sessionStorage.getItem("currentUserID"))
 			}
@@ -157,8 +142,8 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user }) => {
 
 
 			const userOptionDto = {
-				conversationID: Number(state.currentConversationID),
-				username: user.login,
+				conversationID: Number(state.currentChannel?.id),
+				username: user.username,
 				state : true,
 				from: Number(sessionStorage.getItem("currentUserID"))
 			}
@@ -176,9 +161,9 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user }) => {
 				console.log("ban");
 	
 				const status = await response.json();
-        user.isBan = !user.isBan;
-        setBan(true);
-        globalState.userSocket?.emit('banUser', { userToBan: user.login, roomName: state.currentConversation, roomID: state.currentConversationID } );
+				user.isBan = !user.isBan;
+				setBan(true);
+				globalState.userSocket?.emit('banUser', { userToBan: user.username, roomName: state.currentConversation, roomID: state.currentConversationID } );
 			}
 		}
 		catch (error) {
@@ -191,8 +176,8 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user }) => {
 		try {
 
 			const userOptionDto = {
-				conversationID: Number(state.currentConversationID),
-				username: user.login,
+				conversationID: Number(state.currentChannel?.id),
+				username: user.username,
 				state : false,
 				from: Number(sessionStorage.getItem("currentUserID"))
 			}
@@ -208,10 +193,10 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user }) => {
 		
 			if (response.ok) {
 				console.log("unban");
-        const status = await response.json();
-        user.isBan = !user.isBan;
-        setBan(false);
-        globalState.userSocket?.emit('unbanUser', { userToUnban: user.login, roomName: state.currentConversation, roomID: state.currentConversationID } );
+				const status = await response.json();
+				user.isBan = !user.isBan;
+				setBan(false);
+				globalState.userSocket?.emit('unbanUser', { userToUnban: user.username, roomName: state.currentConversation, roomID: state.currentConversationID } );
 			}
 		}
 		catch (error) {
@@ -224,8 +209,8 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user }) => {
 		
 		try {
 			const userOptionDto = {
-				conversationID: Number(state.currentConversationID),
-				username: user.login,
+				conversationID: Number(state.currentChannel?.id),
+				username: user.username,
 				state : true,
 				from: Number(sessionStorage.getItem("currentUserID"))
 			}
@@ -255,8 +240,8 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user }) => {
 		try{
 
 			const userOptionDto = {
-				conversationID: Number(state.currentConversationID),
-				username: user.login,
+				conversationID: Number(state.currentChannel?.id),
+				username: user.username,
 				state : false,
 				from: Number(sessionStorage.getItem("currentUserID"))
 			}
@@ -303,8 +288,8 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user }) => {
 	const handleLeaveChannel = async() => {
 		try {
 			const quitlConversationDto = {
-					conversationID: Number(state.currentConversationID),
-					userID: user.id,
+				conversationID: Number(state.currentChannel?.id),
+					userID: user.UserId,
 			}
 	
 			const response = await fetch(`http://localhost:3001/chat/quitConversation`, {
@@ -332,7 +317,7 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user }) => {
 		<div className="blur-background"></div>
 			<img className="add_button_cancel" src='./close.png'  onClick={handleCancel}/>
 			<div className="add_container">
-				<h2 className="add__title">{user.login}</h2>	
+				<h2 className="add__title">{user.username}</h2>	
 				<div className="option-block">
 					{admin ?
 						<img className="option-image" src="crown.png" onClick={demoteAdminUser}/>
@@ -349,7 +334,7 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user }) => {
 						:
 						<img className="option-image-opacity" src="interdit.png" onClick={banUser}/>
 					}
-					{block ?
+					{isBlock ?
 						<img className="option-image" src="block.png" onClick={unblockUser}/>
 						:
 						<img className="option-image-opacity" src="block.png" onClick={blockUser}/>

@@ -5,29 +5,22 @@ import OptionsChannel from '../../bodyChat/addConversation/OptionsChannel';
 import { Socket } from 'socket.io-client';
 import PasswordChangeComponent from './PasswordChange';
 
-
-
-interface user{
-	id: number;
-	login : string;
-	isAdmin: boolean;
-	isOwner: boolean;
-}
-
 const IdDiscussionComponent: React.FC = () => {
 	const { state, dispatch } = useChat();
 	var id;
-
+	const meChannel = state.currentUserChannel;
+	const meDm = state.targetUser;
 	if (state.currentChannelBool)
 	{
-		id = `${state.currentConversation}#${state.currentConversationID}`;
+		id = `${state.currentChannel?.name}#${state.currentChannel?.id}`;
 	}
 	else
-		id = state.currentConversation;
+		id = state.targetUser?.username;
+	 	// id= "cocou";
 	return (
 		<div className='bloc-id'>
 			<p className="id">{id}</p>
-			{state.currentIsAdmin &&
+			{state.currentUserChannel?.isAdmin &&
 				<img
 					className='image-id'
 					src='settings.png'

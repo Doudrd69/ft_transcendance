@@ -13,12 +13,11 @@ const SendBoxChannelComponent: React.FC = () => {
 	const handleMessageInput = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setMessageValue(e.target.value);
 	};
-	
 	const messageDto = {
 		from: sessionStorage.getItem("currentUserLogin"),
 		content: messageValue,
 		post_datetime: new Date(),
-		conversationID: state.currentConversationID,
+		conversationID: state.currentChannel?.id,
 	}
 
 	const handleMessage = async (e: React.FormEvent) => {
@@ -37,7 +36,7 @@ const SendBoxChannelComponent: React.FC = () => {
 	
 			if (response.ok) {
 				if (globalState.userSocket?.connected) {
-					globalState.userSocket?.emit('message', { dto: messageDto, conversationName: state.currentConversation });
+					globalState.userSocket?.emit('message', { dto: messageDto, conversationName: state.currentChannel?.id });
 				}
 				else {
 					console.log("Client is not connected");

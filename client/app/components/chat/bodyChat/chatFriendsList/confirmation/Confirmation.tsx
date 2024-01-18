@@ -12,7 +12,6 @@ const ConfirmationComponent: React.FC<ConfirmationComponentProps> = ({ phrase, f
 
 	const handleCancel = () => {
 		dispatch({ type: 'DISABLE', payload: 'showConfirmation' })
-		console.log("state =========================: ", state.showBackComponent);
 	};
 
 	useEffect(() => {

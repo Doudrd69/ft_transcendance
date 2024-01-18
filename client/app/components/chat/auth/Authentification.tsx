@@ -14,9 +14,6 @@ const Authentificationcomponent = () => {
 
 		try{
 			e.preventDefault();
-	
-			console.log("Username : ", username);
-	
 			const response = await fetch('http://localhost:3001/users/signup', {
 				method: 'POST',
 				headers: {

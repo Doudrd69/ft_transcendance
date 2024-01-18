@@ -18,9 +18,9 @@ const PasswordChangeComponent: React.FC = () => {
 		try {
 
 			const channelOptionDto = {
-				conversationID: Number(state.currentConversationID),
+				conversationID: state.currentChannel?.id,
 				userID: Number(sessionStorage.getItem("currentUserID")),
-				state: state.currentConversationIsProtected,
+				state: state.currentChannel?.isProtected,
 				password: password,
 			}
 			console.log("HANDLE PROTECTED: ", channelOptionDto);
@@ -35,10 +35,17 @@ const PasswordChangeComponent: React.FC = () => {
 			});
 	
 			if (response.ok) {
-				dispatch({ type: 'ACTIVATE', payload: 'currentConversationIsProtected' });
+				dispatch({
+					type: 'SET_CURRENT_CHANNEL',
+					payload: {
+						...state.currentChannel,
+						isProtected: true,
+					},
+				});
 				dispatch({ type: 'ACTIVATE', payload: 'showOptionUseChannel' });
 				dispatch({ type: 'ACTIVATE', payload: 'showBackComponent' });
 				dispatch({ type: 'DISABLE', payload: 'showPasswordChange' });
+				
 			};} 
 			catch (error) {
 			console.log(error);
