@@ -2,6 +2,7 @@ import { Entity, Column, PrimaryGeneratedColumn, ManyToMany, OneToMany } from 't
 
 @Entity()
 export class Game {
+
 	@PrimaryGeneratedColumn()
 	gameId: number;
 

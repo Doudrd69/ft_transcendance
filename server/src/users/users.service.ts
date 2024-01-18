@@ -13,6 +13,7 @@ import { UpdateUsernameDto } from './dto/UpdateUsernameDto.dto';
 import { existsSync, unlinkSync } from 'fs';
 import { BlockUserDto } from './dto/BlockUserDto.dto';
 import { Conversation } from 'src/chat/entities/conversation.entity';
+import { Game } from 'src/game/entities/games.entity';
 
 @Injectable()
 export class UsersService {
@@ -58,7 +59,7 @@ export class UsersService {
 	}
 
 	/**************************************************************/
-	/***					USER MANAGEMENT						***/
+	/***					AVATAR MANAGEMENT					***/
 	/**************************************************************/
 
 	async uploadAvatarURL(avatarURL: string, userID: number): Promise<UpdateResult | undefined> {
@@ -110,50 +111,26 @@ export class UsersService {
 		}
 		return user.avatarURL;
 	}
-	// async deleteUserAvatar(data: Buffer, fileName:string , userID: number) {
-		
-	// 	const avatar = await this.avatarService.create(userID, data, fileName);
-	// 	if (!avatar)
-	// 		throw console.log("error");
-	// 	await this.usersRepository.update(userID, {avatarID : avatar.ID})
-	// 	return avatar;
-	// }
 
-	// async getUserAvatar(userID: number): Promise<Avatar> {
-	// 	const user = await this.usersRepository.findOne({
-	// 	  where: { id: userID },
-	// 	});
-	  
-	// 	if (!user || !user.avatarID) {
-	// 	  throw new NotFoundException(`User or avatar not found for ID ${userID}`);
-	// 	}
-
-	// 	return this.avatarService.getAvatarByID(user.avatarID);
-	//   }
+	/**************************************************************/
+	/***					USER MANAGEMENT					***/
+	/**************************************************************/
 
 	// Testing purpose - Maybe future implementation
-	async createNewUser(username: string): Promise<User> {
-		const userToCreate = await this.usersRepository.findOne({ where: {username: username } });
-		if (!userToCreate) {
-			// const saltOrRounds = 10;
-			// password = await bcrypt.hash(password, saltOrRounds);
-			// const isMatch = await bcrypt.compare(password, hash);
-			const newUser = new User();
-			newUser.login = username;
-			newUser.firstname = username;
-			newUser.username = username;
-			newUser.officialProfileImage = "";
-			return await this.usersRepository.save(newUser);
-		}
-		throw new Error('User with this username already exists');
-	}
-
-	// async deleteUser(username: string) {
-	// 	const userToDelete = await this.usersRepository.findOne({ where: { username } });
-	// 	if (userToDelete) {
-	// 		return await this.usersRepository.delete(username);
+	// async createNewUser(username: string): Promise<User> {
+	// 	const userToCreate = await this.usersRepository.findOne({ where: {username: username } });
+	// 	if (!userToCreate) {
+	// 		// const saltOrRounds = 10;
+	// 		// password = await bcrypt.hash(password, saltOrRounds);
+	// 		// const isMatch = await bcrypt.compare(password, hash);
+	// 		const newUser = new User();
+	// 		newUser.login = username;
+	// 		newUser.firstname = username;
+	// 		newUser.username = username;
+	// 		newUser.officialProfileImage = "";
+	// 		return await this.usersRepository.save(newUser);
 	// 	}
-	// 	throw new NotFoundException();
+	// 	throw new Error('User with this username already exists');
 	// }
 
 	async updateUserStatus(userID: number, flag: boolean) {
@@ -173,6 +150,8 @@ export class UsersService {
 		new42User.firstname = userData.firstname;
 		new42User.officialProfileImage = userData.image;
 		new42User.groups = [];
+		new42User.games = [];
+		// new42User.blockedUsers = [];
 		return this.usersRepository.save(new42User);
 	}
 	
@@ -195,54 +174,130 @@ export class UsersService {
 		throw new Error("username is already used");
 	}
 
+	async blockUser(blockUserDto: BlockUserDto): Promise<boolean> {
+
+		const user : User = await this.usersRepository.findOne({ where: { username: blockUserDto.initiatorLogin } });
+		const userToBlock : User = await this.usersRepository.findOne({ where: {username: blockUserDto.recipientLogin } });
+		
+		if (user && userToBlock) {
+			user.blockedUsers.push(userToBlock.login);
+			await this.usersRepository.save(user);
+			return true;
+		}
+
+		throw new Error("Fatal error");
+	}
+
+	async unblockUser(blockUserDto: BlockUserDto): Promise<boolean> {
+
+		const user : User = await this.usersRepository.findOne({ where: { username: blockUserDto.initiatorLogin } });
+		const userToUnblock : User = await this.usersRepository.findOne({ where: {username: blockUserDto.recipientLogin } });
+
+		if (user && userToUnblock) {
+			const filter = user.blockedUsers.filter((user: string) => user != userToUnblock.login);
+			user.blockedUsers = filter;
+			await this.usersRepository.save(user);
+			return true;
+		}
+
+		throw new Error("Fatal error");
+	}
+
+	/**************************************************************/
+	/***				GAMES MANAGEMENT					***/
+	/**************************************************************/
+
+	// faudra peut etre faire comme pour les conversations (des Group)
+	async saveGame(game: Game, userOneID: number, userTwoID: number) {
+
+		const userOne : User = await this.usersRepository.findOne({
+			where: { id: userOneID },
+			relations: ['games'],
+		});
+
+		const userTwo : User = await this.usersRepository.findOne({
+			where: { id: userTwoID },
+			relations: ['games'],
+		});
+
+		// la "game" est deja sauvegarde dans la table Game
+		// peut etre creer deux nouvelles instances games, avec les meme donnees comme ca pas de soucis de FK?
+		// voir systeme avec GameGroup
+		if (userOne && userTwo) {
+
+			userOne.games.push(game);
+			await this.usersRepository.save(userOne);
+
+			userTwo.games.push(game);
+			await this.usersRepository.save(userTwo);
+
+			return ;
+		}
+
+		throw new Error('Fatal error');
+	}
+
+	async getUserGames(userID: number) {
+
+		const user : User = await this.usersRepository.findOne({
+			where: { id: userID },
+			relations: ['games'],
+		});
+
+		if (user) {
+			return user.games;
+		}
+
+		throw new Error('Fatal error');
+	}
+
 	/**************************************************************/
 	/***				FRIENDSHIP MANAGEMENT					***/
 	/**************************************************************/
 
+
 	async createFriendship(friendRequestDto: FriendRequestDto): Promise<boolean> {
 
-		if (friendRequestDto.initiatorLogin === friendRequestDto.recipientLogin) {
-			throw new Error("Fatal error");
-		}
-
+		
 		const initiator = await this.usersRepository.findOne({
 			where: {username: friendRequestDto.initiatorLogin},
 			relations: ["initiatedFriendships"],
 		});
-
+		
 		const recipient = await this.usersRepository.findOne({
 			where: {username: friendRequestDto.recipientLogin},
 			relations: ["initiatedFriendships"],
 		});
-
-		if (!recipient) {
+		
+		if (!recipient || !initiator) {
 			throw new Error("user does not exist");
 		}
 
-		if (initiator) {
-			
-			const friendshipAlreadyExists : Friendship = await this.friendshipRepository.findOne({
-				where: {initiator: initiator, friend: recipient},
-			});
-			
-			if (!friendshipAlreadyExists) {
-	
-				let newFriendship = new Friendship();
-				newFriendship.initiator = initiator;
-				newFriendship.friend = recipient;
-				await this.friendshipRepository.save(newFriendship);
-				return true;
-			}
-			else if (friendshipAlreadyExists && !friendshipAlreadyExists.isAccepted) {
-				return true;
-			}
-
-			throw new Error(`${recipient.username} is already in your friend list`);
+		if (initiator.id === recipient.id) {
+			throw new Error("Fatal error");
 		}
-		
-		throw new Error("Fatal error");
+	
+		const friendshipAlreadyExists : Friendship = await this.friendshipRepository.findOne({
+			where: {initiator: initiator, friend: recipient},
+		});
+			
+		if (!friendshipAlreadyExists) {
+	
+			let newFriendship = new Friendship();
+			newFriendship.initiator = initiator;
+			newFriendship.friend = recipient;
+			await this.friendshipRepository.save(newFriendship);
+			return true;
+		}
+		else if (friendshipAlreadyExists && !friendshipAlreadyExists.isAccepted) {
+			return true;
+		}
+
+		throw new Error(`${recipient.username} is already in your friend list`);
 	}
 	
+
+	// attention si ami bloque car la conv existe deja
 	async updateFriendship(friendRequestDto: FriendRequestDto, flag: boolean): Promise<Conversation | Friendship> {
 
 		const initiator = await this.usersRepository.findOne({
@@ -263,9 +318,11 @@ export class UsersService {
 	
 			if (friendshipToUpdate) {
 
+				// verif que la conv existe deja
 				friendshipToUpdate.isAccepted = flag;
 				await this.friendshipRepository.save(friendshipToUpdate);
 
+				// si la conv existe deja, pas besoin de la refaire mdr
 				if (flag) {
 					const conversation = this.chatService.createFriendsConversation(initiator, friend);
 					return conversation;
@@ -293,35 +350,6 @@ export class UsersService {
 		const friendshipToUpdate = await this.updateFriendship(blockUserDto, false);
 		if (friendshipToUpdate) {
 			return friendshipToUpdate;
-		}
-
-		throw new Error("Fatal error");
-	}
-
-	async blockUser(blockUserDto: BlockUserDto): Promise<boolean> {
-
-		const user : User = await this.usersRepository.findOne({ where: { username: blockUserDto.initiatorLogin } });
-		const userToBlock : User = await this.usersRepository.findOne({ where: {username: blockUserDto.recipientLogin } });
-		
-		if (user && userToBlock) {
-			user.blockedUsers.push(userToBlock.login);
-			await this.usersRepository.save(user);
-			return true;
-		}
-
-		throw new Error("Fatal error");
-	}
-
-	async unblockUser(blockUserDto: BlockUserDto): Promise<boolean> {
-
-		const user : User = await this.usersRepository.findOne({ where: { username: blockUserDto.initiatorLogin } });
-		const userToUnblock : User = await this.usersRepository.findOne({ where: {username: blockUserDto.recipientLogin } });
-
-		if (user && userToUnblock) {
-			const filter = user.blockedUsers.filter((user: string) => user != userToUnblock.login);
-			user.blockedUsers = filter;
-			await this.usersRepository.save(user);
-			return true;
 		}
 
 		throw new Error("Fatal error");

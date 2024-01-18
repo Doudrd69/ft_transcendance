@@ -1,24 +1,22 @@
 import { Entity, Column, PrimaryGeneratedColumn, ManyToMany, OneToMany } from 'typeorm';
-import { Game } from './games.entity';
-import { Paddle } from './paddle.entity';
-import { Ball } from './ball.entity';
 
 @Entity()
 export class GameEngine {
+
 	@PrimaryGeneratedColumn()
-	gameEngineId: number;
-
-	@Column({default: 5})
-	gameID: number;
-
-	@Column({default: 5})
-	victory_condition: number;
+	gameId: number;
 
 	@Column()
 	playerOneID: string;
 
 	@Column()
 	playerTwoID: string;
+
+	@Column()
+	playerOneLogin: string;
+
+	@Column()
+	playerTwoLogin: string;
 
 	@Column()
 	scoreOne: number;
