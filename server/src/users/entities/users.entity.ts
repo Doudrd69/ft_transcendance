@@ -2,6 +2,7 @@ import { Entity, Column, PrimaryGeneratedColumn, ManyToMany, OneToMany, JoinTabl
 import { Friendship } from './friendship.entity';
 import { GroupMember } from 'src/chat/entities/group_member.entity';
 import { Conversation } from 'src/chat/entities/conversation.entity';
+import { Game } from 'src/game/entities/game.entity';
 
 @Entity()
 export class User {
@@ -11,35 +12,35 @@ export class User {
 	@Column({ default: "1234" })
 	socketGame: string;
 
-	@Column({ default: false })
-	inGame: boolean;
-
 	@Column()
- 	login: string;
-
+	login: string;
+	
 	@Column()
 	firstname: string;
 
 	@Column({ default: null })
 	username: string;
-
+	
 	@Column({ default: "https://uxwing.com/wp-content/themes/uxwing/download/peoples-avatars/corporate-user-icon.png" })
 	avatarURL: string;
-
+	
 	@Column()
 	officialProfileImage: string;
 
 	@Column({ default: "" })
 	TFA_secret: string;
-
+	
 	@Column({ default: "" })
 	TFA_temp_secret: string;
 
 	@Column({ default: false })
 	TFA_isEnabled: boolean;
-
+	
 	@Column({ default: false })
 	isActive: boolean;
+
+	@Column({ default: false })
+	inGame: boolean;
 
 	@Column("varchar", {
 		array: true,
@@ -62,6 +63,22 @@ export class User {
 		}
 	})
 	groups: GroupMember[];
+
+	@ManyToMany(type => Game, {
+		eager: true,
+	})
+	@JoinTable({
+		name: "user_to_game",
+		joinColumn: {
+			name: "user",
+			referencedColumnName: "id"
+		},
+		inverseJoinColumn: {
+			name: "game",
+			referencedColumnName: "id"
+		}
+	})
+	games: Game[];
 
 	@OneToMany(() => Friendship, (friendship) => friendship.initiator, {
 		eager: true,

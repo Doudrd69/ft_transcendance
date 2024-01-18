@@ -5,7 +5,7 @@ import { User } from "src/users/entities/users.entity";
 import { Ball } from "../entities/ball.entity";
 import { GameEngine } from "../entities/gameEngine.entity";
 import { Paddle } from "../entities/paddle.entity";
-import { Game } from "../entities/games.entity";
+import { Game } from "../entities/game.entity";
 import { Vector } from '../entities/vector.entity';
 import { vector_instance } from 'src/game_gateway/game.gateway';
 

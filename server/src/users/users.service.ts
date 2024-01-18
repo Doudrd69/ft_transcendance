@@ -13,6 +13,7 @@ import { UpdateUsernameDto } from './dto/UpdateUsernameDto.dto';
 import { existsSync, unlinkSync } from 'fs';
 import { BlockUserDto } from './dto/BlockUserDto.dto';
 import { Conversation } from 'src/chat/entities/conversation.entity';
+import { Game } from 'src/game/entities/game.entity';
 
 @Injectable()
 export class UsersService {
@@ -173,6 +174,8 @@ export class UsersService {
 		new42User.firstname = userData.firstname;
 		new42User.officialProfileImage = userData.image;
 		new42User.groups = [];
+		new42User.games = [];
+		// new42User.blockedUsers = [];
 		return this.usersRepository.save(new42User);
 	}
 	
@@ -193,6 +196,53 @@ export class UsersService {
 		}
 
 		throw new Error("username is already used");
+	}
+
+	/**************************************************************/
+	/***				GAMES MANAGEMENT					***/
+	/**************************************************************/
+
+	// faudra peut etre faire comme pour les conversations (des Group)
+	async saveGame(game: Game, userOneID: number, userTwoID: number) {
+
+		const userOne : User = await this.usersRepository.findOne({
+			where: { id: userOneID },
+			relations: ['games'],
+		});
+
+		const userTwo : User = await this.usersRepository.findOne({
+			where: { id: userTwoID },
+			relations: ['games'],
+		});
+
+		// la "game" est deja sauvegarde dans la table Game
+		// a voir si pas besoin de faire un group (fait chier)
+		if (userOne && userTwo) {
+
+			userOne.games.push(game);
+			await this.usersRepository.save(userOne);
+
+			userTwo.games.push(game);
+			await this.usersRepository.save(userTwo);
+
+			return ;
+		}
+
+		throw new Error('Fatal error');
+	}
+
+	async getUserGames(userID: number) {
+
+		const user : User = await this.usersRepository.findOne({
+			where: { id: userID },
+			relations: ['games'],
+		});
+
+		if (user) {
+			return user.games;
+		}
+
+		throw new Error('Fatal error');
 	}
 
 	/**************************************************************/

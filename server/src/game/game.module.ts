@@ -7,7 +7,7 @@ import { Friendship } from 'src/users/entities/friendship.entity';
 import { MatchmakingService } from './matchmaking/matchmaking.service';
 import { ChatService } from 'src/chat/chat.service';
 import { Conversation } from 'src/chat/entities/conversation.entity';
-import { Game } from './entities/games.entity';
+import { Game } from './entities/game.entity';
 import { GameController } from './game.controller';
 import { GameService } from './game.service';
 import { GameEngine } from './entities/gameEngine.entity';
