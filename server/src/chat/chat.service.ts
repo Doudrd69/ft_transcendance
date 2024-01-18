@@ -960,7 +960,7 @@ export class ChatService {
 
 	async getUserListFromConversation(conversationID: number) {
 
-		const conversation = await this.conversationRepository.findOne({ id: conversationID });
+		const conversation = await this.conversationRepository.findOne({ where: { id: conversationID } });
 		const users = await this.usersRepository.find({
 			relations: ['groups', 'groups.conversation'],
 		});
