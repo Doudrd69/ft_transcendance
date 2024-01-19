@@ -239,6 +239,7 @@ export class ChatService {
 								id: userGroup.conversation.id,
 								username: user.username,
 								avatarURL: user.avatarURL,
+								name: userGroup.conversation.name,
 							});
 						}
 					})
