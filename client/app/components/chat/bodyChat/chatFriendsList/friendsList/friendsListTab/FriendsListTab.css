@@ -61,14 +61,6 @@
 	width: 25%;
 	height: 40px;
 	border-radius: 10px;
-	
-	background-image: url('interdit.png');
-	background-repeat: no-repeat;
-	background-position: center center;
-	background-color:  white;
-	background-size: contain; /* Ajuste la taille de l'image pour contenir le bouton */
-	background-color: transparent;
-	border:none;
 	transition: transform 0.2s ease;
 }
 
