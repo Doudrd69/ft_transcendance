@@ -123,16 +123,17 @@
 		margin: 10px;
 		opacity: 0.5;
 	}
+
 .option-block {
 	display: flex;
 	background-color: var(--fourth);
 	border-radius: 10px;
-	flex-wrap: wrap; /* Permettre l'enveloppement sur plusieurs lignes */
+	flex-wrap: wrap;
 	justify-content: space-between;
-	align-items: center; /* Aligner les éléments au centre verticalement si nécessaire */
+	align-items: center; 
 	}
 	
-	.option-image {
+.option-image {
 	width: 50px;
 	height: auto;
 	margin: 10px;

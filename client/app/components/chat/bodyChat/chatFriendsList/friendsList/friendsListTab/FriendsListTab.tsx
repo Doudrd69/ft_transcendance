@@ -10,7 +10,7 @@ import { useGlobal } from '@/app/GlobalContext';
 interface User {
 	id: number;
 	username: string;
-	isBlock: boolean;
+	isBlocked: boolean;
 }
 
 interface FriendsListTabComponentProps {
@@ -21,16 +21,17 @@ interface FriendsListTabComponentProps {
 const FriendsListTabComponent:  React.FC<FriendsListTabComponentProps> = ({user}) => {
 	
 	const {state, dispatch} = useChat();
-	const [block, setBlock] = useState<boolean>(false);
 	const {globalState} = useGlobal();
 	const [confirmationText, setConfirmationText] = useState('');
 	const [showConfirmation, setShowConfirmation] = useState(false);
 	const [funtionToExecute, setFunctionToExecute] = useState<() => void>(() => {});
-
+	console.log("user", user);
 
 	const blockUser = async() => {
 
 		try {
+			console.log("bebebebebeebeb")
+
 			const BlockUserDto = {
 				initiatorLogin: sessionStorage.getItem("currentUserLogin"),
 				recipientLogin: user.username,
@@ -46,9 +47,8 @@ const FriendsListTabComponent:  React.FC<FriendsListTabComponentProps> = ({user}
 			});
 		
 		if (response.ok) {
-			user.isBlock = !user.isBlock;
-			setBlock(true);
-
+			user.isBlocked = true;
+			dispatch({ type: 'DISABLE', payload: 'showConfirmation' })
 			globalState.userSocket?.emit('joinRoom', { roomName: `whoblocked${user.username}`, roomID: '' } );
 		}
 		}
@@ -60,7 +60,7 @@ const FriendsListTabComponent:  React.FC<FriendsListTabComponentProps> = ({user}
 	const unblockUser = async() => {
 
 		try {
-
+			console.log("ahahahahah")
 			const BlockUserDto = {
 				initiatorLogin: sessionStorage.getItem("currentUserLogin"),
 				recipientLogin: user.username,
@@ -75,11 +75,10 @@ const FriendsListTabComponent:  React.FC<FriendsListTabComponentProps> = ({user}
 			});
 		
 		if (response.ok) {
-			user.isBlock = !user.isBlock;
-			setBlock(false);
+			user.isBlocked = false;
 
 			globalState.userSocket?.emit('leaveRoom', { roomName: `whoblocked${user.username}`, roomID: '' } );
-
+			dispatch({ type: 'DISABLE', payload: 'showConfirmation' })
 			console.log("unblock");
 		}
 		}
@@ -101,7 +100,7 @@ const FriendsListTabComponent:  React.FC<FriendsListTabComponentProps> = ({user}
 	const removeFriends = async () => {
 
 		try {
-
+			console.log("Removing friend");
 			const blockUserDto = {
 				initiatorLogin: sessionStorage.getItem("currentUserLogin"),
 				recipientLogin:  user.username,
@@ -118,8 +117,8 @@ const FriendsListTabComponent:  React.FC<FriendsListTabComponentProps> = ({user}
 	
 			if (response.ok) {
 	
+				dispatch({ type: 'DISABLE', payload: 'showConfirmation' })
 				const data = await response.json();
-	
 				if (!data.isAccepted) {
 					return ;
 				}
@@ -136,11 +135,16 @@ const FriendsListTabComponent:  React.FC<FriendsListTabComponentProps> = ({user}
 	return (
 		<>
 			<div className="bloc-tab">
-				<button className='tab2' onClick={() => handleTabClick(`Etes vous sur de vouloir défier ${user.username} ?`, gameInvite)} />
-				<button className='tab3' onClick={() => dispatch({ type: 'ACTIVATE', payload: 'showListChannelAdd' })} />
-				<button className='tab4'/>
-				<img className='tab5' src="block.png" onClick={() => handleTabClick(`Etes vous sur de vouloir supprimer de votre liste d'amies ${user.username} ?`, removeFriends)}/>
-				<img className='tab5' src="closered.png" onClick={() => handleTabClick(`Etes vous sur de vouloir supprimer de votre liste d'amies ${user.username} ?`, removeFriends)}/>
+				<img className='image-tab' src="ping-pong.png" onClick={() => handleTabClick(`Etes vous sur de vouloir défier ${user.username} ?`, gameInvite)} />
+				<img className='image-tab' src="ajouter-un-groupe.png" onClick={() => dispatch({ type: 'ACTIVATE', payload: 'showListChannelAdd' })} />
+				<img className='image-tab' src="stats.png"/>
+				{user.isBlocked ? (
+					<img className='image-tab' src="block.png" onClick={() => handleTabClick(`Etes vous sur de vouloir bloquer ${user.username} ?`, unblockUser)}/>
+				)
+				:
+					<img className='image-tab-opacity' src="block.png" onClick={() => handleTabClick(`Etes vous sur de vouloir bloquer ${user.username} ?`, blockUser)}/>
+				}
+				<img className='image-tab' src="closered.png" onClick={() => handleTabClick(`Etes vous sur de vouloir supprimer de votre liste d'amies ${user.username} ?`, removeFriends)}/>
 			</div>
 			{state.showConfirmation && (
 			<ConfirmationComponent phrase={confirmationText} functionToExecute={funtionToExecute}/>
