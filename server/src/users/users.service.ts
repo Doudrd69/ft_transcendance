@@ -174,7 +174,7 @@ export class UsersService {
 		new42User.officialProfileImage = userData.image;
 		new42User.groups = [];
 		// new42User.games = [];
-		// new42User.blockedUsers = [];
+		new42User.blockedUsers = [];
 		return this.usersRepository.save(new42User);
 	}
 	

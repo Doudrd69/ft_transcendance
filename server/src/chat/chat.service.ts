@@ -736,6 +736,10 @@ export class ChatService {
 		if (user && conversation) {
 
 			const groupToRemove = await this.getRelatedGroup(user, conversation);
+			if (groupToRemove.isBan) {
+				throw new Error("user is ban from this channel");
+			}
+
 			const isOwnerStatus = await this.getGroupIsOwnerStatus(user, conversation);
 			
 			if (groupToRemove) {
