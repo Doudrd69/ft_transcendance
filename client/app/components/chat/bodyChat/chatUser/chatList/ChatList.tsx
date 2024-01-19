@@ -7,20 +7,13 @@ import AvatarImageComponent from '@/app/components/Avatar/Avatar';
 import AvatarImageBisComponent from '@/app/components/Avatar/AvatarBis';
 import { setCurrentComponent } from '../../../ChatContext';
 
-interface FriendShip {
-	id: number;
-	isAccepted: true;
-	isActive: boolean;
-	friend?: any;
-	initiator?: any
-	roomName?: string;
-	roomID?: string;
-}
+
 
 interface Conversation {
-	id: string,
+	id: number,
+	username: string;
+	avatarURL: string;
 	name: string;
-	is_channel:boolean;
 }
 
 const ChatListComponent: React.FC = () => {
@@ -28,40 +21,23 @@ const ChatListComponent: React.FC = () => {
 	const { state, dispatch } = useChat();
 	const username = sessionStorage.getItem("currentUserLogin");
 	const [activeIndex, setActiveIndex] = useState<number | null>(null);
-	const [friendList, setFriendList] = useState<FriendShip[]>([]);
+	const [dm, setDm] = useState<Conversation[]>([]);
   
 	const loadFriendList = async () => {
 
 		try {
-			const response = await fetch(`http://localhost:3001/users/getFriends/${username}`, {
+			const requestDms = await fetch(`http://localhost:3001/chat/getDMsConversations/${sessionStorage.getItem("currentUserID")}`, {
 				method: 'GET',
 				headers: {
 					'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
-				}
+				},
 			});
-			
-			if (response.ok) {
-				const friends = await response.json();
-	
-				const requestDms = await fetch(`http://localhost:3001/chat/getDMsConversations/${sessionStorage.getItem("currentUserID")}`, {
-					method: 'GET',
-					headers: {
-						'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
-					},
-				});
-	
-				if (requestDms.ok) {
-					const conversations = await requestDms.json();
-					friends.forEach((friend: FriendShip) => {
-						conversations.forEach((dm: Conversation) => {
-							friend.roomName = dm.name;
-							friend.roomID = dm.id;
-						});
-					});
-					setFriendList([...friends]);
-				}
+
+			if (requestDms.ok) {
+				const dmResult = await requestDms.json();
+				setDm([...dmResult]);
 			}
-		}
+	}
 		catch (error) {
 			console.error(error);
 		}
@@ -76,23 +52,23 @@ const ChatListComponent: React.FC = () => {
 
 	return (
 		<div className="bloc-discussion-list">
-			{friendList.map((friend: FriendShip, id: number) => (
-				<div key={friend.id} className="bloc-button-discussion-list">
+			{dm.map((dm: Conversation, id: number) => (
+				<div key={dm.id} className="bloc-button-discussion-list">
 				<img
-						src={`http://localhost:3001/users/getAvatarByLogin/${friend.friend ? friend.friend.login : friend.initiator ? friend.initiator.login : 'Unknown User'}/${timestamp}`}
-					className={`profil-discussion-list ${friend.isActive ? 'on' : 'off'}`}
+						src={`http://localhost:3001/users/getAvatarByLogin/${dm.username}/${timestamp}`}
+					className={`profil-discussion-list`}
 					alt="User Avatar"
 					/>
 			  		<div className={`amies ${activeIndex === id ? 'active' : ''}`} onClick={() => {
-						  dispatch({ type: 'SET_CURRENT_CONVERSATION', payload: friend.friend ? friend.friend.username : friend.initiator ? friend.initiator.username : 'Unknown User'});
-						  dispatch({ type: 'SET_CURRENT_ROOM', payload: friend.roomName});
-						  dispatch({ type: 'SET_CURRENT_CONVERSATION_ID', payload: friend.roomID});
+						  dispatch({ type: 'SET_CURRENT_CONVERSATION', payload: dm.username});
+						  dispatch({ type: 'SET_CURRENT_ROOM', payload: dm.name});
+						  dispatch({ type: 'SET_CURRENT_CONVERSATION_ID', payload: dm.id});
 						  dispatch({ type: 'DISABLE', payload: 'showChatList' });
 						  dispatch({ type: 'ACTIVATE', payload: 'showChat' });
 						  dispatch(setCurrentComponent('showChatList'));
 
 						}}>
-						{friend.friend ? friend.friend.username : friend.initiator ? friend.initiator.username : 'Unknown User'}
+						{dm.username}
 					</div>
 				</div>
 			))}
