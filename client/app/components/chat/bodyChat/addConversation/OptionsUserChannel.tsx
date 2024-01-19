@@ -386,14 +386,14 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me}) => 
 									) : (
 										<img className="option-image-opacity" src="interdit.png" onClick={banUser}/>
 									)}
-									{block ? (
-										<img className="option-image" src="block.png" onClick={unblockUser}/>
-									) : (
-										<img className="option-image-opacity" src="block.png" onClick={blockUser}/>
-									)}
 									</>
 								)
 							}
+							{block ? (
+								<img className="option-image" src="block.png" onClick={unblockUser}/>
+							) : (
+								<img className="option-image-opacity" src="block.png" onClick={blockUser}/>
+							)}
 						</div>
 					)}
 					<img className="option-image" src="logoutred.png" onClick={handleLeaveChannel}/>
