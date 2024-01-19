@@ -173,6 +173,8 @@ export class UsersService {
 		new42User.firstname = userData.firstname;
 		new42User.officialProfileImage = userData.image;
 		new42User.groups = [];
+		// new42User.games = [];
+		// new42User.blockedUsers = [];
 		return this.usersRepository.save(new42User);
 	}
 	
@@ -194,6 +196,83 @@ export class UsersService {
 
 		throw new Error("username is already used");
 	}
+
+	// async blockUser(blockUserDto: BlockUserDto): Promise<boolean> {
+
+	// 	const user : User = await this.usersRepository.findOne({ where: { username: blockUserDto.initiatorLogin } });
+	// 	const userToBlock : User = await this.usersRepository.findOne({ where: {username: blockUserDto.recipientLogin } });
+		
+	// 	if (user && userToBlock) {
+	// 		user.blockedUsers.push(userToBlock.login);
+	// 		await this.usersRepository.save(user);
+	// 		return true;
+	// 	}
+
+	// 	throw new Error("Fatal error");
+	// }
+
+	// async unblockUser(blockUserDto: BlockUserDto): Promise<boolean> {
+
+	// 	const user : User = await this.usersRepository.findOne({ where: { username: blockUserDto.initiatorLogin } });
+	// 	const userToUnblock : User = await this.usersRepository.findOne({ where: {username: blockUserDto.recipientLogin } });
+
+	// 	if (user && userToUnblock) {
+	// 		const filter = user.blockedUsers.filter((user: string) => user != userToUnblock.login);
+	// 		user.blockedUsers = filter;
+	// 		await this.usersRepository.save(user);
+	// 		return true;
+	// 	}
+
+	// 	throw new Error("Fatal error");
+	// }
+
+	// /**************************************************************/
+	// /***				GAMES MANAGEMENT					***/
+	// /**************************************************************/
+
+	// // faudra peut etre faire comme pour les conversations (des Group)
+	// async saveGame(game: Game, userOneID: number, userTwoID: number) {
+
+	// 	const userOne : User = await this.usersRepository.findOne({
+	// 		where: { id: userOneID },
+	// 		relations: ['games'],
+	// 	});
+
+	// 	const userTwo : User = await this.usersRepository.findOne({
+	// 		where: { id: userTwoID },
+	// 		relations: ['games'],
+	// 	});
+
+	// 	// la "game" est deja sauvegarde dans la table Game
+	// 	// peut etre creer deux nouvelles instances games, avec les meme donnees comme ca pas de soucis de FK?
+	// 	// voir systeme avec GameGroup
+	// 	if (userOne && userTwo) {
+
+	// 		userOne.games.push(game);
+	// 		await this.usersRepository.save(userOne);
+
+	// 		userTwo.games.push(game);
+	// 		await this.usersRepository.save(userTwo);
+
+	// 		return ;
+	// 	}
+
+	// 	throw new Error('Fatal error');
+	// }
+
+	// async getUserGames(userID: number) {
+
+	// 	const user : User = await this.usersRepository.findOne({
+	// 		where: { id: userID },
+	// 		relations: ['games'],
+	// 	});
+
+	// 	if (user) {
+	// 		return user.games;
+	// 	}
+
+	// 	throw new Error('Fatal error');
+	// }
 
 	/**************************************************************/
 	/***				FRIENDSHIP MANAGEMENT					***/
