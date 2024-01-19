@@ -14,6 +14,7 @@ import { ChannelOptionsDto } from './dto/channelOptionsDto.dto';
 import { QuitConversationDto } from './dto/quitConversationDto.dto';
 import { UpdateIsPublicDto } from './dto/updateIsPublicDto.dto';
 import { UpdateProtectFalseDto } from './dto/updateProtectFalseDto.dto';
+import { DeleteConversationDto } from './dto/deleteConversationDto.dto';
 
 @Controller('chat')
 export class ChatController {
@@ -59,6 +60,13 @@ export class ChatController {
 	@Post('quitConversation')
 	userQuitsConversation(@Body() quitConversationDto: QuitConversationDto): Promise<boolean> {
 		return this.chatService.quitConversation(quitConversationDto);
+	}
+
+	@UseGuards(AuthGuard)
+	@HttpCode(HttpStatus.OK)
+	@Post('deleteConversation')
+	deleteConversation(@Body() deleteConversationDto: DeleteConversationDto): Promise<boolean> {
+		return this.chatService.deleteConversation(deleteConversationDto);
 	}
 
 	/******		USER OPTIONS ON CHANNEL		******/

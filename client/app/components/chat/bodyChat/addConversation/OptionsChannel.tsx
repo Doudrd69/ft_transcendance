@@ -87,10 +87,9 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 			const channelOptionDto = {
 				conversationID: Number(state.currentConversationID),
 				userID: Number(sessionStorage.getItem("currentUserID")),
-				state: state.currentConversationIsPrivate,
 			}
 	
-			const response = await fetch(`http://localhost:3001/chat/updateIsPublic`, {
+			const response = await fetch(`http://localhost:3001/chat/deleteConversation`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
@@ -100,8 +99,11 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 			});
 	
 			if (response.ok) {
-				dispatch({ type: 'TOGGLEX', payload: 'currentConversationIsPrivate' });
-				console.log("Updated status");
+				console.log("CONVERSATION DELETED");
+				dispatch({ type: 'DISABLE', payload: 'showOptionChannel' });
+				dispatch({ type: 'DISABLE', payload: 'showChannel' });
+				dispatch({ type: 'ACTIVATE', payload: 'showBackComponent' });
+				dispatch({ type: 'ACTIVATE', payload: 'showChannelList' });
 			}
 		}
 		catch (error) {
@@ -163,6 +165,7 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 			document.removeEventListener('keydown', handleEscape);
 		};
 	}, []);
+
 	return (
 		<>
 		<div className="blur-background"></div>
@@ -191,18 +194,14 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 								onClick={() => { 
 										dispatch({ type: 'ACTIVATE', payload: 'showPasswordChange' });
 										dispatch({ type: 'DISABLE', payload: 'showOptionChannel' });
-							}}/>}
+								}}/>}
 						</> 
 						:
 						null
 					}
 					
 					{isOwner &&
-						<img className="option-image" src="closered.png" onClick={() => { 
-									{deleteChannel}
-									dispatch({ type: 'DISABLE', payload: 'showOptionUseChannel' });
-
-					}}/>}
+						<img className="option-image" src="closered.png" onClick={() => deleteChannel() }/>}
 				</div>
 			</div>
 		</>

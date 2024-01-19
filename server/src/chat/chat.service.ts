@@ -19,6 +19,7 @@ import { FormatInputPathObject } from 'path';
 import { GroupDto } from './dto/group.dto';
 import { UpdateIsPublicDto } from './dto/updateIsPublicDto.dto';
 import { UpdateProtectFalseDto } from './dto/updateProtectFalseDto.dto';
+import { DeleteConversationDto } from './dto/deleteConversationDto.dto';
 
 @Injectable()
 export class ChatService {
@@ -609,6 +610,43 @@ export class ChatService {
 	/***					CONVERSATION						***/
 	/**************************************************************/
 	
+	async deleteConversation(deleteConversationDto: DeleteConversationDto): Promise<boolean> {
+
+		console.log(deleteConversationDto);
+		// recuperer la conv a delete
+		const conversationToDelete: Conversation = await this.conversationRepository.findOne({ where: { id: deleteConversationDto.conversationID } });
+		// verifier is le user qui fait la requete est le owner
+		const user = await this.usersRepository.findOne({
+			where: { id: deleteConversationDto.userID },
+			relations: ['groups', 'groups.conversation'],
+		});
+
+		const userGroup = await this.getRelatedGroup(user, conversationToDelete);
+		console.log(userGroup);
+		if (userGroup && userGroup.isOwner) {
+			
+			const idToDelete = conversationToDelete.id;
+
+			await this.groupMemberRepository
+  				.createQueryBuilder()
+  				.delete()
+  				.from(GroupMember)
+ 				.where("conversation.id = :id", { id: idToDelete })
+  				.execute();
+
+			await this.conversationRepository
+				.createQueryBuilder()
+				.delete()
+				.from(Conversation)
+				.where("id = :id", { id: conversationToDelete.id })
+				.execute()
+
+			return true ;
+		}
+
+		throw new Error("Fatal error");
+	}
+
 	async promoteNewOwner(conversation: Conversation): Promise<boolean> {
 
 		let groupToPromote : GroupMember;
@@ -787,6 +825,7 @@ export class ChatService {
 			relations: ['groups'],
 		});
 		
+		// verifier si conv existe pas deja
 		if (user) {
 			
 			const conv = new Conversation();
