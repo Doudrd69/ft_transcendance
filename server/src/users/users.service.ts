@@ -433,6 +433,7 @@ export class UsersService {
 	async getFriendships(username: string): Promise<Friendship[]> {
 
 		console.log(username, "friend list loading...");
+		const user: User = await this.usersRepository.findOne({ where: { username: username } });
 
 		const initiatedfriends = await this.friendshipRepository
 			.createQueryBuilder('friendship')
@@ -448,14 +449,21 @@ export class UsersService {
 			.andWhere('friendship.isAccepted = true')
 			.getMany();
  
-		// let array = [];
+		let array = [];
 		const friendships = [...initiatedfriends, ...acceptedfriends];
-		// friendships.forEach((element: Friendship) => {
-		// 	array.push({
-		// 		id: element.friend ? element.friend.id : element.initiator ? element.initiator.id : -1,
-		// 		username: element.friend ? element.friend.username : element.initiator ? element.initiator.username : 'unknown user',
-		// 	});
-		// });
+		friendships.forEach((element: Friendship) => {
+			let blockStatus = false;
+			user.blockedUsers.forEach((blockedFriend: string) => {
+				if (blockedFriend == (element.friend ? element.friend.username : element.initiator ? element.initiator.username : '')) {
+					blockStatus = true;
+				}
+			});
+			array.push({
+				id: element.friend ? element.friend.id : element.initiator ? element.initiator.id : -1,
+				username: element.friend ? element.friend.username : element.initiator ? element.initiator.username : 'unknown user',
+				isBlocked: blockStatus,
+			});
+		});
 
 		return friendships;
 	}
