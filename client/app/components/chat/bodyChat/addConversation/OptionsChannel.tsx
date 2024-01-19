@@ -177,11 +177,13 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 								:
 								<img className="option-image" src="public.png" onClick={updateIsPublicTrue}/>
 							}
-							<img className="option-image" src="upload-password.png"  onClick={() => { 
+							{state.currentConversationIsProtected &&
+								<img className="option-image" src="upload-password.png"  onClick={() => { 
 									if (state.currentConversationIsProtected)
 										dispatch({ type: 'ACTIVATE', payload: 'showPasswordChange' });
 										dispatch({ type: 'DISABLE', payload: 'showOptionChannel' });
-							}}/>
+								}}/>
+							}
 							{state.currentConversationIsProtected ?
 								<img className="option-image" src="password.png" onClick={updateIsProtectedFalse}/>
 								:
@@ -196,9 +198,9 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 					}
 					
 					{isOwner &&
-					<img className="option-image" src="closered.png" onClick={() => { 
-								{deleteChannel}
-								dispatch({ type: 'DISABLE', payload: 'showOptionUseChannel' });
+						<img className="option-image" src="closered.png" onClick={() => { 
+									{deleteChannel}
+									dispatch({ type: 'DISABLE', payload: 'showOptionUseChannel' });
 
 					}}/>}
 				</div>
