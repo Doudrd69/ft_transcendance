@@ -6,6 +6,7 @@ import { Socket } from 'socket.io-client';
 import ListMyChannelComponent from '../../listMyChannel/ListMyChannel';
 import PasswordComponent from '../../listMyChannel/Password';
 import { setCurrentComponent } from '../../../ChatContext';
+import { useGlobal } from '@/app/GlobalContext';
 
 interface Conversation {
 	id: string;
@@ -23,6 +24,7 @@ interface userList {
 const ChannelListComponent: React.FC = () => {
 
 	const { state, dispatch } = useChat();
+	const { globalState } = useGlobal();
 
 	const userID = Number(sessionStorage.getItem("currentUserID"));
 	const userName = sessionStorage.getItem("currentUserLogin")
@@ -34,7 +36,7 @@ const ChannelListComponent: React.FC = () => {
 	
 
 	const loadDiscussions = async () => {
-		console.log("feuuuuur");
+
 		try{
 
 			const response = await fetch(`http://localhost:3001/chat/getConversationsWithStatus/${userID}`, {
@@ -61,6 +63,20 @@ const ChannelListComponent: React.FC = () => {
 			console.error(error);
 		}
 	};
+
+	useEffect(() => {
+		console.log("bahahahahah");
+		globalState.userSocket?.on('userIsBan', () => {
+			console.log("Ban notif");
+			dispatch({ type: 'DISABLE', payload: 'showChannel' });
+			dispatch({ type: 'ACTIVATE', payload: 'showChannelList' });
+		});
+
+		return () => {
+			globalState.userSocket?.off('banUser');
+		}
+
+	}, [globalState?.userSocket]);
 
 	useEffect(() => {
 		console.log("Loading conversations...");

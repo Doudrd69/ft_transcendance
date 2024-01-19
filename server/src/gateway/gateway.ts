@@ -174,7 +174,7 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	// je peux aussi utiliser la liste userBlocked pour except les demandes d'amis
 	@SubscribeMessage('addFriend')
 	handleFriendRequest(@MessageBody() dto: any) {
-		this.server.to(dto.recipientLogin).emit('friendRequest', {
+		this.server.to(dto.recipientLogin).except(`whoblocked${dto.initiatorLogin}`).emit('friendRequest', {
 			recipientLogin: dto.recipientLogin,
 			initiatorLogin: dto.initiatorLogin,
 		});
