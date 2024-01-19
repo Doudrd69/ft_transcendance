@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Socket } from 'socket.io-client';
-import { useChat } from '../../ChatContext';
+import { setCurrentComponent, useChat } from '../../ChatContext';
 import { toast } from 'react-toastify';
 import './AddConversation.css';
 import { RSC } from 'next/dist/client/components/app-router-headers';
@@ -317,7 +317,8 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user }) => {
 			});
 	
 			if (response.ok) {
-				dispatch({ type: 'ACTIVATE', payload: 'showBackComponent' });
+				dispatch({ type: 'ACTIVATE', payload: 'showChannelList' });
+				dispatch({ type: 'DISABLE', payload: 'showChannel' });
 				dispatch({ type: 'DISABLE', payload: 'showOptionsUserChannel' });
 				console.log("Updated status");
 			}
@@ -326,7 +327,36 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user }) => {
 			console.log(error);
 		}
 	}
-  
+	const handleDms = async() => {
+		try {
+			const createConversationDto = {
+				initiatorID: Number(sessionStorage.getItem("currentUserID")),
+				recipientID: user.id,
+			}
+	
+			const response = await fetch(`http://localhost:3001/chat/createConversation`, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
+				},
+				body: JSON.stringify(createConversationDto),
+			});
+	
+			if (response.ok) {
+				const conversation = await response.json();
+				dispatch({ type: 'SET_CURRENT_CONVERSATION', payload: conversation.name });
+				dispatch({ type: 'SET_CURRENT_ROOM', payload: conversation.name });
+				dispatch({ type: 'SET_CURRENT_CONVERSATION_ID', payload: conversation.id });
+				dispatch({ type: 'DISABLE', payload: 'showOptionsUserChannel' });
+				dispatch({ type: 'ACTIVATE', payload: 'showChat' });
+				console.log("Conversation created");
+			}
+		}
+		catch (error) {
+			console.log(error);
+		}
+	}
 	return (
 		<>
 		<div className="blur-background"></div>
@@ -334,26 +364,31 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user }) => {
 			<div className="add_container">
 				<h2 className="add__title">{user.login}</h2>	
 				<div className="option-block">
-					{admin ?
-						<img className="option-image" src="crown.png" onClick={demoteAdminUser}/>
-						:
-						<img className="option-image-opacity" src="crown.png" onClick={promoteAdminUser}/>
-					}
-					{mute ?
-						<img className="option-image" src="volume-mute.png" onClick={unmuteUser}/>
-						:
-						<img className="option-image" src="unmute.png" onClick={muteUser}/>
-					}
-					{ban ?
-						<img className="option-image" src="interdit.png" onClick={unbanUser}/>
-						:
-						<img className="option-image-opacity" src="interdit.png" onClick={banUser}/>
-					}
-					{block ?
-						<img className="option-image" src="block.png" onClick={unblockUser}/>
-						:
-						<img className="option-image-opacity" src="block.png" onClick={blockUser}/>
-					}
+					{user.login !== sessionStorage.getItem("currentUserLogin") && (
+						<div>
+							<img className="option-image" src="chat.png" onClick={handleDms}/>
+							{admin ? (
+								<img className="option-image" src="crown.png" onClick={demoteAdminUser}/>
+							) : (
+								<img className="option-image-opacity" src="crown.png" onClick={promoteAdminUser}/>
+							)}
+							{mute ? (
+								<img className="option-image" src="volume-mute.png" onClick={unmuteUser}/>
+							) : (
+								<img className="option-image" src="unmute.png" onClick={muteUser}/>
+							)}
+							{ban ? (
+								<img className="option-image" src="interdit.png" onClick={unbanUser}/>
+							) : (
+								<img className="option-image-opacity" src="interdit.png" onClick={banUser}/>
+							)}
+							{block ? (
+								<img className="option-image" src="block.png" onClick={unblockUser}/>
+							) : (
+								<img className="option-image-opacity" src="block.png" onClick={blockUser}/>
+							)}
+						</div>
+					)}
 					<img className="option-image" src="logoutred.png" onClick={handleLeaveChannel}/>
 				</div>
 			</div>

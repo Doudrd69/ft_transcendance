@@ -205,6 +205,48 @@ export class ChatService {
 		return [];
 	}
 
+	async getUserListFromDms(userID: number) {
+
+		const myuser = await this.usersRepository.findOne({
+			where: { id: userID },
+			relations: ['groups', 'groups.conversation'],
+		});
+
+		// les dms = group.conversation -->!is_channel
+		let userDMs = [];
+		myuser.groups.forEach((group: GroupMember) => {
+			if (!group.conversation.is_channel) {
+				userDMs.push(group.conversation);
+			}
+		});
+
+		const users = await this.usersRepository.find({
+			relations: ['groups', 'groups.conversation'],
+		});
+
+		// tout les users
+		let DMList = [];
+		users.forEach((user: User) => {
+			// tout les groups d'un user
+			if (user.id != myuser.id) {
+				user.groups.forEach((userGroup: GroupMember) => {
+					// chaque groupe du user par rapport a NOS groups de DM
+					userDMs.forEach((dm: Conversation) => {
+						// Si on a une conv privee
+						if (userGroup.conversation.id == dm.id) {
+							DMList.push({
+								id: userGroup.conversation.id,
+								username: user.username,
+								avatarURL: user.avatarURL,
+							});
+						}
+					})
+				});
+			}
+		});
+
+		return DMList;
+	}
 	private async getDMsConversations(userID: number): Promise<Conversation[]> {
 		
 		
@@ -229,6 +271,7 @@ export class ChatService {
 		return [];
 	}
 
+	
 	async getAllConversations(userID: number): Promise<Conversation[]> {
 		
 		const userToFind : User = await this.usersRepository.findOne({
