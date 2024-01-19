@@ -151,7 +151,7 @@ export class UsersService {
 		new42User.officialProfileImage = userData.image;
 		new42User.groups = [];
 		new42User.games = [];
-		// new42User.blockedUsers = [];
+		new42User.blockedUsers = [];
 		return this.usersRepository.save(new42User);
 	}
 	
@@ -223,6 +223,8 @@ export class UsersService {
 		// la "game" est deja sauvegarde dans la table Game
 		// peut etre creer deux nouvelles instances games, avec les meme donnees comme ca pas de soucis de FK?
 		// voir systeme avec GameGroup
+
+		// ou essayer avec juste un games: Game[];
 		if (userOne && userTwo) {
 
 			userOne.games.push(game);
