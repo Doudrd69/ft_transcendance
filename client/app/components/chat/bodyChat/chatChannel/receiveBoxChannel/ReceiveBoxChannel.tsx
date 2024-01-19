@@ -72,9 +72,11 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 		}
 	};
 
-	// gerer le cas ou la liste est vide
  	const ownerUsers_array = state.currentUserList.filter((user: userList) => user.isOwner === true);
+	 console.log("userlist: ", state.currentUserList);
+
 	const ownerUsers = ownerUsers_array[0];
+	console.log("Owner: ", ownerUsers);
 
 	useEffect(() => {
 		globalState.userSocket?.on('userJoinedRoom', (notification: string) => {
@@ -111,11 +113,11 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 							<img className='admin-user' src='./crown.png' alt='user' />
 							<img
 							className='img-list-users-channel-admin'
-							src={`http://localhost:3001${ownerUsers.avatarURL}`}
+							src={`http://localhost:3001${ownerUsers?.avatarURL}`}
 							onClick={() => {
 								dispatch({ type: 'ACTIVATE', payload: 'dontcandcel' });
 								dispatch({ type: 'ACTIVATE', payload: 'showOptionsUserChannelOwner' });
-								dispatch({ type: 'SET_CURRENT_OPTION_CHANNEL_NAME', payload: ownerUsers.login});
+								dispatch({ type: 'SET_CURRENT_OPTION_CHANNEL_NAME', payload: ownerUsers?.login});
 								dispatch({ type: 'DISABLE', payload: 'showBackComponent' });
 						}}/>
 						</div>
@@ -125,15 +127,15 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 				</div>
 			</div>
 			<div className='list-users-channel'>
-				{state.currentUserList && state.currentUserList.map((userList: userList, index: number) => (
+				{state.currentUserList && state.currentUserList?.map((userList: userList, index: number) => (
 				<div key={index} className='user-list-item'>
 
-						{userList.isAdmin && !userList.isOwner &&
+						{userList?.isAdmin && !userList?.isOwner &&
 							<div className='avatar-container'>
 								<img className='admin-user' src='./crown.png' alt='user' />
 								<img
 								className='img-list-users-channel-admin'
-								src={`http://localhost:3001${userList.avatarURL}`}
+								src={`http://localhost:3001${userList?.avatarURL}`}
 								onClick={() => {
 									dispatch({ type: 'ACTIVATE', payload: 'dontcandcel' });
 									dispatch({ type: 'ACTIVATE', payload: 'showOptionsUserChannel' });
@@ -144,7 +146,7 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 						{!userList.isAdmin && !userList.isOwner &&
 							<img
 								className='img-list-users-channel'
-								src={`http://localhost:3001${userList.avatarURL}`}
+								src={`http://localhost:3001${userList?.avatarURL}`}
 								onClick={() => {
 									dispatch({ type: 'ACTIVATE', payload: 'dontcandcel' });
 									dispatch({ type: 'ACTIVATE', payload: 'showOptionsUserChannel' });
