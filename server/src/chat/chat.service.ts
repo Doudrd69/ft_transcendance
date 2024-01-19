@@ -470,9 +470,15 @@ export class ChatService {
 		const user = await this.usersRepository.findOne({ where: { id: muteUserDto.from } });
 		const conversation = await this.conversationRepository.findOne({ where: { id: muteUserDto.conversationID } });
 		const userGroup = await this.getRelatedGroup(user, conversation);
+		if (userGroup.isBan) {
+			throw new Error(`${user.username} is ban from this channel`);
+		}
 
 		if (userToMute && conversation && userGroup) {
 			const groupToUpdate = await this.getRelatedGroup(userToMute, conversation);
+			if (groupToUpdate.isBan) {
+				throw new Error(`${userToMute.username} is ban from this channel`);
+			}
 
 			if (userGroup.isOwner || userGroup.isAdmin) {
 				if (groupToUpdate && !groupToUpdate.isOwner || !groupToUpdate.isAdmin) {
@@ -499,9 +505,15 @@ export class ChatService {
 		const user = await this.usersRepository.findOne({ where: { id: muteUserDto.from } });
 		const conversation = await this.conversationRepository.findOne({ where: { id: muteUserDto.conversationID } });
 		const userGroup = await this.getRelatedGroup(user, conversation);
+		if (userGroup.isBan) {
+			throw new Error(`${user.username} is ban from this channel`);
+		}
 
 		if (userToMute && conversation && userGroup) {
 			const groupToUpdate = await this.getRelatedGroup(userToMute, conversation);
+			if (groupToUpdate.isBan) {
+				throw new Error(`${userToMute.username} is ban from this channel`);
+			}
 
 			if (userGroup.isOwner || userGroup.isAdmin) {
 				if (groupToUpdate && !groupToUpdate.isOwner || !groupToUpdate.isAdmin) {
@@ -529,9 +541,15 @@ export class ChatService {
 		const user = await this.usersRepository.findOne({ where: { id: banUserDto.from } });
 		const conversation = await this.conversationRepository.findOne({ where: { id: banUserDto.conversationID } });
 		const userGroup = await this.getRelatedGroup(user, conversation);
+		if (userGroup.isBan) {
+			throw new Error(`${user.username} is ban from this channel`);
+		}
 
 		if (userToBan && conversation && userGroup) {
 			const groupToUpdate = await this.getRelatedGroup(userToBan, conversation);
+			if (groupToUpdate.isBan) {
+				throw new Error(`${userToBan.username} is ban from this channel`);
+			}
 
 			if (userGroup.isOwner || userGroup.isAdmin) {
 				if (groupToUpdate && !groupToUpdate.isOwner || !groupToUpdate.isAdmin) {
@@ -558,9 +576,15 @@ export class ChatService {
 		const user = await this.usersRepository.findOne({ where: { id: banUserDto.from } });
 		const conversation = await this.conversationRepository.findOne({ where: { id: banUserDto.conversationID } });
 		const userGroup = await this.getRelatedGroup(user, conversation);
+		if (userGroup.isBan) {
+			throw new Error(`${user.username} is ban from this channel`);
+		}
 
 		if (userToUnban && conversation && userGroup) {
 			const groupToUpdate = await this.getRelatedGroup(userToUnban, conversation);
+			if (groupToUpdate.isBan) {
+				throw new Error(`${userToUnban.username} is ban from this channel`);
+			}
 
 			if (userGroup.isOwner || userGroup.isAdmin) {
 				if (groupToUpdate && !groupToUpdate.isOwner || !groupToUpdate.isAdmin) {
@@ -580,27 +604,26 @@ export class ChatService {
 
 	async updateUserAdminStatusFromConversationTrue(promoteUserToAdminDto: UserOptionsDto): Promise<boolean> {
 
-		// if (promoteUserToAdminDto.from === promoteUserToAdminDto.username) {
-
-		// }
-
 		const userToPromote : User = await this.usersRepository.findOne({
 			where: { username: promoteUserToAdminDto.username },
 			relations: ['groups'],
 		});
 		const user = await this.usersRepository.findOne({ where: { id: promoteUserToAdminDto.from } });
-		console.log("user: ", user.id);
-		console.log("userToPromote: ", userToPromote.id);
-
 		if (user.id == userToPromote.id) {
 			return false;
 		}
 
 		const conversation = await this.conversationRepository.findOne({ where: { id: promoteUserToAdminDto.conversationID } });
 		const userGroup = await this.getRelatedGroup(user, conversation);
+		if (userGroup.isBan) {
+			throw new Error(`${user.username} is ban from this channel`);
+		}
 	
 		if (userToPromote && conversation && userGroup) {
 			const groupToUpdate = await this.getRelatedGroup(userToPromote, conversation);
+			if (groupToUpdate.isBan) {
+				throw new Error(`${userToPromote.username} is ban from this channel`);
+			}
 
 			if (userGroup.isOwner || userGroup.isAdmin) {
 				if (groupToUpdate && !groupToUpdate.isOwner || !groupToUpdate.isAdmin) {
@@ -628,9 +651,15 @@ export class ChatService {
 		const user = await this.usersRepository.findOne({ where: { id: promoteUserToAdminDto.from } });
 		const conversation = await this.conversationRepository.findOne({ where: { id: promoteUserToAdminDto.conversationID } });
 		const userGroup = await this.getRelatedGroup(user, conversation);
+		if (userGroup.isBan) {
+			throw new Error(`${user.username} is ban from this channel`);
+		}
 
 		if (userToPromote && conversation && userGroup) {
 			const groupToUpdate = await this.getRelatedGroup(userToPromote, conversation);
+			if (groupToUpdate.isBan) {
+				throw new Error(`${userToPromote.username} is ban from this channel`);
+			}
 
 			if (userGroup.isOwner || userGroup.isAdmin) {
 				if (groupToUpdate && !groupToUpdate.isOwner || !groupToUpdate.isAdmin) {
