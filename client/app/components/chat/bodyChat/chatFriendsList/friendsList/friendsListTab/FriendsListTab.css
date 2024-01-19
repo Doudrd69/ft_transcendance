@@ -1,97 +1,32 @@
 .bloc-tab{
 	height: 100%;
-	/* border-radius: 10px; */
+	width: 100%;
 	display: flex;
-	margin: 0px 10px;
 	flex-direction: row;
 	/* background-color: rgb(157, 157, 157); */
-	justify-content: space-between;
+	justify-content: space-around;
 }
 
-.tab1{
-	width: 25%;
-	height: 40px;
+
+.image-tab{
+	width: 40px;
+	height: auto;
 	margin: 10px;
-	border-radius: 10px;
-	background-image: url('tab.png');
-	background-repeat: no-repeat;
-	background-position: center center;
-	background-color:  white;
-	background-size: contain; /* Ajuste la taille de l'image pour contenir le bouton */
-	background-color: transparent;
-	border:none;
+}
+
+.image-tab:hover{
+	transform: scale(1.2);
 	transition: transform 0.2s ease;
 }
 
-.tab2{
-	width: 25%;
-	height: 40px;
+.image-tab-opacity{
+	width: 40px;
+	opacity: 0.5;
+	height: auto;
 	margin: 10px;
-	border-radius: 10px;
+}
 
-	background-image: url('ping-pong.png');
-	background-repeat: no-repeat;
-	background-position: center center;
-	background-color: transparent;
-	border:none;
-	background-size: contain; /* Ajuste la taille de l'image pour contenir le bouton */
+.image-tab-opacity:hover{
+	transform: scale(1.2);
 	transition: transform 0.2s ease;
-}
-
-
-.tab3{
-	margin: 10px;
-	width: 25%;
-	height: 40px;
-	border-radius: 10px;
-
-	background-image: url('ajouter-un-groupe.png');
-	background-repeat: no-repeat;
-	background-size: contain; /* Ajuste la taille de l'image pour contenir le bouton */
-	background-position: center center;
-	background-color:  white;
-	background-color: transparent;
-	border:none;
-	transition: transform 0.2s ease;
-}
-
-
-.tab5{
-	margin:10px;
-	width: 25%;
-	height: 40px;
-	border-radius: 10px;
-	transition: transform 0.2s ease;
-}
-
-.tab4{
-	margin:10px;
-	width: 25%;
-	height: 40px;
-	border-radius: 10px;
-	
-	background-image: url('stats.png');
-	background-repeat: no-repeat;
-	background-position: center center;
-	background-color:  white;
-	background-size: contain; /* Ajuste la taille de l'image pour contenir le bouton */
-	background-color: transparent;
-	border:none;
-	transition: transform 0.2s ease;
-}
-
-.tab1:hover {
-	transform: scale(1.3);
-}
-.tab2:hover {
-	transform: scale(1.3);
-}
-.tab3:hover {
-	transform: scale(1.3);
-}
-.tab4:hover {
-	transform: scale(1.3);
-}
-.tab5:hover {
-	transform: scale(1.3);
 }

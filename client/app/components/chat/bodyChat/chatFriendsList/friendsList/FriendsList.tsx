@@ -9,7 +9,7 @@ import AvatarImageComponent from '@/app/components/Avatar/Avatar';
 interface FriendShip {
 	id: number;
 	username: string;
-	isBlock: boolean;
+	isBlocked: boolean;
 }
 
 interface Conversation {
