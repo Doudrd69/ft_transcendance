@@ -334,6 +334,7 @@ export class UsersService {
 			relations: ["initiatedFriendships", "acceptedFriendships", "groups"],
 		});
 	  
+		// empecher de demander 15 fois en ami + de pas recreer la conv si existe deja
 		if (initiator && friend) {
 
 			const friendshipToUpdate = await this.friendshipRepository.findOne({
