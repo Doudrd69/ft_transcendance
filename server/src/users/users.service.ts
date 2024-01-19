@@ -465,7 +465,7 @@ export class UsersService {
 			});
 		});
 
-		return friendships;
+		return array;
 	}
 
 	async getPendingFriendships(username: string): Promise<Friendship[]> {

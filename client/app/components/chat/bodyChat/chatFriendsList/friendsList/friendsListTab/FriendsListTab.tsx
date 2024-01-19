@@ -1,5 +1,5 @@
 import './FriendsListTab.css'
-import React, { useState } from 'react';
+import React, { use, useState } from 'react';
 import ConfirmationComponent from '../../confirmation/Confirmation';
 import { useChat } from '@/app/components/chat/ChatContext';
 import ListMyChannelComponent from '../../../listMyChannel/ListMyChannel';
@@ -7,13 +7,18 @@ import { Socket } from 'socket.io-client';
 import { handleWebpackExternalForEdgeRuntime } from 'next/dist/build/webpack/plugins/middleware-plugin';
 import { useGlobal } from '@/app/GlobalContext';
 
-interface FriendsListTabComponentProps {
-	userLogin : any;
-	roomName : any;
-	roomID : any;
+interface User {
+	id: number;
+	username: string;
+	isBlock: boolean;
 }
 
-const FriendsListTabComponent:  React.FC<FriendsListTabComponentProps> = ({ userLogin, roomName, roomID }) => {
+interface FriendsListTabComponentProps {
+	user: User;
+}
+
+
+const FriendsListTabComponent:  React.FC<FriendsListTabComponentProps> = ({user}) => {
 	
 	const {state, dispatch} = useChat();
 	const [block, setBlock] = useState<boolean>(false);
@@ -28,7 +33,7 @@ const FriendsListTabComponent:  React.FC<FriendsListTabComponentProps> = ({ user
 		try {
 			const BlockUserDto = {
 				initiatorLogin: sessionStorage.getItem("currentUserLogin"),
-				recipientLogin: user.login,
+				recipientLogin: user.username,
 			}
 	
 			const response = await fetch(`http://localhost:3001/users/blockUser`, {
@@ -44,7 +49,7 @@ const FriendsListTabComponent:  React.FC<FriendsListTabComponentProps> = ({ user
 			user.isBlock = !user.isBlock;
 			setBlock(true);
 
-			globalState.userSocket?.emit('joinRoom', { roomName: `whoblocked${user.login}`, roomID: '' } );
+			globalState.userSocket?.emit('joinRoom', { roomName: `whoblocked${user.username}`, roomID: '' } );
 		}
 		}
 		catch (error) {
@@ -58,7 +63,7 @@ const FriendsListTabComponent:  React.FC<FriendsListTabComponentProps> = ({ user
 
 			const BlockUserDto = {
 				initiatorLogin: sessionStorage.getItem("currentUserLogin"),
-				recipientLogin: user.login,
+				recipientLogin: user.username,
 			}
 				const response = await fetch(`http://localhost:3001/users/unblockUser`, {
 				method: 'POST',
@@ -73,7 +78,7 @@ const FriendsListTabComponent:  React.FC<FriendsListTabComponentProps> = ({ user
 			user.isBlock = !user.isBlock;
 			setBlock(false);
 
-			globalState.userSocket?.emit('leaveRoom', { roomName: `whoblocked${user.login}`, roomID: '' } );
+			globalState.userSocket?.emit('leaveRoom', { roomName: `whoblocked${user.username}`, roomID: '' } );
 
 			console.log("unblock");
 		}
@@ -99,7 +104,7 @@ const FriendsListTabComponent:  React.FC<FriendsListTabComponentProps> = ({ user
 
 			const blockUserDto = {
 				initiatorLogin: sessionStorage.getItem("currentUserLogin"),
-				recipientLogin:  userLogin,
+				recipientLogin:  user.username,
 			}
 	
 			const response = await fetch('http://localhost:3001/users/removeFriend', {
@@ -131,25 +136,17 @@ const FriendsListTabComponent:  React.FC<FriendsListTabComponentProps> = ({ user
 	return (
 		<>
 			<div className="bloc-tab">
-				<button className='tab1' onClick={() => {
-					dispatch({ type: 'TOGGLE', payload: 'showChat' });
-					dispatch({ type: 'SET_CURRENT_CONVERSATION', payload: userLogin});
-					dispatch({ type: 'SET_CURRENT_ROOM', payload: roomName});
-					dispatch({ type: 'SET_CURRENT_CONVERSATION_ID', payload: roomID});
-					dispatch({ type: 'ACTIVATE', payload: 'showBackComponent' });
-				}}/>
-				<button className='tab2' onClick={() => handleTabClick(`Etes vous sur de vouloir défier ${userLogin} ?`, gameInvite)} />
+				<button className='tab2' onClick={() => handleTabClick(`Etes vous sur de vouloir défier ${user.username} ?`, gameInvite)} />
 				<button className='tab3' onClick={() => dispatch({ type: 'ACTIVATE', payload: 'showListChannelAdd' })} />
 				<button className='tab4'/>
-				<img className='tab5' src="closered.png" onClick={() => handleTabClick(`Etes vous sur de vouloir supprimer de votre liste d'amies ${userLogin} ?`, removeFriends)}/>
-				
-				<img className='tab5' src="closered.png" onClick={() => handleTabClick(`Etes vous sur de vouloir supprimer de votre liste d'amies ${userLogin} ?`, removeFriends)}/>
+				<img className='tab5' src="block.png" onClick={() => handleTabClick(`Etes vous sur de vouloir supprimer de votre liste d'amies ${user.username} ?`, removeFriends)}/>
+				<img className='tab5' src="closered.png" onClick={() => handleTabClick(`Etes vous sur de vouloir supprimer de votre liste d'amies ${user.username} ?`, removeFriends)}/>
 			</div>
 			{state.showConfirmation && (
 			<ConfirmationComponent phrase={confirmationText} functionToExecute={funtionToExecute}/>
 			)}
 			{state.showListChannelAdd && (
-				<ListMyChannelComponent user={userLogin}  title={`INVITE ${userLogin} TO MY CHANNEL`}/>
+				<ListMyChannelComponent user={user.username}  title={`INVITE ${user.username} TO MY CHANNEL`}/>
 			)}
 		</>
 	);
