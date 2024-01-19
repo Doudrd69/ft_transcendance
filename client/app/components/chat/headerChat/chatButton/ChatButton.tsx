@@ -13,7 +13,7 @@ const ChatButtonComponent: React.FC = () => {
 		dispatch({ type: 'TOGGLE', payload: 'showChatList' })
 		dispatch({type: 'ACTIVATE', payload: 'showBackComponent'})
 	  }}>
-	USER
+		DM
     </button>
   );
 };
