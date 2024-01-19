@@ -90,7 +90,6 @@ const GeneralComponent = () => {
 			const payload = JSON.parse(atob(jwtArray[1]));
 			sessionStorage.setItem("currentUserID", payload.sub);
 			sessionStorage.setItem("2fa", payload.tfa_enabled);
-			console.log("Username: ", payload.username);
 			if (payload.username === payload.login)
 				sessionStorage.setItem("currentUserLogin", payload.login);
 			else
@@ -128,13 +127,12 @@ const GeneralComponent = () => {
 
 			const token = await response.json();
 			sessionStorage.setItem("jwt", token.access_token);
-			const jwt = sessionStorage.getItem("jwt");
-			if (jwt) {
-				await setUserSession(jwt);
+			if (token.access_token) {
+				await setUserSession(token.access_token);
 				const userSocket = io('http://localhost:3001/user', {
 					autoConnect: false,
 					auth: {
-						token: jwt,
+						token: token.access_token,
 					}
 				});
 				userSocket.connect();

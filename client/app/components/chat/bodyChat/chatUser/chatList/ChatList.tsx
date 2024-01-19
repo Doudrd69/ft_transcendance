@@ -52,7 +52,6 @@ const ChatListComponent: React.FC = () => {
 	
 				if (requestDms.ok) {
 					const conversations = await requestDms.json();
-	
 					friends.forEach((friend: FriendShip) => {
 						conversations.forEach((dm: Conversation) => {
 							friend.roomName = dm.name;

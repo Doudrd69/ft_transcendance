@@ -13,12 +13,6 @@ import { MessageDto } from 'src/chat/dto/message.dto';
 	},
 })
 
-// quand ton client se connecte, il rejoin les rooms des gens qu il a bloque
-// join(whoblockedUSERLOGIN)
-// to('room').except("WhoBlocked#senderId") (tu connais senderId)
-// reste a implementer dans le front les events au moment du fetch pour tout se suite rejoindre/qutter les rooms de block
-// creer un dossier pour les dto de la gateway
-
 export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	constructor(
