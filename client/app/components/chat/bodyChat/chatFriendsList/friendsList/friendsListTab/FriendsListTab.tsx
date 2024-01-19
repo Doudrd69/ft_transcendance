@@ -29,7 +29,7 @@ const FriendsListTabComponent:  React.FC<FriendsListTabComponentProps> = ({ user
 		console.log("Inviting user to play");
 	}
 
-	const blockUser = async () => {
+	const removeFriend = async () => {
 
 		try {
 
@@ -77,7 +77,7 @@ const FriendsListTabComponent:  React.FC<FriendsListTabComponentProps> = ({ user
 				<button className='tab2' onClick={() => handleTabClick(`Etes vous sur de vouloir défier ${userLogin} ?`, gameInvite)} />
 				<button className='tab3' onClick={() => dispatch({ type: 'ACTIVATE', payload: 'showListChannelAdd' })} />
 				<button className='tab4'/>
-				<button className='tab5' onClick={() => handleTabClick(`Etes vous sur de vouloir bloquer ${userLogin} ?`, blockUser)}/>
+				<button className='tab5' onClick={() => handleTabClick(`Etes vous sur de vouloir bloquer ${userLogin} ?`, removeFriend)}/>
 				
 			</div>
 			{state.showConfirmation && (
