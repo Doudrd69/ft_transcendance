@@ -113,7 +113,7 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 							<img className='admin-user' src='./crown.png' alt='user' />
 							<img
 							className='img-list-users-channel-admin'
-							src={`http://localhost:3001${ownerUsers?.avatarURL}`}
+							src={`http://localhost:3001/users/getAvatarByLogin/${ownerUsers.login}/${timestamp}`}
 							onClick={() => {
 								dispatch({ type: 'ACTIVATE', payload: 'dontcandcel' });
 								dispatch({ type: 'ACTIVATE', payload: 'showOptionsUserChannelOwner' });
@@ -135,7 +135,7 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 								<img className='admin-user' src='./crown.png' alt='user' />
 								<img
 								className='img-list-users-channel-admin'
-								src={`http://localhost:3001${userList?.avatarURL}`}
+								src={`http://localhost:3001/users/getAvatarByLogin/${userList.login}/${timestamp}`}
 								onClick={() => {
 									dispatch({ type: 'ACTIVATE', payload: 'dontcandcel' });
 									dispatch({ type: 'ACTIVATE', payload: 'showOptionsUserChannel' });
@@ -146,7 +146,7 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 						{!userList.isAdmin && !userList.isOwner &&
 							<img
 								className='img-list-users-channel'
-								src={`http://localhost:3001${userList?.avatarURL}`}
+								src={`http://localhost:3001/users/getAvatarByLogin/${userList.login}/${timestamp}`}
 								onClick={() => {
 									dispatch({ type: 'ACTIVATE', payload: 'dontcandcel' });
 									dispatch({ type: 'ACTIVATE', payload: 'showOptionsUserChannel' });
