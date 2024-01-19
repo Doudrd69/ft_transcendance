@@ -18,10 +18,11 @@ interface user {
 
 interface OptionsUserChannelProps {
 	user: user
+	me :user
 }
 
 
-const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user }) => {
+const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me}) => {
 
 	const { state, dispatch } = useChat();
 	const { globalState } = useGlobal();
@@ -357,6 +358,7 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user }) => {
 			console.log(error);
 		}
 	}
+	console.log(me);
 	return (
 		<>
 		<div className="blur-background"></div>
@@ -367,26 +369,31 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user }) => {
 					{user.login !== sessionStorage.getItem("currentUserLogin") && (
 						<div>
 							<img className="option-image" src="chat.png" onClick={handleDms}/>
-							{admin ? (
-								<img className="option-image" src="crown.png" onClick={demoteAdminUser}/>
-							) : (
-								<img className="option-image-opacity" src="crown.png" onClick={promoteAdminUser}/>
-							)}
-							{mute ? (
-								<img className="option-image" src="volume-mute.png" onClick={unmuteUser}/>
-							) : (
-								<img className="option-image" src="unmute.png" onClick={muteUser}/>
-							)}
-							{ban ? (
-								<img className="option-image" src="interdit.png" onClick={unbanUser}/>
-							) : (
-								<img className="option-image-opacity" src="interdit.png" onClick={banUser}/>
-							)}
-							{block ? (
-								<img className="option-image" src="block.png" onClick={unblockUser}/>
-							) : (
-								<img className="option-image-opacity" src="block.png" onClick={blockUser}/>
-							)}
+							{me.isAdmin && (
+									<>
+									{admin ? (
+										<img className="option-image" src="crown.png" onClick={demoteAdminUser}/>
+									) : (
+										<img className="option-image-opacity" src="crown.png" onClick={promoteAdminUser}/>
+									)}
+									{mute ? (
+										<img className="option-image" src="volume-mute.png" onClick={unmuteUser}/>
+									) : (
+										<img className="option-image" src="unmute.png" onClick={muteUser}/>
+									)}
+									{ban ? (
+										<img className="option-image" src="interdit.png" onClick={unbanUser}/>
+									) : (
+										<img className="option-image-opacity" src="interdit.png" onClick={banUser}/>
+									)}
+									{block ? (
+										<img className="option-image" src="block.png" onClick={unblockUser}/>
+									) : (
+										<img className="option-image-opacity" src="block.png" onClick={blockUser}/>
+									)}
+									</>
+								)
+							}
 						</div>
 					)}
 					<img className="option-image" src="logoutred.png" onClick={handleLeaveChannel}/>

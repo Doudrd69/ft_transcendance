@@ -78,6 +78,9 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 	const ownerUsers = ownerUsers_array[0];
 	console.log("Owner: ", ownerUsers);
 
+	const me_array = state.currentUserList.filter((user: userList) => user.login === sessionStorage.getItem("currentUserLogin"));
+	const me = me_array[0];
+
 	useEffect(() => {
 		globalState.userSocket?.on('userJoinedRoom', (notification: string) => {
 		console.log("Channel log: ", notification);
@@ -122,7 +125,7 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 						}}/>
 						</div>
 					{state.showOptionsUserChannelOwner && 
-						<OptionsUserChannel user={ownerUsers} />
+						<OptionsUserChannel user={ownerUsers} me={me} />
 					}
 				</div>
 			</div>
@@ -154,7 +157,7 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 									dispatch({ type: 'DISABLE', payload: 'showBackComponent'});
 							}}/>}
 					{state.showOptionsUserChannel && !userList.isOwner &&
-						(<OptionsUserChannel user={userList} />)
+						(<OptionsUserChannel user={userList} me={me}/>)
 					}
 				</div>
 				))}
