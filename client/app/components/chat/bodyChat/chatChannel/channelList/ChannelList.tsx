@@ -34,7 +34,7 @@ const ChannelListComponent: React.FC = () => {
 	
 
 	const loadDiscussions = async () => {
-
+		console.log("feuuuuur");
 		try{
 
 			const response = await fetch(`http://localhost:3001/chat/getConversationsWithStatus/${userID}`, {
