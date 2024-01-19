@@ -13,6 +13,7 @@ import { UpdateUsernameDto } from './dto/UpdateUsernameDto.dto';
 import { existsSync, unlinkSync } from 'fs';
 import { BlockUserDto } from './dto/BlockUserDto.dto';
 import { Conversation } from 'src/chat/entities/conversation.entity';
+import { GroupMember } from 'src/chat/entities/group_member.entity';
 
 @Injectable()
 export class UsersService {
@@ -321,17 +322,33 @@ export class UsersService {
 		
 		throw new Error("Fatal error");
 	}
+
+	async friendshipConversation(user1: User, user2: User) {
+
+		let conversation = null;
+		user1.groups.forEach((userOneGroup: GroupMember) => {
+			user2.groups.forEach((userTwoGroup: GroupMember) => {
+				if (userOneGroup.conversation.id == userTwoGroup.conversation.id) {
+					console.log("found conversation!");
+					conversation = userOneGroup.conversation;
+					return ;
+				}
+			});
+		});
+
+		return conversation;
+	}
 	
 	async updateFriendship(friendRequestDto: FriendRequestDto, flag: boolean): Promise<Conversation | Friendship> {
 
 		const initiator = await this.usersRepository.findOne({
 			where: { username: friendRequestDto.initiatorLogin },
-			relations: ["initiatedFriendships", "acceptedFriendships", "groups"],
+			relations: ["initiatedFriendships", "acceptedFriendships", "groups", "groups.conversation"],
 		});
 
 		const friend = await this.usersRepository.findOne({
 			where: { username: friendRequestDto.recipientLogin },
-			relations: ["initiatedFriendships", "acceptedFriendships", "groups"],
+			relations: ["initiatedFriendships", "acceptedFriendships", "groups",  "groups.conversation"],
 		});
 	  
 		// empecher de demander 15 fois en ami + de pas recreer la conv si existe deja
@@ -346,9 +363,14 @@ export class UsersService {
 				friendshipToUpdate.isAccepted = flag;
 				await this.friendshipRepository.save(friendshipToUpdate);
 
-				if (flag) {
-					const conversation = this.chatService.createFriendsConversation(initiator, friend);
-					return conversation;
+				const privateConversation = await this.friendshipConversation(initiator, friend);
+				console.log(privateConversation);
+				if (!privateConversation) {
+					// si la conv existe deja, on la recreer pas
+					if (flag) {
+						const conversation = this.chatService.createFriendsConversation(initiator, friend);
+						return conversation;
+					}
 				}
 
 				return friendshipToUpdate;
