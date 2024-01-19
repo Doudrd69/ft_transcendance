@@ -8,12 +8,8 @@ import AvatarImageComponent from '@/app/components/Avatar/Avatar';
 
 interface FriendShip {
 	id: number;
-	isAccepted: true;
-	isActive: boolean;
-	friend?: any;
-	initiator?: any;
-	roomName?: string;
-	roomID?: string;
+	username: string;
+	isBlock: boolean;
 }
 
 interface Conversation {
@@ -48,27 +44,9 @@ const FriendsListComponent: React.FC = () => {
 					'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
 				}
 			});
-			
 			if (response.ok) {
 				const friends = await response.json();
-				const requestDms = await fetch(`http://localhost:3001/chat/getDMsConversations/${sessionStorage.getItem("currentUserID")}`, {
-					method: 'GET',
-					headers: {
-						'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
-					},
-				});
-				if (requestDms.ok) {
-					const conversations = await requestDms.json();
-					const DMs = conversations.filter((conversation: Conversation) => !conversation.is_channel);
-	
-					friends.forEach((friend: FriendShip) => {
-						DMs.forEach((dm: Conversation) => {
-							friend.roomName = dm.name;
-							friend.roomID = dm.id;
-						});
-					});
-					setFriendList([...friends]);
-				}
+				setFriendList([...friends]);
 			}
 		}
 		catch (error) {
@@ -95,18 +73,19 @@ const FriendsListComponent: React.FC = () => {
 			</button>
 			{state.showAddFriend && <AddFriendComponent updateFriends={loadFriendList} title="ADD NEW FRIEND"/>}
 			{friendList.map((friend: FriendShip, id: number) => (
+				console.log(friend),
 			<div className="tab-and-userclicked" key={id}>
 				<div className="bloc-button-friendslist">
 						<img
-							src={`http://localhost:3001/users/getAvatarByLogin/${friend.friend ? friend.friend.login : friend.initiator ? friend.initiator.login : 'Unknown User'}/${timestamp}`}
-							className={`profil-friendslist ${friend.isActive ? 'on' : 'off'}`}
+							src={`http://localhost:3001/users/getAvatarByLogin/${friend.username}/${timestamp}`}
+							className={`profil-friendslist`}
 							alt="User Avatar"
 						/>
 						<div className={`amies ${activeIndex === id ? 'active' : ''}`} onClick={() => activateTabFriendsList(id)}>
-							{friend.friend ? friend.friend.username : friend.initiator ? friend.initiator.username : 'Unknown User'}
+							{friend.username}
 						</div>
 				</div>
-				{activeIndex === id && <FriendsListTabComponent userLogin={friend.friend ? friend.friend.username : friend.initiator ? friend.initiator.username : 'Unknown User'} roomName={friend.roomName}  roomID= {friend.roomID}/>}
+				{activeIndex === id && <FriendsListTabComponent user={friend}/>}
 			</div>
 		  ))}
 		</div>
