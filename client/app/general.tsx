@@ -70,16 +70,21 @@ const GeneralComponent = () => {
 
 	const FriendRequestReceived = ({ closeToast, toastProps, friendRequestDto }: any) => (
 		<div>
-		  You received a friend request from  {friendRequestDto.initiatorLogin}
-		  <button style={{ padding: '5px '}} onClick={() => friendRequestValidation(friendRequestDto)}>Accept</button>
-		  <button style={{ padding: '5px '}} onClick={closeToast}>Deny</button>
+		  	You received a friend request from  {friendRequestDto.initiatorLogin}
+			<button style={{ padding: '5px '}} onClick={() => {
+				friendRequestValidation(friendRequestDto);
+				closeToast
+				}}>
+			Accept
+			</button>
+		 	 <button style={{ padding: '5px '}} onClick={closeToast}>Deny</button>
 		</div>
 	)
 
 	const FriendRequestAccepted = ({ closeToast, toastProps, friend }: any) => (
 		<div>
-		  {friend} has accepted your friend request!
-		  <button onClick={closeToast}>Understand!</button>
+			{friend} has accepted your friend request!
+			<button onClick={closeToast}>Understand!</button>
 		</div>
 	)
 

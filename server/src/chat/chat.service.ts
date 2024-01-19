@@ -582,9 +582,9 @@ export class ChatService {
 
 		if (userToUnban && conversation && userGroup) {
 			const groupToUpdate = await this.getRelatedGroup(userToUnban, conversation);
-			if (groupToUpdate.isBan) {
-				throw new Error(`${userToUnban.username} is ban from this channel`);
-			}
+			// if (groupToUpdate.isBan) {
+			// 	throw new Error(`${userToUnban.username} is ban from this channel`);
+			// }
 
 			if (userGroup.isOwner || userGroup.isAdmin) {
 				if (groupToUpdate && !groupToUpdate.isOwner || !groupToUpdate.isAdmin) {
