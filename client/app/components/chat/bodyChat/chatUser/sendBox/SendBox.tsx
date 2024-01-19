@@ -39,6 +39,7 @@ const SendBoxComponent: React.FC = () => {
 			
 			if (response.ok) {
 				console.log("Message sent and created in DB");
+				console.log("----> ", state.currentRoom);
 				if (globalState.userSocket?.connected) {
 				globalState.userSocket?.emit('message', { dto: messageDto, conversationName: state.currentRoom } , () => {
 					console.log("Message sent to gateway");
