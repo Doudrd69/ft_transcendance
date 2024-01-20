@@ -15,6 +15,7 @@ import { QuitConversationDto } from './dto/quitConversationDto.dto';
 import { UpdateIsPublicDto } from './dto/updateIsPublicDto.dto';
 import { UpdateProtectFalseDto } from './dto/updateProtectFalseDto.dto';
 import { DeleteConversationDto } from './dto/deleteConversationDto.dto';
+import { MuteUserDto } from './dto/muteUserDto.dto';
 
 @Controller('chat')
 export class ChatController {
@@ -88,8 +89,8 @@ export class ChatController {
 	@UseGuards(AuthGuard)
 	@HttpCode(HttpStatus.OK)
 	@Post('muteUser')
-	muteUserFromConversation(@Body() userOptionsDto: UserOptionsDto): Promise<boolean> {
-		return this.chatService.updateUserMuteStatusFromConversation(userOptionsDto);
+	muteUserFromConversation(@Body() muteUserDto: MuteUserDto): Promise<boolean> {
+		return this.chatService.updateUserMuteStatusFromConversation(muteUserDto);
 	}
 
 	@UseGuards(AuthGuard)

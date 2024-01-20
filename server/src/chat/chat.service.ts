@@ -20,6 +20,7 @@ import { GroupDto } from './dto/group.dto';
 import { UpdateIsPublicDto } from './dto/updateIsPublicDto.dto';
 import { UpdateProtectFalseDto } from './dto/updateProtectFalseDto.dto';
 import { DeleteConversationDto } from './dto/deleteConversationDto.dto';
+import { MuteUserDto } from './dto/muteUserDto.dto';
 
 @Injectable()
 export class ChatService {
@@ -108,17 +109,36 @@ export class ChatService {
 		return status;
 	}
 
+	isUserMuted(group: GroupMember): boolean {
+		// si user mute mais sans temps : return true
+		return group.mutedUntil !== null && new Date() < group.mutedUntil;
+	}
+
 	private async getGroupIsMuteStatus(user: User, conversation: Conversation): Promise<boolean> {
 
 		let status = false;
+		let updateStatus = false;
+		let groupToUpdate = null
 		user.groups.forEach((group: GroupMember) => {
 			if (group.conversation.id == conversation.id) {
-				if (group.isMute) {
+				if (group.mutedUntil != null) {
+					status = this.isUserMuted(group);
+					if (!status) {
+						updateStatus = true;
+						groupToUpdate = group;
+					}
+				}
+				else if (group.isMute) {
 					status = true;
-					return ;
 				}
 			}
 		});
+
+		if (updateStatus) {
+			groupToUpdate.isMute = false;
+			groupToUpdate.mutedUntil = null;
+			await this.groupMemberRepository.save(groupToUpdate);
+		}
 
 		return status;
 	}
@@ -146,7 +166,7 @@ export class ChatService {
 		let array = [];
 		user.groups.forEach((userGroup: GroupMember) => {
 			if (userGroup.conversation.is_channel) {
-				let userListForThisGroup = [];
+				 let userListForThisGroup = [];
 				users.forEach((user_: User) => {
 						user_.groups.forEach((group: GroupMember) => {
 							if (group.conversation.id == userGroup.conversation.id) {
@@ -461,7 +481,7 @@ export class ChatService {
 	/***					USER CHANNEL OPTIONS				***/
 	/**************************************************************/
 
-	async updateUserMuteStatusFromConversation(muteUserDto: UserOptionsDto): Promise<boolean> {
+	async updateUserMuteStatusFromConversation(muteUserDto: MuteUserDto): Promise<boolean> {
 
 		const userToMute : User = await this.usersRepository.findOne({
 			where: { username: muteUserDto.username },
@@ -474,6 +494,7 @@ export class ChatService {
 			throw new Error(`${user.username} is ban from this channel`);
 		}
 
+		
 		if (userToMute && conversation && userGroup) {
 			const groupToUpdate = await this.getRelatedGroup(userToMute, conversation);
 			if (groupToUpdate.isBan) {
@@ -483,10 +504,13 @@ export class ChatService {
 			if (userGroup.isOwner || userGroup.isAdmin) {
 				if (groupToUpdate && !groupToUpdate.isOwner || !groupToUpdate.isAdmin) {
 					groupToUpdate.isMute = true;
+					const currentDate = new Date();
+					const mutedUntil = new Date(currentDate.getTime() + muteUserDto.mutedUntil * 60000);
+					groupToUpdate.mutedUntil = mutedUntil;
 					await this.groupMemberRepository.save(groupToUpdate);
 					return true;	
 				}
-
+	
 				throw new Error(`${userToMute.username} has higher privilege`);
 			}
 
@@ -518,6 +542,7 @@ export class ChatService {
 			if (userGroup.isOwner || userGroup.isAdmin) {
 				if (groupToUpdate && !groupToUpdate.isOwner || !groupToUpdate.isAdmin) {
 					groupToUpdate.isMute = false;
+					groupToUpdate.mutedUntil = null;
 					await this.groupMemberRepository.save(groupToUpdate);
 					return true;	
 				}
@@ -933,7 +958,7 @@ export class ChatService {
 	/**************************************************************/
 	/***						MESSAGE							***/
 	/**************************************************************/
-	
+
 	// need to check muteStatus here or in front?
 	async createMessage(messageDto: MessageDto): Promise<Message> {
 		
@@ -945,6 +970,7 @@ export class ChatService {
 
 		const isMuteStatus = await this.getGroupIsMuteStatus(sender, conversation);
 		const isBanStatus = await this.getGroupIsBanStatus(sender, conversation);
+
 
 		if (isMuteStatus) {
 			console.error("User is mute");
