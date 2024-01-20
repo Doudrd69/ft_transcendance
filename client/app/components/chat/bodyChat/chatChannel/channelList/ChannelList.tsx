@@ -65,11 +65,14 @@ const ChannelListComponent: React.FC = () => {
 	};
 
 	useEffect(() => {
-		console.log("bahahahahah");
 		globalState.userSocket?.on('userIsBan', () => {
 			console.log("Ban notif");
 			dispatch({ type: 'DISABLE', payload: 'showChannel' });
 			dispatch({ type: 'ACTIVATE', payload: 'showChannelList' });
+		});
+
+		globalState.userSocket?.on('userAddedToFriendRoom', () => {
+			loadDiscussions();
 		});
 
 		return () => {
