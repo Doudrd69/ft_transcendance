@@ -5,12 +5,15 @@ import { ChatService } from 'src/chat/chat.service';
 import { UsersService } from 'src/users/users.service';
 import { Conversation } from 'src/chat/entities/conversation.entity';
 import { MessageDto } from 'src/chat/dto/message.dto';
+import { GatewayGuard } from './Gatewayguard.guard';
+import { UseGuards } from '@nestjs/common'
 
 @WebSocketGateway({
 	namespace: 'user',
 	cors: {
 		origin: ['http://localhost:3000']
 	},
+	middlewares: [GatewayGuard],
 })
 
 export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -72,6 +75,7 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	handleConnection(client: Socket) {
 
 		console.log(`---> GeneralGtw client connected    : ${client.id}`);
+		// client got the auth.token payload, we will know if connection is good
 		this.connectedUsers[client.id] = client;
 		
 		client.on('joinPersonnalRoom', (personnalRoom: string, userID: number) => {
@@ -101,6 +105,7 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	}
 
 	@SubscribeMessage('joinRoom')
+	@UseGuards(GatewayGuard)
 	addUserToRoom( @ConnectedSocket() client: Socket, @MessageBody() data: { roomName: string, roomID: string } ) {
 
 		const { roomName, roomID } = data;
@@ -118,6 +123,7 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	}
 
 	@SubscribeMessage('leaveRoom')
+	@UseGuards(GatewayGuard)
 	leaveRoom( @ConnectedSocket() client: Socket, @MessageBody() data: { roomName: string, roomID: string } ) {
 
 		const { roomName, roomID } = data;
@@ -132,6 +138,7 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	}
 
 	@SubscribeMessage('addUserToRoom')
+	@UseGuards(GatewayGuard)
 	addUserToNewRoom( @MessageBody() data: { convID: number, convName: string, friend: string} ) {
 		const { convID, convName, friend } = data;
 		console.log("==== addUserToRoom Event ====");
@@ -143,6 +150,7 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	}
 
 	@SubscribeMessage('banUser')
+	@UseGuards(GatewayGuard)
 	handleUserBan(@MessageBody() data: { userToBan: string, roomName: string, roomID: string } ) {
 		const { userToBan, roomName, roomID } = data;
 		console.log(userToBan);
@@ -153,6 +161,7 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	}
 
 	@SubscribeMessage('unbanUser')
+	@UseGuards(GatewayGuard)
 	handleUserUnban(@MessageBody() data: { userToUnban: string, roomName: string, roomID: string } ) {
 		const { userToUnban, roomName, roomID } = data;
 		console.log(userToUnban);
@@ -163,7 +172,8 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	}
 
 	@SubscribeMessage('message')
-	handleMessage(@MessageBody() data: { dto: MessageDto, conversationName: string } ) {
+	@UseGuards(GatewayGuard)
+	async handleMessage( @MessageBody() data: { dto: MessageDto, conversationName: string } ) {
 
 		const { dto, conversationName } = data;
 		console.log("Message sent to: ", conversationName + dto.conversationID);
@@ -180,6 +190,7 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 
 	// je peux aussi utiliser la liste userBlocked pour except les demandes d'amis
 	@SubscribeMessage('addFriend')
+	@UseGuards(GatewayGuard)
 	handleFriendRequest(@MessageBody() dto: any) {
 		this.server.to(dto.recipientLogin).except(`whoblocked${dto.initiatorLogin}`).emit('friendRequest', {
 			recipientLogin: dto.recipientLogin,
@@ -189,6 +200,7 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 
 	// faut aussi, peut etre le nom de celui qui a accepte mdr
 	@SubscribeMessage('friendRequestAccepted')
+	@UseGuards(GatewayGuard)
 	handleAcceptedFriendRequest(@MessageBody() data: { roomName: string, roomID: string, initiator: string, recipient: string } ) {
 		const { roomName, roomID, initiator, recipient } = data;
 		this.server.to(initiator).emit('friendRequestAcceptedNotif', {
