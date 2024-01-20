@@ -192,7 +192,6 @@ const GeneralComponent = () => {
 			globalState.userSocket?.on('userIsBan', ( data: { roomName: string, roomID: string } ) => {
 				const { roomName, roomID } = data; 
 				if (roomName && roomID) {
-					// dispatch({ type: 'DISABLE', payload: 'showChannel' });
 					globalState.userSocket?.emit('leaveRoom', { roomName: roomName, roomID: roomID });
 					toast.warn(`You are ban from ${roomName}`);
 				}

@@ -125,11 +125,12 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me}) => 
 	const muteUser = async() => {
 
 		try{
-			const userOptionDto = {
+			const muteUserDto = {
 				conversationID: Number(state.currentConversationID),
 				username: user.login,
 				state: true,
-				from: Number(sessionStorage.getItem("currentUserID"))
+				from: Number(sessionStorage.getItem("currentUserID")),
+				mutedUntil: 5,
 			}
 	
 			const response = await fetch(`http://localhost:3001/chat/muteUser`, {
@@ -138,7 +139,7 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me}) => 
 					'Content-Type': 'application/json',
 					'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
 				},
-				body: JSON.stringify(userOptionDto),
+				body: JSON.stringify(muteUserDto),
 			});
 		
 			if (response.ok) {

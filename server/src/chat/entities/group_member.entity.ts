@@ -20,10 +20,13 @@ export class GroupMember {
   @Column({ default: false})
   isMute: boolean;
 
+  @Column({ type: 'timestamptz', default: null  })
+  mutedUntil: Date;
+
   @ManyToOne(() => Conversation)
   conversation: Conversation;
   
-  @Column({ type: 'timestamptz' })
+  @Column({ type: 'timestamptz', default: null  })
   joined_datetime: Date;
 
   @Column({ type: 'timestamptz', default: null })

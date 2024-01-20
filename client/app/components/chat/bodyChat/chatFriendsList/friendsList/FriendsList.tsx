@@ -5,6 +5,7 @@ import { useChat } from '../../../ChatContext';
 import AddFriendComponent from '../../addConversation/AddFriends';
 import { Socket } from 'socket.io-client';
 import AvatarImageComponent from '@/app/components/Avatar/Avatar';
+import { useGlobal } from '@/app/GlobalContext';
 
 interface FriendShip {
 	id: number;
@@ -21,6 +22,7 @@ interface Conversation {
 const FriendsListComponent: React.FC = () => {
 	
 	const {state, dispatch} = useChat();
+	const { globalState } = useGlobal();
 	const [showTabFriendsList, setTabFriendsList] = useState(false);
 	const [activeIndex, setActiveIndex] = useState<number | null>(null);
 	const [friendList, setFriendList] = useState<FriendShip[]>([]);
@@ -58,8 +60,14 @@ const FriendsListComponent: React.FC = () => {
 		console.log("Loading friend list...");
 		loadFriendList();
 	}, [state.refreshFriendList]);
-	const timestamp = new Date().getTime();
 
+	useEffect(() => {
+		globalState.userSocket?.on('friendRequestAcceptedNotif', () => {
+			loadFriendList();
+		});
+	}, [globalState?.userSocket]);
+
+	const timestamp = new Date().getTime();
 
 	return (
 		<div className="bloc-friendslist">
