@@ -51,14 +51,16 @@ export class UsersController {
 		},
 		}),
 	}))
-
 	// @UseGuards(AuthGuard)
 	async uploadAvatar(@UploadedFile() avatar: Express.Multer.File, @Param('userId') userId: number) {
 
 		if (!avatar) {
 			throw new Error("No files uploaded");
 		}
-
+		const isValidPNG = await this.usersService.isPNG(avatar.path);
+		if (!isValidPNG) {
+			throw new Error('Invalid file format');
+		}
 		const avatarURL = `/avatars/${avatar.filename}`;
 		await this.usersService.uploadAvatarURL(avatarURL, userId);
 		return { avatarURL };

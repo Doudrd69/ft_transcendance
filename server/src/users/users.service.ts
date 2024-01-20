@@ -14,6 +14,9 @@ import { existsSync, unlinkSync } from 'fs';
 import { BlockUserDto } from './dto/BlockUserDto.dto';
 import { Conversation } from 'src/chat/entities/conversation.entity';
 import { GroupMember } from 'src/chat/entities/group_member.entity';
+import * as Jimp from 'jimp';
+import { promisify } from 'util';
+import * as fs from 'fs';
 
 @Injectable()
 export class UsersService {
@@ -64,21 +67,36 @@ export class UsersService {
 
 	async uploadAvatarURL(avatarURL: string, userID: number): Promise<UpdateResult | undefined> {
 		try {
+
 			const user = await this.getUserByID(userID);
 			const oldAvatarPath = join(__dirname, 'users', user.avatarURL);
-
 			if (existsSync(oldAvatarPath)) {
 				unlinkSync(oldAvatarPath); 
 			  }
 			if (!user) {
 				throw new Error("user not found");
 			}
-				// Mettez à jour uniquement l'avatarURL
-				const updateResult = await this.usersRepository.update({ id: userID }, { avatarURL });
-
+			console.log("uploadAvatarURL", avatarURL);
+			// Mettez à jour uniquement l'avatarURL
+			const updateResult = await this.usersRepository.update({ id: userID }, { avatarURL });
 			return updateResult;
 		} catch (error) {
 			throw error;
+		}
+	}
+	
+	async isPNG(filePath: string): Promise<boolean> {
+		try {
+			const fileDescriptor = await fs.promises.open(filePath, 'r');
+			const buffer = Buffer.alloc(8);
+			await fileDescriptor.read(buffer, 0, 8, 0);
+			await fileDescriptor.close();
+			const signature = buffer.toString('hex');
+			return signature === "89504e470d0a1a0a";
+	  
+		} catch (error) {
+		  console.error("Error reading file or checking format:", error);
+		  throw new Error("Invalid file format");
 		}
 	}
 
