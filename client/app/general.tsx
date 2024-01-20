@@ -105,7 +105,7 @@ const GeneralComponent = () => {
 		}
 	}
 
-	const handleAccessToken = async (code: any): Promise<boolean> => {
+	const userReconnects = () => {
 
 		if (sessionStorage.getItem("jwt")) {
 			const userSocket = io('http://localhost:3001/user', {
@@ -119,6 +119,14 @@ const GeneralComponent = () => {
 			setAuthValidated(true);
 			return true;
 		}
+
+		return false;
+	}
+
+	const handleAccessToken = async (code: any): Promise<boolean> => {
+
+		if (userReconnects())
+			return true;
 
 		const response = await fetch('http://localhost:3001/auth/access', {
 			method: 'POST',
@@ -212,6 +220,7 @@ const GeneralComponent = () => {
 	// Connection - Deconnection useEffect
 	useEffect(() => {
 		
+			// Works on both connection and reconnection
 			globalState.userSocket?.on('connect', () => {
 				console.log("UserSocket new connection : ", globalState.userSocket?.id);
 				const personnalRoom = sessionStorage.getItem("currentUserLogin");

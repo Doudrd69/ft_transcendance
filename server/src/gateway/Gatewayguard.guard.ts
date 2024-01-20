@@ -1,11 +1,11 @@
-import { CanActivate, ExecutionContext, Injectable, UnauthorizedException, } from '@nestjs/common';
+import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { jwtConstants } from '../auth/constants';
 
 @Injectable()
 export class  GatewayGuard implements CanActivate {
 
-	constructor(private readonly jwtService: JwtService) { }
+	constructor(private readonly jwtService: JwtService) {}
 
 	async canActivate(context: ExecutionContext): Promise<boolean> {
 
@@ -17,13 +17,10 @@ export class  GatewayGuard implements CanActivate {
 		}
 
 		try {
-			const payload = await this.jwtService.verifyAsync(token, { secret: jwtConstants.secret } );
-			client.handshake.auth = payload;
+			await this.jwtService.verifyAsync(token, { secret: jwtConstants.secret } );
+			return true;
 		} catch (error) {
 			throw new UnauthorizedException();
 		}
-		
-		console.log("Client verified: ", client.handshake.auth)
-		return true;
 	}
 }
