@@ -65,6 +65,16 @@ const FriendsListComponent: React.FC = () => {
 		globalState.userSocket?.on('friendRequestAcceptedNotif', () => {
 			loadFriendList();
 		});
+
+		globalState.userSocket?.on('refreshFriends', () => {
+			loadFriendList();
+		});
+
+		return () => {
+			globalState.userSocket?.off('friendRequestAcceptedNotif');
+			globalState.userSocket?.off('refreshFriends');
+		}
+
 	}, [globalState?.userSocket]);
 
 	const timestamp = new Date().getTime();

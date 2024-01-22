@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Socket } from 'socket.io-client';
 import { useChat } from '../../ChatContext';
 import './AddConversation.css';
+import { useGlobal } from '@/app/GlobalContext';
 
 
 
@@ -21,10 +22,18 @@ interface userList {
 const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 
 	const [formValue, setFormValue] = useState('');
+	const [me, setMe] = useState<userList[]>();
+	const [isAdmin, setIsAdmin] = useState<boolean>(false);
+	const [isOwner, setIsOwner] = useState<boolean>(false);
+	const { globalState } = useGlobal();
 	const { state, dispatch } = useChat();
-	const me = state.currentUserList.filter((user: userList) => user.login === sessionStorage.getItem("currentUserLogin"));
-	const isAdmin = me[0].isAdmin;
-	const isOwner = me[0].isOwner;
+	// if (state.currentUserList) {
+		setMe(state.currentUserList.filter((user: userList) => user.login === sessionStorage.getItem("currentUserLogin")));
+	// }
+	if (me) {
+		setIsAdmin(me[0].isAdmin);
+		setIsOwner(me[0].isOwner);
+	}
 
 
 	const updateIsPublicTrue = async() => {
@@ -99,7 +108,14 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 			});
 	
 			if (response.ok) {
-				console.log("CONVERSATION DELETED");
+
+				// makes everyone in the channel leave + refresh component
+				console.log(state.currentConversationID);
+				globalState.userSocket?.emit('deleteChannel', {
+					roomName: state.currentConversation,
+					roomID: state.currentConversationID,
+				});
+
 				dispatch({ type: 'DISABLE', payload: 'showOptionChannel' });
 				dispatch({ type: 'DISABLE', payload: 'showChannel' });
 				dispatch({ type: 'ACTIVATE', payload: 'showBackComponent' });

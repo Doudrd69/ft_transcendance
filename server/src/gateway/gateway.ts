@@ -149,28 +149,6 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		});
 	}
 
-	@SubscribeMessage('banUser')
-	@UseGuards(GatewayGuard)
-	handleUserBan(@MessageBody() data: { userToBan: string, roomName: string, roomID: string } ) {
-		const { userToBan, roomName, roomID } = data;
-		console.log(userToBan);
-		this.server.to(userToBan).emit('userIsBan', {
-			roomName: roomName,
-			roomID: roomID,
-		});
-	}
-
-	@SubscribeMessage('unbanUser')
-	@UseGuards(GatewayGuard)
-	handleUserUnban(@MessageBody() data: { userToUnban: string, roomName: string, roomID: string } ) {
-		const { userToUnban, roomName, roomID } = data;
-		console.log(userToUnban);
-		this.server.to(userToUnban).emit('userIsUnban', {
-			roomName: roomName,
-			roomID: roomID,
-		});
-	}
-
 	@SubscribeMessage('message')
 	@UseGuards(GatewayGuard)
 	async handleMessage( @MessageBody() data: { dto: MessageDto, conversationName: string } ) {
@@ -209,5 +187,68 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 			initiator: initiator,
 			recipient: recipient,
 		})
+	}
+
+	/* REFRESH HANDLERS */
+
+	@SubscribeMessage('banUser')
+	@UseGuards(GatewayGuard)
+	handleUserBan(@MessageBody() data: { userToBan: string, roomName: string, roomID: string } ) {
+		const { userToBan, roomName, roomID } = data;
+		console.log(userToBan);
+		this.server.to(userToBan).emit('userIsBan', {
+			roomName: roomName,
+			roomID: roomID,
+		});
+	}
+
+	@SubscribeMessage('unbanUser')
+	@UseGuards(GatewayGuard)
+	handleUserUnban(@MessageBody() data: { userToUnban: string, roomName: string, roomID: string } ) {
+		const { userToUnban, roomName, roomID } = data;
+		console.log(userToUnban);
+		this.server.to(userToUnban).emit('userIsUnban', {
+			roomName: roomName,
+			roomID: roomID,
+		});
+	}
+
+	@SubscribeMessage('deleteChannel')
+	@UseGuards(GatewayGuard)
+	handleDeleteChannel(@MessageBody() data: { roomName: string, roomID: string } ) {
+		const { roomName, roomID } = data;
+		console.log("Emitting to ", roomName + roomID);
+		// recup channelUserList et emit sur chaque user?
+		this.server.to(roomName + roomID).emit('channelDeleted', {
+			roomName: roomName,
+			roomID: roomID,
+		});
+	}
+
+	@SubscribeMessage('kickUserFromChannel')
+	@UseGuards(GatewayGuard)
+	handleKickUser(@MessageBody() data: { userToKick: string, roomName: string, roomID: string } ) {
+		const { userToKick, roomName, roomID } = data;
+		this.server.to(userToKick).emit('kickUser', {
+			roomName: roomName,
+			roomID: roomID,
+		});
+	}
+
+	@SubscribeMessage('refreshUserChannelList')
+	@UseGuards(GatewayGuard)
+	handleRefresh(@MessageBody() data: { userToRefresh: string, roomName: string, roomID: string } ) {
+		const { userToRefresh, roomName, roomID } = data;
+		this.server.to(userToRefresh).emit('refreshChannelList', {
+			roomName: roomName,
+			roomID: roomID,
+		});
+	}
+
+	@SubscribeMessage('refreshUser')
+	@UseGuards(GatewayGuard)
+	handleUserRefresh(@MessageBody() data: { userToRefresh: string, target: string, status: boolean } ) {
+		const { userToRefresh, target, status } = data;
+		this.server.to(userToRefresh).emit(target, status);
 	}
 }

@@ -166,7 +166,7 @@ export class ChatService {
 		let array = [];
 		user.groups.forEach((userGroup: GroupMember) => {
 			if (userGroup.conversation.is_channel) {
-				 let userListForThisGroup = [];
+				let userListForThisGroup = [];
 				users.forEach((user_: User) => {
 						user_.groups.forEach((group: GroupMember) => {
 							if (group.conversation.id == userGroup.conversation.id) {
@@ -187,6 +187,40 @@ export class ChatService {
 			}
 		});
 
+		return array;
+	}
+
+	private async getUserListFromTargetConversation(conversationID: number) {
+
+		const users = await this.usersRepository.find({
+			relations: ["groups", "groups.conversation"],
+		});
+
+		const conversation = await this.conversationRepository.findOne({ where: { id: conversationID } });
+		if (!conversation) {
+			return [];
+		}
+
+		let array = [];
+		users.forEach((user_: User) => {
+			user_.groups.forEach((group: GroupMember) => {
+				if (group.conversation.id == conversationID) {
+					if (group.conversation.is_channel) {
+						array.push({
+							login: user_.login,
+							avatarURL: user_.avatarURL,
+							isAdmin: group.isAdmin,
+							isMute: group.isMute,
+							isOwner: group.isOwner,
+							isBan: group.isBan,
+							id: user_.id,
+						});
+					}
+				}
+			});
+		});
+
+		console.log("JPP: ", array);
 		return array;
 	}
 
@@ -732,6 +766,14 @@ export class ChatService {
  				.where("conversation.id = :id", { id: idToDelete })
   				.execute();
 
+			// supprimer les messages avant 
+			await this.conversationRepository
+				.createQueryBuilder()
+				.delete()
+				.from(Message)
+				.where("conversation.id = :id", { id: conversationToDelete.id })
+				.execute()
+
 			await this.conversationRepository
 				.createQueryBuilder()
 				.delete()
@@ -1095,6 +1137,11 @@ export class ChatService {
 		}
 
 		return allFriendConversations;
+	}
+
+	async getUserList(conversationID: number) {
+
+		return await this.getUserListFromTargetConversation(conversationID);
 	}
 
 	// return un array d'array d'objets "user" : login, avatarURL

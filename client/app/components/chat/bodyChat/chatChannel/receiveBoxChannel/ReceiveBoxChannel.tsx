@@ -1,9 +1,11 @@
 import './ReceiveBoxChannel.css';
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, use } from 'react';
 import { Socket } from 'socket.io-client';
 import { useChat } from '../../../ChatContext';
 import OptionsUserChannel from '../../addConversation/OptionsUserChannel';
 import { useGlobal } from '@/app/GlobalContext';
+import { toast } from 'react-toastify';
+import { setCurrentUserList } from '../../../ChatContext';
 
 interface Message {
 	from: string;
@@ -12,15 +14,14 @@ interface Message {
 	conversationID: number;
 }
 
-interface userList {
+interface User {
+	id: number;
 	login: string;
 	avatarURL: string;
 	isAdmin: boolean;
 	isMute: boolean;
 	isBan: boolean;
 	isOwner: boolean;
-	isBlock: boolean;
-	id: number;
 }
 
 const ReceiveBoxChannelComponent: React.FC = () => {
@@ -29,6 +30,10 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 	const { globalState } = useGlobal();
 	const [messages, setMessages] = useState<Message[]>([]);
 	const messagesContainerRef = useRef<HTMLDivElement>(null);
+	const [userList, setUserList] = useState<User[]>();
+	const [owner, setOwner] = useState<User>();
+	const [me, setMe] = useState<User>();
+
 
 	const isMyMessage = (message: Message): boolean => {
 		return message.from === sessionStorage.getItem("currentUserLogin");
@@ -72,16 +77,28 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 		}
 	};
 
- 	const ownerUsers_array = state.currentUserList.filter((user: userList) => user.isOwner === true);
-	 console.log("userlist: ", state.currentUserList);
-
-	const ownerUsers = ownerUsers_array[0];
-	console.log("Owner: ", ownerUsers);
-
-	const me_array = state.currentUserList.filter((user: userList) => user.login === sessionStorage.getItem("currentUserLogin"));
-	const me = me_array[0];
+	const loadUserList = async () => {
+		try {
+			const response = await fetch(`http://localhost:3001/chat/getUserlist/${state.currentConversationID}`, {
+				method: 'GET',
+				headers: {
+				'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
+				},
+			});
+	
+			if (response.ok) {
+				const userList = await response.json();
+				// console.log("userlist dans le fetch: ", userList);
+				setUserList([...userList]);
+				console.log("userlist dans le fetch: ", userList);
+			}
+			} catch (error) {
+				console.log(error);
+			}
+	}
 
 	useEffect(() => {
+		console.log("AAAAAAAAAAAAAAAAA");
 		globalState.userSocket?.on('userJoinedRoom', (notification: string) => {
 		console.log("Channel log: ", notification);
 		});
@@ -91,12 +108,55 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 			setMessages((prevMessages: Message[]) => [...prevMessages, message]);
 		});
 
+		globalState.userSocket?.on('kickUser', ( data: {roomName: string, roomID: string} ) => {
+			const { roomName, roomID } = data;
+			globalState.userSocket?.emit('leaveRoom', { roomName: roomName, roomID: roomID });
+			dispatch({ type: 'DISABLE', payload: 'showChannel' });
+		});
+
+		globalState.userSocket?.on('channelDeleted', ( data: {roomName: string, roomID: string} ) => {
+			const { roomName, roomID } = data;
+			globalState.userSocket?.emit('leaveRoom', { roomName: roomName, roomID: roomID });
+			dispatch({ type: 'DISABLE', payload: 'showChannel' });
+		});
+
+		globalState.userSocket?.on('refreshChannel', () => {
+			loadUserList();
+			// console.log("userlist: ", userList);
+			// const owner_array = userList?.filter((user: User) => user.isOwner === true);
+			// if (owner_array)
+			// 	setOwner(owner_array[0]);
+			// const me_array = userList?.filter((user: User) => user.login === sessionStorage.getItem("currentUserLogin"));
+			// if (me_array)
+			// 	setMe(me_array[0]);
+			// console.log("me: ", me);
+			// console.log("owner: ", owner);
+			console.log("REFRESH CHANNEL");
+		});
+		
 		return () => {
 			globalState.userSocket?.off('userJoinedRoom');
 			globalState.userSocket?.off('onMessage');
+			globalState.userSocket?.off('refreshChannel');
+			globalState.userSocket?.off('kickUser');
+			globalState.userSocket?.off('channelDeleted');
 		};
+		
 	}, [globalState?.userSocket]);
-
+	
+	useEffect(() => {
+		loadUserList();
+		console.log("userlist dans useEffect: ", userList);
+		const owner_array = userList?.filter((user: User) => user.isOwner === true)[0];
+		if (owner_array)
+			setOwner(owner_array[0]);
+		console.log("owner: ", owner);
+		const me_array = userList?.filter((user: User) => user.login === sessionStorage.getItem("currentUserLogin"));
+		if (me_array)
+			setMe(me_array[0]);
+		console.log("me: ", me);
+	}, [owner]);
+	
 	useEffect(() => {
 		console.log("Loading conversation...");
 		getMessages();
@@ -116,48 +176,48 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 							<img className='admin-user' src='./crown.png' alt='user' />
 							<img
 							className='img-list-users-channel-admin'
-							src={`http://localhost:3001/users/getAvatarByLogin/${ownerUsers.login}/${timestamp}`}
+							src={`http://localhost:3001${userList?.filter((user: User) => user.isOwner === true)[0]?.avatarURL}`}
 							onClick={() => {
 								dispatch({ type: 'ACTIVATE', payload: 'dontcandcel' });
 								dispatch({ type: 'ACTIVATE', payload: 'showOptionsUserChannelOwner' });
-								dispatch({ type: 'SET_CURRENT_OPTION_CHANNEL_NAME', payload: ownerUsers?.login});
+								dispatch({ type: 'SET_CURRENT_OPTION_CHANNEL_NAME', payload: userList?.filter((user: User) => user.isOwner === true)[0]?.login});
 								dispatch({ type: 'DISABLE', payload: 'showBackComponent' });
 						}}/>
 						</div>
-					{state.showOptionsUserChannelOwner && 
-						<OptionsUserChannel user={ownerUsers} me={me} />
+					{state.showOptionsUserChannelOwner && userList?.filter((user: User) => user.isOwner === true)[0] && 
+						<OptionsUserChannel user={userList?.filter((user: User) => user.isOwner === true)[0]} me={userList?.filter((user: User) => user.login === sessionStorage.getItem("currentUserLogin"))[0]} />
 					}
 				</div>
 			</div>
 			<div className='list-users-channel'>
-				{state.currentUserList && state.currentUserList?.map((userList: userList, index: number) => (
-				<div key={index} className='user-list-item'>
-
-						{userList?.isAdmin && !userList?.isOwner &&
+				{userList && userList?.map((user: User, index: number) => (
+					console.log("user in bouceule: ", user.login),
+					<div key={index} className='user-list-item'>
+						{user?.isAdmin && !user?.isOwner &&
 							<div className='avatar-container'>
 								<img className='admin-user' src='./crown.png' alt='user' />
 								<img
 								className='img-list-users-channel-admin'
-								src={`http://localhost:3001/users/getAvatarByLogin/${userList.login}/${timestamp}`}
+								src={`http://localhost:3001${user?.avatarURL}`}
 								onClick={() => {
 									dispatch({ type: 'ACTIVATE', payload: 'dontcandcel' });
 									dispatch({ type: 'ACTIVATE', payload: 'showOptionsUserChannel' });
-									dispatch({ type: 'SET_CURRENT_OPTION_CHANNEL_NAME', payload: userList.login});
+									dispatch({ type: 'SET_CURRENT_OPTION_CHANNEL_NAME', payload: user.login});
 									dispatch({ type: 'DISABLE', payload: 'showBackComponent' });
 								}}/>
 							</div>}
-						{!userList.isAdmin && !userList.isOwner &&
+						{!user.isAdmin && !user.isOwner &&
 							<img
 								className='img-list-users-channel'
-								src={`http://localhost:3001/users/getAvatarByLogin/${userList.login}/${timestamp}`}
+								src={`http://localhost:3001/users/getAvatarByLogin/${user.login}/${timestamp}`}
 								onClick={() => {
 									dispatch({ type: 'ACTIVATE', payload: 'dontcandcel' });
 									dispatch({ type: 'ACTIVATE', payload: 'showOptionsUserChannel' });
-									dispatch({ type: 'SET_CURRENT_OPTION_CHANNEL_NAME', payload: userList.login});
+									dispatch({ type: 'SET_CURRENT_OPTION_CHANNEL_NAME', payload: user.login});
 									dispatch({ type: 'DISABLE', payload: 'showBackComponent'});
 							}}/>}
-					{state.showOptionsUserChannel && !userList.isOwner &&
-						(<OptionsUserChannel user={userList} me={me}/>)
+					{state.showOptionsUserChannel && !user.isOwner && userList?.filter((user: User) => user.login === sessionStorage.getItem("currentUserLogin"))[0] &&
+						(<OptionsUserChannel user={user} me={userList?.filter((user: User) => user.login === sessionStorage.getItem("currentUserLogin"))[0]}/>)
 					}
 				</div>
 				))}
