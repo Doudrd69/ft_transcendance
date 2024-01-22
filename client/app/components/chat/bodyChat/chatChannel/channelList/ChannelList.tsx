@@ -129,7 +129,6 @@ const ChannelListComponent: React.FC = () => {
 		dispatch({ type: 'ACTIVATE', payload: 'dontcancel' });
 		if(isAdmin[index])
 			dispatch({ type: 'ACTIVATE', payload: 'showAdmin' });
-		dispatch({ type: 'SET_CURRENT_USER_LIST', payload: user });
 		dispatch({ type: 'DISABLE', payload: 'showChannelList' });
 		dispatch({ type: 'ACTIVATE', payload: 'showChannel' });
 	

@@ -17,7 +17,7 @@ interface User {
 
 interface OptionsUserChannelProps {
 	user: User
-	me :User
+	me : User
 }
 
 
@@ -239,7 +239,7 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 				// refresh user list in channel for userToRefresh (who has been promoted)
 				globalState.userSocket?.emit('refreshUser', {
 					userToRefresh: user.login,
-					target: 'adminChange',
+					target: 'refreshChannel',
 					status: false,
 				});
 
@@ -279,25 +279,29 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 				console.log(user);
 				if (user.login == me.login)
 				{
+					// je quitte le channel donc faut refresh le composant pour les autres
 					dispatch({ type: 'ACTIVATE', payload: 'showChannelList' });
 					dispatch({ type: 'DISABLE', payload: 'showChannel' });
+					globalState.userSocket?.emit('leaveRoom', { roomName: state.currentConversation, roomID: state.currentConversationID });
 				}
-				dispatch({ type: 'ACTIVATE', payload: 'showBackComponent' });
-				dispatch({ type: 'DISABLE', payload: 'showOptionsUserChannel' });
+				else {
+					// je kick un user donc faut refresh le composant pour les autres
+					dispatch({ type: 'ACTIVATE', payload: 'showBackComponent' });
+					dispatch({ type: 'DISABLE', payload: 'showOptionsUserChannel' });
 
-				globalState.userSocket?.emit('kickUserFromChannel', {
-					userToKick: user.login,
-					roomName: state.currentConversation,
-					roomID: state.currentConversationID,
-				});
+					// permet au user kick de leave la room
+					globalState.userSocket?.emit('kickUserFromChannel', {
+						userToKick: user.login,
+						roomName: state.currentConversation,
+						roomID: state.currentConversationID,
+					});
 
-				// refresh channel list for userToRefresh (who has quit the channel)
-				globalState.userSocket?.emit('refreshUserChannelList', {
-					userToRefresh: user.login,
-					roomName: state.currentConversation,
-					roomID: state.currentConversationID,
-				});
-
+					globalState.userSocket?.emit('refreshUserChannelList', {
+						userToRefresh: user.login,
+						roomName: state.currentConversation,
+						roomID: state.currentConversationID,
+					});
+				}
 			}
 		}
 		catch (error) {

@@ -30,7 +30,9 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 	const { globalState } = useGlobal();
 	const [messages, setMessages] = useState<Message[]>([]);
 	const messagesContainerRef = useRef<HTMLDivElement>(null);
-	const [userList, setUserList] = useState<User[]>(state.currentUserList);
+	const [userList, setUserList] = useState<User[]>();
+	const [owner, setOwner] = useState<User>();
+	const [me, setMe] = useState<User>();
 
 
 	const isMyMessage = (message: Message): boolean => {
@@ -75,13 +77,6 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 		}
 	};
 
-	const ownerUsers_array = state.currentUserList.filter((user: User) => user.isOwner === true);
-	console.log("userlist: ", state.currentUserList);
-
-	const me_array = state.currentUserList.filter((user: User) => user.login === sessionStorage.getItem("currentUserLogin"));
-	const me = me_array[0];
-
-
 	const loadUserList = async () => {
 		try {
 			const response = await fetch(`http://localhost:3001/chat/getUserlist/${state.currentConversationID}`, {
@@ -92,8 +87,10 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 			});
 	
 			if (response.ok) {
-				const messageList = await response.json();
-				setMessages((prevMessages: Message[]) => [...prevMessages, ...messageList]);
+				const userList = await response.json();
+				// console.log("userlist dans le fetch: ", userList);
+				setUserList([...userList]);
+				console.log("userlist dans le fetch: ", userList);
 			}
 			} catch (error) {
 				console.log(error);
@@ -101,7 +98,7 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 	}
 
 	useEffect(() => {
-
+		console.log("AAAAAAAAAAAAAAAAA");
 		globalState.userSocket?.on('userJoinedRoom', (notification: string) => {
 		console.log("Channel log: ", notification);
 		});
@@ -125,10 +122,18 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 
 		globalState.userSocket?.on('refreshChannel', () => {
 			loadUserList();
+			// console.log("userlist: ", userList);
+			// const owner_array = userList?.filter((user: User) => user.isOwner === true);
+			// if (owner_array)
+			// 	setOwner(owner_array[0]);
+			// const me_array = userList?.filter((user: User) => user.login === sessionStorage.getItem("currentUserLogin"));
+			// if (me_array)
+			// 	setMe(me_array[0]);
+			// console.log("me: ", me);
+			// console.log("owner: ", owner);
 			console.log("REFRESH CHANNEL");
 		});
-
-
+		
 		return () => {
 			globalState.userSocket?.off('userJoinedRoom');
 			globalState.userSocket?.off('onMessage');
@@ -136,9 +141,22 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 			globalState.userSocket?.off('kickUser');
 			globalState.userSocket?.off('channelDeleted');
 		};
-
+		
 	}, [globalState?.userSocket]);
-
+	
+	useEffect(() => {
+		loadUserList();
+		console.log("userlist dans useEffect: ", userList);
+		const owner_array = userList?.filter((user: User) => user.isOwner === true)[0];
+		if (owner_array)
+			setOwner(owner_array[0]);
+		console.log("owner: ", owner);
+		const me_array = userList?.filter((user: User) => user.login === sessionStorage.getItem("currentUserLogin"));
+		if (me_array)
+			setMe(me_array[0]);
+		console.log("me: ", me);
+	}, [owner]);
+	
 	useEffect(() => {
 		console.log("Loading conversation...");
 		getMessages();
@@ -158,29 +176,29 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 							<img className='admin-user' src='./crown.png' alt='user' />
 							<img
 							className='img-list-users-channel-admin'
-							src={`http://localhost:3001/users/getAvatarByLogin/${ownerUsers?.login}/${timestamp}`}
+							src={`http://localhost:3001${userList?.filter((user: User) => user.isOwner === true)[0]?.avatarURL}`}
 							onClick={() => {
 								dispatch({ type: 'ACTIVATE', payload: 'dontcandcel' });
 								dispatch({ type: 'ACTIVATE', payload: 'showOptionsUserChannelOwner' });
-								dispatch({ type: 'SET_CURRENT_OPTION_CHANNEL_NAME', payload: ownerUsers?.login});
+								dispatch({ type: 'SET_CURRENT_OPTION_CHANNEL_NAME', payload: userList?.filter((user: User) => user.isOwner === true)[0]?.login});
 								dispatch({ type: 'DISABLE', payload: 'showBackComponent' });
 						}}/>
 						</div>
-					{state.showOptionsUserChannelOwner && 
-						<OptionsUserChannel user={ownerUsers} me={me} />
+					{state.showOptionsUserChannelOwner && userList?.filter((user: User) => user.isOwner === true)[0] && 
+						<OptionsUserChannel user={userList?.filter((user: User) => user.isOwner === true)[0]} me={userList?.filter((user: User) => user.login === sessionStorage.getItem("currentUserLogin"))[0]} />
 					}
 				</div>
 			</div>
 			<div className='list-users-channel'>
 				{userList && userList?.map((user: User, index: number) => (
-					console.log("user in bouceule: ", user),
-				<div key={index} className='user-list-item'>
+					console.log("user in bouceule: ", user.login),
+					<div key={index} className='user-list-item'>
 						{user?.isAdmin && !user?.isOwner &&
 							<div className='avatar-container'>
 								<img className='admin-user' src='./crown.png' alt='user' />
 								<img
 								className='img-list-users-channel-admin'
-								src={`http://localhost:3001/users/getAvatarByLogin/${user.login}/${timestamp}`}
+								src={`http://localhost:3001${user?.avatarURL}`}
 								onClick={() => {
 									dispatch({ type: 'ACTIVATE', payload: 'dontcandcel' });
 									dispatch({ type: 'ACTIVATE', payload: 'showOptionsUserChannel' });
@@ -198,8 +216,8 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 									dispatch({ type: 'SET_CURRENT_OPTION_CHANNEL_NAME', payload: user.login});
 									dispatch({ type: 'DISABLE', payload: 'showBackComponent'});
 							}}/>}
-					{state.showOptionsUserChannel && !user.isOwner &&
-						(<OptionsUserChannel user={user} me={me}/>)
+					{state.showOptionsUserChannel && !user.isOwner && userList?.filter((user: User) => user.login === sessionStorage.getItem("currentUserLogin"))[0] &&
+						(<OptionsUserChannel user={user} me={userList?.filter((user: User) => user.login === sessionStorage.getItem("currentUserLogin"))[0]}/>)
 					}
 				</div>
 				))}
