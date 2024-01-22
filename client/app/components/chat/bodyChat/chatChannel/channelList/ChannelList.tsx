@@ -15,10 +15,14 @@ interface Conversation {
 	isPublic: boolean;
 	isProtected: boolean;
 }
-
-interface userList {
+interface User {
+	id: number;
 	login: string;
 	avatarURL: string;
+	isAdmin: boolean;
+	isMute: boolean;
+	isBan: boolean;
+	isOwner: boolean;
 }
 
 const ChannelListComponent: React.FC = () => {
@@ -31,8 +35,7 @@ const ChannelListComponent: React.FC = () => {
 
 	const [conversations, setConversations] = useState<Conversation[]>([]);
 	const [isAdmin, setIsAdmin] = useState<boolean[]>([]);
-	const [userList, setUserList] = useState<userList[]>([]);
-	const [isAdd, setIsAdd] = useState<boolean>(false);
+	const [userList, setUserList] = useState<User[]>([]);
 	
 
 	const loadDiscussions = async () => {
@@ -121,7 +124,7 @@ const ChannelListComponent: React.FC = () => {
 			};
 	}, []);
 
-	const handleConv = (conversation: Conversation, userList: userList, index: number) => {
+	const handleConv = (conversation: Conversation, user: User, index: number) => {
 		dispatch({ type: 'SET_CURRENT_CONVERSATION', payload: conversation.name });
 		dispatch(setCurrentComponent('showChannelList'));
 		dispatch({ type: 'SET_CURRENT_CONVERSATION_ID', payload: conversation.id });
@@ -131,7 +134,7 @@ const ChannelListComponent: React.FC = () => {
 		dispatch({ type: 'ACTIVATE', payload: 'dontcancel' });
 		if(isAdmin[index])
 			dispatch({ type: 'ACTIVATE', payload: 'showAdmin' });
-		dispatch({ type: 'SET_CURRENT_USER_LIST', payload: userList });
+		dispatch({ type: 'SET_CURRENT_USER_LIST', payload: user });
 		dispatch({ type: 'DISABLE', payload: 'showChannelList' });
 		dispatch({ type: 'ACTIVATE', payload: 'showChannel' });
 	

@@ -5,23 +5,23 @@ import './AddConversation.css';
 import { RSC } from 'next/dist/client/components/app-router-headers';
 import { useGlobal } from '@/app/GlobalContext';
 
-interface user {
+interface User {
+	id: number;
 	login: string;
 	avatarURL: string;
 	isAdmin: boolean;
 	isMute: boolean;
 	isBan: boolean;
-	isBlock: boolean;
-	id: number;
+	isOwner: boolean;
 }
 
 interface OptionsUserChannelProps {
-	user: user
-	me :user
+	user: User
+	me :User
 }
 
 
-const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me}) => {
+const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) => {
 
 	const { state, dispatch } = useChat();
 	const { globalState } = useGlobal();
@@ -29,70 +29,6 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me}) => 
 	const [admin, setAdmin] = useState<boolean>(user.isAdmin);
 	const [mute, setMute] = useState<boolean>(user.isMute);
 	const [ban, setBan] = useState<boolean>(user.isBan);
-	const [block, setBlock] = useState<boolean>(user.isBlock);
-
-
-	const blockUser = async() => {
-
-		try {
-			const BlockUserDto = {
-				initiatorLogin: sessionStorage.getItem("currentUserLogin"),
-				recipientLogin: user.login,
-			}
-	
-			const response = await fetch(`http://localhost:3001/users/blockUser`, {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-					'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
-				},
-				body: JSON.stringify(BlockUserDto),
-			});
-		
-		if (response.ok) {
-			user.isBlock = !user.isBlock;
-			setBlock(true);
-
-			globalState.userSocket?.emit('joinRoom', { roomName: `whoblocked${user.login}`, roomID: '' } );
-		}
-		}
-		catch (error) {
-			console.error(error);
-		}
-	}
-	
-	const unblockUser = async() => {
-
-		try {
-
-			const BlockUserDto = {
-				initiatorLogin: sessionStorage.getItem("currentUserLogin"),
-				recipientLogin: user.login,
-			}
-
-			const response = await fetch(`http://localhost:3001/users/unblockUser`, {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-					'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
-				},
-				body: JSON.stringify(BlockUserDto),
-			});
-		
-		if (response.ok) {
-			user.isBlock = !user.isBlock;
-			setBlock(false);
-
-			globalState.userSocket?.emit('leaveRoom', { roomName: `whoblocked${user.login}`, roomID: '' } );
-
-			console.log("unblock");
-		}
-		}
-		catch (error) {
-			console.error(error);
-		}
-	}
-
 	const unmuteUser = async() => {
 
 		try {
@@ -458,11 +394,11 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me}) => 
 									</>
 								)
 							}
-							{block ? (
+							{/* {block ? (
 								<img className="option-image" src="block.png" onClick={unblockUser}/>
 							) : (
 								<img className="option-image-opacity" src="block.png" onClick={blockUser}/>
-							)}
+							)} */}
 						</div>
 					)}
 					<img className="option-image" src="logoutred.png" onClick={handleLeaveChannel}/>
