@@ -193,4 +193,10 @@ export class ChatController {
 	getConversationsRightsFromUser(@Param('userID') userID: number) {
 		return this.chatService.getConversationsWithStatus(userID);
 	}
+
+	@UseGuards(AuthGuard)
+	@Get('getUserList/:conversationID')
+	getUserList(@Param('conversationID') conversation: number) {
+		return this.chatService.getUserList(conversation);
+	}
 }

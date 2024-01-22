@@ -87,11 +87,6 @@ const ChannelListComponent: React.FC = () => {
 			loadDiscussions();
 		});
 
-		// globalState.userSocket?.on('refreshChannel', () => {
-		// 	console.log("REFRESH CHANNEL");
-		// 	loadDiscussions();
-		// });
-
 		return () => {
 			globalState.userSocket?.off('banUser');
 			globalState.userSocket?.off('userAddedToFriendRoom');

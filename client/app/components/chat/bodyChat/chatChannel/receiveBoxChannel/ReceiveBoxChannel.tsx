@@ -5,6 +5,7 @@ import { useChat } from '../../../ChatContext';
 import OptionsUserChannel from '../../addConversation/OptionsUserChannel';
 import { useGlobal } from '@/app/GlobalContext';
 import { toast } from 'react-toastify';
+import { setCurrentUserList } from '../../../ChatContext';
 
 interface Message {
 	from: string;
@@ -77,9 +78,6 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 	const ownerUsers_array = state.currentUserList.filter((user: User) => user.isOwner === true);
 	console.log("userlist: ", state.currentUserList);
 
-	const ownerUsers = ownerUsers_array[0];
-	console.log("Owner: ", ownerUsers);
-
 	const me_array = state.currentUserList.filter((user: User) => user.login === sessionStorage.getItem("currentUserLogin"));
 	const me = me_array[0];
 
@@ -101,6 +99,7 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 				console.log(error);
 			}
 	}
+
 	useEffect(() => {
 
 		globalState.userSocket?.on('userJoinedRoom', (notification: string) => {
@@ -159,7 +158,7 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 							<img className='admin-user' src='./crown.png' alt='user' />
 							<img
 							className='img-list-users-channel-admin'
-							src={`http://localhost:3001/users/getAvatarByLogin/${ownerUsers.login}/${timestamp}`}
+							src={`http://localhost:3001/users/getAvatarByLogin/${ownerUsers?.login}/${timestamp}`}
 							onClick={() => {
 								dispatch({ type: 'ACTIVATE', payload: 'dontcandcel' });
 								dispatch({ type: 'ACTIVATE', payload: 'showOptionsUserChannelOwner' });

@@ -22,11 +22,18 @@ interface userList {
 const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 
 	const [formValue, setFormValue] = useState('');
+	const [me, setMe] = useState<userList[]>();
+	const [isAdmin, setIsAdmin] = useState<boolean>(false);
+	const [isOwner, setIsOwner] = useState<boolean>(false);
 	const { globalState } = useGlobal();
 	const { state, dispatch } = useChat();
-	const me = state.currentUserList.filter((user: userList) => user.login === sessionStorage.getItem("currentUserLogin"));
-	const isAdmin = me[0].isAdmin;
-	const isOwner = me[0].isOwner;
+	// if (state.currentUserList) {
+		setMe(state.currentUserList.filter((user: userList) => user.login === sessionStorage.getItem("currentUserLogin")));
+	// }
+	if (me) {
+		setIsAdmin(me[0].isAdmin);
+		setIsOwner(me[0].isOwner);
+	}
 
 
 	const updateIsPublicTrue = async() => {

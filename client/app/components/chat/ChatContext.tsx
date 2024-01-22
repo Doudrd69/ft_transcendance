@@ -8,7 +8,7 @@ interface userList {
 	isAdmin: boolean;
 	isMute: boolean;
 	isBan: boolean;
-	isBlock: boolean;
+	id: boolean;
 }
 
 type ActionType =
@@ -76,7 +76,7 @@ interface ChatState {
 	showPasswordChange:boolean;
 	dontcancel:boolean;
 	showBackComponent: boolean;
-	[key: string]: boolean  |number | string | null;
+	[key: string]: boolean  | number | string | null | userList[];
 }
 
 // État initial
@@ -210,7 +210,7 @@ export const setCurrentConversationID = (payload: string | null): Action => ({
 	payload,
 });
 
-export const setCurrentUserLis = (payload: any | null): Action => ({
+export const setCurrentUserList = (payload: any): Action => ({
 	type: 'SET_CURRENT_USER_LIST',
 	payload,
 });
