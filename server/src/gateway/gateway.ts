@@ -149,28 +149,6 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		});
 	}
 
-	@SubscribeMessage('banUser')
-	@UseGuards(GatewayGuard)
-	handleUserBan(@MessageBody() data: { userToBan: string, roomName: string, roomID: string } ) {
-		const { userToBan, roomName, roomID } = data;
-		console.log(userToBan);
-		this.server.to(userToBan).emit('userIsBan', {
-			roomName: roomName,
-			roomID: roomID,
-		});
-	}
-
-	@SubscribeMessage('unbanUser')
-	@UseGuards(GatewayGuard)
-	handleUserUnban(@MessageBody() data: { userToUnban: string, roomName: string, roomID: string } ) {
-		const { userToUnban, roomName, roomID } = data;
-		console.log(userToUnban);
-		this.server.to(userToUnban).emit('userIsUnban', {
-			roomName: roomName,
-			roomID: roomID,
-		});
-	}
-
 	@SubscribeMessage('message')
 	@UseGuards(GatewayGuard)
 	async handleMessage( @MessageBody() data: { dto: MessageDto, conversationName: string } ) {
@@ -209,5 +187,46 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 			initiator: initiator,
 			recipient: recipient,
 		})
+	}
+
+	/* REFRESH HANDLERS */
+
+	@SubscribeMessage('banUser')
+	@UseGuards(GatewayGuard)
+	handleUserBan(@MessageBody() data: { userToBan: string, roomName: string, roomID: string } ) {
+		const { userToBan, roomName, roomID } = data;
+		console.log(userToBan);
+		this.server.to(userToBan).emit('userIsBan', {
+			roomName: roomName,
+			roomID: roomID,
+		});
+	}
+
+	@SubscribeMessage('unbanUser')
+	@UseGuards(GatewayGuard)
+	handleUserUnban(@MessageBody() data: { userToUnban: string, roomName: string, roomID: string } ) {
+		const { userToUnban, roomName, roomID } = data;
+		console.log(userToUnban);
+		this.server.to(userToUnban).emit('userIsUnban', {
+			roomName: roomName,
+			roomID: roomID,
+		});
+	}
+
+	@SubscribeMessage('refreshUserChannelList')
+	@UseGuards(GatewayGuard)
+	handleRefresh(@MessageBody() data: { userToRefresh: string, roomName: string, roomID: string } ) {
+		const { userToRefresh, roomName, roomID } = data;
+		this.server.to(userToRefresh).emit('refresh', {
+			roomName: roomName,
+			roomID: roomID,
+		});
+	}
+
+	@SubscribeMessage('refreshUser')
+	@UseGuards(GatewayGuard)
+	handleUserRefresh(@MessageBody() data: { userToRefresh: string, target: string, status: boolean } ) {
+		const { userToRefresh, target, status } = data;
+		this.server.to(userToRefresh).emit(target, status);
 	}
 }

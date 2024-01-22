@@ -26,11 +26,11 @@ export class UsersService {
 		@InjectRepository(Friendship)
 		private friendshipRepository: Repository<Friendship>,
 		private chatService: ChatService,
-	) {}
+	) { }
 
 	private async isUsernameValid(usernameToFInd: string): Promise<boolean> {
 
-		const usernameMatch = await this.usersRepository.findOne({ where: {username: usernameToFInd } });
+		const usernameMatch = await this.usersRepository.findOne({ where: { username: usernameToFInd } });
 
 		if (usernameMatch) {
 			return false;
@@ -44,13 +44,13 @@ export class UsersService {
 
 	async register2FATempSecret(userID: number, secret: string) {
 
-		const userToUpdate = await this.usersRepository.findOne({ where: {id: userID} });
+		const userToUpdate = await this.usersRepository.findOne({ where: { id: userID } });
 		if (userToUpdate) {
 			userToUpdate.TFA_temp_secret = secret;
 			return this.usersRepository.save(userToUpdate);
 		}
 
-		return ;
+		return;
 	}
 
 	save2FASecret(user: User, code: string, flag: boolean) {
@@ -71,8 +71,8 @@ export class UsersService {
 			const user = await this.getUserByID(userID);
 			const oldAvatarPath = join(__dirname, 'users', user.avatarURL);
 			if (existsSync(oldAvatarPath)) {
-				unlinkSync(oldAvatarPath); 
-			  }
+				unlinkSync(oldAvatarPath);
+			}
 			if (!user) {
 				throw new Error("user not found");
 			}
@@ -84,7 +84,7 @@ export class UsersService {
 			throw error;
 		}
 	}
-	
+
 	async isPNG(filePath: string): Promise<boolean> {
 		try {
 			const fileDescriptor = await fs.promises.open(filePath, 'r');
@@ -93,16 +93,16 @@ export class UsersService {
 			await fileDescriptor.close();
 			const signature = buffer.toString('hex');
 			return signature === "89504e470d0a1a0a";
-	  
+
 		} catch (error) {
-		  console.error("Error reading file or checking format:", error);
-		  throw new Error("Invalid file format");
+			console.error("Error reading file or checking format:", error);
+			throw new Error("Invalid file format");
 		}
 	}
 
 	async getAvatar(userId: number): Promise<string | null> {
 		const user = await this.getUserByID(userId);
-	
+
 		if (!user || !user.avatarURL) {
 			console.log("Avatar not found");
 			return null;
@@ -112,7 +112,7 @@ export class UsersService {
 
 	async getAvatarbyLogin(login: string): Promise<string | null> {
 		const user = await this.getUserByLogin(login);
-	
+
 		if (!user || !user.avatarURL) {
 			console.log("Avatar not found");
 			return null;
@@ -122,7 +122,7 @@ export class UsersService {
 
 	async getAvatarbyLoginBis(login: string): Promise<string | null> {
 		const user = await this.getUserByLogin(login);
-	
+
 		if (!user || !user.avatarURL) {
 			console.log("Avatar not found");
 			return null;
@@ -130,7 +130,7 @@ export class UsersService {
 		return user.avatarURL;
 	}
 	// async deleteUserAvatar(data: Buffer, fileName:string , userID: number) {
-		
+
 	// 	const avatar = await this.avatarService.create(userID, data, fileName);
 	// 	if (!avatar)
 	// 		throw console.log("error");
@@ -142,7 +142,7 @@ export class UsersService {
 	// 	const user = await this.usersRepository.findOne({
 	// 	  where: { id: userID },
 	// 	});
-	  
+
 	// 	if (!user || !user.avatarID) {
 	// 	  throw new NotFoundException(`User or avatar not found for ID ${userID}`);
 	// 	}
@@ -152,7 +152,7 @@ export class UsersService {
 
 	// Testing purpose - Maybe future implementation
 	async createNewUser(username: string): Promise<User> {
-		const userToCreate = await this.usersRepository.findOne({ where: {username: username } });
+		const userToCreate = await this.usersRepository.findOne({ where: { username: username } });
 		if (!userToCreate) {
 			// const saltOrRounds = 10;
 			// password = await bcrypt.hash(password, saltOrRounds);
@@ -177,8 +177,8 @@ export class UsersService {
 
 	async updateUserStatus(userID: number, flag: boolean) {
 
-		const user = await this.usersRepository.findOne({where: { id: userID }});
-		
+		const user = await this.usersRepository.findOne({ where: { id: userID } });
+
 		if (user) {
 			user.isActive = flag;
 			return await this.usersRepository.save(user);
@@ -196,12 +196,12 @@ export class UsersService {
 		new42User.blockedUsers = [];
 		return this.usersRepository.save(new42User);
 	}
-	
+
 	async updateUsername(updateUsernameDto: UpdateUsernameDto) {
-		
-		const user : User = await this.usersRepository.findOne({ where: {id: updateUsernameDto.userID} });
+
+		const user: User = await this.usersRepository.findOne({ where: { id: updateUsernameDto.userID } });
 		const usernameValidation = await this.isUsernameValid(updateUsernameDto.newUsername);
-		
+
 		if (usernameValidation) {
 
 			if (user) {
@@ -220,7 +220,7 @@ export class UsersService {
 
 	// 	const user : User = await this.usersRepository.findOne({ where: { username: blockUserDto.initiatorLogin } });
 	// 	const userToBlock : User = await this.usersRepository.findOne({ where: {username: blockUserDto.recipientLogin } });
-		
+
 	// 	if (user && userToBlock) {
 	// 		user.blockedUsers.push(userToBlock.login);
 	// 		await this.usersRepository.save(user);
@@ -304,12 +304,12 @@ export class UsersService {
 		}
 
 		const initiator = await this.usersRepository.findOne({
-			where: {username: friendRequestDto.initiatorLogin},
+			where: { username: friendRequestDto.initiatorLogin },
 			relations: ["initiatedFriendships"],
 		});
 
 		const recipient = await this.usersRepository.findOne({
-			where: {username: friendRequestDto.recipientLogin},
+			where: { username: friendRequestDto.recipientLogin },
 			relations: ["initiatedFriendships"],
 		});
 
@@ -318,13 +318,13 @@ export class UsersService {
 		}
 
 		if (initiator) {
-			
-			const friendshipAlreadyExists : Friendship = await this.friendshipRepository.findOne({
-				where: {initiator: initiator, friend: recipient},
+
+			const friendshipAlreadyExists: Friendship = await this.friendshipRepository.findOne({
+				where: { initiator: initiator, friend: recipient },
 			});
-			
+
 			if (!friendshipAlreadyExists) {
-	
+
 				let newFriendship = new Friendship();
 				newFriendship.initiator = initiator;
 				newFriendship.friend = recipient;
@@ -337,7 +337,7 @@ export class UsersService {
 
 			throw new Error(`${recipient.username} is already in your friend list`);
 		}
-		
+
 		throw new Error("Fatal error");
 	}
 
@@ -349,14 +349,14 @@ export class UsersService {
 				if (userOneGroup.conversation.id == userTwoGroup.conversation.id) {
 					console.log("found conversation!");
 					conversation = userOneGroup.conversation;
-					return ;
+					return;
 				}
 			});
 		});
 
 		return conversation;
 	}
-	
+
 	async updateFriendship(friendRequestDto: FriendRequestDto, flag: boolean): Promise<Conversation | Friendship> {
 
 		const initiator = await this.usersRepository.findOne({
@@ -366,16 +366,25 @@ export class UsersService {
 
 		const friend = await this.usersRepository.findOne({
 			where: { username: friendRequestDto.recipientLogin },
-			relations: ["initiatedFriendships", "acceptedFriendships", "groups",  "groups.conversation"],
+			relations: ["initiatedFriendships", "acceptedFriendships", "groups", "groups.conversation"],
 		});
-	  
+
 		// empecher de demander 15 fois en ami + de pas recreer la conv si existe deja
 		if (initiator && friend) {
 
-			const friendshipToUpdate = await this.friendshipRepository.findOne({
-				where: { initiator: { id: initiator.id }, friend: { id: friend.id } },
-			});
-	
+			// pour eviter les erreurs : chercher dans les 2 sens
+			// const friendshipToUpdate = await this.friendshipRepository.findOne({
+			// 	where: { initiator: { id: initiator.id }, friend: { id: friend.id } },
+			// });
+
+			const friendshipToUpdate = await this.friendshipRepository
+				.createQueryBuilder('friendship')
+				.where('(friendship.initiator.id = :initiatorId AND friendship.friend.id = :friendId) OR (friendship.initiator.id = :friendId AND friendship.friend.id = :initiatorId)', {
+					initiatorId: initiator.id,
+					friendId: friend.id,
+				})
+				.getOne();
+
 			if (friendshipToUpdate) {
 
 				friendshipToUpdate.isAccepted = flag;
@@ -383,8 +392,8 @@ export class UsersService {
 
 				const privateConversation = await this.friendshipConversation(initiator, friend);
 				console.log(privateConversation);
+				// si la conv existe deja, on la recreer pas
 				if (!privateConversation) {
-					// si la conv existe deja, on la recreer pas
 					if (flag) {
 						const conversation = this.chatService.createFriendsConversation(initiator, friend);
 						return conversation;
@@ -392,7 +401,9 @@ export class UsersService {
 				}
 
 				return friendshipToUpdate;
-		  	}
+			}
+
+			throw new Error("Users are not friend");
 		}
 
 		throw new Error("Fatal error");
@@ -420,9 +431,9 @@ export class UsersService {
 
 	async blockUser(blockUserDto: BlockUserDto): Promise<boolean> {
 
-		const user : User = await this.usersRepository.findOne({ where: { username: blockUserDto.initiatorLogin } });
-		const userToBlock : User = await this.usersRepository.findOne({ where: {username: blockUserDto.recipientLogin } });
-		
+		const user: User = await this.usersRepository.findOne({ where: { username: blockUserDto.initiatorLogin } });
+		const userToBlock: User = await this.usersRepository.findOne({ where: { username: blockUserDto.recipientLogin } });
+
 		if (user && userToBlock) {
 			user.blockedUsers.push(userToBlock.login);
 			await this.usersRepository.save(user);
@@ -434,8 +445,8 @@ export class UsersService {
 
 	async unblockUser(blockUserDto: BlockUserDto): Promise<boolean> {
 
-		const user : User = await this.usersRepository.findOne({ where: { username: blockUserDto.initiatorLogin } });
-		const userToUnblock : User = await this.usersRepository.findOne({ where: {username: blockUserDto.recipientLogin } });
+		const user: User = await this.usersRepository.findOne({ where: { username: blockUserDto.initiatorLogin } });
+		const userToUnblock: User = await this.usersRepository.findOne({ where: { username: blockUserDto.recipientLogin } });
 
 		if (user && userToUnblock) {
 			const filter = user.blockedUsers.filter((user: string) => user != userToUnblock.login);
@@ -452,12 +463,12 @@ export class UsersService {
 	/**************************************************************/
 
 	async getUserByID(userID: number): Promise<User> {
-		return await this.usersRepository.findOne({ where: {id: userID} });
+		return await this.usersRepository.findOne({ where: { id: userID } });
 	}
 
 	async getUserByLogin(loginToSearch: string): Promise<User> {
 		// We search by login because it is unique
-		return await this.usersRepository.findOne({ where: { login: loginToSearch} });
+		return await this.usersRepository.findOne({ where: { login: loginToSearch } });
 	}
 
 	async getBlockedUserList(userID: number) {
@@ -481,14 +492,14 @@ export class UsersService {
 			.where('initiator.username != :username', { username })
 			.andWhere('friendship.isAccepted = true')
 			.getMany();
-		
+
 		const acceptedfriends = await this.friendshipRepository
 			.createQueryBuilder('friendship')
 			.leftJoinAndSelect('friendship.friend', 'friend')
 			.where('friend.username != :username', { username })
 			.andWhere('friendship.isAccepted = true')
 			.getMany();
- 
+
 		let array = [];
 		const friendships = [...initiatedfriends, ...acceptedfriends];
 		friendships.forEach((element: Friendship) => {
@@ -516,14 +527,14 @@ export class UsersService {
 			.where('initiator.username != :username', { username })
 			.andWhere('friendship.isAccepted = false')
 			.getMany();
-		
+
 		const acceptedfriends = await this.friendshipRepository
 			.createQueryBuilder('friendship')
 			.leftJoinAndSelect('friendship.friend', 'friend')
 			.where('friend.username != :username', { username })
 			.andWhere('friendship.isAccepted = false')
 			.getMany();
- 
+
 		// let array = [];
 		const friendships = [...initiatedfriends, ...acceptedfriends];
 		// friendships.forEach((element: Friendship) => {

@@ -73,7 +73,7 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 	};
 
  	const ownerUsers_array = state.currentUserList.filter((user: userList) => user.isOwner === true);
-	 console.log("userlist: ", state.currentUserList);
+	console.log("userlist: ", state.currentUserList);
 
 	const ownerUsers = ownerUsers_array[0];
 	console.log("Owner: ", ownerUsers);

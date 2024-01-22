@@ -70,7 +70,8 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me}) => 
 				initiatorLogin: sessionStorage.getItem("currentUserLogin"),
 				recipientLogin: user.login,
 			}
-				const response = await fetch(`http://localhost:3001/users/unblockUser`, {
+
+			const response = await fetch(`http://localhost:3001/users/unblockUser`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
@@ -176,11 +177,10 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me}) => 
 		
 			if (response.ok) {
 				console.log("ban");
-	
 				const status = await response.json();
-        user.isBan = !user.isBan;
-        setBan(true);
-        globalState.userSocket?.emit('banUser', { userToBan: user.login, roomName: state.currentConversation, roomID: state.currentConversationID } );
+				user.isBan = !user.isBan;
+				setBan(true);
+				globalState.userSocket?.emit('banUser', { userToBan: user.login, roomName: state.currentConversation, roomID: state.currentConversationID } );
 			}
 		}
 		catch (error) {
@@ -210,10 +210,10 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me}) => 
 		
 			if (response.ok) {
 				console.log("unban");
-        const status = await response.json();
-        user.isBan = !user.isBan;
-        setBan(false);
-        globalState.userSocket?.emit('unbanUser', { userToUnban: user.login, roomName: state.currentConversation, roomID: state.currentConversationID } );
+				const status = await response.json();
+				user.isBan = !user.isBan;
+				setBan(false);
+				globalState.userSocket?.emit('unbanUser', { userToUnban: user.login, roomName: state.currentConversation, roomID: state.currentConversationID } );
 			}
 		}
 		catch (error) {
@@ -244,6 +244,16 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me}) => 
 			if (response.ok) {
 				user.isAdmin = !user.isAdmin;
 				console.log("Promote");
+				globalState.userSocket?.emit('refreshUser', {
+					userToRefresh: user.login,
+					target: 'adminChange',
+					status: true,
+				});
+				globalState.userSocket?.emit('refreshUserChannelList', {
+					userToRefresh: user.login,
+					roomName: state.currentConversation,
+					roomID: state.currentConversationID,
+				});
 				setAdmin(true);
 			}
 		}
@@ -274,6 +284,16 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me}) => 
 			if (response.ok) {
 				console.log("demote");
 				user.isAdmin = !user.isAdmin;
+				globalState.userSocket?.emit('refreshUser', {
+					userToRefresh: user.login,
+					target: 'adminChange',
+					status: false,
+				});
+				globalState.userSocket?.emit('refreshUserChannelList', {
+					userToRefresh: user.login,
+					roomName: state.currentConversation,
+					roomID: state.currentConversationID,
+				});
 				setAdmin(false);
 			}
 		}
@@ -281,27 +301,7 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me}) => 
 			console.error(error);
 		}
 	}
-
-	const handleCancel = () => {
-		dispatch({ type: 'DISABLE', payload: 'showOptionsUserChannel' });
-		dispatch({ type: 'DISABLE', payload: 'showOptionsUserChannelOwner' });
-		dispatch({ type: 'ACTIVATE', payload: 'showBackComponent' });		
-		setFormValue('');
-	};
 	
-	useEffect(() => {
-		const handleEscape = (event: KeyboardEvent) => {
-			if (event.key === 'Escape') {
-				handleCancel();
-			}
-		};
-	
-		document.addEventListener('keydown', handleEscape);
-		return () => {
-			document.removeEventListener('keydown', handleEscape);
-		};
-	}, []);
-
 	const handleLeaveChannel = async() => {
 		try {
 			const quitlConversationDto = {
@@ -322,20 +322,21 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me}) => 
 				dispatch({ type: 'ACTIVATE', payload: 'showChannelList' });
 				dispatch({ type: 'DISABLE', payload: 'showChannel' });
 				dispatch({ type: 'DISABLE', payload: 'showOptionsUserChannel' });
-				console.log("Updated status");
+				globalState.userSocket?.emit('refreshUserChannelList', { userToRefresh: user.login, roomName: state.currentConversation, roomID: state.currentConversationID } );
 			}
 		}
 		catch (error) {
 			console.log(error);
 		}
 	}
+	
 	const handleDms = async() => {
 		try {
 			const createConversationDto = {
 				initiatorID: Number(sessionStorage.getItem("currentUserID")),
 				recipientID: user.id,
 			}
-	
+			
 			const response = await fetch(`http://localhost:3001/chat/createConversation`, {
 				method: 'POST',
 				headers: {
@@ -359,7 +360,41 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me}) => 
 			console.log(error);
 		}
 	}
-	console.log(me);
+
+	const handleCancel = () => {
+		dispatch({ type: 'DISABLE', payload: 'showOptionsUserChannel' });
+		dispatch({ type: 'DISABLE', payload: 'showOptionsUserChannelOwner' });
+		dispatch({ type: 'ACTIVATE', payload: 'showBackComponent' });		
+		setFormValue('');
+	};
+		
+	useEffect(() => {
+		const handleEscape = (event: KeyboardEvent) => {
+			if (event.key === 'Escape') {
+				handleCancel();
+			}
+		};
+		
+		document.addEventListener('keydown', handleEscape);
+		return () => {
+			document.removeEventListener('keydown', handleEscape);
+		};
+	}, []);
+
+	// Refresh handler
+	// useEffect(() => {
+
+	// 	globalState.userSocket.on('adminChange', (flag: boolean) => {
+	// 		console.log("COUCOCUOCUOCUOCOCUCUOUCCU");
+	// 		setAdmin(flag);
+	// 	});
+
+	// 	return () => {
+	// 		globalState.userSocket?.off('adminChange');
+	// 	}
+
+	// }, [globalState?.userSocket]);
+
 	return (
 		<>
 		<div className="blur-background"></div>

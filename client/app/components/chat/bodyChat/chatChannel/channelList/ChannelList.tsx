@@ -65,18 +65,29 @@ const ChannelListComponent: React.FC = () => {
 	};
 
 	useEffect(() => {
+
 		globalState.userSocket?.on('userIsBan', () => {
-			console.log("Ban notif");
 			dispatch({ type: 'DISABLE', payload: 'showChannel' });
 			dispatch({ type: 'ACTIVATE', payload: 'showChannelList' });
+			loadDiscussions();
+		});
+
+		globalState.userSocket?.on('userIsUnban', () => {
+			loadDiscussions();
 		});
 
 		globalState.userSocket?.on('userAddedToFriendRoom', () => {
 			loadDiscussions();
 		});
 
+		globalState.userSocket?.on('refresh', () => {
+			loadDiscussions();
+		});
+
 		return () => {
 			globalState.userSocket?.off('banUser');
+			globalState.userSocket?.off('userAddedToFriendRoom');
+			globalState.userSocket?.off('refresh');
 		}
 
 	}, [globalState?.userSocket]);
