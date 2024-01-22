@@ -19,13 +19,13 @@ const GameComponent = (socket: {socket: Socket}) => {
 
 	return (
 	  		<div className="right-half">
-				{/* {renderComponent(<MatchMakingComponent socket={socket.socket} />, state.showGameMatchmaking)}
+				{renderComponent(<MatchMakingComponent socket={socket.socket} />, state.showGameMatchmaking)}
 				{renderComponent(<GameMenuComponent socket={socket.socket} />, state.showGameMenu)}
 				{renderComponent(<SettingsComponent/>, state.showGameSettings)}
 				{renderComponent(<SettingsDisplay/>, state.showSettingsDisplay)}
 				{renderComponent(<SettingsGame/>, state.showSettingsGame)}
 				{renderComponent(<SettingsKeyboard/>, state.showSettingsKeyboard)}
-				{renderComponent(<PongComponent socket={socket.socket}/>, state.showGame)} */}
+				{renderComponent(<PongComponent socket={socket.socket}/>, state.showGame)}
 	  		</div>
 	);
   };

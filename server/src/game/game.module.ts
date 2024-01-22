@@ -10,7 +10,6 @@ import { Conversation } from 'src/chat/entities/conversation.entity';
 import { Game } from './entities/games.entity';
 import { GameController } from './game.controller';
 import { GameService } from './game.service';
-import { GameEngine } from './entities/gameEngine.entity';
 import { Paddle } from './entities/paddle.entity';
 import { PaddleService } from './gameObject/paddle.service';
 import { Ball } from './entities/ball.entity';
@@ -24,7 +23,6 @@ import { GameEngineService } from './gameEngine.service';
       TypeOrmModule.forFeature([User]),
       TypeOrmModule.forFeature([Friendship]),
       TypeOrmModule.forFeature([Game]),
-      TypeOrmModule.forFeature([GameEngine]),
       TypeOrmModule.forFeature([Paddle]),
       TypeOrmModule.forFeature([Ball]),
       TypeOrmModule.forFeature([Vector]),

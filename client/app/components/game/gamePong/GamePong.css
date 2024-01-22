@@ -1,4 +1,5 @@
 .pong-container {
+    position: relative;
     width: 100%;
     height: 100%;
     background-color: #410010;
@@ -27,18 +28,16 @@
   .ball
   {
     position: absolute;
-    width: 2%;
-    height: 3%;
+    width: 2vw;
+    height: 2vw;
     background-color: #000;
-    border-radius: 50%;
+    border-radius: 100%;
   }
   
   .pongpaddle {
     position: absolute;
-    width: 3%;
-    height: 10%;
     background-color: #000;
-    border-radius: 10px;
+    border-radius: clamp(10px, 5vw, 25px);
   }
 
   .col-heading h1 {
@@ -73,10 +72,6 @@
       gap: 10px;
       max-height: 100%;
     }
-  }
-
-  .pong-container {
-    position: relative;
   }
   
   .game-blur {

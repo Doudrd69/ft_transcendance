@@ -164,4 +164,3 @@ const FriendsListTabComponent:  React.FC<FriendsListTabComponentProps> = ({user}
 }
 
 export default FriendsListTabComponent;
-
