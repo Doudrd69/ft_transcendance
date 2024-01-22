@@ -146,15 +146,15 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 	
 	useEffect(() => {
 		loadUserList();
-		console.log("userlist dans useEffect: ", userList);
-		const owner_array = userList?.filter((user: User) => user.isOwner === true)[0];
-		if (owner_array)
-			setOwner(owner_array[0]);
-		console.log("owner: ", owner);
-		const me_array = userList?.filter((user: User) => user.login === sessionStorage.getItem("currentUserLogin"));
-		if (me_array)
-			setMe(me_array[0]);
-		console.log("me: ", me);
+		// console.log("userlist dans useEffect: ", userList);
+		// const owner_array = userList?.filter((user: User) => user.isOwner === true)[0];
+		// if (owner_array)
+		// 	setOwner(owner_array[0]);
+		// console.log("owner: ", owner);
+		// const me_array = userList?.filter((user: User) => user.login === sessionStorage.getItem("currentUserLogin"));
+		// if (me_array)
+		// 	setMe(me_array[0]);
+		// console.log("me: ", me);
 	}, [owner]);
 	
 	useEffect(() => {
