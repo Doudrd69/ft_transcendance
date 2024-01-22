@@ -11,7 +11,6 @@ interface user {
 	isAdmin: boolean;
 	isMute: boolean;
 	isBan: boolean;
-	isBlock: boolean;
 	id: number;
 }
 
@@ -339,8 +338,14 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me}) => 
 			});
 	
 			if (response.ok) {
-				dispatch({ type: 'ACTIVATE', payload: 'showChannelList' });
-				dispatch({ type: 'DISABLE', payload: 'showChannel' });
+				console.log(me);
+				console.log(user);
+				if (user.login == me.login)
+				{
+					dispatch({ type: 'ACTIVATE', payload: 'showChannelList' });
+					dispatch({ type: 'DISABLE', payload: 'showChannel' });
+				}
+				dispatch({ type: 'ACTIVATE', payload: 'showBackComponent' });
 				dispatch({ type: 'DISABLE', payload: 'showOptionsUserChannel' });
 
 				globalState.userSocket?.emit('kickUserFromChannel', {

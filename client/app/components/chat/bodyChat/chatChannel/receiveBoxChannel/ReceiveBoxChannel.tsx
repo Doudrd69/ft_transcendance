@@ -5,6 +5,7 @@ import { useChat } from '../../../ChatContext';
 import OptionsUserChannel from '../../addConversation/OptionsUserChannel';
 import { useGlobal } from '@/app/GlobalContext';
 import { toast } from 'react-toastify';
+import { setCurrentUserList } from '../../../ChatContext';
 
 interface Message {
 	from: string;
@@ -13,14 +14,13 @@ interface Message {
 	conversationID: number;
 }
 
-interface userList {
+interface user{
 	login: string;
 	avatarURL: string;
 	isAdmin: boolean;
 	isMute: boolean;
 	isBan: boolean;
 	isOwner: boolean;
-	isBlock: boolean;
 	id: number;
 }
 
@@ -73,14 +73,33 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 		}
 	};
 
-	const ownerUsers_array = state.currentUserList.filter((user: userList) => user.isOwner === true);
-	console.log("userlist: ", state.currentUserList);
+	// const loadUserlist = async () => {
 
-	const ownerUsers = ownerUsers_array[0];
-	console.log("Owner: ", ownerUsers);
+	// 	try{
 
-	const me_array = state.currentUserList.filter((user: userList) => user.login === sessionStorage.getItem("currentUserLogin"));
-	const me = me_array[0];
+	// 		console.log(state.currentConversationID);
+	// 		const response = await fetch(`http://localhost:3001/chat/getUserList/${state.currentConversationID}`, {
+	// 			method: 'GET',
+	// 			headers: {
+	// 				'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
+	// 			}
+	// 		});
+	
+	// 		if (response.ok) {
+	// 			const responseData = await response.json();
+	// 			setUserList([...responseData]);
+	// 			dispatch(setCurrentUserList(userList));
+	// 			console.log("Fetch end: ", state.currentUserList);
+
+	// 			setOwnerUsers_array(state.currentUserList.filter((user: userList) => user.isOwner === true));
+	// 			setOwnerUser(ownerUsers_array[0]);
+	// 			setMe_array(state.currentUserList.filter((user: userList) => user.login === sessionStorage.getItem("currentUserLogin")));
+	// 		}
+	// 	}
+	// 	catch (error) {
+	// 		console.error(error);
+	// 	}
+	// };
 
 	useEffect(() => {
 
@@ -105,14 +124,15 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 			dispatch({ type: 'DISABLE', payload: 'showChannel' });
 		});
 
-		// globalState.userSocket?.on('refreshChannel', () => {
-		// 	console.log("REFRESH CHANNEL");
-		// });
+		globalState.userSocket?.on('refreshChannel', () => {
+			console.log("USER LIST");
+			// loadUserlist();
+		});
 
 		return () => {
 			globalState.userSocket?.off('userJoinedRoom');
 			globalState.userSocket?.off('onMessage');
-			// globalState.userSocket?.off('refreshChannel');
+			globalState.userSocket?.off('refreshChannel');
 			globalState.userSocket?.off('kickUser');
 			globalState.userSocket?.off('channelDeleted');
 		};
@@ -138,7 +158,7 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 							<img className='admin-user' src='./crown.png' alt='user' />
 							<img
 							className='img-list-users-channel-admin'
-							src={`http://localhost:3001/users/getAvatarByLogin/${ownerUsers.login}/${timestamp}`}
+							src={`http://localhost:3001/users/getAvatarByLogin/${ownerUsers?.login}/${timestamp}`}
 							onClick={() => {
 								dispatch({ type: 'ACTIVATE', payload: 'dontcandcel' });
 								dispatch({ type: 'ACTIVATE', payload: 'showOptionsUserChannelOwner' });
@@ -152,7 +172,7 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 				</div>
 			</div>
 			<div className='list-users-channel'>
-				{state.currentUserList && state.currentUserList?.map((userList: userList, index: number) => (
+				{state.currentUserList && state.currentUserList?.map((user: user, index: number) => (
 				<div key={index} className='user-list-item'>
 
 						{userList?.isAdmin && !userList?.isOwner &&

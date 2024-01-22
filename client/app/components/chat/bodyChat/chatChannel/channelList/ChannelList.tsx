@@ -19,6 +19,11 @@ interface Conversation {
 interface userList {
 	login: string;
 	avatarURL: string;
+	isAdmin: boolean;
+	isMute: boolean;
+	isBan: boolean;
+	isOwner: boolean;
+	id: number;
 }
 
 const ChannelListComponent: React.FC = () => {
@@ -83,11 +88,6 @@ const ChannelListComponent: React.FC = () => {
 			console.log("REFRESH LIST");
 			loadDiscussions();
 		});
-
-		// globalState.userSocket?.on('refreshChannel', () => {
-		// 	console.log("REFRESH CHANNEL");
-		// 	loadDiscussions();
-		// });
 
 		return () => {
 			globalState.userSocket?.off('banUser');

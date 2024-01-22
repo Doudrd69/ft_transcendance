@@ -11,15 +11,15 @@ const ChatChannelComponent: React.FC = () => {
 
   const { state } = useChat();
 
-  	const renderComponent = (component: React.ReactNode, condition: boolean) =>
+  const renderComponent = (component: React.ReactNode, condition: boolean) =>
     condition ? component : null;
 
   return (
     <div className="chat-channel">
-		
-		{renderComponent(<ChannelListComponent />, state.showChannelList)}
-		{renderComponent(<ReceiveBoxChannelComponent />, state.showChannel)}
-		{renderComponent(<SendBoxChannelComponent />, state.showChannel)}
+
+      {renderComponent(<ChannelListComponent />, state.showChannelList)}
+      {renderComponent(<ReceiveBoxChannelComponent />, state.showChannel)}
+      {renderComponent(<SendBoxChannelComponent />, state.showChannel)}
     </div>
   );
 };
