@@ -11,7 +11,6 @@ import { GameGateway } from './game.gateway';
 import { GameController } from 'src/game/game.controller';
 import { MatchmakingService } from 'src/game/matchmaking/matchmaking.service';
 import { Game } from 'src/game/entities/games.entity';
-import { GameEngine } from 'src/game/entities/gameEngine.entity';
 import { GameEngineService } from 'src/game/gameEngine.service';
 import { Paddle } from 'src/game/entities/paddle.entity';
 import { PaddleService } from 'src/game/gameObject/paddle.service';
@@ -26,7 +25,6 @@ import { Vector } from 'src/game/entities/vector.entity';
 		TypeOrmModule.forFeature([User]),
 		TypeOrmModule.forFeature([Friendship]),
 		TypeOrmModule.forFeature([Game]),
-		TypeOrmModule.forFeature([GameEngine]),
 		TypeOrmModule.forFeature([Paddle]),
 		TypeOrmModule.forFeature([Ball]),
 		TypeOrmModule.forFeature([Vector]),

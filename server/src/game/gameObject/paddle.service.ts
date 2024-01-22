@@ -3,7 +3,6 @@ import { Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { Game } from '../entities/games.entity';
 import { User } from 'src/users/entities/users.entity';
-import { GameEngine } from '../entities/gameEngine.entity';
 import { Paddle } from '../entities/paddle.entity';
 import { paddle_instance } from 'src/game_gateway/game.gateway';
 import { VectorService } from './vector.service';
@@ -15,8 +14,6 @@ export class PaddleService {
 		private gameRepository: Repository<Game>,
 		@InjectRepository(User)
 		private usersRepository: Repository<User>,
-		@InjectRepository(GameEngine)
-		private gameEngineRepository: Repository<GameEngine>,
 		@InjectRepository(Paddle)
 		private paddleRepository: Repository<Paddle>,
 		private readonly VectorService: VectorService,
@@ -35,7 +32,6 @@ export class PaddleService {
 			if (paddle.y > 1 - paddle.length)
 				paddle.y = 1 - paddle.length;
 		}
-		console.log(`paddle y: ${paddle.y}`);
 	}
 
 	wallUnit(paddle: paddle_instance) {

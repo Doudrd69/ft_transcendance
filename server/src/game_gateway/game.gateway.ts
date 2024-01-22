@@ -1,6 +1,5 @@
 import { WebSocketGateway, WebSocketServer, SubscribeMessage, OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect, ConnectedSocket, MessageBody } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { GameEngine } from 'src/game/entities/gameEngine.entity';
 import { Game } from 'src/game/entities/games.entity';
 import { Paddle } from 'src/game/entities/paddle.entity';
 import { GameService } from 'src/game/game.service';
@@ -20,6 +19,7 @@ export interface ball_instance {
     r: number;
     alive: boolean;
     elasticity: number;
+    goal: number;
 }
 
 export interface paddle_instance {
@@ -32,6 +32,7 @@ export interface paddle_instance {
     length: number;
     start: vector_instance;
     end: vector_instance;
+    number: number;
 }
 
 export interface Game_instance {
@@ -62,7 +63,6 @@ export class GameGateway {
     @WebSocketServer()
     server: Server;
     game: Game;
-    gameEngine: GameEngine;
     paddle: Paddle;
     game_instance: Game_instance[];
     //   MatchmakingService: MatchmakingService;
@@ -114,7 +114,6 @@ export class GameGateway {
             for (const pair of pairs) {
                 const socketIDs: [string, string] = [pair[0], pair[1]];
                 this.game = await this.GameService.createGame(pair[0], pair[1]);
-                this.gameEngine = await this.GameEnginceService.createGameEngine(pair[0], pair[1]);
                 const gameInstance: Game_instance = this.GameEnginceService.createGameInstance(this.game);
                 this.game_instance.push(gameInstance);
                 this.MatchmakingService.leave(pair[0]);
@@ -157,9 +156,11 @@ export class GameGateway {
         for (let i = 0; i < this.game_instance.length; i++) {
             gameInstance = this.game_instance[i];
             if (gameInstance.gameID === data.gameID) {
-                // enter for the 1st player and the 2scd i think
                 this.GameEnginceService.game_input(data.input, gameInstance, client.id);
                 this.server.to([gameInstance.players[0], gameInstance.players[1]]).emit('GamePaddleUpdate', {
+                    BallPosition: { x: gameInstance.ball.position.x, y: gameInstance.ball.position.y },
+                    scoreOne: gameInstance.player1_score,
+                    scoreTwo: gameInstance.player2_score,
                     paddleOne: { x: gameInstance.paddles[0].x, y: gameInstance.paddles[0].y },
                     paddleTwo: { x: gameInstance.paddles[1].x, y: gameInstance.paddles[1].y },
                 })
@@ -170,15 +171,17 @@ export class GameGateway {
 
     @SubscribeMessage('GameBackUpdate')
     async handleGameUpdate(client: Socket, @MessageBody() data: { gameID: number, width: number, heigth: number }) {
-        // console.log(`BALL`);
         for (let i = 0; i < this.game_instance.length; i++) {
             gameInstance = this.game_instance[i];
             if (gameInstance.gameID === data.gameID) {
-                this.GameEnginceService.updateGameEngine(gameInstance);
+                if (gameInstance.game_has_ended !== true)
+                    this.GameEnginceService.updateGameInstance(gameInstance, this.server);
                 this.server.to([gameInstance.players[0], gameInstance.players[1]]).emit('GameBallUpdate', {
                     BallPosition: { x: gameInstance.ball.position.x, y: gameInstance.ball.position.y },
                     scoreOne: gameInstance.player1_score,
                     scoreTwo: gameInstance.player2_score,
+                    paddleOne: { x: gameInstance.paddles[0].x, y: gameInstance.paddles[0].y },
+                    paddleTwo: { x: gameInstance.paddles[1].x, y: gameInstance.paddles[1].y },
                 })
                 break;
             }

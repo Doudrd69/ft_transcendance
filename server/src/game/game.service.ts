@@ -5,7 +5,6 @@ import { Game } from './entities/games.entity';
 import { GameModule } from './game.module';
 import { env } from 'process';
 import { User } from 'src/users/entities/users.entity';
-import { GameEngine } from './entities/gameEngine.entity';
 import { Paddle } from './entities/paddle.entity';
 
 
@@ -32,8 +31,6 @@ export class GameService {
         private gameRepository: Repository<Game>,
         @InjectRepository(User)
         private usersRepository: Repository<User>,
-        @InjectRepository(GameEngine)
-        private gameEngineRepository: Repository<GameEngine>,
 
         
     ) { }

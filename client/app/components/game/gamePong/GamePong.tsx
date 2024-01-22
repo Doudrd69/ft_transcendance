@@ -2,6 +2,7 @@ import './GamePong.css';
 import React, { useState, useEffect, useRef } from 'react';
 import { useGame } from '../GameContext'
 import { Socket } from 'socket.io-client'
+// import { clearInterval } from 'timers';
 
 const PongComponent = (socket: { socket: Socket }) => {
 
@@ -26,19 +27,20 @@ const PongComponent = (socket: { socket: Socket }) => {
         ArrowDown: inputState
     }
 
-    interface gameBallState {
+
+    interface gameState {
         BallPosition: { x: number, y: number } | null,
         scoreOne: number,
-        scoreTwo: number
-    }
-
-    interface gamePaddleState {
-        paddleOne: { x: number, y: number } | null,
-        paddleTwo: { x: number, y: number } | null,
+        scoreTwo: number,
+        paddleOne: { x: number, y: number, width: number, height: number } | null,
+        paddleTwo: { x: number, y: number, width: number, height: number } | null,
     }
 
     const [containerWidth, setContainerWidth] = useState<number>(0);
     const [containerHeight, setContainerHeight] = useState<number>(0);
+
+
+    let countdownInterval: NodeJS.Timeout;
 
     useEffect(() => {
         const pongContainer = document.querySelector('.pong-container');
@@ -46,6 +48,14 @@ const PongComponent = (socket: { socket: Socket }) => {
             const handleResize = () => {
                 setContainerWidth(pongContainer.clientWidth);
                 setContainerHeight(pongContainer.clientHeight);
+                const newGameState: gameState = {
+                    BallPosition: { x: gameState.BallPosition!.x * containerWidth || containerWidth / 2, y: gameState.BallPosition!.y * containerHeight || containerHeight / 2 },
+                    scoreOne: gameState.scoreOne,
+                    scoreTwo: gameState.scoreTwo,
+                    paddleOne: { x: gameState.paddleOne!.x * containerWidth, y: gameState.paddleOne!.y * containerHeight, width: containerWidth * 0.025, height: containerHeight * 0.17 },
+                    paddleTwo: { x: gameState.paddleTwo!.x * containerWidth, y: gameState.paddleTwo!.y * containerHeight, width: containerWidth * 0.025, height: containerHeight * 0.17 },
+                }
+                setGameState(newGameState);
                 console.log(`pongcontainer size, x:${pongContainer.clientWidth}, y: ${pongContainer.clientHeight}`);
             };
             // Mettez à jour les dimensions du conteneur lorsqu'il est redimensionné
@@ -59,19 +69,15 @@ const PongComponent = (socket: { socket: Socket }) => {
         }
     }, [blurGame]);
 
-    const defaultGamePaddleState: gamePaddleState = {
-        paddleOne: { x: 0, y: 0.5 * containerHeight },
-        paddleTwo: { x: 0.9 * containerWidth, y: 0.5 * containerHeight },
-    };
-
-    const defaultGameBallState: gameBallState = {
+    const defaultGameState: gameState = {
         BallPosition: { x: 0.5 * containerWidth, y: 0.5 * containerHeight },
         scoreOne: 0,
         scoreTwo: 0,
+        paddleOne: { x: 0, y: 0.5 * containerHeight, width: containerWidth * 0.025, height: containerHeight * 0.17 },
+        paddleTwo: { x: (1 - 0.025) * containerWidth, y: 0.5 * containerHeight, width: containerWidth * 0.025, height: containerHeight * 0.17 },
     };
 
-    const [gameBallState, setGameBallState] = useState<gameBallState>(defaultGameBallState);
-    const [gamePaddleState, setGamePaddleState] = useState<gamePaddleState>(defaultGamePaddleState);
+    const [gameState, setGameState] = useState<gameState>(defaultGameState);
 
 
     interface Game {
@@ -82,6 +88,7 @@ const PongComponent = (socket: { socket: Socket }) => {
         playerTwoLogin: string,
         scoreOne: number;
         scoreTwo: number;
+        pause: boolean;
     }
 
     const defaultGame: Game = {
@@ -92,6 +99,7 @@ const PongComponent = (socket: { socket: Socket }) => {
         playerTwoLogin: "Edouard",
         scoreOne: 0,
         scoreTwo: 0,
+        pause: true,
     };
 
     const [Game, setGame] = useState<Game>(defaultGame);
@@ -100,7 +108,7 @@ const PongComponent = (socket: { socket: Socket }) => {
     useEffect(() => {
         const startCountdown = () => {
             setInCountdown(true);
-            const countdownInterval = setInterval(() => {
+            countdownInterval = setInterval(() => {
                 setCountdown((prevCountdown) => prevCountdown - 1);
             }, 1000);
 
@@ -108,6 +116,10 @@ const PongComponent = (socket: { socket: Socket }) => {
                 clearInterval(countdownInterval);
                 setCountdown(0); // Disappear the countdown div after 3 seconds
                 setBlurGame(false); // Remove the blur effect after the countdown
+                setGame((prevState) => ({
+                    ...prevState,
+                    pause: false,
+                }));
             }, 3000);
         };
 
@@ -131,28 +143,32 @@ const PongComponent = (socket: { socket: Socket }) => {
             }));
         });
 
-        const gameLoop = setInterval(() => {
+        const gameLoop: NodeJS.Timeout = setInterval(() => {
             if (!blurGame) {
-                console.log(`BALL`);
-                gameSocket.emit('GameBackUpdate', { gameID: gameID});
+                gameSocket.emit('GameBackUpdate', { gameID: gameID });
             }
-        }, 16);
+        }, 50);
 
-        gameSocket.on('GamePaddleUpdate', (gamePaddleState: gamePaddleState) => {
-            const newGamePaddleState: gamePaddleState = {
-                paddleOne: { x: gamePaddleState.paddleOne!.x * containerWidth, y: gamePaddleState.paddleOne!.y * containerHeight },
-                paddleTwo: { x: gamePaddleState.paddleTwo!.x * containerWidth, y: gamePaddleState.paddleTwo!.y * containerHeight },
+        gameSocket.on('GamePaddleUpdate', (gameState: gameState) => {
+            const newGameState: gameState = {
+                BallPosition: { x: gameState.BallPosition!.x * containerWidth || 153, y: gameState.BallPosition!.y * containerHeight || 50 },
+                scoreOne: gameState.scoreOne,
+                scoreTwo: gameState.scoreTwo,
+                paddleOne: { x: gameState.paddleOne!.x * containerWidth, y: gameState.paddleOne!.y * containerHeight, width: containerWidth * 0.025, height: containerHeight * 0.17 },
+                paddleTwo: { x: gameState.paddleTwo!.x * containerWidth, y: gameState.paddleTwo!.y * containerHeight, width: containerWidth * 0.025, height: containerHeight * 0.17 },
             }
-            setGamePaddleState(newGamePaddleState);
+            setGameState(newGameState);
         });
 
-        gameSocket.on('GameBallUpdate', (gameBallState: gameBallState) => {
-            const newGameBallState: gameBallState = {
-                BallPosition: { x: gameBallState.BallPosition!.x * containerWidth || 153, y: gameBallState.BallPosition!.y * containerHeight || 50 },
-                scoreOne: gameBallState.scoreOne,
-                scoreTwo: gameBallState.scoreTwo,
+        gameSocket.on('GameBallUpdate', (gameState: gameState) => {
+            const newGameState: gameState = {
+                BallPosition: { x: gameState.BallPosition!.x * containerWidth || 153, y: gameState.BallPosition!.y * containerHeight || 50 },
+                scoreOne: gameState.scoreOne,
+                scoreTwo: gameState.scoreTwo,
+                paddleOne: { x: gameState.paddleOne!.x * containerWidth, y: gameState.paddleOne!.y * containerHeight, width: containerWidth * 0.025, height: containerHeight * 0.17 },
+                paddleTwo: { x: gameState.paddleTwo!.x * containerWidth, y: gameState.paddleTwo!.y * containerHeight, width: containerWidth * 0.025, height: containerHeight * 0.17 },
             }
-            setGameBallState(newGameBallState);
+            setGameState(newGameState);
         });
 
         let inputLoop: NodeJS.Timeout;
@@ -162,15 +178,46 @@ const PongComponent = (socket: { socket: Socket }) => {
                 inputLoop = setInterval(() => {
                     if (e.key === 'ArrowUp') {
                         keyState.ArrowUp.down = true;
-                        gameSocket.emit('Game_Input', { input: "ArrowUp", gameID: gameID });
+                        if (Game.pause !== true) {
+                            gameSocket.emit('Game_Input', { input: "ArrowUp", gameID: gameID });
+                        }
 
                     } else if (e.key === 'ArrowDown') {
                         keyState.ArrowUp.down = true;
-                        gameSocket.emit('Game_Input', { input: "ArrowDown", gameID: gameID });
+                        if (Game.pause !== true) {
+                            gameSocket.emit('Game_Input', { input: "ArrowDown", gameID: gameID });
+                        }
                     }
                 }, 16);
             }
         };
+
+        gameSocket.on('GameGoal', (game: Game) => {
+            setGame((prevState) => ({
+                ...prevState,
+                pause: true,
+            }));
+            setTimeout(() => {
+                setGame((prevState) => ({
+                    ...prevState,
+                    pause: false,
+                }));
+            }, 3000);
+        });
+        
+        gameSocket.on('GameEnd', (game: Game) => {
+            setGame((prevState) => ({
+                ...prevState,
+                pause: true,
+            }));
+            clearInterval(gameLoop);
+            clearInterval(inputLoop);
+            dispatch({
+                type: 'TOGGLE',
+                payload: 'showGameMenu',
+            });
+            state.showGameMenu = true;
+        });
 
         const handleKeyUp = (e: KeyboardEvent) => {
             if (e.key === 'ArrowUp') {
@@ -195,11 +242,12 @@ const PongComponent = (socket: { socket: Socket }) => {
             gameSocket.off('GamePaddleUpdate');
             gameSocket.off('Game_Start');
             clearInterval(gameLoop);
+            clearInterval(countdownInterval);
             clearInterval(inputLoop);
             window.removeEventListener('keydown', handleKeyDown);
             window.removeEventListener('keyup', handleKeyUp);
         };
-    }, [gameID, gameSocket, containerWidth, containerHeight, inCountdown]);
+    }, [blurGame, gameID, gameSocket, containerWidth, containerHeight, inCountdown]);
 
 
     return (
@@ -210,16 +258,16 @@ const PongComponent = (socket: { socket: Socket }) => {
             <div className="scoreboard">
                 <div className="col-heading">
                     <h1>{Game.playerOneLogin}</h1>
-                    <div className="col-display" id={Game.playerOneLogin}>{gameBallState.scoreOne}</div>
+                    <div className="col-display" id={Game.playerOneLogin}>{gameState.scoreOne}</div>
                 </div>
                 <div className="col-heading">
                     <h1>{Game.playerTwoLogin}</h1>
-                    <div className="col-display" id={Game.playerTwoLogin}>{gameBallState.scoreTwo}</div>
+                    <div className="col-display" id={Game.playerTwoLogin}>{gameState.scoreTwo}</div>
                 </div>
             </div>
-            <div className="ball" style={{ left: `${gameBallState!.BallPosition!.x}px`, top: `${gameBallState!.BallPosition!.y}px` }}></div>
-            <div className="pongpaddle" style={{ top: `${gamePaddleState!.paddleOne!.y}px`, left: `${gamePaddleState!.paddleOne!.x}px` }}></div>
-            <div className="pongpaddle" style={{ left: `${gamePaddleState!.paddleTwo!.x}px`, top: `${gamePaddleState!.paddleTwo!.y}px` }}></div>
+            <div className="ball" style={{ left: `${gameState!.BallPosition!.x}px`, top: `${gameState!.BallPosition!.y}px` }}></div>
+            <div className="pongpaddle" style={{ top: `${gameState!.paddleOne!.y}px`, left: `${gameState!.paddleOne!.x}px`, width: `${gameState!.paddleOne!.width}px`, height: `${gameState!.paddleOne!.height}px` }}></div>
+            <div className="pongpaddle" style={{ left: `${gameState!.paddleTwo!.x}px`, top: `${gameState!.paddleTwo!.y}px`, width: `${gameState!.paddleTwo!.width}px`, height: `${gameState!.paddleTwo!.height}px` }}></div>
         </div>
     );
 };

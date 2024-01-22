@@ -3,7 +3,6 @@ import { Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { Game } from '../entities/games.entity';
 import { User } from 'src/users/entities/users.entity';
-import { GameEngine } from '../entities/gameEngine.entity';
 import { Paddle } from '../entities/paddle.entity';
 import { Ball } from '../entities/ball.entity';
 import { VectorService } from './vector.service';
@@ -17,8 +16,6 @@ export class BallService {
 		private gameRepository: Repository<Game>,
 		@InjectRepository(User)
 		private usersRepository: Repository<User>,
-		@InjectRepository(GameEngine)
-		private gameEngineRepository: Repository<GameEngine>,
 		@InjectRepository(Paddle)
 		private paddleRepository: Repository<Paddle>,
 		@InjectRepository(Ball)
@@ -37,11 +34,13 @@ export class BallService {
 
 	updateBallPosition(ball: ball_instance) {
         ball.position = this.VectorService.add(ball.position, ball.speed);
-		if (ball.position.x - ball.r < 0) {
+		if (ball.position.x < 0) {
 			ball.alive = false;
+			ball.goal = 1;
 		}
-		else if (ball.position.x + ball.r > 16/9) {
+		else if (ball.position.x + (ball.r / 2) > 1) {
             ball.alive = false;
+			ball.goal = 2;
 		}
 		return (ball);
     }
@@ -49,6 +48,7 @@ export class BallService {
 	collisionWithPaddle(ball: ball_instance, paddle: paddle_instance) {
 		let closest_dist_vec = this.VectorService.sub(this.closestPointWithPaddle(ball, paddle), ball.position);
         if (this.VectorService.mag(closest_dist_vec) <= ball.r) {
+			console.log(`COLLISION!!!!`)
             return true;
         }
         return false;
@@ -92,9 +92,14 @@ export class BallService {
         }
 	}
 
+	// collision non fonctionnel, paddle gauche ne prend pas en compte, regarder les autres pour le ratio,
+	// Collision Bas, descend a rayon/2 trop bas,
+	// Collision haut, s'arrete a rayon complet trop bas,
+	// Collision paddle Gauche player 1, pas fonctionnel check si Collision interprete puis la suite des calculs
+	// Collision paddle Droit player 2, a priori fonctionnel mais j'ai l'impression pas au bonne endroit.
 
-
-	//peut etre donner le score et le changer ici ?
+	// Pour le reset de parties, ne pas pouvoir changer pos paddle pendant la pause, de meme pendant le blurgame.
+	// check l'incrementation de point, et stop tout avec un emit socket pour changer de pages les player.
 
 	// private async createAndSaveBall(x: number, y: number, speedx: number, speedy: number) {
 

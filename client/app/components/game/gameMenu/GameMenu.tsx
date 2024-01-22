@@ -21,11 +21,11 @@ const Menu = (socket: { socket: Socket }) => {
     }
         
     const handleStartClick = async () => {
-        const currentUserID = sessionStorage.getItem("currentUserID");
+        const currentUserLogin = sessionStorage.getItem("currentUserLogin");
 
         if (gameSocket.connected) {
             // gameSocket.emit('linkSocketWithUser', sessionStorage.getItem("currentUserLogin"));
-            gameSocket.emit('join-matchmaking', currentUserID);
+            gameSocket.emit('join-matchmaking', currentUserLogin);
             await gameSocket.on('joinGame', (game: Game) => {
                 dispatch({
                     type: 'TOGGLE',
