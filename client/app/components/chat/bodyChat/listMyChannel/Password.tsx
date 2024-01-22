@@ -90,4 +90,3 @@ const PasswordComponent: React.FC = () => {
 };
 
 export default PasswordComponent;
-
