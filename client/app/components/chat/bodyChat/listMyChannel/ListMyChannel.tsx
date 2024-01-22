@@ -100,7 +100,11 @@ const ListMyChannelComponent: React.FC<ListMyChannelComponentProps> = ({ user, i
 				const conversation = await response.json();
 				if (globalState.userSocket?.connected) {
 					// on utilise la meme pour inviter et rejoindre --> probleme
+					console.log("JOINING ", conversation.name+conversation.id);
 					globalState.userSocket?.emit('addUserToRoom', { convID: conversation.id, convName: conversation.name, friend: user });
+					globalState.userSocket?.emit('refreshChannel', {
+						channel: conversation.name + conversation.id,
+					});
 					console.log("User has been successfully added!");
 					dispatch({ type: 'TOGGLEX', payload: 'showAddCreateChannel' });
 					dispatch({ type: 'TOGGLEX', payload: 'showAddChannel' });

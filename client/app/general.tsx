@@ -186,7 +186,8 @@ const GeneralComponent = () => {
 	
 			globalState.userSocket?.on('userAddedToFriendRoom', (data: {convID: number, convName: string}) => {
 				const { convID, convName } = data;
-				globalState.userSocket?.emit('joinRoom',  { roomName: convName, roomID: convID });
+				console.log("Add user to room = ", convName + convID);
+				globalState.userSocket?.emit('joinRoom', {roomName: convName, roomID: convID});
 			});
 	
 			globalState.userSocket?.on('userIsBan', ( data: { roomName: string, roomID: string } ) => {
@@ -204,6 +205,11 @@ const GeneralComponent = () => {
 					toast.warn(`You are unban from ${roomName}`);
 				}
 			});
+
+			globalState.userSocket?.on('kickUser', ( data: {roomName: string, roomID: string} ) => {
+				const { roomName, roomID } = data;
+				globalState.userSocket?.emit('leaveRoom', { roomName: roomName, roomID: roomID });
+			});
 	
 			return () => {
 				globalState.userSocket?.off('friendRequest');
@@ -212,6 +218,7 @@ const GeneralComponent = () => {
 				globalState.userSocket?.off('userAddedToFriendRoom');
 				globalState.userSocket?.off('userIsUnban');
 				globalState.userSocket?.off('userIsBan');
+				globalState.userSocket?.off('kickUser');
 		}
 
 	}, [globalState?.userSocket]);

@@ -191,11 +191,8 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 				user.isAdmin = !user.isAdmin;
 				console.log("Promote");
 
-				// refresh user list in channel for userToRefresh (who has been promoted)
-				globalState.userSocket?.emit('refreshUser', {
-					userToRefresh: user.login,
-					target: 'refreshChannel',
-					status: true,
+				globalState.userSocket?.emit('refreshChannel', {
+					channel: state.currentConversation + state.currentConversationID,
 				});
 
 				// refresh channel list for userToRefresh (who has been promoted)
@@ -236,11 +233,8 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 				console.log("demote");
 				user.isAdmin = !user.isAdmin;
 
-				// refresh user list in channel for userToRefresh (who has been promoted)
-				globalState.userSocket?.emit('refreshUser', {
-					userToRefresh: user.login,
-					target: 'refreshChannel',
-					status: false,
+				globalState.userSocket?.emit('refreshChannel', {
+					channel: state.currentConversation + state.currentConversationID,
 				});
 
 				// refresh channel list for userToRefresh (who has been promoted)
@@ -282,13 +276,23 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 					// je quitte le channel donc faut refresh le composant pour les autres
 					dispatch({ type: 'ACTIVATE', payload: 'showChannelList' });
 					dispatch({ type: 'DISABLE', payload: 'showChannel' });
-					globalState.userSocket?.emit('leaveRoom', { roomName: state.currentConversation, roomID: state.currentConversationID });
+					globalState.userSocket?.emit('refreshChannel', {
+						channel: state.currentConversation + state.currentConversationID,
+					});
+					globalState.userSocket?.emit('leaveRoom', {
+						roomName: state.currentConversation,
+						roomID: state.currentConversationID,
+					});
 				}
 				else {
 					// je kick un user donc faut refresh le composant pour les autres
 					dispatch({ type: 'ACTIVATE', payload: 'showBackComponent' });
 					dispatch({ type: 'DISABLE', payload: 'showOptionsUserChannel' });
 
+					// refresh channel for all users inside
+					globalState.userSocket?.emit('refreshChannel', {
+						channel: state.currentConversation + state.currentConversationID,
+					});
 					// permet au user kick de leave la room
 					globalState.userSocket?.emit('kickUserFromChannel', {
 						userToKick: user.login,

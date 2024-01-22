@@ -220,7 +220,6 @@ export class ChatService {
 			});
 		});
 
-		console.log("JPP: ", array);
 		return array;
 	}
 

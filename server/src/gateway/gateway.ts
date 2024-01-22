@@ -142,7 +142,7 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	addUserToNewRoom( @MessageBody() data: { convID: number, convName: string, friend: string} ) {
 		const { convID, convName, friend } = data;
 		console.log("==== addUserToRoom Event ====");
-		console.log("Add ", friend," to room : ", convName + convID);
+		console.log("Emit to add ", friend," to room : ", convName + convID);
 		this.server.to(friend).emit('userAddedToFriendRoom', {
 			convID: convID,
 			convName: convName,
@@ -250,5 +250,12 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	handleUserRefresh(@MessageBody() data: { userToRefresh: string, target: string, status: boolean } ) {
 		const { userToRefresh, target, status } = data;
 		this.server.to(userToRefresh).emit(target, status);
+	}
+
+	@SubscribeMessage('refreshChannel')
+	@UseGuards(GatewayGuard)
+	handleChannelrRefresh(@MessageBody() data: { channel: string } ) {
+		const { channel } = data;
+		this.server.to(channel).emit('refresh_channel');
 	}
 }
