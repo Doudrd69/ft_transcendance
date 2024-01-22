@@ -213,11 +213,33 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		});
 	}
 
+	@SubscribeMessage('deleteChannel')
+	@UseGuards(GatewayGuard)
+	handleDeleteChannel(@MessageBody() data: { roomName: string, roomID: string } ) {
+		const { roomName, roomID } = data;
+		console.log("Emitting to ", roomName + roomID);
+		// recup channelUserList et emit sur chaque user?
+		this.server.to(roomName + roomID).emit('channelDeleted', {
+			roomName: roomName,
+			roomID: roomID,
+		});
+	}
+
+	@SubscribeMessage('kickUserFromChannel')
+	@UseGuards(GatewayGuard)
+	handleKickUser(@MessageBody() data: { userToKick: string, roomName: string, roomID: string } ) {
+		const { userToKick, roomName, roomID } = data;
+		this.server.to(userToKick).emit('kickUser', {
+			roomName: roomName,
+			roomID: roomID,
+		});
+	}
+
 	@SubscribeMessage('refreshUserChannelList')
 	@UseGuards(GatewayGuard)
 	handleRefresh(@MessageBody() data: { userToRefresh: string, roomName: string, roomID: string } ) {
 		const { userToRefresh, roomName, roomID } = data;
-		this.server.to(userToRefresh).emit('refresh', {
+		this.server.to(userToRefresh).emit('refreshChannelList', {
 			roomName: roomName,
 			roomID: roomID,
 		});

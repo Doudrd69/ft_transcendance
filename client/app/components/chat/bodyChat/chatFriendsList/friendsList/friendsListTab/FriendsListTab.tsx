@@ -119,7 +119,13 @@ const FriendsListTabComponent:  React.FC<FriendsListTabComponentProps> = ({user}
 	
 				dispatch({ type: 'DISABLE', payload: 'showConfirmation' })
 				const data = await response.json();
-				globalState.userSocket?.emit('refreshUser', { userToRefresh: user.username, target: 'refreshFriends', status: true } );
+
+				globalState.userSocket?.emit('refreshUser', {
+					userToRefresh: user.username,
+					target: 'refreshFriends',
+					status: true
+				});
+
 				if (!data.isAccepted) {
 					return ;
 				}

@@ -4,6 +4,7 @@ import { Socket } from 'socket.io-client';
 import { useChat } from '../../../ChatContext';
 import OptionsUserChannel from '../../addConversation/OptionsUserChannel';
 import { useGlobal } from '@/app/GlobalContext';
+import { toast } from 'react-toastify';
 
 interface Message {
 	from: string;
@@ -72,7 +73,7 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 		}
 	};
 
- 	const ownerUsers_array = state.currentUserList.filter((user: userList) => user.isOwner === true);
+	const ownerUsers_array = state.currentUserList.filter((user: userList) => user.isOwner === true);
 	console.log("userlist: ", state.currentUserList);
 
 	const ownerUsers = ownerUsers_array[0];
@@ -82,6 +83,7 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 	const me = me_array[0];
 
 	useEffect(() => {
+
 		globalState.userSocket?.on('userJoinedRoom', (notification: string) => {
 		console.log("Channel log: ", notification);
 		});
@@ -91,10 +93,30 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 			setMessages((prevMessages: Message[]) => [...prevMessages, message]);
 		});
 
+		globalState.userSocket?.on('kickUser', ( data: {roomName: string, roomID: string} ) => {
+			const { roomName, roomID } = data;
+			globalState.userSocket?.emit('leaveRoom', { roomName: roomName, roomID: roomID });
+			dispatch({ type: 'DISABLE', payload: 'showChannel' });
+		});
+
+		globalState.userSocket?.on('channelDeleted', ( data: {roomName: string, roomID: string} ) => {
+			const { roomName, roomID } = data;
+			globalState.userSocket?.emit('leaveRoom', { roomName: roomName, roomID: roomID });
+			dispatch({ type: 'DISABLE', payload: 'showChannel' });
+		});
+
+		// globalState.userSocket?.on('refreshChannel', () => {
+		// 	console.log("REFRESH CHANNEL");
+		// });
+
 		return () => {
 			globalState.userSocket?.off('userJoinedRoom');
 			globalState.userSocket?.off('onMessage');
+			// globalState.userSocket?.off('refreshChannel');
+			globalState.userSocket?.off('kickUser');
+			globalState.userSocket?.off('channelDeleted');
 		};
+
 	}, [globalState?.userSocket]);
 
 	useEffect(() => {

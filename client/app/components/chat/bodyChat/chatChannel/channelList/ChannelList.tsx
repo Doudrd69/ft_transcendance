@@ -54,7 +54,6 @@ const ChannelListComponent: React.FC = () => {
 				if (isAdmin)
 					setIsAdmin([...isAdmin]);
 				if (usersList ) {
-					console.log(userList);
 					setUserList([...usersList]);
 				}	
 			}
@@ -80,14 +79,21 @@ const ChannelListComponent: React.FC = () => {
 			loadDiscussions();
 		});
 
-		globalState.userSocket?.on('refresh', () => {
+		globalState.userSocket?.on('refreshChannelList', () => {
+			console.log("REFRESH LIST");
 			loadDiscussions();
 		});
+
+		// globalState.userSocket?.on('refreshChannel', () => {
+		// 	console.log("REFRESH CHANNEL");
+		// 	loadDiscussions();
+		// });
 
 		return () => {
 			globalState.userSocket?.off('banUser');
 			globalState.userSocket?.off('userAddedToFriendRoom');
-			globalState.userSocket?.off('refresh');
+			globalState.userSocket?.off('refreshChannelList');
+			globalState.userSocket?.off('refreshChannel');
 		}
 
 	}, [globalState?.userSocket]);

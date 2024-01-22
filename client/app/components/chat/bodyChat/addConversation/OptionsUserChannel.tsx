@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Socket } from 'socket.io-client';
 import { setCurrentComponent, useChat } from '../../ChatContext';
-import { toast } from 'react-toastify';
 import './AddConversation.css';
 import { RSC } from 'next/dist/client/components/app-router-headers';
 import { useGlobal } from '@/app/GlobalContext';
@@ -180,7 +179,13 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me}) => 
 				const status = await response.json();
 				user.isBan = !user.isBan;
 				setBan(true);
-				globalState.userSocket?.emit('banUser', { userToBan: user.login, roomName: state.currentConversation, roomID: state.currentConversationID } );
+
+				globalState.userSocket?.emit('banUser', {
+					userToBan: user.login,
+					roomName: state.currentConversation,
+					roomID: state.currentConversationID
+				});
+
 			}
 		}
 		catch (error) {
@@ -213,15 +218,20 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me}) => 
 				const status = await response.json();
 				user.isBan = !user.isBan;
 				setBan(false);
-				globalState.userSocket?.emit('unbanUser', { userToUnban: user.login, roomName: state.currentConversation, roomID: state.currentConversationID } );
+
+				globalState.userSocket?.emit('unbanUser', {
+					userToUnban: user.login,
+					roomName: state.currentConversation,
+					roomID: state.currentConversationID
+				});
+
 			}
 		}
 		catch (error) {
 			console.error(error);
 		}
 	}
-	
-	
+
 	const promoteAdminUser = async() => {
 		
 		try {
@@ -244,16 +254,21 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me}) => 
 			if (response.ok) {
 				user.isAdmin = !user.isAdmin;
 				console.log("Promote");
+
+				// refresh user list in channel for userToRefresh (who has been promoted)
 				globalState.userSocket?.emit('refreshUser', {
 					userToRefresh: user.login,
-					target: 'adminChange',
+					target: 'refreshChannel',
 					status: true,
 				});
+
+				// refresh channel list for userToRefresh (who has been promoted)
 				globalState.userSocket?.emit('refreshUserChannelList', {
 					userToRefresh: user.login,
 					roomName: state.currentConversation,
 					roomID: state.currentConversationID,
 				});
+
 				setAdmin(true);
 			}
 		}
@@ -284,16 +299,21 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me}) => 
 			if (response.ok) {
 				console.log("demote");
 				user.isAdmin = !user.isAdmin;
+
+				// refresh user list in channel for userToRefresh (who has been promoted)
 				globalState.userSocket?.emit('refreshUser', {
 					userToRefresh: user.login,
 					target: 'adminChange',
 					status: false,
 				});
+
+				// refresh channel list for userToRefresh (who has been promoted)
 				globalState.userSocket?.emit('refreshUserChannelList', {
 					userToRefresh: user.login,
 					roomName: state.currentConversation,
 					roomID: state.currentConversationID,
 				});
+
 				setAdmin(false);
 			}
 		}
@@ -322,7 +342,20 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me}) => 
 				dispatch({ type: 'ACTIVATE', payload: 'showChannelList' });
 				dispatch({ type: 'DISABLE', payload: 'showChannel' });
 				dispatch({ type: 'DISABLE', payload: 'showOptionsUserChannel' });
-				globalState.userSocket?.emit('refreshUserChannelList', { userToRefresh: user.login, roomName: state.currentConversation, roomID: state.currentConversationID } );
+
+				globalState.userSocket?.emit('kickUserFromChannel', {
+					userToKick: user.login,
+					roomName: state.currentConversation,
+					roomID: state.currentConversationID,
+				});
+
+				// refresh channel list for userToRefresh (who has quit the channel)
+				globalState.userSocket?.emit('refreshUserChannelList', {
+					userToRefresh: user.login,
+					roomName: state.currentConversation,
+					roomID: state.currentConversationID,
+				});
+
 			}
 		}
 		catch (error) {
