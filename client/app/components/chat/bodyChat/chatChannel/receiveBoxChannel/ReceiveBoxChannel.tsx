@@ -98,7 +98,7 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 	}
 
 	useEffect(() => {
-		console.log("AAAAAAAAAAAAAAAAA");
+
 		globalState.userSocket?.on('userJoinedRoom', (notification: string) => {
 		console.log("Channel log: ", notification);
 		});
@@ -110,7 +110,6 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 
 		globalState.userSocket?.on('kickUser', ( data: {roomName: string, roomID: string} ) => {
 			const { roomName, roomID } = data;
-			globalState.userSocket?.emit('leaveRoom', { roomName: roomName, roomID: roomID });
 			dispatch({ type: 'DISABLE', payload: 'showChannel' });
 		});
 
@@ -120,24 +119,15 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 			dispatch({ type: 'DISABLE', payload: 'showChannel' });
 		});
 
-		globalState.userSocket?.on('refreshChannel', () => {
-			loadUserList();
-			// console.log("userlist: ", userList);
-			// const owner_array = userList?.filter((user: User) => user.isOwner === true);
-			// if (owner_array)
-			// 	setOwner(owner_array[0]);
-			// const me_array = userList?.filter((user: User) => user.login === sessionStorage.getItem("currentUserLogin"));
-			// if (me_array)
-			// 	setMe(me_array[0]);
-			// console.log("me: ", me);
-			// console.log("owner: ", owner);
+		globalState.userSocket?.on('refresh_channel', () => {
 			console.log("REFRESH CHANNEL");
+			loadUserList();
 		});
 		
 		return () => {
 			globalState.userSocket?.off('userJoinedRoom');
 			globalState.userSocket?.off('onMessage');
-			globalState.userSocket?.off('refreshChannel');
+			globalState.userSocket?.off('refresh_channel');
 			globalState.userSocket?.off('kickUser');
 			globalState.userSocket?.off('channelDeleted');
 		};
@@ -146,15 +136,6 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 	
 	useEffect(() => {
 		loadUserList();
-		// console.log("userlist dans useEffect: ", userList);
-		// const owner_array = userList?.filter((user: User) => user.isOwner === true)[0];
-		// if (owner_array)
-		// 	setOwner(owner_array[0]);
-		// console.log("owner: ", owner);
-		// const me_array = userList?.filter((user: User) => user.login === sessionStorage.getItem("currentUserLogin"));
-		// if (me_array)
-		// 	setMe(me_array[0]);
-		// console.log("me: ", me);
 	}, [owner]);
 	
 	useEffect(() => {

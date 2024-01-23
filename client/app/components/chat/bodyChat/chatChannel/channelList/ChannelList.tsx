@@ -78,10 +78,6 @@ const ChannelListComponent: React.FC = () => {
 			loadDiscussions();
 		});
 
-		globalState.userSocket?.on('userAddedToFriendRoom', () => {
-			loadDiscussions();
-		});
-
 		globalState.userSocket?.on('refreshChannelList', () => {
 			console.log("REFRESH LIST");
 			loadDiscussions();
@@ -89,7 +85,6 @@ const ChannelListComponent: React.FC = () => {
 
 		return () => {
 			globalState.userSocket?.off('banUser');
-			globalState.userSocket?.off('userAddedToFriendRoom');
 			globalState.userSocket?.off('refreshChannelList');
 			globalState.userSocket?.off('refreshChannel');
 		}

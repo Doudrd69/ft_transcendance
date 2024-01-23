@@ -14,17 +14,18 @@ const SendBoxChannelComponent: React.FC = () => {
 		setMessageValue(e.target.value);
 	};
 	
-	const messageDto = {
-		from: sessionStorage.getItem("currentUserLogin"),
-		content: messageValue,
-		post_datetime: new Date(),
-		conversationID: state.currentConversationID,
-	}
-
+	
 	const handleMessage = async (e: React.FormEvent) => {
 		
 		try {
 			e.preventDefault();
+
+			const messageDto = {
+				from: sessionStorage.getItem("currentUserLogin"),
+				content: messageValue,
+				post_datetime: new Date(),
+				conversationID: state.currentConversationID,
+			}
 			
 			const response = await fetch('http://localhost:3001/chat/newMessage', {
 				method: 'POST',

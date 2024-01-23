@@ -27,9 +27,9 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 	const [isOwner, setIsOwner] = useState<boolean>(false);
 	const { globalState } = useGlobal();
 	const { state, dispatch } = useChat();
-	// if (state.currentUserList) {
+	if (state.currentUserList) {
 		setMe(state.currentUserList.filter((user: userList) => user.login === sessionStorage.getItem("currentUserLogin")));
-	// }
+	}
 	if (me) {
 		setIsAdmin(me[0].isAdmin);
 		setIsOwner(me[0].isOwner);

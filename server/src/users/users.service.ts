@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, Res } from '@nestjs/common';
+import { Injectable, NotFoundException, Res, Inject, forwardRef } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository, UpdateResult } from 'typeorm'
 import * as bcrypt from 'bcrypt'
@@ -25,6 +25,7 @@ export class UsersService {
 		private usersRepository: Repository<User>,
 		@InjectRepository(Friendship)
 		private friendshipRepository: Repository<Friendship>,
+		@Inject(forwardRef(() => ChatService))
 		private chatService: ChatService,
 	) { }
 
@@ -341,15 +342,17 @@ export class UsersService {
 		throw new Error("Fatal error");
 	}
 
-	async friendshipConversation(user1: User, user2: User) {
+	async findDMConversation(user1: User, user2: User) {
 
 		let conversation = null;
 		user1.groups.forEach((userOneGroup: GroupMember) => {
 			user2.groups.forEach((userTwoGroup: GroupMember) => {
-				if (userOneGroup.conversation.id == userTwoGroup.conversation.id) {
-					console.log("found conversation!");
-					conversation = userOneGroup.conversation;
-					return;
+				if ((userOneGroup.conversation.id == userTwoGroup.conversation.id) &&
+					(!userOneGroup.conversation.is_channel && !userTwoGroup.conversation.is_channel)) {
+						console.log("== found DM ==");
+						console.log(userOneGroup.conversation);
+						conversation = userOneGroup.conversation;
+						return;
 				}
 			});
 		});
@@ -390,12 +393,12 @@ export class UsersService {
 				friendshipToUpdate.isAccepted = flag;
 				await this.friendshipRepository.save(friendshipToUpdate);
 
-				const privateConversation = await this.friendshipConversation(initiator, friend);
-				console.log(privateConversation);
+				const privateConversation = await this.findDMConversation(initiator, friend);
+				console.log("Found DM: ", privateConversation);
 				// si la conv existe deja, on la recreer pas
 				if (!privateConversation) {
 					if (flag) {
-						const conversation = this.chatService.createFriendsConversation(initiator, friend);
+						const conversation = this.chatService.createDMConversation(initiator, friend);
 						return conversation;
 					}
 				}

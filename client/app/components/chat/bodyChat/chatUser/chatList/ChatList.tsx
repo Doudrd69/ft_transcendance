@@ -6,6 +6,7 @@ import { Socket } from 'socket.io-client';
 import AvatarImageComponent from '@/app/components/Avatar/Avatar';
 import AvatarImageBisComponent from '@/app/components/Avatar/AvatarBis';
 import { setCurrentComponent } from '../../../ChatContext';
+import { useGlobal } from '@/app/GlobalContext';
 
 
 
@@ -19,11 +20,12 @@ interface Conversation {
 const ChatListComponent: React.FC = () => {
 
 	const { state, dispatch } = useChat();
+	const { globalState } = useGlobal();
 	const username = sessionStorage.getItem("currentUserLogin");
 	const [activeIndex, setActiveIndex] = useState<number | null>(null);
 	const [dm, setDm] = useState<Conversation[]>([]);
   
-	const loadFriendList = async () => {
+	const loadDMs = async () => {
 
 		try {
 			const requestDms = await fetch(`http://localhost:3001/chat/getDMsConversations/${sessionStorage.getItem("currentUserID")}`, {
@@ -44,8 +46,21 @@ const ChatListComponent: React.FC = () => {
 	}
 
 	useEffect(() => {
-		console.log("Loading friend list...");
-		loadFriendList();
+
+		globalState.userSocket?.on('refreshDmList', () => {
+			console.log("Loading DMs...");
+			loadDMs();
+		});
+
+		return () => {
+			globalState.userSocket?.off('refreshDmList');
+		}
+
+	}, [globalState?.userSocket]);
+
+	useEffect(() => {
+		console.log("Loading DMs...");
+		loadDMs();
 	}, [state.refreshFriendList]);
 
 	const timestamp = new Date().getTime();
