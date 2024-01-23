@@ -98,24 +98,34 @@ export class GameService {
         const UserOne: User = await this.usersRepository.findOne({ where: { socketGame: gameInstance.players[0] } })
         const UserTwo: User = await this.usersRepository.findOne({ where: { socketGame: gameInstance.players[1] } })
 
-        // if (gameInstance.player1_score > gameInstance.player2_score) {
-        //     UserOne.victory += 1;
-        //     UserTwo.defeat += 1;
-        // }
-        // else {
-        //     UserTwo.victory += 1;
-        //     UserOne.defeat += 1;
-        // }
+        console.log("User 1: ", UserOne.victory, UserOne.defeat , UserOne.WR_ratio);
+        console.log("User 2: ", UserTwo.victory, UserTwo.defeat , UserTwo.WR_ratio);
+        let user1TotalWin;
+        let user1TotalLoose;
+        let user2TotalWin;
+        let user2TotalLoose;
+        if (gameInstance.player1_score > gameInstance.player2_score) {
+            user1TotalWin = UserOne.victory + 1;
+            user2TotalLoose = UserTwo.defeat + 1;
+        }
+        else {
+            user2TotalWin = UserTwo.victory + 1;
+            user1TotalLoose = UserOne.defeat + 1;
+        }
 
-        // UserOne.WR_ratio = UserOne.victory / UserOne.defeat;
-        // UserTwo.WR_ratio = UserTwo.victory / UserTwo.defeat;
+        UserOne.WR_ratio = user1TotalWin / user1TotalLoose;
+        UserTwo.WR_ratio = user2TotalWin / user2TotalLoose;
+        UserOne.victory = user1TotalWin;
+        UserOne.defeat = user1TotalLoose;
+        UserTwo.victory = user2TotalWin;
+        UserTwo.defeat = user2TotalLoose;
         
-        // console.log("User 1: ", UserOne.victory, UserOne.defeat , UserOne.WR_ratio);
-        // console.log("User 2: ", UserTwo.victory, UserTwo.defeat , UserTwo.WR_ratio);
         UserOne.inGame = false;
         UserTwo.inGame = false;
         this.usersRepository.save(UserOne);
         this.usersRepository.save(UserTwo);
+        console.log("User 1: ", UserOne.victory, UserOne.defeat , UserOne.WR_ratio);
+        console.log("User 2: ", UserTwo.victory, UserTwo.defeat , UserTwo.WR_ratio);
 
         // Game update
         game.playerOneID = String(UserOne.id);
