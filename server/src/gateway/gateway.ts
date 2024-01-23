@@ -187,6 +187,7 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 			initiator: initiator,
 			recipient: recipient,
 		})
+		this.server.to(recipient).emit('refreshFriends');
 	}
 
 	/* REFRESH HANDLERS */

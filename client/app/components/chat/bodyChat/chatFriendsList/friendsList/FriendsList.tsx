@@ -62,6 +62,7 @@ const FriendsListComponent: React.FC = () => {
 	}, [state.refreshFriendList]);
 
 	useEffect(() => {
+
 		globalState.userSocket?.on('friendRequestAcceptedNotif', () => {
 			loadFriendList();
 		});

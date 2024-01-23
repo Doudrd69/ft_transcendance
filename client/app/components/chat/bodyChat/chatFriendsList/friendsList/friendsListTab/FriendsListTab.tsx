@@ -118,6 +118,8 @@ const FriendsListTabComponent:  React.FC<FriendsListTabComponentProps> = ({user}
 			if (response.ok) {
 	
 				dispatch({ type: 'DISABLE', payload: 'showConfirmation' })
+				// faut rajouter un dispatch ici pour qu'on retourne a la liste d'amis
+				// et pas rester bloque sur le friendlist tab
 				const data = await response.json();
 
 				globalState.userSocket?.emit('refreshUser', {
