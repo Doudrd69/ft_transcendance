@@ -320,9 +320,13 @@ export class UsersService {
 
 		if (initiator) {
 
-			const friendshipAlreadyExists: Friendship = await this.friendshipRepository.findOne({
-				where: { initiator: initiator, friend: recipient },
-			});
+			const friendshipAlreadyExists = await this.friendshipRepository
+				.createQueryBuilder('friendship')
+				.where('(friendship.initiator.id = :initiatorId AND friendship.friend.id = :friendId) OR (friendship.initiator.id = :friendId AND friendship.friend.id = :initiatorId)', {
+					initiatorId: initiator.id,
+					friendId: recipient.id,
+				})
+				.getOne();
 
 			if (!friendshipAlreadyExists) {
 
@@ -372,13 +376,7 @@ export class UsersService {
 			relations: ["initiatedFriendships", "acceptedFriendships", "groups", "groups.conversation"],
 		});
 
-		// empecher de demander 15 fois en ami + de pas recreer la conv si existe deja
 		if (initiator && friend) {
-
-			// pour eviter les erreurs : chercher dans les 2 sens
-			// const friendshipToUpdate = await this.friendshipRepository.findOne({
-			// 	where: { initiator: { id: initiator.id }, friend: { id: friend.id } },
-			// });
 
 			const friendshipToUpdate = await this.friendshipRepository
 				.createQueryBuilder('friendship')
