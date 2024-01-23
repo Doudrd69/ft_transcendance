@@ -187,6 +187,7 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 			initiator: initiator,
 			recipient: recipient,
 		})
+		this.server.to(recipient).emit('refreshFriends');
 	}
 
 	/* REFRESH HANDLERS */
@@ -237,12 +238,9 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 
 	@SubscribeMessage('refreshUserChannelList')
 	@UseGuards(GatewayGuard)
-	handleRefresh(@MessageBody() data: { userToRefresh: string, roomName: string, roomID: string } ) {
-		const { userToRefresh, roomName, roomID } = data;
-		this.server.to(userToRefresh).emit('refreshChannelList', {
-			roomName: roomName,
-			roomID: roomID,
-		});
+	handleRefresh(@MessageBody() data: { userToRefresh: string } ) {
+		const { userToRefresh } = data;
+		this.server.to(userToRefresh).emit('refreshChannelList');
 	}
 
 	@SubscribeMessage('refreshUser')
