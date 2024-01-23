@@ -119,9 +119,8 @@
 			</div>
 		</div>
 	);
-	/**
+	/*
 	 * flatpak run --filesystem=home com.google.Chrome
-	 * flatpak run --filesystem=host com.google.Chrome
 	 */
 	};
 
