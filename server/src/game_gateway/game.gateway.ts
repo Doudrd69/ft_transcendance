@@ -105,8 +105,8 @@ export class GameGateway {
     }
 
     @SubscribeMessage('join-matchmaking')
-    async handleJoinMatchmaking(client: Socket, playerLogin: string): Promise<String> {
-        console.log("JOINMATCHMAKING");
+    async handleJoinMatchmaking(@ConnectedSocket() client: Socket, @MessageBody() data: { playerLogin: string}) {
+        // const { playerLogin } = data;
         this.MatchmakingService.join(client.id);
         const enoughPlayers = this.MatchmakingService.IsThereEnoughPairs();
         if (enoughPlayers) {
@@ -140,7 +140,6 @@ export class GameGateway {
                 }, 1000);
             }
         }
-        return (playerLogin);
     }
 
 

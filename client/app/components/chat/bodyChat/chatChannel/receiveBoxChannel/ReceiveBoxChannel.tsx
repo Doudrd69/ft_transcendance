@@ -142,6 +142,10 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 	}, []);
 
 	useEffect(() => {
+		loadUserList();
+	}, [globalState.showRefresh]);
+
+	useEffect(() => {
 		scrollToBottom();
 	}, [messages]);
 
