@@ -54,14 +54,12 @@ const GlobalSettingsComponent: React.FC = () => {
 	
 			if (response.ok) {
 				const qrcode = await response.json();
-				// console.log("2FA QRCode => ", qrcode.qrcodeURL);
 				setUrlQrCode(qrcode.qrcodeURL);
 				setActiveUrlImg(true);
 			} else {
-			const error = await response.json();
-			console.log("Fatal error: ", error.message);
+				const error = await response.json();
+				console.log("Fatal error: ", error.message);
 			}
-			console.log("activateUrlImage: ", activeUrlImg);
 		}
 		catch (error) {
 				console.error(error);

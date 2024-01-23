@@ -19,7 +19,7 @@ import { GameGatewayModule } from './game_gateway/gameGateway.module';
 //We set the synchronize option to true, which means that TypeORM will automatically
 //generate database tables based on the entities. However, this option should be used
 //with caution in production because it can cause data loss and conflicts.
-console.log('path', join(__dirname, 'avatars.png'));
+
 dotenv.config();
 
 const dbPass = process.env.POSTGRES_PASSWORD;

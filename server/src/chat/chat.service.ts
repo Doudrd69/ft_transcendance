@@ -56,7 +56,7 @@ export class ChatService {
 		user.groups.forEach((userGroup: GroupMember) => {
 			groupList.forEach((group: GroupMember) => {
 				if (userGroup.id == group.id) {
-					console.log("Found ", group.id);
+					// console.log("Related group: ", group.id);
 					groupFound = group;
 				}
 			});
@@ -370,7 +370,7 @@ export class ChatService {
 					userToAdd: checkPasswordDto.username,
 					conversationID: conversation.id,
 				}
-				console.log("Add user to protected conv");
+
 				const conversationToAdd = await this.addUserToConversation(addUserToConversationDto);
 				if (conversationToAdd)
 					return true;
@@ -418,7 +418,6 @@ export class ChatService {
 
 		const isUserIsAdmin = await this.getGroupIsAdminStatus(user, channelToUpdate);
 
-		console.log(updateIsPublicDto);
 		if (isUserIsAdmin) {
 			if (channelToUpdate) {
 				channelToUpdate.isPublic = true;
@@ -445,7 +444,6 @@ export class ChatService {
 
 		const isUserIsAdmin = await this.getGroupIsAdminStatus(user, channelToUpdate);
 
-		console.log(updateIsPublicDto);
 		if (isUserIsAdmin) {
 			if (channelToUpdate) {
 				channelToUpdate.isPublic = false;
@@ -747,7 +745,6 @@ export class ChatService {
 	
 	async deleteConversation(deleteConversationDto: DeleteConversationDto): Promise<boolean> {
 
-		console.log(deleteConversationDto);
 		// recuperer la conv a delete
 		const conversationToDelete: Conversation = await this.conversationRepository.findOne({ where: { id: deleteConversationDto.conversationID } });
 		// verifier is le user qui fait la requete est le owner
@@ -757,7 +754,6 @@ export class ChatService {
 		});
 
 		const userGroup = await this.getRelatedGroup(user, conversationToDelete);
-		console.log(userGroup);
 		if (userGroup && userGroup.isOwner) {
 			
 			const idToDelete = conversationToDelete.id;
@@ -801,7 +797,6 @@ export class ChatService {
 				}
 			});
 			if (groupToPromote) {
-				console.log("promote group ", groupToPromote.id);
 				groupToPromote.isOwner = true;
 				groupToPromote.isAdmin = true;
 				await this.groupMemberRepository.save(groupToPromote);
@@ -966,7 +961,7 @@ export class ChatService {
 
 		if (user1 && user2) {
 			const dm = await this.createDMConversation(user1, user2);
-			console.log("DM result: ", dm);
+			console.log("Created DM: ", dm);
 			if (dm) {
 				return dm;
 			}
@@ -1017,7 +1012,6 @@ export class ChatService {
 			conv.isPublic = conversationDto.isPublic;
 			conv.isProtected = conversationDto.isProtected;
 			if (conversationDto.password) {
-				console.log("Password to save: ", conversationDto.password);
 				conv.password = await this.hashChannelPassword(conversationDto.password);
 			}
 			await this.conversationRepository.save(conv);

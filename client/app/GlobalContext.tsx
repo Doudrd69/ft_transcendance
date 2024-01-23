@@ -77,7 +77,6 @@ const chatReducer = (state: GlobalState, action: Action): GlobalState => {
 			// Gérer le cas où action.payload n'est ni un objet ni une chaîne
 			return state;
 		case 'SET_SOCKET':
-			console.log("usersocket ---> ", action.payload);
 			return { ...state, userSocket: action.payload || null };
 	  default:
 		return state;

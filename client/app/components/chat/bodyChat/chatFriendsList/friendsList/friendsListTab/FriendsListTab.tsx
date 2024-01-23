@@ -25,12 +25,10 @@ const FriendsListTabComponent:  React.FC<FriendsListTabComponentProps> = ({user}
 	const [confirmationText, setConfirmationText] = useState('');
 	const [showConfirmation, setShowConfirmation] = useState(false);
 	const [funtionToExecute, setFunctionToExecute] = useState<() => void>(() => {});
-	console.log("user", user);
 
 	const blockUser = async() => {
 
 		try {
-			console.log("bebebebebeebeb")
 
 			const BlockUserDto = {
 				initiatorLogin: sessionStorage.getItem("currentUserLogin"),
@@ -60,7 +58,6 @@ const FriendsListTabComponent:  React.FC<FriendsListTabComponentProps> = ({user}
 	const unblockUser = async() => {
 
 		try {
-			console.log("ahahahahah")
 			const BlockUserDto = {
 				initiatorLogin: sessionStorage.getItem("currentUserLogin"),
 				recipientLogin: user.username,
@@ -79,7 +76,6 @@ const FriendsListTabComponent:  React.FC<FriendsListTabComponentProps> = ({user}
 
 			globalState.userSocket?.emit('leaveRoom', { roomName: `whoblocked${user.username}`, roomID: '' } );
 			dispatch({ type: 'DISABLE', payload: 'showConfirmation' })
-			console.log("unblock");
 		}
 		}
 		catch (error) {
@@ -100,7 +96,6 @@ const FriendsListTabComponent:  React.FC<FriendsListTabComponentProps> = ({user}
 	const removeFriends = async () => {
 
 		try {
-			console.log("Removing friend");
 			const blockUserDto = {
 				initiatorLogin: sessionStorage.getItem("currentUserLogin"),
 				recipientLogin:  user.username,

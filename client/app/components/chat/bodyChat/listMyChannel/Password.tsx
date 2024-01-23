@@ -11,8 +11,6 @@ const PasswordComponent: React.FC = () => {
 	const { state, dispatch } = useChat();
 	const { globalState } = useGlobal();
 
-	console.log("Password: ", password);
-
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setPassword(e.target.value);
 	};
@@ -37,7 +35,6 @@ const PasswordComponent: React.FC = () => {
 		
 			if (response.ok) {
 				const passwordValidated = await response.json();
-				console.log("--> passwordValidated: ", passwordValidated);
 				dispatch({ type: 'DISABLE', payload: 'showPassword' });
 			if (globalState.userSocket?.connected) {
 				globalState.userSocket?.emit('joinRoom', { roomName: state.currentConversation, roomID: state.currentConversationID });
@@ -46,7 +43,7 @@ const PasswordComponent: React.FC = () => {
 		} 
 		}
 		catch (error) {
-		console.log(error);
+			console.log(error);
 		}
 	}
 
