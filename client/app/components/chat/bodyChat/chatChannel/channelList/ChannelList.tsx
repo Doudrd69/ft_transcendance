@@ -78,6 +78,7 @@ const ChannelListComponent: React.FC = () => {
 			loadDiscussions();
 		});
 
+		// seul event rfreshChannelList est ici donc besoin de rien
 		globalState.userSocket?.on('refreshChannelList', () => {
 			console.log("REFRESH LIST");
 			loadDiscussions();

@@ -98,9 +98,11 @@ const ListMyChannelComponent: React.FC<ListMyChannelComponentProps> = ({ user, i
 
 			if (response.ok) {
 				const conversation = await response.json();
+
+				console.log("ADD USER TO CONVERSATION: ", friend);
 				if (globalState.userSocket?.connected) {
+
 					// on utilise la meme pour inviter et rejoindre --> probleme
-	
 					globalState.userSocket?.emit('addUserToRoom', {
 						convID: conversation.id,
 						convName: conversation.name,
@@ -108,9 +110,9 @@ const ListMyChannelComponent: React.FC<ListMyChannelComponentProps> = ({ user, i
 					});
 
 					// refresh channel list
-					// globalState.userSocket?.emit('refreshUserChannelList', {
-					// 	userToRefresh: sessionStorage.get,
-					// });
+					globalState.userSocket?.emit('refreshUserChannelList', {
+						userToRefresh: friend, 
+					});
 
 					// refresh userList in channel for user arrival update
 					globalState.userSocket?.emit('refreshChannel', {

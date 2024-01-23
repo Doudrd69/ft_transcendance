@@ -203,8 +203,6 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 					// refresh channel list for userToRefresh (who has been promoted)
 					globalState.userSocket?.emit('refreshUserChannelList', {
 						userToRefresh: user.login,
-						roomName: state.currentConversation,
-						roomID: state.currentConversationID,
 					});
 				}
 
@@ -247,8 +245,6 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 					// refresh channel list for userToRefresh (who has been promoted)
 					globalState.userSocket?.emit('refreshUserChannelList', {
 						userToRefresh: user.login,
-						roomName: state.currentConversation,
-						roomID: state.currentConversationID,
 					});
 				}
 
@@ -314,8 +310,6 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 	
 						globalState.userSocket?.emit('refreshUserChannelList', {
 							userToRefresh: user.login,
-							roomName: state.currentConversation,
-							roomID: state.currentConversationID,
 						});
 					}
 				}
