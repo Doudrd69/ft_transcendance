@@ -268,11 +268,17 @@ export class UsersService {
 			console.log(`User ${user.username} games history: `);
 			let array = [];
 			userGames.forEach((game: Game) => {
-				console.log(game);
-				array.push(game);
+				array.push({
+					id: game.gameId,
+					playerOne: game.playerOneLogin,
+					playerTwo: game.playerTwoLogin,
+					scoreP1: game.scoreOne,
+					scoreP2: game.scoreTwo,
+				});
 			});
 
 			if (array) {
+				console.log(array);
 				return array;
 			}
 		}
@@ -450,6 +456,7 @@ export class UsersService {
 	/**************************************************************/
 
 	async getUserByID(userID: number): Promise<User> {
+		console.log(userID);
 		return await this.usersRepository.findOne({ where: { id: userID } });
 	}
 

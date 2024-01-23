@@ -44,6 +44,15 @@ export class User {
 	@Column({ default: false })
 	isActive: boolean;
 
+	@Column({ default: 0 })
+	WR_ratio: number;
+	
+	@Column({default: 0 })
+	victory: number;
+
+	@Column({ default: 0  })
+	defeat: number;
+
 	@Column("varchar", {
 		array: true,
 		default: null,

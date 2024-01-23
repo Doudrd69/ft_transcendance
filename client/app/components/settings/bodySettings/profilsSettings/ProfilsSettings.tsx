@@ -77,25 +77,26 @@ const ProfilsSettingsComponent: React.FC = () => {
 			const formData = new FormData();
 			if (newImage && newImage instanceof File) {
 				formData.append('avatar', newImage, newImage.name);
-				}
-			
-				const response = await fetch(`http://localhost:3001/users/upload-Avatar/${sessionStorage.getItem('currentUserID')}`, {
+			}
+
+			const response = await fetch(`http://localhost:3001/users/upload-Avatar/${sessionStorage.getItem('currentUserID')}`, {
 				method: 'POST',
 				body: formData,
 			});
-			if (response.ok){
+
+			if (response.ok) {
 				dispatch({ type: 'ACTIVATE', payload: 'showAvatar' });
 				dispatch({ type: 'DISABLE', payload: 'showUploadAvatar' });
 				dispatch({ type: 'TOGGLEX', payload: 'showRefresh'});
-				
 			}
-		} 
+		}
 		catch (error) {
 			console.error(error);
 		}
 	};
 
 	const [imageURL, setImageURL] = useState<string | null>(null);
+
 	useEffect(() => {
 		if (newImage) {
 			const fileReader = new FileReader();
@@ -110,6 +111,7 @@ const ProfilsSettingsComponent: React.FC = () => {
 			setImageURL(null);
 		}
 	}, [newImage]);
+
 	return (
 		<div className="bloc-profils-settings">
 			<div className="upload-image">

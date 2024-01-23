@@ -92,12 +92,32 @@ export class GameService {
     }
 
     async endOfGame(game: Game, gameInstance: game_instance): Promise<Game> {
+
+        
+        // User update
         const UserOne: User = await this.usersRepository.findOne({ where: { socketGame: gameInstance.players[0] } })
         const UserTwo: User = await this.usersRepository.findOne({ where: { socketGame: gameInstance.players[1] } })
+
+        // if (gameInstance.player1_score > gameInstance.player2_score) {
+        //     UserOne.victory += 1;
+        //     UserTwo.defeat += 1;
+        // }
+        // else {
+        //     UserTwo.victory += 1;
+        //     UserOne.defeat += 1;
+        // }
+
+        // UserOne.WR_ratio = UserOne.victory / UserOne.defeat;
+        // UserTwo.WR_ratio = UserTwo.victory / UserTwo.defeat;
+        
+        // console.log("User 1: ", UserOne.victory, UserOne.defeat , UserOne.WR_ratio);
+        // console.log("User 2: ", UserTwo.victory, UserTwo.defeat , UserTwo.WR_ratio);
         UserOne.inGame = false;
         UserTwo.inGame = false;
         this.usersRepository.save(UserOne);
         this.usersRepository.save(UserTwo);
+
+        // Game update
         game.playerOneID = String(UserOne.id);
         game.playerTwoID = String(UserTwo.id);
         game.gameEnd = true;
