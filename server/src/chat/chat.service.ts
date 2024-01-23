@@ -769,7 +769,6 @@ export class ChatService {
  				.where("conversation.id = :id", { id: idToDelete })
   				.execute();
 
-			// supprimer les messages avant 
 			await this.conversationRepository
 				.createQueryBuilder()
 				.delete()
@@ -810,6 +809,13 @@ export class ChatService {
 				return true;
 			}
 		}
+
+		await this.conversationRepository
+			.createQueryBuilder()
+			.delete()
+			.from(Message)
+			.where("conversation.id = :id", { id: conversation.id })
+			.execute()
 
 		await this.conversationRepository
 			.createQueryBuilder()
