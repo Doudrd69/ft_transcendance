@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ChatModule } from 'src/chat/chat.module';
 import { User } from './entities/users.entity';
@@ -11,7 +11,7 @@ import { AuthGuard } from 'src/auth/auth.guard';
   imports: [
     TypeOrmModule.forFeature([User]),
     TypeOrmModule.forFeature([Friendship]),
-    ChatModule,
+    forwardRef(() => ChatModule),
   ],
   providers: [UsersService],
   exports: [UsersService],

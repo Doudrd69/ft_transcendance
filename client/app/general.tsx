@@ -183,13 +183,7 @@ const GeneralComponent = () => {
 				console.log("Notif from server: ", notification);
 				// on peut toast ici ou gerer autrement
 			});
-	
-			// globalState.userSocket?.on('userAddedToFriendRoom', (data: {convID: number, convName: string}) => {
-			// 	const { convID, convName } = data;
-			// 	console.log("Add user to room = ", convName + convID);
-			// 	globalState.userSocket?.emit('joinRoom', {roomName: convName, roomID: convID});
-			// });
-	
+
 			globalState.userSocket?.on('userIsBan', ( data: { roomName: string, roomID: string } ) => {
 				const { roomName, roomID } = data; 
 				if (roomName && roomID) {
@@ -210,15 +204,21 @@ const GeneralComponent = () => {
 				const { roomName, roomID } = data;
 				globalState.userSocket?.emit('leaveRoom', { roomName: roomName, roomID: roomID });
 			});
+
+			globalState.userSocket?.on('userAddedToRoom', (data: {convID: number, convName: string}) => {
+				const { convID, convName } = data;
+				console.log("Add user to room = ", convName + convID);
+				globalState.userSocket?.emit('joinRoom', {roomName: convName, roomID: convID});
+			});
 	
 			return () => {
 				globalState.userSocket?.off('friendRequest');
 				globalState.userSocket?.off('friendRequestAcceptedNotif');
 				globalState.userSocket?.off('userJoinedRoom');
-				// globalState.userSocket?.off('userAddedToFriendRoom');
 				globalState.userSocket?.off('userIsUnban');
 				globalState.userSocket?.off('userIsBan');
 				globalState.userSocket?.off('kickUser');
+				globalState.userSocket?.off('userAddedToRoom');
 		}
 
 	}, [globalState?.userSocket]);

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Inject, forwardRef } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import { Repository } from 'typeorm';
@@ -21,6 +21,8 @@ import { UpdateIsPublicDto } from './dto/updateIsPublicDto.dto';
 import { UpdateProtectFalseDto } from './dto/updateProtectFalseDto.dto';
 import { DeleteConversationDto } from './dto/deleteConversationDto.dto';
 import { MuteUserDto } from './dto/muteUserDto.dto';
+import { DMcreationDto } from './dto/DMcreationDto.dto';
+import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class ChatService {
@@ -33,6 +35,8 @@ export class ChatService {
 		private groupMemberRepository: Repository<GroupMember>,
 		@InjectRepository(User)
 		private usersRepository: Repository<User>,
+		@Inject(forwardRef(() => UsersService))
+		private userService: UsersService,
 	) {}
 
 	/**************************************************************/
@@ -899,40 +903,70 @@ export class ChatService {
 		throw new Error("Fatal error");
 	}
 	
-	async createFriendsConversation(initiator: User, friend: User): Promise<Conversation> {
+	async createDMConversation(initiator: User, friend: User): Promise<Conversation> {
 		
-		const room = new Conversation();
-		room.name = initiator.username + friend.username;
-		room.is_channel = false;
-		await this.conversationRepository.save(room);
-		
-		if (room) {
+		// We first check if there is not already a conversation between the two users
+		const conversationCheck = await this.userService.findDMConversation(initiator, friend);
+
+		console.log("CONV check ==> ", conversationCheck);
+		// If not, we can create the DM conversation
+		if (!conversationCheck) {
+			const room = new Conversation();
+			room.name = initiator.username + friend.username;
+			room.is_channel = false;
+			await this.conversationRepository.save(room);
 			
-			const roomGroupInitiator = new GroupMember();
-			roomGroupInitiator.isAdmin = false;
-			roomGroupInitiator.joined_datetime = new Date();
-			roomGroupInitiator.conversation = room;
-			await this.groupMemberRepository.save(roomGroupInitiator);
-			
-			const roomGroupFriend = new GroupMember();
-			roomGroupFriend.isAdmin = false;
-			roomGroupFriend.joined_datetime = new Date();
-			roomGroupFriend.conversation = room;
-			await this.groupMemberRepository.save(roomGroupFriend);
-			
-			if (roomGroupInitiator && roomGroupFriend) {
+			if (room) {
 				
-				friend.groups.push(roomGroupFriend);
-				await this.usersRepository.save(friend);
+				const roomGroupInitiator = new GroupMember();
+				roomGroupInitiator.isAdmin = false;
+				roomGroupInitiator.joined_datetime = new Date();
+				roomGroupInitiator.conversation = room;
+				await this.groupMemberRepository.save(roomGroupInitiator);
 				
-				initiator.groups.push(roomGroupInitiator);
-				await this.usersRepository.save(initiator);
+				const roomGroupFriend = new GroupMember();
+				roomGroupFriend.isAdmin = false;
+				roomGroupFriend.joined_datetime = new Date();
+				roomGroupFriend.conversation = room;
+				await this.groupMemberRepository.save(roomGroupFriend);
 				
-				return room;
+				if (roomGroupInitiator && roomGroupFriend) {
+					
+					friend.groups.push(roomGroupFriend);
+					await this.usersRepository.save(friend);
+					
+					initiator.groups.push(roomGroupInitiator);
+					await this.usersRepository.save(initiator);
+					
+					return room;
+				}
 			}
 		}
 		
 		return ;
+	}
+
+	async createPrivateConversation(DMcreationDto: DMcreationDto): Promise<Conversation> {
+
+		const user1 = await this.usersRepository.findOne({
+			where: { id: DMcreationDto.user1 },
+			relations: ['groups', 'groups.conversation'],
+		});
+
+		const user2 = await this.usersRepository.findOne({
+			where: { id: DMcreationDto.user2 },
+			relations: ['groups', 'groups.conversation'],
+		});
+
+		if (user1 && user2) {
+			const dm = await this.createDMConversation(user1, user2);
+			console.log("DM result: ", dm);
+			if (dm) {
+				return dm;
+			}
+		}
+
+		throw new Error("Fatal error");
 	}
 	
 	// Let admins update conversation to private/public and add/remove password
@@ -965,7 +999,7 @@ export class ChatService {
 		
 		const user = await this.usersRepository.findOne({
 			where: { id: conversationDto.userID},
-			relations: ['groups'],
+			relations: ['groups', 'groups.conversation'],
 		});
 		
 		// verifier si conv existe pas deja

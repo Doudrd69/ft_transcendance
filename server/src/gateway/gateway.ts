@@ -143,7 +143,7 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		const { convID, convName, friend } = data;
 		console.log("==== addUserToRoom Event ====");
 		console.log("Emit to add ", friend," to room : ", convName + convID);
-		this.server.to(friend).emit('userAddedToFriendRoom', {
+		this.server.to(friend).emit('userAddedToRoom', {
 			convID: convID,
 			convName: convName,
 		});

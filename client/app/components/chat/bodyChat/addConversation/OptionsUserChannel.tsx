@@ -20,6 +20,10 @@ interface OptionsUserChannelProps {
 	me : User
 }
 
+interface Conversation {
+	name: string,
+	id: number,
+}
 
 const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) => {
 
@@ -323,28 +327,53 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 	}
 	
 	const handleDms = async() => {
+
 		try {
-			const createConversationDto = {
-				initiatorID: Number(sessionStorage.getItem("currentUserID")),
-				recipientID: user.id,
+
+			const createDMConversationDto = {
+				user1: Number(user.id),
+				user2: Number(sessionStorage.getItem("currentUserID")),
 			}
 			
-			const response = await fetch(`http://localhost:3001/chat/createConversation`, {
+			console.log(createDMConversationDto);
+			const response = await fetch(`http://localhost:3001/chat/newDMConversation`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
 					'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
 				},
-				body: JSON.stringify(createConversationDto),
+				body: JSON.stringify(createDMConversationDto),
 			});
 	
 			if (response.ok) {
-				const conversation = await response.json();
+				const conversation : Conversation = await response.json();
+				console.log(conversation);
+				console.log(conversation.name);
+				
 				dispatch({ type: 'SET_CURRENT_CONVERSATION', payload: conversation.name });
 				dispatch({ type: 'SET_CURRENT_ROOM', payload: conversation.name });
 				dispatch({ type: 'SET_CURRENT_CONVERSATION_ID', payload: conversation.id });
-				dispatch({ type: 'DISABLE', payload: 'showOptionsUserChannel' });
-				dispatch({ type: 'ACTIVATE', payload: 'showChat' });
+				
+				// Current user joins the room
+				globalState.userSocket?.emit('joinRoom', { roomName: conversation.name, roomID: conversation.id } );
+				// Emit to the targeted user so he joins the room
+				globalState.userSocket?.emit('addUserToRoom', {
+					convID: conversation.id,
+					convName: conversation.name,
+					friend: user.login,
+				});
+				// Emit to refresh DM list
+				globalState.userSocket?.emit('refreshUser', {
+					userToRefresh: user.username,
+					target: 'refreshDmList',
+					status: true
+				});
+				
+				// dispatch({ type: 'DISABLE', payload: 'showOptionsUserChannel' });
+				// dispatch({ type: 'DISABLE', payload: 'showOptionsUserChannelOwner' });
+				// dispatch({ type: 'DISABLE', payload: 'showChannel' });
+				// dispatch({ type: 'ACTIVATE', payload: 'showChat' });
+
 				console.log("Conversation created");
 			}
 		}
@@ -372,20 +401,6 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 			document.removeEventListener('keydown', handleEscape);
 		};
 	}, []);
-
-	// Refresh handler
-	// useEffect(() => {
-
-	// 	globalState.userSocket.on('adminChange', (flag: boolean) => {
-	// 		console.log("COUCOCUOCUOCUOCOCUCUOUCCU");
-	// 		setAdmin(flag);
-	// 	});
-
-	// 	return () => {
-	// 		globalState.userSocket?.off('adminChange');
-	// 	}
-
-	// }, [globalState?.userSocket]);
 
 	return (
 		<>

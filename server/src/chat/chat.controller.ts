@@ -16,6 +16,7 @@ import { UpdateIsPublicDto } from './dto/updateIsPublicDto.dto';
 import { UpdateProtectFalseDto } from './dto/updateProtectFalseDto.dto';
 import { DeleteConversationDto } from './dto/deleteConversationDto.dto';
 import { MuteUserDto } from './dto/muteUserDto.dto';
+import { DMcreationDto } from './dto/DMcreationDto.dto';
 
 @Controller('chat')
 export class ChatController {
@@ -26,6 +27,13 @@ export class ChatController {
 	@Post('newConversation')
 	createNewConversation(@Body() conversationDto: ConversationDto): Promise<Conversation> {
 		return this.chatService.createConversation(conversationDto);
+	}
+
+	@UseGuards(AuthGuard)
+	@HttpCode(HttpStatus.OK)
+	@Post('newDMConversation')
+	createNewDMConversation(@Body() DMcreationDto: DMcreationDto): Promise<Conversation> {
+		return this.chatService.createPrivateConversation(DMcreationDto);
 	}
 
 	@UseGuards(AuthGuard)
