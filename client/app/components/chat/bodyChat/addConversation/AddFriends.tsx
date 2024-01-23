@@ -34,15 +34,15 @@ const AddFriendComponent: React.FC<AddFriendComponentProps> = ({ updateFriends, 
 			});
 
 			if (response.ok) {
-				  dispatch({ type: 'TOGGLEX', payload: 'refreshFriendsList' });
-
+				
 				const data = await response.json();
 				console.log("Return ", data);
 				if (!data) {
 					console.log("Request denied, please enter a valid username");
 					return;
 				}
-
+				
+				dispatch({ type: 'TOGGLEX', payload: 'refreshFriendsList' });
 				dispatch({ type: 'DISABLE', payload: 'showAddChannel' });
 				dispatch({ type: 'DISABLE', payload: 'showAddUser' });
 				dispatch({ type: 'DISABLE', payload: 'showAddFriend' });
