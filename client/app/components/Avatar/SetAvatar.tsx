@@ -31,7 +31,6 @@ const SetComponent : React.FC = () => {
 			fetchData();
 	}, [globalState.showAvatar, globalState.showUploadAvatar]);
 
-	console.log('etat dans useEffect', globalState);
 	return null;
 	};
 

@@ -78,6 +78,7 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 	};
 
 	const loadUserList = async () => {
+
 		try {
 			const response = await fetch(`http://localhost:3001/chat/getUserlist/${state.currentConversationID}`, {
 				method: 'GET',
@@ -88,13 +89,11 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 	
 			if (response.ok) {
 				const userList = await response.json();
-				// console.log("userlist dans le fetch: ", userList);
 				setUserList([...userList]);
-				console.log("userlist dans le fetch: ", userList);
 			}
-			} catch (error) {
-				console.log(error);
-			}
+		} catch (error) {
+			console.log(error);
+		}
 	}
 
 	useEffect(() => {
@@ -120,7 +119,6 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 		});
 
 		globalState.userSocket?.on('refresh_channel', () => {
-			console.log("REFRESH CHANNEL");
 			loadUserList();
 		});
 		
@@ -172,7 +170,6 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 			</div>
 			<div className='list-users-channel'>
 				{userList && userList?.map((user: User, index: number) => (
-					console.log("user in bouceule: ", user.login),
 					<div key={index} className='user-list-item'>
 						{user?.isAdmin && !user?.isOwner &&
 							<div className='avatar-container'>

@@ -6,7 +6,6 @@ const BackButtonComponent: React.FC = () => {
 
 	const { state, dispatch } = useChat();
 	const handleCancel = () => {
-			console.log("MEEEEEEEEEEEEEEEEEEEEEEE");
 			dispatch({ type: 'DISABLE', payload: 'showChat' });
 			dispatch({ type: 'DISABLE', payload: 'showChannel' });
 			dispatch({ type: 'DISABLE', payload: 'showOptionsUserChannel' });

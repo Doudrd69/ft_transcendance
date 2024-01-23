@@ -77,8 +77,7 @@ export class UsersService {
 			if (!user) {
 				throw new Error("user not found");
 			}
-			console.log("uploadAvatarURL", avatarURL);
-			// Mettez à jour uniquement l'avatarURL
+
 			const updateResult = await this.usersRepository.update({ id: userID }, { avatarURL });
 			return updateResult;
 		} catch (error) {
@@ -320,9 +319,13 @@ export class UsersService {
 
 		if (initiator) {
 
-			const friendshipAlreadyExists: Friendship = await this.friendshipRepository.findOne({
-				where: { initiator: initiator, friend: recipient },
-			});
+			const friendshipAlreadyExists = await this.friendshipRepository
+				.createQueryBuilder('friendship')
+				.where('(friendship.initiator.id = :initiatorId AND friendship.friend.id = :friendId) OR (friendship.initiator.id = :friendId AND friendship.friend.id = :initiatorId)', {
+					initiatorId: initiator.id,
+					friendId: recipient.id,
+				})
+				.getOne();
 
 			if (!friendshipAlreadyExists) {
 
@@ -349,7 +352,7 @@ export class UsersService {
 			user2.groups.forEach((userTwoGroup: GroupMember) => {
 				if ((userOneGroup.conversation.id == userTwoGroup.conversation.id) &&
 					(!userOneGroup.conversation.is_channel && !userTwoGroup.conversation.is_channel)) {
-						console.log("== found DM ==");
+						console.log("== found common DM ==");
 						console.log(userOneGroup.conversation);
 						conversation = userOneGroup.conversation;
 						return;
@@ -372,13 +375,7 @@ export class UsersService {
 			relations: ["initiatedFriendships", "acceptedFriendships", "groups", "groups.conversation"],
 		});
 
-		// empecher de demander 15 fois en ami + de pas recreer la conv si existe deja
 		if (initiator && friend) {
-
-			// pour eviter les erreurs : chercher dans les 2 sens
-			// const friendshipToUpdate = await this.friendshipRepository.findOne({
-			// 	where: { initiator: { id: initiator.id }, friend: { id: friend.id } },
-			// });
 
 			const friendshipToUpdate = await this.friendshipRepository
 				.createQueryBuilder('friendship')
@@ -486,7 +483,6 @@ export class UsersService {
 
 	async getFriendships(username: string): Promise<Friendship[]> {
 
-		console.log(username, "friend list loading...");
 		const user: User = await this.usersRepository.findOne({ where: { username: username } });
 
 		const initiatedfriends = await this.friendshipRepository

@@ -23,7 +23,6 @@ const PasswordChangeComponent: React.FC = () => {
 				state: state.currentConversationIsProtected,
 				password: password,
 			}
-			console.log("HANDLE PROTECTED: ", channelOptionDto);
 
 			const response = await fetch(`http://localhost:3001/chat/updateIsProtectedTrue`, {
 				method: 'POST',
@@ -41,7 +40,7 @@ const PasswordChangeComponent: React.FC = () => {
 				dispatch({ type: 'DISABLE', payload: 'showPasswordChange' });
 			};} 
 			catch (error) {
-			console.log(error);
+				console.log(error);
 			}
 	}
 

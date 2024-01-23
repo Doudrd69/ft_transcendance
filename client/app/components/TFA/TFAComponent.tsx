@@ -31,7 +31,6 @@ const TFAComponent: React.FC<TFAComponentProps>  = ({ on2FADone　}) => {
 			});
 	
 			if (response.ok) {
-				console.log("-- Code OK, 2FA ENABLED --");
 				on2FADone();
 			}
 		}

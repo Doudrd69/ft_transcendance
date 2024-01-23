@@ -99,7 +99,6 @@ const ListMyChannelComponent: React.FC<ListMyChannelComponentProps> = ({ user, i
 			if (response.ok) {
 				const conversation = await response.json();
 
-				console.log("ADD USER TO CONVERSATION: ", friend);
 				if (globalState.userSocket?.connected) {
 
 					// on utilise la meme pour inviter et rejoindre --> probleme
@@ -119,7 +118,6 @@ const ListMyChannelComponent: React.FC<ListMyChannelComponentProps> = ({ user, i
 						channel: conversation.name + conversation.id,
 					});
 
-					console.log("User has been successfully added to channel ", conversation.name);
 					dispatch({ type: 'TOGGLEX', payload: 'showAddCreateChannel' });
 					dispatch({ type: 'TOGGLEX', payload: 'showAddChannel' });
 				}

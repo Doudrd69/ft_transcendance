@@ -231,7 +231,6 @@ export const setCurrentFriend = (payload: string | null): Action => ({
 // });
 
 export const setCurrentComponent = (payload: string | null): Action => {
-	console.log("payload =====> ", payload);
 	return {
 	  type: 'SET_CURRENT_COMPONENT',
 	  payload,

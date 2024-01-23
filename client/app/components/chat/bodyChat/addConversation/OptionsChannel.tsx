@@ -43,7 +43,6 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 				conversationID: Number(state.currentConversationID),
 				userID: Number(sessionStorage.getItem("currentUserID")),
 			}
-			console.log("HANDLE PRIVATE: ", channelOptionDto);
 
 			const response = await fetch(`http://localhost:3001/chat/updateIsPublicTrue`, {
 				method: 'POST',
@@ -65,25 +64,23 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 	const updateIsPublicFalse = async() => {
 
 		try {
-		const channelOptionDto = {
-			conversationID: Number(state.currentConversationID),
-			userID: Number(sessionStorage.getItem("currentUserID")),
-		}
-		console.log("HANDLE PRIVATE: ", channelOptionDto);
+			const channelOptionDto = {
+				conversationID: Number(state.currentConversationID),
+				userID: Number(sessionStorage.getItem("currentUserID")),
+			}
 
-		const response = await fetch(`http://localhost:3001/chat/updateIsPublicFalse`, {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-				'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
-			},
-			body: JSON.stringify(channelOptionDto),
-		});
+			const response = await fetch(`http://localhost:3001/chat/updateIsPublicFalse`, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
+				},
+				body: JSON.stringify(channelOptionDto),
+			});
 
-		if (response.ok) {
-			dispatch({ type: 'DISABLE', payload: 'currentConversationIsPrivate' });
-			console.log("Updated status");
-		}
+			if (response.ok) {
+				dispatch({ type: 'DISABLE', payload: 'currentConversationIsPrivate' });
+			}
 		}
 		catch (error) {
 			console.error(error);
@@ -110,7 +107,6 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 			if (response.ok) {
 
 				// makes everyone in the channel leave + refresh component
-				console.log(state.currentConversationID);
 				globalState.userSocket?.emit('deleteChannel', {
 					roomName: state.currentConversation,
 					roomID: state.currentConversationID,
@@ -147,16 +143,14 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 	
 			if (response.ok) {
 				const status = await response.json();
-				console.log(status);
 				if (status) {
 					dispatch({ type: 'DISABLE', payload: 'currentConversationIsProtected' });
-					console.log("Password updated");
 				}
 				else {
 					console.log("User is not admin on this channel");
 				}
 
-		}
+			}
 		}
 		catch (error) {
 			console.error(error);

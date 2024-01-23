@@ -129,7 +129,6 @@ export class ChatController {
 	@Post('updateIsPublicTrue')
 	updateChannelIsPublicStatusTrue(@Req() req, @Body() updateIsPublicDto: UpdateIsPublicDto){
 		const { user } = req;
-		console.log("TEST DU CONTROLLER MDR ", user);
 		return this.chatService.updateChannelPublicStatusToTrue(updateIsPublicDto, user);
 	}
 
@@ -138,7 +137,6 @@ export class ChatController {
 	@Post('updateIsPublicFalse')
 	updateChannelIsPublicStatusFalse(@Req() req, @Body() updateIsPublicDto: UpdateIsPublicDto){
 		const { user } = req;
-		console.log("TEST DU CONTROLLER MDR ", user);
 		return this.chatService.updateChannelPublicStatusToFalse(updateIsPublicDto, user);
 	}
 
@@ -191,7 +189,6 @@ export class ChatController {
 	@UseGuards(AuthGuard)
 	@Get('getConversationsPublic/:userID')
 	getConversationsPublicOption(@Param('userID') userID: number)  {
-		console.log("userID", userID);
 		return this.chatService.getAllPublicConversationsOption(userID);
 	}
 
