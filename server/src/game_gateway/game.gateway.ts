@@ -205,6 +205,7 @@ export class GameGateway {
         }
 
     }
+
 }
 
 /** Liste des choses a faire :

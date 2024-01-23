@@ -98,6 +98,8 @@ export class GameService {
         UserTwo.inGame = false;
         this.usersRepository.save(UserOne);
         this.usersRepository.save(UserTwo);
+        game.playerOneID = String(UserOne.id);
+        game.playerTwoID = String(UserTwo.id);
         game.gameEnd = true;
         game.scoreOne = gameInstance.player1_score;
         game.scoreTwo = gameInstance.player2_score;
