@@ -8,6 +8,7 @@ import { Ball } from '../entities/ball.entity';
 import { VectorService } from './vector.service';
 import { ball_instance, paddle_instance } from 'src/game_gateway/game.gateway';
 import { PaddleService } from './paddle.service';
+import { truncate } from 'fs';
 
 @Injectable()
 export class BallService {
@@ -95,7 +96,7 @@ export class BallService {
 		let resolution_normnitude = ball.r - this.VectorService.norm(resolution_vec);
 		ball.position = this.VectorService.add(ball.position, this.VectorService.scale(resolution_normnitude, resolution_vec_normal));
 	}
-
+ 
 	collision_resolution_bw(ball: ball_instance, paddle: paddle_instance) {
 		let normal = this.VectorService.normalize(this.VectorService.sub(ball.position, this.closestPointWithPaddle(ball, paddle)));
 		let normal_velocity = this.VectorService.dot(normal, ball.speed);

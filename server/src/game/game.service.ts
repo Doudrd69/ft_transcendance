@@ -92,18 +92,16 @@ export class GameService {
     }
 
     async endOfGame(game: Game, gameInstance: game_instance): Promise<Game> {
-
-        // User update
         const UserOne: User = await this.usersRepository.findOne({ where: { socketGame: gameInstance.players[0] } })
         const UserTwo: User = await this.usersRepository.findOne({ where: { socketGame: gameInstance.players[1] } })
-
-        // Game update
-        game.playerOneID = String(UserOne.id);
-        game.playerTwoID = String(UserTwo.id);
+        UserOne.inGame = false;
+        UserTwo.inGame = false;
+        this.usersRepository.save(UserOne);
+        this.usersRepository.save(UserTwo);
         game.gameEnd = true;
         game.scoreOne = gameInstance.player1_score;
         game.scoreTwo = gameInstance.player2_score;
-        await this.gameRepository.save(game);
+        this.gameRepository.save(game);
         return (game);
     }
 
