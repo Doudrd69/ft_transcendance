@@ -23,51 +23,46 @@ const AddConversationComponent: React.FC<AddConversationComponentProps> = ({ loa
 	const handleConversationCreation = async (e: React.FormEvent) => {
 		try{
 
-		e.preventDefault();
+			e.preventDefault();
 
-		const conversationDto = {
-			name: formValue,
-			userID: Number(sessionStorage.getItem("currentUserID")),
-			is_channel: isChannel,
-			isPublic: isPublic,
-			isProtected: isPassword,
-			password: !isPassword ? '' : passwordValue,
-		}
+			const conversationDto = {
+				name: formValue,
+				userID: Number(sessionStorage.getItem("currentUserID")),
+				is_channel: isChannel,
+				isPublic: isPublic,
+				isProtected: isPassword,
+				password: !isPassword ? '' : passwordValue,
+			}
 
-		console.log("DTO conv --> ", conversationDto);
+			const response = await fetch('http://localhost:3001/chat/newConversation', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`
+				},
+				body: JSON.stringify(conversationDto),
+			});
 
-		const response = await fetch('http://localhost:3001/chat/newConversation', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-				'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`
-			},
-			body: JSON.stringify(conversationDto),
-		});
+			if (response.ok) {
 
-		if (response.ok) {
+				const data = await response.json();
 
-			const data = await response.json();
-
-			if (globalState.userSocket?.connected) {
-				globalState.userSocket?.emit('joinRoom', { roomName: data.name, roomID: data.id }, () => {
-					console.log("Room creation loading...");
-				});
+				if (globalState.userSocket?.connected) {
+					globalState.userSocket?.emit('joinRoom', { roomName: data.name, roomID: data.id });
 				}
-	
+		
 				console.log("Conversation successfully created");
 				dispatch({ type: 'DISABLE', payload: 'showCreateChannel' });
 				dispatch({ type: 'DISABLE', payload: 'showAddCreateChannel' });
-	
 				dispatch({ type: 'TOGGLEX', payload: 'refreshChannel'});
-			
+				
 			}
-			}
-		catch(error)
-		{
+		}
+		catch(error) {
 			console.log(error);
 		}
 	};
+
 	const handleCancel = () => {
 		dispatch({ type: 'DISABLE', payload: 'showAddChannel' });
 		dispatch({ type: 'DISABLE', payload: 'showAddUser' });

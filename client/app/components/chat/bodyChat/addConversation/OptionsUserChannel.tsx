@@ -85,7 +85,6 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 			if (response.ok) {
 				user.isMute = !user.isMute;
 				setMute(true);
-				console.log("Mute");
 			}
 		}
 		catch (error) {
@@ -115,7 +114,6 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 			});
 		
 			if (response.ok) {
-				console.log("ban");
 				const status = await response.json();
 				user.isBan = !user.isBan;
 				setBan(true);
@@ -154,7 +152,6 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 			});
 		
 			if (response.ok) {
-				console.log("unban");
 				const status = await response.json();
 				user.isBan = !user.isBan;
 				setBan(false);
@@ -193,7 +190,6 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 		
 			if (response.ok) {
 				user.isAdmin = !user.isAdmin;
-				console.log("Promote");
 
 				if (state.currentConversation) {
 					globalState.userSocket?.emit('refreshChannel', {
@@ -234,7 +230,6 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 				body: JSON.stringify(userOptionDto),
 			});
 			if (response.ok) {
-				console.log("demote");
 				user.isAdmin = !user.isAdmin;
 
 				if (state.currentConversation) {
@@ -273,8 +268,6 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 			});
 	
 			if (response.ok) {
-				console.log(me);
-				console.log(user);
 				if (user.login == me.login)
 				{
 					// je quitte le channel donc faut refresh le composant pour les autres
@@ -328,8 +321,7 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 				user1: Number(user.id),
 				user2: Number(sessionStorage.getItem("currentUserID")),
 			}
-			
-			console.log(createDMConversationDto);
+
 			const response = await fetch(`http://localhost:3001/chat/newDMConversation`, {
 				method: 'POST',
 				headers: {
@@ -341,8 +333,6 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 	
 			if (response.ok) {
 				const conversation : Conversation = await response.json();
-				console.log(conversation);
-				console.log(conversation.name);
 				
 				dispatch({ type: 'SET_CURRENT_CONVERSATION', payload: conversation.name });
 				dispatch({ type: 'SET_CURRENT_ROOM', payload: conversation.name });

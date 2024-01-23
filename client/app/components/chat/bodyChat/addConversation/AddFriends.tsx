@@ -36,7 +36,6 @@ const AddFriendComponent: React.FC<AddFriendComponentProps> = ({ updateFriends, 
 			if (response.ok) {
 				
 				const data = await response.json();
-				console.log("Return ", data);
 				if (!data) {
 					console.log("Request denied, please enter a valid username");
 					return;
@@ -48,13 +47,8 @@ const AddFriendComponent: React.FC<AddFriendComponentProps> = ({ updateFriends, 
 				dispatch({ type: 'DISABLE', payload: 'showAddFriend' });
 
 				if (globalState.userSocket?.connected) {
-
-					globalState.userSocket?.emit('joinRoom', { roomName: data.name, roomID: data.id }, () => {
-						console.log("Room creation loading...");
-					});
-
+					globalState.userSocket?.emit('joinRoom', { roomName: data.name, roomID: data.id });
 					globalState.userSocket?.emit('addFriend', friendRequestDto);
-
 				}
 			}
 		} catch (error) {

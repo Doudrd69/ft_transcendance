@@ -120,7 +120,6 @@ export class UsersController {
 		try {
 			const avatarURL = await this.usersService.getAvatar(userId);
 			if (!avatarURL) {
-				console.log('getUserAvatar erreur');
 				throw new Error("Avatar not found");
 			}
 			res.setHeader('Content-Type', 'image/*'); 

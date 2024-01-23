@@ -53,7 +53,6 @@ const ProfilsSettingsComponent: React.FC = () => {
 			if (response.ok) {
 				const userName = await response.json();
 				const { newUsername } = userName;
-				console.log("newusername: ", newUsername);
 				if (!userName) {
 					toast.warn("Error: username is already used");
 					return ;
@@ -85,7 +84,6 @@ const ProfilsSettingsComponent: React.FC = () => {
 				body: formData,
 			});
 			if (response.ok){
-				console.log('Image envoyée avec succès au backend');
 				dispatch({ type: 'ACTIVATE', payload: 'showAvatar' });
 				dispatch({ type: 'DISABLE', payload: 'showUploadAvatar' });
 				dispatch({ type: 'TOGGLEX', payload: 'showRefresh'});

@@ -77,8 +77,7 @@ export class UsersService {
 			if (!user) {
 				throw new Error("user not found");
 			}
-			console.log("uploadAvatarURL", avatarURL);
-			// Mettez à jour uniquement l'avatarURL
+
 			const updateResult = await this.usersRepository.update({ id: userID }, { avatarURL });
 			return updateResult;
 		} catch (error) {
@@ -353,7 +352,7 @@ export class UsersService {
 			user2.groups.forEach((userTwoGroup: GroupMember) => {
 				if ((userOneGroup.conversation.id == userTwoGroup.conversation.id) &&
 					(!userOneGroup.conversation.is_channel && !userTwoGroup.conversation.is_channel)) {
-						console.log("== found DM ==");
+						console.log("== found common DM ==");
 						console.log(userOneGroup.conversation);
 						conversation = userOneGroup.conversation;
 						return;
@@ -484,7 +483,6 @@ export class UsersService {
 
 	async getFriendships(username: string): Promise<Friendship[]> {
 
-		console.log(username, "friend list loading...");
 		const user: User = await this.usersRepository.findOne({ where: { username: username } });
 
 		const initiatedfriends = await this.friendshipRepository

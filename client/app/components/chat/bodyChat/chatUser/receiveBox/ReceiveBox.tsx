@@ -47,7 +47,6 @@ const ReceiveBoxComponent: React.FC = () => {
 	const getMessage = async () => {
 
 		try {
-			console.log("Get conversation ", state.currentConversationID);
 			const response = await fetch(`http://localhost:3001/chat/getMessages/${state.currentConversationID}`, {
 				method: 'GET',
 				headers: {
@@ -81,7 +80,6 @@ const ReceiveBoxComponent: React.FC = () => {
 	
 	// Loading the conversation (retrieving all messages on component rendering)
 	useEffect(() => {
-		console.log("Loading DM conversation...");
 		getMessage();
 	}, []);
 

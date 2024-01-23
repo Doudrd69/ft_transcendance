@@ -181,7 +181,6 @@ const GeneralComponent = () => {
 			globalState.userSocket?.on('userJoinedRoom', (notification: string) => {
 				console.log("User socket in main: ", globalState.userSocket?.id);
 				console.log("Notif from server: ", notification);
-				// on peut toast ici ou gerer autrement
 			});
 
 			globalState.userSocket?.on('userIsBan', ( data: { roomName: string, roomID: string } ) => {
@@ -207,7 +206,6 @@ const GeneralComponent = () => {
 
 			globalState.userSocket?.on('userAddedToRoom', (data: {convID: number, convName: string}) => {
 				const { convID, convName } = data;
-				console.log("Add user to room = ", convName + convID);
 				globalState.userSocket?.emit('joinRoom', {roomName: convName, roomID: convID});
 			});
 	
@@ -267,7 +265,6 @@ const GeneralComponent = () => {
 		})
 
 		return () => {
-			console.log('Unregistering events...');
 			gameSocket.off('connect');
 			gameSocket.off('disconnect');
 		}
