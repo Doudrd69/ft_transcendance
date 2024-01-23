@@ -9,7 +9,7 @@ import { Ball } from './entities/ball.entity';
 import { BallService } from './gameObject/ball.service';
 import { VectorService } from './gameObject/vector.service';
 import { Vector } from './entities/vector.entity';
-import { Game_instance, ball_instance, vector_instance } from 'src/game_gateway/game.gateway';
+import { game_instance, ball_instance, vector_instance } from 'src/game_gateway/game.gateway';
 // import { serverHooks } from 'next/dist/server/app-render/entry-base';
 
 @Injectable()
@@ -46,7 +46,7 @@ export class GameEngineService {
 		const paddleFourStart: vector_instance = { x: 0, y: 1 };
 		const paddleFourEnd: vector_instance = { x: 1, y: 1 };
 		let signe = (Math.random() - 0.5) > 0 ? 1 : -1;
-		const newGame: Game_instance = {
+		const newGame: game_instance = {
 			game_has_started: true,
 			game_has_ended: false,
 			gameID: game.gameId,
@@ -63,7 +63,7 @@ export class GameEngineService {
 			players: [game.playerOneID, game.playerTwoID],
 			playersLogin: [game.playerOneLogin, game.playerTwoLogin],
 			super_game_mode: false,
-			victory_condition: 5,
+			victory_condition: 1,
 			paddles: [
 				{ number: 1, x: 0, y: 0.415, speed: 1 / 60, up: false, down: false, end: { x: 0, y: 0.585 }, start: { x: 0, y: 0.415 }, is_a_paddle: true, length: this.VectorService.mag(this.VectorService.sub(paddleOneEnd, paddleOneStart)) },
 				{ number: 2, x: 1 - 0.025, y: 0.415, speed: 1 / 60, up: false, down: false, end: { x: 1 - 0.025, y: 0.585 }, start: { x: 1 - 0.025, y: 0.415 }, is_a_paddle: true, length: this.VectorService.mag(this.VectorService.sub(paddleTwoEnd, paddleTwoStart)) },
@@ -74,7 +74,7 @@ export class GameEngineService {
 		return newGame;
 	}
 
-	async game_input(input: string, gameInstance: Game_instance, playerID: string) {
+	async game_input(input: string, gameInstance: game_instance, playerID: string) {
 		console.log("Input detected");
 		if (playerID === gameInstance.players[0]) {
 			this.PaddleService.process_input(gameInstance.paddles[0], input);
@@ -88,7 +88,7 @@ export class GameEngineService {
 			console.log("No Player find in GameEngine for this Input");
 	}
 
-	async paddleLeftInput(input: string, gameInstance: Game_instance) {
+	async paddleLeftInput(input: string, gameInstance: game_instance) {
 		if (input === "ArrowUp") {
 			this.paddleLeftUp(gameInstance);
 		}
@@ -99,7 +99,7 @@ export class GameEngineService {
 			console.log("Wrong PaddleLeftInput try something like ArrowUp or ArrowDown")
 	}
 
-	async paddleRightInput(input: string, gameInstance: Game_instance) {
+	async paddleRightInput(input: string, gameInstance: game_instance) {
 		if (input === "ArrowUp") {
 			this.paddleRightUp(gameInstance);
 		}
@@ -110,19 +110,19 @@ export class GameEngineService {
 			console.log("Wrong PaddleRightInput try something like ArrowUp or ArrowDown")
 	}
 
-	async paddleRightUp(gameInstance: Game_instance) {
+	async paddleRightUp(gameInstance: game_instance) {
 		this.PaddleService.updatePaddlePosition(gameInstance.paddles[1]);
 	}
 
-	async paddleRightDown(gameInstance: Game_instance) {
+	async paddleRightDown(gameInstance: game_instance) {
 		this.PaddleService.updatePaddlePosition(gameInstance.paddles[1]);
 	}
 
-	async paddleLeftDown(gameInstance: Game_instance) {
+	async paddleLeftDown(gameInstance: game_instance) {
 		this.PaddleService.updatePaddlePosition(gameInstance.paddles[0]);
 	}
 
-	async paddleLeftUp(gameInstance: Game_instance) {
+	async paddleLeftUp(gameInstance: game_instance) {
 		this.PaddleService.updatePaddlePosition(gameInstance.paddles[0]);
 	}
 
@@ -169,7 +169,7 @@ export class GameEngineService {
 	// 	return (gameEngine);
 	// }
 
-	updateGameInstance(gameInstance: Game_instance, server: any) {
+	updateGameInstance(gameInstance: game_instance, server: any) {
 		const paddleOneStart: vector_instance = { x: 0, y: 0.415 };
 		const paddleOneEnd: vector_instance = { x: 0, y: 0.585 };
 

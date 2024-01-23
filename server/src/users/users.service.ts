@@ -14,6 +14,7 @@ import { existsSync, unlinkSync } from 'fs';
 import { BlockUserDto } from './dto/BlockUserDto.dto';
 import { Conversation } from 'src/chat/entities/conversation.entity';
 import { GroupMember } from 'src/chat/entities/group_member.entity';
+import { Game } from 'src/game/entities/games.entity';
 import * as Jimp from 'jimp';
 import { promisify } from 'util';
 import * as fs from 'fs';
@@ -25,6 +26,8 @@ export class UsersService {
 		private usersRepository: Repository<User>,
 		@InjectRepository(Friendship)
 		private friendshipRepository: Repository<Friendship>,
+		@InjectRepository(Game)
+		private gameRepository: Repository<Game>,
 		@Inject(forwardRef(() => ChatService))
 		private chatService: ChatService,
 	) { }
@@ -245,53 +248,37 @@ export class UsersService {
 	// 	throw new Error("Fatal error");
 	// }
 
-	// /**************************************************************/
-	// /***				GAMES MANAGEMENT					***/
-	// /**************************************************************/
+	/**************************************************************/
+	/***				GAMES MANAGEMENT						***/
+	/**************************************************************/
 
-	// // faudra peut etre faire comme pour les conversations (des Group)
-	// async saveGame(game: Game, userOneID: number, userTwoID: number) {
+	async getUserGames(userID: number) {
 
-	// 	const userOne : User = await this.usersRepository.findOne({
-	// 		where: { id: userOneID },
-	// 		relations: ['games'],
-	// 	});
+		const user : User = await this.usersRepository.findOne({
+			where: { id: userID },
+		});
 
-	// 	const userTwo : User = await this.usersRepository.findOne({
-	// 		where: { id: userTwoID },
-	// 		relations: ['games'],
-	// 	});
+		if (user) {
 
-	// 	// la "game" est deja sauvegarde dans la table Game
-	// 	// peut etre creer deux nouvelles instances games, avec les meme donnees comme ca pas de soucis de FK?
-	// 	// voir systeme avec GameGroup
-	// 	if (userOne && userTwo) {
+			const userGames = await this.gameRepository
+				.createQueryBuilder('game')
+				.where('(game.playerOneID = :id) OR (game.playerTwoID = :id)', { id: user.id })
+				.getMany()
 
-	// 		userOne.games.push(game);
-	// 		await this.usersRepository.save(userOne);
+			console.log(`User ${user.username} games history: `);
+			let array = [];
+			userGames.forEach((game: Game) => {
+				console.log(game);
+				array.push(game);
+			});
 
-	// 		userTwo.games.push(game);
-	// 		await this.usersRepository.save(userTwo);
+			if (array) {
+				return array;
+			}
+		}
 
-	// 		return ;
-	// 	}
-
-	// 	throw new Error('Fatal error');
-	// }
-
-	// async getUserGames(userID: number) {
-
-	// 	const user : User = await this.usersRepository.findOne({
-	// 		where: { id: userID },
-	// 		relations: ['games'],
-	// 	});
-
-	// 	if (user) {
-	// 		return user.games;
-	// 	}
-
-	// 	throw new Error('Fatal error');
-	// }
+		throw new Error('Fatal error');
+	}
 
 	/**************************************************************/
 	/***				FRIENDSHIP MANAGEMENT					***/

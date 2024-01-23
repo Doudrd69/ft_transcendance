@@ -185,8 +185,15 @@ export class UsersController {
 		return this.usersService.getFriendships(username);
 	}
 
+	@UseGuards(AuthGuard)
 	@Get('getPendingFriends/:username')
 	getPendingFriendsList(@Param('username') username: string): Promise<Friendship[]> {
 		return this.usersService.getPendingFriendships(username);
+	}
+
+	@UseGuards(AuthGuard)
+	@Get('getGameHistory/:userID')
+	getUserGamehistory(@Param('userID') userID: number) {
+		return this.usersService.getUserGames(userID);
 	}
 }

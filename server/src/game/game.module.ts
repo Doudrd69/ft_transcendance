@@ -31,5 +31,4 @@ import { GameEngineService } from './gameEngine.service';
   providers: [GameService, MatchmakingService, PaddleService, BallService, VectorService, GameEngineService],
   exports: [GameService],
 })
-export class GameModule {
-}
+export class GameModule {}

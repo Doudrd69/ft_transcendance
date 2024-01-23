@@ -22,4 +22,7 @@ export class Game {
 
 	@Column()
 	scoreTwo: number;
+
+	@Column({ default: false})
+	gameEnd: boolean;
 }
