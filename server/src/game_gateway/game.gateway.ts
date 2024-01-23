@@ -89,7 +89,7 @@ export class GameGateway {
 
     handleDisconnect(@ConnectedSocket() client: Socket) {
         console.log(`GameGtw client disconnected : ${client.id}`);
-
+        //faire un inmatchmaking fasle et ingamefalse, faire de meme avec le ingame de l'autre joueur (faire un emit pour quitter le jeu)
         delete this.connectedUsers[client.id];
         // client.leave(`user_game${client.id}`);
     }
@@ -107,6 +107,7 @@ export class GameGateway {
     @SubscribeMessage('join-matchmaking')
     async handleJoinMatchmaking(client: Socket, playerLogin: string): Promise<String> {
         console.log("JOINMATCHMAKING");
+        // faire un if check inmatchmaking ou ingame false 
         this.MatchmakingService.join(client.id);
         const enoughPlayers = this.MatchmakingService.IsThereEnoughPairs();
         if (enoughPlayers) {
@@ -152,38 +153,48 @@ export class GameGateway {
     }
 
     @SubscribeMessage('Game_Input')
-    async handlePaddleMove(@ConnectedSocket() client: Socket, @MessageBody() data: { input: string, gameID: number, width: number, heigth: number }) {
+    async handlePaddleMove(@ConnectedSocket() client: Socket, @MessageBody() data: { input: string, gameID: number }) {
         for (let i = 0; i < this.game_instance.length; i++) {
             gameInstance = this.game_instance[i];
             if (gameInstance.gameID === data.gameID) {
-                this.GameEnginceService.game_input(data.input, gameInstance, client.id);
-                this.server.to([gameInstance.players[0], gameInstance.players[1]]).emit('GamePaddleUpdate', {
-                    BallPosition: { x: gameInstance.ball.position.x, y: gameInstance.ball.position.y },
-                    scoreOne: gameInstance.player1_score,
-                    scoreTwo: gameInstance.player2_score,
-                    paddleOne: { x: gameInstance.paddles[0].x, y: gameInstance.paddles[0].y },
-                    paddleTwo: { x: gameInstance.paddles[1].x, y: gameInstance.paddles[1].y },
-                })
+                if (gameInstance.ball.goal !== 3) {
+                    this.GameEnginceService.game_input(data.input, gameInstance, client.id);
+                    this.server.to([gameInstance.players[0], gameInstance.players[1]]).emit('GamePaddleUpdate', {
+                        BallPosition: { x: gameInstance.ball.position.x, y: gameInstance.ball.position.y },
+                        scoreOne: gameInstance.player1_score,
+                        scoreTwo: gameInstance.player2_score,
+                        paddleOne: { x: gameInstance.paddles[0].x - 0.025, y: gameInstance.paddles[0].y },
+                        paddleTwo: { x: gameInstance.paddles[1].x, y: gameInstance.paddles[1].y },
+                    })
+                }
                 break;
             }
         }
     }
 
     @SubscribeMessage('GameBackUpdate')
-    async handleGameUpdate(client: Socket, @MessageBody() data: { gameID: number, width: number, heigth: number }) {
+    async handleGameUpdate(client: Socket, @MessageBody() data: { gameID: number }) {
         for (let i = 0; i < this.game_instance.length; i++) {
             gameInstance = this.game_instance[i];
             if (gameInstance.gameID === data.gameID) {
                 if (gameInstance.game_has_ended !== true)
+                    
                     this.GameEnginceService.updateGameInstance(gameInstance, this.server);
                 this.server.to([gameInstance.players[0], gameInstance.players[1]]).emit('GameBallUpdate', {
                     BallPosition: { x: gameInstance.ball.position.x, y: gameInstance.ball.position.y },
                     scoreOne: gameInstance.player1_score,
                     scoreTwo: gameInstance.player2_score,
-                    paddleOne: { x: gameInstance.paddles[0].x, y: gameInstance.paddles[0].y },
+                    paddleOne: { x: gameInstance.paddles[0].x - 0.025, y: gameInstance.paddles[0].y },
                     paddleTwo: { x: gameInstance.paddles[1].x, y: gameInstance.paddles[1].y },
                 })
                 break;
+            }
+        }
+        if (gameInstance.game_has_ended === true) {
+            this.game = await this.GameService.getGameByID(gameInstance.gameID);
+            if (this.game.gameEnd !== true) {
+                this.GameService.endOfGame(this.game, gameInstance);
+                console.log("Save Game");
             }
         }
     }

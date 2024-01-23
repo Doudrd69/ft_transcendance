@@ -32,6 +32,7 @@ const Menu = (socket: { socket: Socket }) => {
                     payload: 'showGame',
                 });
                 state.showGame = true;
+                gameSocket.emit('Start_Game', (game: Game))
             })
         }   
         else {

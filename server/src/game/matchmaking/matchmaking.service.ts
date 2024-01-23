@@ -2,9 +2,18 @@ import { Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { User } from '../../users/entities/users.entity';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Game } from '../entities/games.entity';
 
 @Injectable()
 export class MatchmakingService {
+    constructor(
+        @InjectRepository(Game)
+        private gameRepository: Repository<Game>,
+        @InjectRepository(User)
+        private usersRepository: Repository<User>,
+
+        
+    ) { }
 
     public playersQueue: string[] = [];
 	
@@ -28,6 +37,9 @@ export class MatchmakingService {
 
     async join(playerID: string) {
 		this.playersQueue.push(playerID);
+        const newUser: User = await this.usersRepository.findOne({ where: { socketGame: playerID } })
+        newUser.inMatchmaking = true;
+        await this.usersRepository.save(newUser);
 		console.log("player rejoin the queue");
     }
 

@@ -12,6 +12,9 @@ export class User {
 	socketGame: string;
 
 	@Column({ default: false })
+	inMatchmaking: boolean;
+	
+	@Column({ default: false })
 	inGame: boolean;
 
 	@Column()

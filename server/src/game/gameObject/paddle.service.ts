@@ -24,15 +24,22 @@ export class PaddleService {
 	async updatePaddlePosition(paddle: paddle_instance) {
 		if (paddle.up) {
 			paddle.y -= paddle.speed;
+			paddle.start.y -= paddle.speed;
+			paddle.end.y -= paddle.speed;
 			if (paddle.y < 0)
 				paddle.y = 0;
+				paddle.start.y = 0;
+				paddle.end.y = 0;
 		}
 		else if (paddle.down) {
 			paddle.y -= (paddle.speed * -1);
+			paddle.start.y -= (paddle.speed * -1);
+			paddle.end.y -= (paddle.speed * -1);
 			if (paddle.y > 1 - paddle.length)
 				paddle.y = 1 - paddle.length;
+				paddle.start.y = 1 - paddle.length;
+				paddle.end.y = 1 - paddle.length;
 		}
-		console.log(`paddle y: ${paddle.y}`);
 	}
 
 	wallUnit(paddle: paddle_instance) {

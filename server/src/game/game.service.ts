@@ -6,21 +6,13 @@ import { GameModule } from './game.module';
 import { env } from 'process';
 import { User } from 'src/users/entities/users.entity';
 import { Paddle } from './entities/paddle.entity';
+import { Game_instance } from 'src/game_gateway/game.gateway';
 
 
 interface BallPosition {
 	x: number,
 	y: number,
 	r: number,
-}
-
-/**
- * use to share the game state
- */
-interface GameState {
-	BallPosition: BallPosition[],
-	paddleOne: {x: number, y: number },
-	paddleTwo: {x: number, y:number },
 }
 
 
@@ -46,6 +38,7 @@ export class GameService {
         game.playerTwoLogin = playersLogin[1];
         game.scoreOne = 0;
         game.scoreTwo = 0;
+        game.gameEnd = false;
         await this.gameRepository.save(game);
         return (game);
     }
@@ -64,13 +57,38 @@ export class GameService {
 
         const UserOne: User = await this.usersRepository.findOne({ where: { socketGame: player1ID } })
         const UserTwo: User = await this.usersRepository.findOne({ where: { socketGame: player2ID } })
+        UserOne.inMatchmaking = false;
+        UserOne.inGame = true;
+        UserTwo.inMatchmaking = false;
+        UserTwo.inGame = true;
+        this.usersRepository.save(UserOne);
+        this.usersRepository.save(UserTwo);
         const playersLogin: [string, string] = [UserOne.login, UserTwo.login]
         return (playersLogin);
     }
 
     async deleteGame(playerID: string) {
         const game: Game = await this.gameRepository.findOne({ where: { playerOneID: playerID } })
-        // regarder comment verifier si le player est dans une game et la supprimer si c'est le cas
+        // peut etre supprimer les game interrompu
+    }
+
+    async getGameByID(gameID: number): Promise<Game> {
+        const game: Game = await this.gameRepository.findOne({ where: { gameId: gameID } })
+        return (game);
+    }
+
+    async endOfGame(game: Game, gameInstance: Game_instance): Promise<Game> {
+        const UserOne: User = await this.usersRepository.findOne({ where: { socketGame: gameInstance.players[0] } })
+        const UserTwo: User = await this.usersRepository.findOne({ where: { socketGame: gameInstance.players[1] } })
+        UserOne.inGame = false;
+        UserTwo.inGame = false;
+        this.usersRepository.save(UserOne);
+        this.usersRepository.save(UserTwo);
+        game.gameEnd = true;
+        game.scoreOne = gameInstance.player1_score;
+        game.scoreTwo = gameInstance.player2_score;
+        this.gameRepository.save(game);
+        return (game);
     }
 
 }
