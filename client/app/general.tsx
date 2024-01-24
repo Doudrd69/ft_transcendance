@@ -42,6 +42,7 @@ const GeneralComponent = () => {
 	const code = searchParams.get('code');
 
 	if (authValidated) {
+		const currentUserId = sessionStorage.getItem("currentUserId");
 		console.log("Login done: gameSocket connection");
 		gameSocket.connect();
 		if (gameSocket.connected) {
@@ -261,7 +262,6 @@ const GeneralComponent = () => {
 
 	// Game socket handler
 	useEffect(() => {
-
 		gameSocket.on('connect', () => {
 			console.log('GameSocket new connection : ', gameSocket.id);
 			gameSocket.emit('linkSocketWithUser', sessionStorage.getItem("currentUserLogin"));

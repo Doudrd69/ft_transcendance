@@ -2,7 +2,6 @@ import './GamePong.css';
 import React, { useState, useEffect, useRef } from 'react';
 import { useGame } from '../GameContext'
 import { Socket } from 'socket.io-client'
-// import { clearInterval } from 'timers';
 
 const PongComponent = (socket: { socket: Socket }) => {
 
@@ -100,6 +99,7 @@ const PongComponent = (socket: { socket: Socket }) => {
     };
 
     const [Game, setGame] = useState<Game>(defaultGame);
+    const currentUserId = sessionStorage.getItem("currentUserId");
 
 
     useEffect(() => {
@@ -196,6 +196,15 @@ const PongComponent = (socket: { socket: Socket }) => {
                 ...prevState,
                 pause: true,
             }));
+            dispatch({
+                type: 'TOGGLE',
+                payload: 'showGameMenu',
+            });
+            state.showGameMenu = true;
+            gameSocket.disconnect();
+        });
+
+        gameSocket.on('GameStop', () => {
             dispatch({
                 type: 'TOGGLE',
                 payload: 'showGameMenu',

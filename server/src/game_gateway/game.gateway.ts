@@ -1,4 +1,5 @@
 import { WebSocketGateway, WebSocketServer, SubscribeMessage, OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect, ConnectedSocket, MessageBody } from '@nestjs/websockets';
+// import { use } from 'react';
 import { Server, Socket } from 'socket.io';
 import { Game } from 'src/game/entities/games.entity';
 import { Paddle } from 'src/game/entities/paddle.entity';
@@ -13,10 +14,10 @@ export interface vector_instance {
     y: number;
 }
 
-// export interface key_instance {
-//     up: boolean;
-//     down: boolean;
-// }
+export interface userGameSockets {
+    userId: string;
+    gameSocketsId: string[];
+}
 
 export interface ball_instance {
     position: vector_instance;
@@ -72,6 +73,7 @@ export class GameGateway {
     game: Game;
     paddle: Paddle;
     game_instance: game_instance[];
+    userGameSockets: userGameSockets[];
 
     constructor(
         private readonly GameService: GameService,
@@ -79,13 +81,25 @@ export class GameGateway {
         private readonly GameEngineceService: GameEngineService,
     ) {
         this.game_instance = [];
+        this.userGameSockets = [];
     }
 
     private connectedUsers: { [userId: string]: Socket } = {};
 
 
-    handleConnection(@ConnectedSocket() client: Socket, playerlogin: string) {
+    handleConnection(@ConnectedSocket() client: Socket, @MessageBody() data: { userId: string}) {
         console.log(`GameGtw client connected : ${client.id}`);
+        if (this.GameService.userHaveAlreadyGameSocketsTab) {
+            const myUserGameSocktets = this.GameService.getMyGameSocketsTab(data.userId);
+            const userGameSockets: userGameSockets = this.GameService.getUserGameSocketsGate(this.userGameSockets, data.userId)
+            this.GameService.addGameSocketInTab(myUserGameSocktets, client.id, userGameSockets)
+        }
+
+        else {
+            // const gameInstance: game_instance = this.GameEngineceService.createGameInstance(this.game);
+            //     this.game_instance.push(gameInstance);
+            // cree un tabsock et push la socket
+        }
         this.connectedUsers[client.id] = client;
         // client.join(`user_game_${client.id}`);
     }
@@ -93,6 +107,12 @@ export class GameGateway {
     handleDisconnect(@ConnectedSocket() client: Socket) {
         console.log(`GameGtw client disconnected : ${client.id}`);
         //faire un inmatchmaking fasle et ingamefalse, faire de meme avec le ingame de l'autre joueur (faire un emit pour quitter le jeu)
+        //ft quitmatchmaking
+        // if ingame :const gameInstance: game_instance = this.GameService.getGameInstance(this.game_instance, data.gameId);
+        // quit game player 2
+        //ft quit ingame if
+        // ft deletegame et clearInterval
+        // penser a supprimer la socket de l'interface.
         delete this.connectedUsers[client.id];
         // client.leave(`user_game${client.id}`);
     }
@@ -161,13 +181,14 @@ export class GameGateway {
         }
     }
 
-    executeGameTick(gameLoop: NodeJS.Timeout, gameInstance: game_instance) {
+    async executeGameTick(gameLoop: NodeJS.Timeout, gameInstance: game_instance) {
         if (gameInstance.game_has_ended === true) {
             clearInterval(gameLoop);
             if (this.game.gameEnd !== true) {
-                this.GameService.endOfGame(this.game, gameInstance);
+                await this.GameService.endOfGame(this.game, gameInstance);
                 console.log("Save Game");
             }
+            
         }
         this.GameEngineceService.processInput(gameInstance);
         this.GameEngineceService.updateGameInstance(gameInstance, this.server);
@@ -208,7 +229,7 @@ export class GameGateway {
 }
 
 /** Liste des choses a faire :
- * remettre les reset de game
+ * remettre les reset de game CHECK
  * mettre en place les inGame et les inMatchmaking
  * gerer les disconnects et les fins de game
  * voir pour les multi sockets

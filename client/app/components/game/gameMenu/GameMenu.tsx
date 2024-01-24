@@ -35,6 +35,7 @@ const Menu = (socket: { socket: Socket }) => {
     const [Game, setGame] = useState<Game>(defaultGame);
         
     const handleStartClick = async () => {
+        const currentUserId = sessionStorage.getItem("currentUserId");
         const currentUserLogin = sessionStorage.getItem("currentUserLogin");
 
 

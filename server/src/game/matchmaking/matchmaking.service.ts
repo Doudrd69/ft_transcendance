@@ -29,6 +29,7 @@ export class MatchmakingService {
     async join(playerID: string) {
 		this.playersQueue.push(playerID);
         const newUser: User = await this.usersRepository.findOne({ where: { socketGame: playerID } })
+        console.log(`NewUserSocket: ${playerID}`);
         newUser.inMatchmaking = true;
         await this.usersRepository.save(newUser);
 		console.log("player rejoin the queue");

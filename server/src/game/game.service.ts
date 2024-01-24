@@ -6,7 +6,7 @@ import { GameModule } from './game.module';
 import { env } from 'process';
 import { User } from 'src/users/entities/users.entity';
 import { Paddle } from './entities/paddle.entity';
-import { game_instance } from 'src/game_gateway/game.gateway';
+import { game_instance, userGameSockets } from 'src/game_gateway/game.gateway';
 
 
 interface BallPosition {
@@ -16,6 +16,7 @@ interface BallPosition {
 }
 
 
+
 @Injectable()
 export class GameService {
     constructor(
@@ -23,10 +24,12 @@ export class GameService {
         private gameRepository: Repository<Game>,
         @InjectRepository(User)
         private usersRepository: Repository<User>,
-
-
-    ) { }
-
+        
+        
+        ) { }
+        
+    userGameSockets : { [userId: string]: string[] };
+    
     async createGame(player1ID: string, player2ID: string): Promise<Game> {
 
         const game = new Game();
@@ -49,7 +52,7 @@ export class GameService {
         const Player: User = await this.usersRepository.findOne({ where: { login: playerLogin } })
         if (Player && playerID) {
             Player.socketGame = playerID;
-            this.usersRepository.save(Player);
+           await  this.usersRepository.save(Player);
         }
     }
 
@@ -61,8 +64,8 @@ export class GameService {
         UserOne.inGame = true;
         UserTwo.inMatchmaking = false;
         UserTwo.inGame = true;
-        this.usersRepository.save(UserOne);
-        this.usersRepository.save(UserTwo);
+        await this.usersRepository.save(UserOne);
+        await this.usersRepository.save(UserTwo);
         const playersLogin: [string, string] = [UserOne.login, UserTwo.login]
         return (playersLogin);
     }
@@ -96,16 +99,36 @@ export class GameService {
         const UserTwo: User = await this.usersRepository.findOne({ where: { socketGame: gameInstance.players[1] } })
         UserOne.inGame = false;
         UserTwo.inGame = false;
-        this.usersRepository.save(UserOne);
-        this.usersRepository.save(UserTwo);
+        await this.usersRepository.save(UserOne);
+        await this.usersRepository.save(UserTwo);
         game.gameEnd = true;
         game.scoreOne = gameInstance.player1_score;
         game.scoreTwo = gameInstance.player2_score;
-        this.gameRepository.save(game);
+        await this.gameRepository.save(game);
         return (game);
     }
 
     getGameInstance(gametab: game_instance[], gameID: number) {
-        return gametab.find(instance => instance.gameID === gameID);;
+        return gametab.find(instance => instance.gameID === gameID);
     }
-}
+
+    userHaveAlreadyGameSocketsTab(userId: string) {
+        if (this.userGameSockets[userId])
+            return true;
+        return false;
+    }
+
+    addGameSocketInTab(myUserGameSocktets: string[], gameSocketId: string, userGameSockets: userGameSockets) {
+        myUserGameSocktets.push(gameSocketId);
+        userGameSockets.gameSocketsId = myUserGameSocktets;
+        return myUserGameSocktets;
+    }
+
+    getMyGameSocketsTab(userId: string) {
+        return this.userGameSockets[userId];
+    }
+
+    getUserGameSocketsGate(userGameSocketsGate: userGameSockets[], userId: string) {
+        return userGameSocketsGate.find(instance => instance.userId === userId);
+    }
+ }

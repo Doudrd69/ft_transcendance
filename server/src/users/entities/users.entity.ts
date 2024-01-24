@@ -8,8 +8,8 @@ export class User {
 	@PrimaryGeneratedColumn()
 	id: number;
 
-	@Column({ default: "1234" })
-	socketGame: string;
+	@Column({ default: "1234"})
+	  socketGame: string;
 
 	@Column({ default: false })
 	inMatchmaking: boolean;
