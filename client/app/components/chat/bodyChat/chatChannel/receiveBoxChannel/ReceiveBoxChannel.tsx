@@ -23,6 +23,7 @@ interface User {
 	isMute: boolean;
 	isBan: boolean;
 	isOwner: boolean;
+	blockList: string[];
 }
 
 
@@ -123,6 +124,7 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 			const { roomName, roomID } = data;
 			globalState.userSocket?.emit('leaveRoom', { roomName: roomName, roomID: roomID });
 			dispatch({ type: 'DISABLE', payload: 'showChannel' });
+			dispatch({ type: 'ACTIVATE', payload: 'showChannelList' });
 		});
 
 		globalState.userSocket?.on('refresh_channel', () => {

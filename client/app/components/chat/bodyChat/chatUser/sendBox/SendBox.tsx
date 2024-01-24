@@ -9,20 +9,19 @@ const SendBoxComponent: React.FC = () => {
 	const { state } = useChat();
 	const { globalState } = useGlobal();
 	const [messageValue, setMessageValue] = useState('');
-
+	
 	const handleMessageInput = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setMessageValue(e.target.value);
 	};
 	
-	const messageDto = {
-		from: sessionStorage.getItem("currentUserLogin"),
-		content: messageValue,
-		post_datetime: new Date(),
-		conversationID: state.currentConversationID,
-	}
-
 	const handleMessage = async (e: React.FormEvent) => {
-
+		const messageDto = {
+			from: sessionStorage.getItem("currentUserLogin"),
+			content: messageValue,
+			post_datetime: new Date(),
+			conversationID: state.currentConversationID,
+		}
+		console.log("messageDto", messageDto);
 		try {
 			e.preventDefault();
 	
@@ -36,6 +35,9 @@ const SendBoxComponent: React.FC = () => {
 			});
 			
 			if (response.ok) {
+				console.log('globalState.userSocket?.connected', globalState.userSocket?.connected);
+				console.log('messageDto', messageDto);
+				console.log('state.currentRoom', state.currentRoom);
 				if (globalState.userSocket?.connected) {
 					globalState.userSocket?.emit('message', { dto: messageDto, conversationName: state.currentRoom });
 				}

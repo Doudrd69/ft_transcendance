@@ -32,7 +32,7 @@ const IdDiscussionComponent: React.FC = () => {
 	return (
 		<div className='bloc-id'>
 			<p className="id">{id}</p>
-			{state.isAdmin &&
+			{state.currentChannelBool && state.isAdmin &&
 				<img
 					className='image-id'
 					src='settings.png'

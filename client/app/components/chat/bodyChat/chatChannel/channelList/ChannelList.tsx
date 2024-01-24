@@ -74,10 +74,14 @@ const ChannelListComponent: React.FC = () => {
 			loadDiscussions();
 		});
 
+		globalState.userSocket?.on('channelDeleted', () => {
+			loadDiscussions();
+			dispatch({ type: 'ACTIVATE', payload: 'showChannelList' });
+		});
+
 		globalState.userSocket?.on('userIsUnban', () => {
 			loadDiscussions();
 		});
-
 		// seul event rfreshChannelList est ici donc besoin de rien
 		globalState.userSocket?.on('refreshChannelList', () => {
 			loadDiscussions();
@@ -87,6 +91,7 @@ const ChannelListComponent: React.FC = () => {
 			globalState.userSocket?.off('banUser');
 			globalState.userSocket?.off('refreshChannelList');
 			globalState.userSocket?.off('refreshChannel');
+			globalState.userSocket?.off('channelDeleted');
 		}
 
 	}, [globalState?.userSocket]);
