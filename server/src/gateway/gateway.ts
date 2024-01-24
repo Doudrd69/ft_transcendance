@@ -72,6 +72,22 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		}
 	}
 
+	private async notifyFriendList(userID: number, personnalRoom: string, event: string, status: string) {
+
+		const user = await this.userService.getUserByID(userID);
+		if (user) {
+			const friends = await this.userService.getFriendships(user.username);
+			if (friends) {
+				friends.forEach((friend: any) => {
+					console.log("Notifying ", friend.username);
+					this.server.except(personnalRoom).to(friend.username).emit(event, `${personnalRoom} is ${status}`);
+				});
+			}
+		}
+
+		return ;
+	}
+
 	handleConnection(client: Socket) {
 
 		console.log(`---> GeneralGtw client connected    : ${client.id}`);
@@ -83,13 +99,12 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 			console.log("Client ", client.id, " has joined ", personnalRoom, " room");
 			this.userRejoinsRooms(client, userID);
 			this.userService.updateUserStatus(userID, true);
-			// Pour emit aux amis, il faut recup la liste et emit chaque room? 
-			// sinon faire join une friend room (voir les etats etc)
-			this.server.except(personnalRoom).emit('newConnection', `${personnalRoom} is online`);
+			this.notifyFriendList(userID, personnalRoom, 'newConnection', 'online');
 
 			client.on('disconnect', () => {
 				console.log("===> Disconnecting user ", personnalRoom, " with ID ", userID);
-				this.server.except(personnalRoom).emit('newDeconnection', `${personnalRoom} is now offline`);
+				this.notifyFriendList(userID, personnalRoom , 'newDeconnection', 'offline');
+				// this.server.except(personnalRoom).emit('newDeconnection', `${personnalRoom} is now offline`);
 				client.leave(personnalRoom);
 				console.log("Client ", client.id, " has left ", personnalRoom, " room");
 				this.userLeavesRooms(client, userID);
