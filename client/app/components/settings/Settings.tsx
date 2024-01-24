@@ -9,6 +9,8 @@ const SettingsComponent: React.FC = () => {
 
 	const { dispatch } = useGlobal();
 
+	// dispatch({ type: 'DISABLE', payload: 'showBackComponent' });
+
 	useEffect(() => {
 		const handleEscape = (event: KeyboardEvent) => {
 			if (event.key === 'Escape') {
@@ -27,6 +29,8 @@ const SettingsComponent: React.FC = () => {
 		dispatch({ type: 'DISABLE', payload: 'showGeneralSettings'});
 		dispatch({ type: 'DISABLE', payload: 'showProfilsSettings'});
 		dispatch({ type: 'DISABLE', payload: 'showGameSettings'});
+		dispatch({ type: 'ACTIVATE', payload: 'showBackComponent' });
+
 	};
 	return (
 		<div className="back-settings">

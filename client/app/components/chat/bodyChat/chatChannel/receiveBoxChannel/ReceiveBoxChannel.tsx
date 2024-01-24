@@ -143,10 +143,6 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 	}, [globalState?.userSocket]);
 	
 	useEffect(() => {
-		loadUserList();
-	}, [ownerUser]);
-	
-	useEffect(() => {
 		console.log("Loading conversation...");
 		getMessages();
 	}, []);
@@ -158,7 +154,7 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 	useEffect(() => {
 		scrollToBottom();
 	}, [messages]);
-
+	// console.log("ownerUser", ownerUser)
 	const timestamp = new Date().getTime();
 		return (
 			<>
@@ -166,11 +162,12 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 				<div className='list-users-channel-owner'>
 				  <div className='user-list-item'>
 					<div className='avatar-container'>
-					  <img className='admin-user' src='./crown.png' alt='user' />
-					  <img
+						<img className='admin-user' src='./crown.png' alt='user' />
+						<img
 						className='img-list-users-channel-admin'
 						src={`http://localhost:3001${ownerUser?.avatarURL}`}
 						onClick={() => {
+							{console.log("ownerUser", ownerUser?.avatarURL)}
 						  dispatch({ type: 'ACTIVATE', payload: 'dontcandcel' });
 						  dispatch({ type: 'ACTIVATE', payload: 'showOptionsUserChannelOwner' });
 						  dispatch({ type: 'SET_CURRENT_OPTION_CHANNEL_NAME', payload: ownerUser?.login });
@@ -202,7 +199,7 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 						{!user.isAdmin && !user.isOwner &&
 						  <img
 							className='img-list-users-channel'
-							src={`http://localhost:3001/users/getAvatarByLogin/${user.login}/${timestamp}`}
+							src={`http://localhost:3001${user.avatarURL}`}
 							onClick={() => {
 							  dispatch({ type: 'ACTIVATE', payload: 'dontcandcel' });
 							  dispatch({ type: 'ACTIVATE', payload: 'showOptionsUserChannel' });

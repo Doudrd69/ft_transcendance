@@ -177,7 +177,7 @@ export class AuthService {
 			}
 		}
 		catch (error) {
-			throw new Error("Fatal error: " + error);
+			throw new Error("Fatal errorr: " + error);
 		}
 	}
 

@@ -259,7 +259,7 @@ export class ChatService {
 			}
 			return [];
 		}
-		console.error("Fatal error: user not found");
+		console.error("Fatal error2: user not found");
 		return [];
 	}
 
@@ -326,7 +326,7 @@ export class ChatService {
 			}
 			return [];
 		}
-		console.error("Fatal error: user not found");
+		console.error("Fatal error2: user not found");
 		return [];
 	}
 
@@ -350,7 +350,7 @@ export class ChatService {
 			}
 			return [];
 		}
-		console.error("Fatal error: user not found");
+		console.error("Fatal error1: user not found");
 		return [];
 	}
 
@@ -1025,7 +1025,7 @@ export class ChatService {
 			return conv;
 		}
 
-		throw new Error("Fatal error: user not found");
+		throw new Error("Fatal error3: user not found");
 	}
 
 

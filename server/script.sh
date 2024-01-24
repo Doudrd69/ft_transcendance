@@ -1,2 +1,3 @@
-#!/bin/sh
+#!/bin/bash
 
+mkdir -pv dist/users/avatars
