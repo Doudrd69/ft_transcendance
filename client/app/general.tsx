@@ -70,14 +70,14 @@ const GeneralComponent = () => {
 
 	const FriendRequestReceived = ({ closeToast, toastProps, friendRequestDto }: any) => (
 		<div>
-		  	You received a friend request from  {friendRequestDto.initiatorLogin}
+			You received a friend request from  {friendRequestDto.initiatorLogin}
 			<button style={{ padding: '5px '}} onClick={() => {
 				friendRequestValidation(friendRequestDto);
 				closeToast
 				}}>
 			Accept
 			</button>
-		 	 <button style={{ padding: '5px '}} onClick={closeToast}>Deny</button>
+				<button style={{ padding: '5px '}} onClick={closeToast}>Deny</button>
 		</div>
 	)
 
@@ -171,13 +171,13 @@ const GeneralComponent = () => {
 			globalState.userSocket?.on('friendRequest', (friendRequestDto: FriendRequestDto) => {
 				toast(<FriendRequestReceived friendRequestDto={friendRequestDto}/>);
 			});
-	
+
 			globalState.userSocket?.on('friendRequestAcceptedNotif', (data: { roomName: string, roomID: string, initiator: string, recipient: string }) => {
 				const { roomName, roomID, initiator, recipient } = data;
 				toast(<FriendRequestAccepted friend={recipient}/>);
 				globalState.userSocket?.emit('joinRoom', {roomName: roomName, roomID: roomID});
 			})
-	
+
 			globalState.userSocket?.on('userJoinedRoom', (notification: string) => {
 				console.log("User socket in main: ", globalState.userSocket?.id);
 				console.log("Notif from server: ", notification);
@@ -190,7 +190,7 @@ const GeneralComponent = () => {
 					toast.warn(`You are ban from ${roomName}`);
 				}
 			});
-	
+
 			globalState.userSocket?.on('userIsUnban', ( data: { roomName: string, roomID: string } ) => {
 				const { roomName, roomID } = data; 
 				if (roomName && roomID) {
@@ -208,7 +208,7 @@ const GeneralComponent = () => {
 				const { convID, convName } = data;
 				globalState.userSocket?.emit('joinRoom', {roomName: convName, roomID: convID});
 			});
-	
+
 			return () => {
 				globalState.userSocket?.off('friendRequest');
 				globalState.userSocket?.off('friendRequestAcceptedNotif');
@@ -234,15 +234,15 @@ const GeneralComponent = () => {
 			globalState.userSocket?.on('disconnect', () => {
 				console.log('UserSocket disconnected from the server : ', globalState.userSocket?.id);
 			})
-	
+
 			globalState.userSocket?.on('newConnection', (notif: string) => {
 				toast(notif);
 			})
-	
+
 			globalState.userSocket?.on('newDeconnection', (notif: string) => {
 				toast(notif);
 			})
-	
+
 			return () => {
 				globalState.userSocket?.off('connect');
 				globalState.userSocket?.off('disconnect');
@@ -284,22 +284,22 @@ const GeneralComponent = () => {
 	// 	if (sessionStorage.getItem("currentUserLogin") != null)
 	// 		setShowLogin(false);
 	// });
-	
+
 		return (
-            <>
-                <ToastContainer />
-                    {showLogin ? (
-                    <Authentificationcomponent />
-                    ) : show2FAForm ? (
-                    <TFAComponent on2FADone={handle2FADone} />
-                    ) : (
-                        <>
-                        {/* <SetComponent/> */}
-                        <Header/>
-                        <BodyComponent gameSocket={gameSocket}/>
-                    </>
-                    )}	
-            </>      
-		  );
+			<>
+				<ToastContainer />
+					{showLogin ? (
+					<Authentificationcomponent />
+					) : show2FAForm ? (
+					<TFAComponent on2FADone={handle2FADone} />
+					) : (
+						<>
+						{/* <SetComponent/> */}
+						<Header/>
+						<BodyComponent gameSocket={gameSocket}/>
+					</>
+					)}	
+			</>
+			);
 }
 export default GeneralComponent;
