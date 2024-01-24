@@ -221,20 +221,18 @@ export class GameGateway {
 
 /** Liste des choses a faire :
  * remettre les reset de game CHECK
- * voir pour les multi sockets
- *  {
- *      pour le multi socket, j'ai implemente une methode qui stock tout les sockets a la connection
- *      ce qui va manquer c'est de les retirer aux disconnect
- *      ensuite quand on aura fini le guard je changerais les userId et pourrait tester
- *      et changer en multiSocketsPlayer dans tout le code
- *  }
+ * mettre en place le singleSocketPlayer
+ * {
+ *      ca consiste a check au moment du matchmaking si le user.id a deja une socket si oui
+ *      deja en matchmaking ou ingame, la supprimer a la fin de la game pour que la deuxieme page puisse retry
+ * }
  * mettre en place les inGame et les inMatchmaking
  * {
- *      j'ai besoin du multiSocketsPlayer pour faire ca
+ *      j'ai pas besoin du multiSocketsPlayer pour faire ca
  * }
  * gerer les disconnects et les fins de game
  * {
- *      a priori je ferais ca avec le In et le multiSocketsPlayer
+ *      no
  * }
  * essayer d'ameliorer les collisions/ speed (avec gael)
  * creer un game mode
