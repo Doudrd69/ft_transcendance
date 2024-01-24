@@ -19,7 +19,7 @@ import { UsersService } from 'src/users/users.service';
 		TypeOrmModule.forFeature([GroupMember]),
 		forwardRef(() => UsersModule),
 	],
-	providers: [ChatService, UsersService],
+	providers: [ChatService],
 	exports: [ChatService],
 	controllers: [ChatController],
 })

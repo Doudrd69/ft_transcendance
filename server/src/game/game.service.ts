@@ -6,6 +6,7 @@ import { GameModule } from './game.module';
 import { env } from 'process';
 import { User } from 'src/users/entities/users.entity';
 import { Paddle } from './entities/paddle.entity';
+import { game_instance } from 'src/game_gateway/game.gateway';
 
 
 interface BallPosition {
@@ -73,4 +74,24 @@ export class GameService {
         // regarder comment verifier si le player est dans une game et la supprimer si c'est le cas
     }
 
+    async getGameByID(gameID: number): Promise<Game> {
+        const game: Game = await this.gameRepository.findOne({ where: { gameId: gameID } })
+        return (game);
+    }
+
+    async endOfGame(game: Game, gameInstance: game_instance): Promise<Game> {
+
+        // User update
+        const UserOne: User = await this.usersRepository.findOne({ where: { socketGame: gameInstance.players[0] } })
+        const UserTwo: User = await this.usersRepository.findOne({ where: { socketGame: gameInstance.players[1] } })
+
+        // Game update
+        game.playerOneID = String(UserOne.id);
+        game.playerTwoID = String(UserTwo.id);
+        game.gameEnd = true;
+        game.scoreOne = gameInstance.player1_score;
+        game.scoreTwo = gameInstance.player2_score;
+        await this.gameRepository.save(game);
+        return (game);
+    }
 }

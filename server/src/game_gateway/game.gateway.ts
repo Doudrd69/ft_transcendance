@@ -35,7 +35,7 @@ export interface paddle_instance {
     number: number;
 }
 
-export interface Game_instance {
+export interface game_instance {
     gameID: number;
     playersLogin: string[];
     player1_score: number;
@@ -49,7 +49,7 @@ export interface Game_instance {
     victory_condition: number;
 }
 
-let gameInstance: Game_instance | null = null;
+let gameInstance: game_instance | null = null;
 @WebSocketGateway({
     namespace: 'game',
     cors: {
@@ -64,7 +64,7 @@ export class GameGateway {
     server: Server;
     game: Game;
     paddle: Paddle;
-    game_instance: Game_instance[];
+    game_instance: game_instance[];
     //   MatchmakingService: MatchmakingService;
     //   GameService: GameService;
 
@@ -105,8 +105,8 @@ export class GameGateway {
     }
 
     @SubscribeMessage('join-matchmaking')
-    async handleJoinMatchmaking(client: Socket, playerLogin: string): Promise<String> {
-        console.log("JOINMATCHMAKING");
+    async handleJoinMatchmaking(@ConnectedSocket() client: Socket, @MessageBody() data: { playerLogin: string}) {
+        // const { playerLogin } = data;
         this.MatchmakingService.join(client.id);
         const enoughPlayers = this.MatchmakingService.IsThereEnoughPairs();
         if (enoughPlayers) {
@@ -114,7 +114,7 @@ export class GameGateway {
             for (const pair of pairs) {
                 const socketIDs: [string, string] = [pair[0], pair[1]];
                 this.game = await this.GameService.createGame(pair[0], pair[1]);
-                const gameInstance: Game_instance = this.GameEnginceService.createGameInstance(this.game);
+                const gameInstance: game_instance = this.GameEnginceService.createGameInstance(this.game);
                 this.game_instance.push(gameInstance);
                 this.MatchmakingService.leave(pair[0]);
                 this.MatchmakingService.leave(pair[1]);
@@ -140,7 +140,6 @@ export class GameGateway {
                 }, 1000);
             }
         }
-        return (playerLogin);
     }
 
 
@@ -170,21 +169,30 @@ export class GameGateway {
     }
 
     @SubscribeMessage('GameBackUpdate')
-    async handleGameUpdate(client: Socket, @MessageBody() data: { gameID: number, width: number, heigth: number }) {
+    async handleGameUpdate(client: Socket, @MessageBody() data: { gameID: number }) {
         for (let i = 0; i < this.game_instance.length; i++) {
             gameInstance = this.game_instance[i];
             if (gameInstance.gameID === data.gameID) {
                 if (gameInstance.game_has_ended !== true)
+
                     this.GameEnginceService.updateGameInstance(gameInstance, this.server);
                 this.server.to([gameInstance.players[0], gameInstance.players[1]]).emit('GameBallUpdate', {
                     BallPosition: { x: gameInstance.ball.position.x, y: gameInstance.ball.position.y },
                     scoreOne: gameInstance.player1_score,
                     scoreTwo: gameInstance.player2_score,
-                    paddleOne: { x: gameInstance.paddles[0].x, y: gameInstance.paddles[0].y },
+                    paddleOne: { x: gameInstance.paddles[0].x - 0.025, y: gameInstance.paddles[0].y },
                     paddleTwo: { x: gameInstance.paddles[1].x, y: gameInstance.paddles[1].y },
                 })
                 break;
             }
         }
+        if (gameInstance.game_has_ended === true) {
+            this.game = await this.GameService.getGameByID(gameInstance.gameID);
+            if (this.game.gameEnd !== true) {
+                await this.GameService.endOfGame(this.game, gameInstance);
+                console.log("Game saved");
+            }
+        }
     }
+
 }

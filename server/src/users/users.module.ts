@@ -6,12 +6,16 @@ import { Friendship } from './entities/friendship.entity';
 import { UsersService } from './users.service';
 import { UsersController } from './users.controller';
 import { AuthGuard } from 'src/auth/auth.guard';
+import { GameModule } from 'src/game/game.module';
+import { Game } from 'src/game/entities/games.entity';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([User]),
     TypeOrmModule.forFeature([Friendship]),
+    TypeOrmModule.forFeature([Game]),
     forwardRef(() => ChatModule),
+    GameModule,
   ],
   providers: [UsersService],
   exports: [UsersService],
