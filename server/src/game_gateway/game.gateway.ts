@@ -154,19 +154,19 @@ export class GameGateway {
             if (this.GameService.everyPlayersJoined(gameInstance)) {
                 setTimeout(() => {
                     const gameLoop = setInterval(() => {
-                        this.executeGameTick(gameLoop, gameInstance)
+                        this.executeGameTick(gameLoop, gameInstance, client.id)
                     }, 16)
                 }, 3000);
             }
         }
     }
 
-    executeGameTick(gameLoop: NodeJS.Timeout, gameInstance: game_instance) {
+    async executeGameTick(gameLoop: NodeJS.Timeout, gameInstance: game_instance, client: string) {
         if (gameInstance.game_has_ended === true) {
             clearInterval(gameLoop);
-            if (this.game.gameEnd !== true) {
-                this.GameService.endOfGame(this.game, gameInstance);
-                console.log("Save Game");
+            if (this.game.gameEnd !== true && client == gameInstance.players[0]) {
+                await this.GameService.endOfGame(this.game, gameInstance);
+                console.log("Game Save");
             }
         }
         this.GameEngineceService.processInput(gameInstance);

@@ -138,12 +138,14 @@ export class AuthService {
 
 	async desactivate2FA(requestTfaDto: RequestTfaDto) {
 
-		const user = await this.usersService.getUserByID(requestTfaDto.userID);
+		const user : User = await this.usersService.getUserByID(requestTfaDto.userID);
 
 		if (user) {
-			await this.usersService.save2FASecret(user, "", false);
-			return ;
+			await this.usersService.upate2FAState(user, false);
+			return false;
 		}
+
+		throw new Error("Fatal error");
 	}
 
 	// on genere le secret si on en a pas
@@ -152,24 +154,27 @@ export class AuthService {
 
 		try {
 			// Verifier si le secret existe deja, auquel cas, ne pas le regenerer
-			const secret = speakeasy.generateSecret();
-			this.usersService.register2FATempSecret(requestTfaDto.userID, secret.base32);
+			const secret = await this.usersService.get2faSecret(requestTfaDto.userID);
+			if (!secret) {
+				const newSecret = speakeasy.generateSecret();
+				await this.usersService.register2FATempSecret(requestTfaDto.userID, newSecret.base32);
 
-			const qrcodeURL = await new Promise<string>((resolve, reject) => {
-				QRCode.toDataURL(secret.otpauth_url, function(err, data_url) {
-					if (err)
-					{
-						console.error(err);
-						reject(err);
-					}
-					else
-					{
-						console.log(data_url);
-						resolve(data_url);
-					}
+				const qrcodeURL = await new Promise<string> ( (resolve, reject) => {
+					QRCode.toDataURL(newSecret.otpauth_url, function(err, data_url) {
+						if (err)
+						{
+							console.error(err);
+							reject(err);
+						}
+						else
+						{
+							console.log(data_url);
+							resolve(data_url);
+						}
+					});
 				});
-			});
-			return { qrcodeURL };
+				return { qrcodeURL };
+			}
 		}
 		catch (error) {
 			throw new Error("Fatal error: " + error);
@@ -185,7 +190,11 @@ export class AuthService {
 			const user = await this.usersService.getUserByID(authenticatorCodeDto.userID);
 			if (user) {
 
-				const base32secret = user.TFA_temp_secret;
+				// Si on a pas de secret, on prend le temporaire
+				let base32secret = user.TFA_secret;
+				if (!base32secret) {
+					base32secret = user.TFA_temp_secret;
+				}
 	
 				// This function will return true if the code given by the client is correct
 				var verified = speakeasy.totp.verify({
@@ -197,12 +206,14 @@ export class AuthService {
 				if (verified)
 				{
 					console.log("-- CODE VERIFIED --");
-					this.usersService.save2FASecret(user, authenticatorCodeDto.code, true);
+					if (!user.TFA_secret)
+						this.usersService.save2FASecret(user, base32secret);
+					await this.usersService.upate2FAState(user, true);
 					return true;
 				}
 				else {
 					console.error("-- INVALID CODE --");
-					this.usersService.save2FASecret(user, "", false);
+					this.usersService.upate2FAState(user, false);
 					throw Error("Invalide code");
 				}
 			}
@@ -210,7 +221,7 @@ export class AuthService {
 		}
 		catch (error) {
 			console.error("!! Token verification failed !!");
-			throw new Error("Token verification failed: " + error);
+			throw new Error(error);
 		}
 	}
 }

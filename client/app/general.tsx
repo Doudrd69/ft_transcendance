@@ -42,14 +42,7 @@ const GeneralComponent = () => {
 	const code = searchParams.get('code');
 
 	if (authValidated) {
-		console.log("Login done: gameSocket connection");
 		gameSocket.connect();
-		if (gameSocket.connected) {
-			console.log("gameSocket connection success");
-		}
-		else {
-			console.log("gameSocket error");
-		}
 	}
 
 	const friendRequestValidation = async (friendRequestDto: FriendRequestDto) => {

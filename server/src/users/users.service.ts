@@ -57,12 +57,28 @@ export class UsersService {
 		return;
 	}
 
-	save2FASecret(user: User, code: string, flag: boolean) {
-		// hash le code?
+	async save2FASecret(user: User, code: string) {
 		user.TFA_secret = code;
-		user.TFA_isEnabled = flag;
-		console.log("-- 2FA UPDATED to ", flag, " --");
-		return this.usersRepository.save(user);
+		return await this.usersRepository.save(user);
+	}
+
+	async upate2FAState(user: User, state: boolean) {
+		user.TFA_isEnabled = state;
+		if (!state) {
+			user.TFA_secret = null;
+			user.TFA_temp_secret = null;
+		}
+		return await this.usersRepository.save(user);
+	}
+
+	async get2faSecret(userID: number) {
+
+		const user : User = await this.usersRepository.findOne({ where: { id: userID } });
+		if (user) {
+			return user.TFA_secret;
+		}
+
+		return null;
 	}
 
 	/**************************************************************/
