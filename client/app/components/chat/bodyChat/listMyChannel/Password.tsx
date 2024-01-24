@@ -35,12 +35,12 @@ const PasswordComponent: React.FC = () => {
 		
 			if (response.ok) {
 				const passwordValidated = await response.json();
+				if (globalState.userSocket?.connected) {
+					globalState.userSocket?.emit('refreshUserChannelList', { userToRefresh: sessionStorage.getItem("currentUserLogin") });
+					globalState.userSocket?.emit('joinRoom', { roomName: state.currentConversation, roomID: state.currentConversationID });
+				}
 				dispatch({ type: 'DISABLE', payload: 'showPassword' });
-			if (globalState.userSocket?.connected) {
-				globalState.userSocket?.emit('joinRoom', { roomName: state.currentConversation, roomID: state.currentConversationID });
 			}
-	
-		} 
 		}
 		catch (error) {
 			console.log(error);

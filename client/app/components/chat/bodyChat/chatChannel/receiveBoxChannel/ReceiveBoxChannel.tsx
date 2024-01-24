@@ -98,13 +98,15 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 
 	useEffect(() => {
 
-		globalState.userSocket?.on('userJoinedRoom', (notification: string) => {
-		console.log("Channel log: ", notification);
+		globalState.userSocket?.on('userJoinedRoom', (notification: Message) => {
+			console.log("Channel log: ", notification);
+			loadUserList();
+			// setMessages((prevMessages: Message[]) => [...prevMessages, notification])
 		});
 
 		globalState.userSocket?.on('onMessage', (message: Message) => {
-		if (message)
-			setMessages((prevMessages: Message[]) => [...prevMessages, message]);
+			if (message)
+				setMessages((prevMessages: Message[]) => [...prevMessages, message]);
 		});
 
 		globalState.userSocket?.on('kickUser', ( data: {roomName: string, roomID: string} ) => {
@@ -119,6 +121,7 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 		});
 
 		globalState.userSocket?.on('refresh_channel', () => {
+			console.log("Refresh channel...");
 			loadUserList();
 		});
 		
