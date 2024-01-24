@@ -74,8 +74,10 @@ const ChannelListComponent: React.FC = () => {
 			loadDiscussions();
 		});
 
-		globalState.userSocket?.on('channelDeleted', () => {
+		globalState.userSocket?.on('channelDeleted', ( data: {roomName: string, roomID: string} ) => {
+			const { roomName, roomID } = data;
 			loadDiscussions();
+			globalState.userSocket?.emit('leaveRoom', { roomName: roomName, roomID: roomID });
 			dispatch({ type: 'ACTIVATE', payload: 'showChannelList' });
 		});
 
