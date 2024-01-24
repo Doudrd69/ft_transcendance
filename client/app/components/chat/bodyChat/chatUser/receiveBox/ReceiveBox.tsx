@@ -9,6 +9,7 @@ interface Message {
 	content: string;
 	post_datetime: string;
 	conversationName: string;
+	conversationID?: number;
 }
 
 const ReceiveBoxComponent: React.FC = () => {
@@ -67,7 +68,7 @@ const ReceiveBoxComponent: React.FC = () => {
 	useEffect(() => {
 
 		globalState.userSocket?.on('onMessage', (message: Message) => {
-			if (message) {
+			if (message && (message.conversationID == state.currentConversationID)) {
 				setMessages((prevMessages: Message[]) => [...prevMessages, message]);
 			}
 		});
