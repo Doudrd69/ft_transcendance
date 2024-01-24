@@ -27,6 +27,7 @@ const FriendsListComponent: React.FC = () => {
 	const [activeIndex, setActiveIndex] = useState<number | null>(null);
 	const [friendList, setFriendList] = useState<FriendShip[]>([]);
 	const username = sessionStorage.getItem("currentUserLogin");
+	console.log("refreshFriendsList0", state.refreshFriendsList);
 
 	const disableTabFriendsList = () => setTabFriendsList(false);
 
@@ -58,8 +59,9 @@ const FriendsListComponent: React.FC = () => {
 
 	useEffect(() => {
 		console.log("Loading friend list...");
+		console.log("refreshFriendsList3", state.refreshFriendsList);
 		loadFriendList();
-	}, [state.refreshFriendList]);
+	}, [state.refreshFriendsList]);
 
 	useEffect(() => {
 

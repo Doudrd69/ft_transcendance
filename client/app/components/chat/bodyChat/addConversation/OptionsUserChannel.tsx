@@ -4,6 +4,7 @@ import { setCurrentComponent, useChat } from '../../ChatContext';
 import './AddConversation.css';
 import { RSC } from 'next/dist/client/components/app-router-headers';
 import { useGlobal } from '@/app/GlobalContext';
+import TimerComponent from './Timer';
 
 interface User {
 	id: number;
@@ -64,33 +65,9 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 	}
 	
 	const muteUser = async() => {
+		dispatch({ type: 'ACTIVATE', payload: 'showTimer' });
+		dispatch({ type: 'DISABLE', payload: 'showOptionsUserChannel' });
 
-		try{
-			const muteUserDto = {
-				conversationID: Number(state.currentConversationID),
-				username: user.login,
-				state: true,
-				from: Number(sessionStorage.getItem("currentUserID")),
-				mutedUntil: 5,
-			}
-	
-			const response = await fetch(`http://localhost:3001/chat/muteUser`, {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-					'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
-				},
-				body: JSON.stringify(muteUserDto),
-			});
-		
-			if (response.ok) {
-				user.isMute = !user.isMute;
-				setMute(true);
-			}
-		}
-		catch (error) {
-			console.error(error);
-		}
 	}
 
 	const banUser = async() => {
@@ -407,21 +384,21 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 									{mute ? (
 										<img className="option-image" src="volume-mute.png" onClick={unmuteUser}/>
 									) : (
-										<img className="option-image" src="unmute.png" onClick={muteUser}/>
+											<img className="option-image" src="unmute.png" onClick={muteUser}/>
 									)}
 									{ban ? (
 										<img className="option-image" src="interdit.png" onClick={unbanUser}/>
-									) : (
-										<img className="option-image-opacity" src="interdit.png" onClick={banUser}/>
-									)}
+										) : (
+											<img className="option-image-opacity" src="interdit.png" onClick={banUser}/>
+											)}
 									</>
 								)
 							}
 							{/* {block ? (
 								<img className="option-image" src="block.png" onClick={unblockUser}/>
-							) : (
-								<img className="option-image-opacity" src="block.png" onClick={blockUser}/>
-							)} */}
+								) : (
+									<img className="option-image-opacity" src="block.png" onClick={blockUser}/>
+								)} */}
 						</div>
 					)}
 					<img className="option-image" src="logoutred.png" onClick={handleLeaveChannel}/>

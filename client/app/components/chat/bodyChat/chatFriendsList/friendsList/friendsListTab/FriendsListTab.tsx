@@ -1,5 +1,5 @@
 import './FriendsListTab.css'
-import React, { use, useState } from 'react';
+import React, { use, useState, useEffect } from 'react';
 import ConfirmationComponent from '../../confirmation/Confirmation';
 import { useChat } from '@/app/components/chat/ChatContext';
 import ListMyChannelComponent from '../../../listMyChannel/ListMyChannel';
@@ -25,6 +25,7 @@ const FriendsListTabComponent:  React.FC<FriendsListTabComponentProps> = ({user}
 	const [confirmationText, setConfirmationText] = useState('');
 	const [showConfirmation, setShowConfirmation] = useState(false);
 	const [funtionToExecute, setFunctionToExecute] = useState<() => void>(() => {});
+	const [accepted, setAccepted] = useState(false);
 
 	const blockUser = async() => {
 
@@ -111,31 +112,24 @@ const FriendsListTabComponent:  React.FC<FriendsListTabComponentProps> = ({user}
 			})
 	
 			if (response.ok) {
-	
-				dispatch({ type: 'DISABLE', payload: 'showConfirmation' })
-				// faut rajouter un dispatch ici pour qu'on retourne a la liste d'amis
-				// et pas rester bloque sur le friendlist tab
 				const data = await response.json();
+				if (data.accepted)
+					setAccepted(data.accepted);
+				dispatch({ type: 'TOGGLEX', payload: 'refreshFriendsList' });
+				dispatch({ type: 'DISABLE', payload: 'showConfirmation' });
+
 
 				globalState.userSocket?.emit('refreshUser', {
 					userToRefresh: user.username,
 					target: 'refreshFriends',
 					status: true
 				});
-
-				if (!data.isAccepted) {
-					return ;
-				}
-				else {
-					console.log("Fatal error");
-				}
 			}
 		}
 		catch (error) {
 			console.error(error);
 		}
 	}
-	
 	return (
 		<>
 			<div className="bloc-tab">
@@ -151,7 +145,7 @@ const FriendsListTabComponent:  React.FC<FriendsListTabComponentProps> = ({user}
 				<img className='image-tab' src="closered.png" onClick={() => handleTabClick(`Etes vous sur de vouloir supprimer de votre liste d'amies ${user.username} ?`, removeFriends)}/>
 			</div>
 			{state.showConfirmation && (
-			<ConfirmationComponent phrase={confirmationText} functionToExecute={funtionToExecute}/>
+				<ConfirmationComponent phrase={confirmationText} functionToExecute={funtionToExecute}/>
 			)}
 			{state.showListChannelAdd && (
 				<ListMyChannelComponent user={user.username}  title={`INVITE ${user.username} TO MY CHANNEL`}/>

@@ -155,7 +155,7 @@ const HeaderComponent: React.FC = () => {
 						dispatch({ type: 'DISABLE', payload: 'showProfilsSettings'});
 						dispatch({ type: 'DISABLE', payload: 'showGameSettings'});
 					}}}>
-						{renderComponent(<AvatarImageComponent className="profils" refresh={globalState.showRefresh}/>, globalState.showUploadAvatar)}
+					{renderComponent(<AvatarImageComponent className="profils" refresh={globalState.showRefresh}/>, globalState.showUploadAvatar)}
 				</button>
 			</div>
 		<div className="bloc-pong">PONG&CHAT</div>
