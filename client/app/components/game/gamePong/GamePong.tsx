@@ -57,11 +57,9 @@ const PongComponent = (socket: { socket: Socket }) => {
                 setGameState(newGameState);
                 console.log(`pongcontainer size, x:${pongContainer.clientWidth}, y: ${pongContainer.clientHeight}`);
             };
-            // Mettez à jour les dimensions du conteneur lorsqu'il est redimensionné
             window.addEventListener('resize', handleResize);
 
             handleResize();
-            // Initialisez les dimensions du conteneur au chargement initial
             return () => {
                 window.removeEventListener('resize', handleResize);
             };
@@ -113,8 +111,8 @@ const PongComponent = (socket: { socket: Socket }) => {
 
             setTimeout(() => {
                 clearInterval(countdownInterval);
-                setCountdown(0); // Disappear the countdown div after 3 seconds
-                setBlurGame(false); // Remove the blur effect after the countdown
+                setCountdown(0);
+                setBlurGame(false);
                 setGame((prevState) => ({
                     ...prevState,
                     pause: false,
@@ -122,13 +120,13 @@ const PongComponent = (socket: { socket: Socket }) => {
             }, 3000);
         };
 
-        setBlurGame(true); // Apply the blur effect initially
+        setBlurGame(true);
         startCountdown();
     }, []);
 
     useEffect(() => {
 
-        gameSocket.on('Game_Start', (Game: Game) => {
+        gameSocket.on('gameStart', (Game: Game) => {
             setGameID(Game.gameId);
             setGame((prevState) => ({
                 ...prevState,
@@ -142,27 +140,9 @@ const PongComponent = (socket: { socket: Socket }) => {
             }));
         });
 
-        const gameLoop: NodeJS.Timeout = setInterval(() => {
-            if (!blurGame) {
-                console.log(`BALL`);
-                gameSocket.emit('GameBackUpdate', { gameID: gameID});
-            }
-        }, 50);
-
-        gameSocket.on('GamePaddleUpdate', (gameState: gameState) => {
+        gameSocket.on('GameUpdate', (gameState: gameState) => {
             const newGameState: gameState = {
-                BallPosition: { x: gameState.BallPosition!.x * containerWidth || 153, y: gameState.BallPosition!.y * containerHeight || 50 },
-                scoreOne: gameState.scoreOne,
-                scoreTwo: gameState.scoreTwo,
-                paddleOne: { x: gameState.paddleOne!.x * containerWidth, y: gameState.paddleOne!.y * containerHeight, width: containerWidth * 0.025, height: containerHeight * 0.17 },
-                paddleTwo: { x: gameState.paddleTwo!.x * containerWidth, y: gameState.paddleTwo!.y * containerHeight, width: containerWidth * 0.025, height: containerHeight * 0.17 },
-            }
-            setGameState(newGameState);
-        });
-
-        gameSocket.on('GameBallUpdate', (gameState: gameState) => {
-            const newGameState: gameState = {
-                BallPosition: { x: gameState.BallPosition!.x * containerWidth || 153, y: gameState.BallPosition!.y * containerHeight || 50 },
+                BallPosition: { x: gameState.BallPosition!.x * containerWidth || 0.5 * containerWidth, y: gameState.BallPosition!.y * containerHeight || 0.5 * containerHeight  },
                 scoreOne: gameState.scoreOne,
                 scoreTwo: gameState.scoreTwo,
                 paddleOne: { x: gameState.paddleOne!.x * containerWidth, y: gameState.paddleOne!.y * containerHeight, width: containerWidth * 0.025, height: containerHeight * 0.17 },
@@ -175,24 +155,30 @@ const PongComponent = (socket: { socket: Socket }) => {
 
         const handleKeyDown = (e: KeyboardEvent) => {
             if (keyState.ArrowDown.down !== true && keyState.ArrowUp.down !== true) {
-                inputLoop = setInterval(() => {
                     if (e.key === 'ArrowUp') {
                         keyState.ArrowUp.down = true;
                         if (Game.pause !== true) {
-                            gameSocket.emit('Game_Input', { input: "ArrowUp", gameID: gameID });
+                            gameSocket.emit('gameInputDown', { input: "ArrowUp", gameID: gameID });
                         }
 
                     } else if (e.key === 'ArrowDown') {
                         keyState.ArrowUp.down = true;
                         if (Game.pause !== true) {
-                            gameSocket.emit('Game_Input', { input: "ArrowDown", gameID: gameID });
+                            gameSocket.emit('gameInputDown', { input: "ArrowDown", gameID: gameID });
                         }
                     }
-                }, 16);
             }
         };
 
-        gameSocket.on('GameGoal', (game: Game) => {
+        gameSocket.on('GameGoal', (gameState: gameState) => {
+            const newGameState: gameState = {
+                BallPosition: { x: gameState.BallPosition!.x * containerWidth || 0.5 * containerWidth, y: gameState.BallPosition!.y * containerHeight || 0.5 * containerHeight },
+                scoreOne: gameState.scoreOne,
+                scoreTwo: gameState.scoreTwo,
+                paddleOne: { x: gameState.paddleOne!.x * containerWidth, y: gameState.paddleOne!.y * containerHeight, width: containerWidth * 0.025, height: containerHeight * 0.17 },
+                paddleTwo: { x: gameState.paddleTwo!.x * containerWidth, y: gameState.paddleTwo!.y * containerHeight, width: containerWidth * 0.025, height: containerHeight * 0.17 },
+            }
+            setGameState(newGameState);
             setGame((prevState) => ({
                 ...prevState,
                 pause: true,
@@ -210,8 +196,6 @@ const PongComponent = (socket: { socket: Socket }) => {
                 ...prevState,
                 pause: true,
             }));
-            clearInterval(gameLoop);
-            clearInterval(inputLoop);
             dispatch({
                 type: 'TOGGLE',
                 payload: 'showGameMenu',
@@ -222,14 +206,14 @@ const PongComponent = (socket: { socket: Socket }) => {
         const handleKeyUp = (e: KeyboardEvent) => {
             if (e.key === 'ArrowUp') {
                 if (keyState.ArrowUp.down === true) {
-                    clearInterval(inputLoop);
                     keyState.ArrowUp.down = false
+                    gameSocket.emit('gameInputUp', { input: "ArrowUp", gameID: gameID });
                 }
             }
             else if (e.key === 'ArrowDown') {
                 if (keyState.ArrowDown.down === true) {
-                    clearInterval(inputLoop);
                     keyState.ArrowDown.down = false
+                    gameSocket.emit('gameInputUp', { input: "ArrowDown", gameID: gameID });
                 }
             }
         };
@@ -241,9 +225,7 @@ const PongComponent = (socket: { socket: Socket }) => {
             gameSocket.off('GameBallUpdate');
             gameSocket.off('GamePaddleUpdate');
             gameSocket.off('Game_Start');
-            clearInterval(gameLoop);
             clearInterval(countdownInterval);
-            clearInterval(inputLoop);
             window.removeEventListener('keydown', handleKeyDown);
             window.removeEventListener('keyup', handleKeyUp);
         };
@@ -265,7 +247,7 @@ const PongComponent = (socket: { socket: Socket }) => {
                     <div className="col-display" id={Game.playerTwoLogin}>{gameState.scoreTwo}</div>
                 </div>
             </div>
-            <div className="ball" style={{ left: `${gameState!.BallPosition!.x}px`, top: `${gameState!.BallPosition!.y}px` }}></div>
+            <div className="ball" style={{ left: `${gameState!.BallPosition!.x - 0.5 * 0.04 * containerWidth}px`, top: `${gameState!.BallPosition!.y - 0.5 * 0.04 * containerHeight}px`, width: 0.04 * containerWidth, height: 0.04 * containerHeight }}></div>
             <div className="pongpaddle" style={{ top: `${gameState!.paddleOne!.y}px`, left: `${gameState!.paddleOne!.x}px`, width: `${gameState!.paddleOne!.width}px`, height: `${gameState!.paddleOne!.height}px` }}></div>
             <div className="pongpaddle" style={{ left: `${gameState!.paddleTwo!.x}px`, top: `${gameState!.paddleTwo!.y}px`, width: `${gameState!.paddleTwo!.width}px`, height: `${gameState!.paddleTwo!.height}px` }}></div>
         </div>

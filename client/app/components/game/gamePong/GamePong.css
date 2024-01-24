@@ -28,8 +28,6 @@
   .ball
   {
     position: absolute;
-    width: 2vw;
-    height: 2vw;
     background-color: #000;
     border-radius: 100%;
   }

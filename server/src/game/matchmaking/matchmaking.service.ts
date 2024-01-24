@@ -2,9 +2,16 @@ import { Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { User } from '../../users/entities/users.entity';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Game } from '../entities/games.entity';
 
 @Injectable()
 export class MatchmakingService {
+    constructor(
+        @InjectRepository(User)
+        private usersRepository: Repository<User>,
+
+        
+    ) { }
 
     public playersQueue: string[] = [];
 	
@@ -16,18 +23,14 @@ export class MatchmakingService {
 			console.log("one pair FIND");
         }
 		return pairs;
-        // return new Promise((resolve, reject) => {
-		// 	if (pairs.length >= 2) {
-		// 	  resolve(pairs);
-		// 	} else {
-		// 	  reject('Not enough players');
-		// 	}
-		// });
 	}
 		
 
     async join(playerID: string) {
 		this.playersQueue.push(playerID);
+        const newUser: User = await this.usersRepository.findOne({ where: { socketGame: playerID } })
+        newUser.inMatchmaking = true;
+        await this.usersRepository.save(newUser);
 		console.log("player rejoin the queue");
     }
 

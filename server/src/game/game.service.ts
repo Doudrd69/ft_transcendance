@@ -10,18 +10,9 @@ import { game_instance } from 'src/game_gateway/game.gateway';
 
 
 interface BallPosition {
-	x: number,
-	y: number,
-	r: number,
-}
-
-/**
- * use to share the game state
- */
-interface GameState {
-	BallPosition: BallPosition[],
-	paddleOne: {x: number, y: number },
-	paddleTwo: {x: number, y:number },
+    x: number,
+    y: number,
+    r: number,
 }
 
 
@@ -33,7 +24,7 @@ export class GameService {
         @InjectRepository(User)
         private usersRepository: Repository<User>,
 
-        
+
     ) { }
 
     async createGame(player1ID: string, player2ID: string): Promise<Game> {
@@ -47,6 +38,7 @@ export class GameService {
         game.playerTwoLogin = playersLogin[1];
         game.scoreOne = 0;
         game.scoreTwo = 0;
+        game.gameEnd = false;
         await this.gameRepository.save(game);
         return (game);
     }
@@ -65,13 +57,33 @@ export class GameService {
 
         const UserOne: User = await this.usersRepository.findOne({ where: { socketGame: player1ID } })
         const UserTwo: User = await this.usersRepository.findOne({ where: { socketGame: player2ID } })
+        UserOne.inMatchmaking = false;
+        UserOne.inGame = true;
+        UserTwo.inMatchmaking = false;
+        UserTwo.inGame = true;
+        this.usersRepository.save(UserOne);
+        this.usersRepository.save(UserTwo);
         const playersLogin: [string, string] = [UserOne.login, UserTwo.login]
         return (playersLogin);
     }
 
     async deleteGame(playerID: string) {
         const game: Game = await this.gameRepository.findOne({ where: { playerOneID: playerID } })
-        // regarder comment verifier si le player est dans une game et la supprimer si c'est le cas
+        // peut etre supprimer les game interrompu
+    }
+
+    playerJoined(playerID: string, gameInstance: game_instance) {
+        if (playerID === gameInstance.players[0])
+            gameInstance.player1Joined = true;
+        if (playerID === gameInstance.players[1])
+            gameInstance.player2Joined = true;
+    }
+
+
+    everyPlayersJoined(gameInstance: game_instance) {
+        if (gameInstance.player1Joined === true && gameInstance.player2Joined === true)
+            return true;
+        return false;
     }
 
     async getGameByID(gameID: number): Promise<Game> {
@@ -80,18 +92,20 @@ export class GameService {
     }
 
     async endOfGame(game: Game, gameInstance: game_instance): Promise<Game> {
-
-        // User update
         const UserOne: User = await this.usersRepository.findOne({ where: { socketGame: gameInstance.players[0] } })
         const UserTwo: User = await this.usersRepository.findOne({ where: { socketGame: gameInstance.players[1] } })
-
-        // Game update
-        game.playerOneID = String(UserOne.id);
-        game.playerTwoID = String(UserTwo.id);
+        UserOne.inGame = false;
+        UserTwo.inGame = false;
+        this.usersRepository.save(UserOne);
+        this.usersRepository.save(UserTwo);
         game.gameEnd = true;
         game.scoreOne = gameInstance.player1_score;
         game.scoreTwo = gameInstance.player2_score;
-        await this.gameRepository.save(game);
+        this.gameRepository.save(game);
         return (game);
+    }
+
+    getGameInstance(gametab: game_instance[], gameID: number) {
+        return gametab.find(instance => instance.gameID === gameID);;
     }
 }

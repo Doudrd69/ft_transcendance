@@ -11,6 +11,12 @@ export class User {
 	@Column({ default: "1234" })
 	socketGame: string;
 
+	@Column({ default: false })
+	inMatchmaking: boolean;
+	
+	@Column({ default: false })
+	inGame: boolean;
+
 	@Column()
  	login: string;
 
@@ -37,9 +43,6 @@ export class User {
 
 	@Column({ default: false })
 	isActive: boolean;
-
-	@Column({ default: false })
-	inGame: boolean;
 
 	@Column({ default: 0 })
 	WR_ratio: number;

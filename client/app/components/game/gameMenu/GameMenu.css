@@ -12,14 +12,14 @@
 }
 
 .titleClass {
-    animation: growShrink 2s infinite alternate;
+    /* animation: growShrink 2s infinite alternate; */
     overflow: hidden;
     white-space: nowrap;
     max-width: 200%;
     text-overflow: ellipsis;
     position: relative;
     top: 10%;
-    font-size: 1vw;
+    font-size: 4vw;
     color: rgb(125, 125, 125); /* Couleur du texte */
     text-shadow: 
         -2px -2px 0 rgb(0, 0, 0),   /* Ombre en haut à gauche (rouge) */
