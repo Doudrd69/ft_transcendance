@@ -111,7 +111,7 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 		});
 
 		globalState.userSocket?.on('onMessage', (message: Message) => {
-			if (message)
+			if (message && (message.conversationID == state.currentConversationID))
 				setMessages((prevMessages: Message[]) => [...prevMessages, message]);
 		});
 

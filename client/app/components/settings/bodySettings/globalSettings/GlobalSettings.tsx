@@ -12,7 +12,9 @@ const GlobalSettingsComponent: React.FC = () => {
 	const [activeUrlImg, setActiveUrlImg] = useState(false);
 
 	const desactivate2FA = async () => {
+	
 		try{
+
 			const tfaDto = {
 				userID: Number(sessionStorage.getItem("currentUserID")),
 			}
@@ -27,6 +29,8 @@ const GlobalSettingsComponent: React.FC = () => {
 			});
 		
 			if (response.ok) {
+				const status = await response.json();
+				sessionStorage.setItem("2faEnabled", `${status}`);
 				setActiveUrlImg(false);
 				toast.warn("2fa is now disabled");
 		}
@@ -39,6 +43,7 @@ const GlobalSettingsComponent: React.FC = () => {
 	const activate2FA = async () => {
 
 		try {
+
 			const tfaDto = {
 				userID: Number(sessionStorage.getItem("currentUserID")),
 			}
@@ -56,13 +61,10 @@ const GlobalSettingsComponent: React.FC = () => {
 				const qrcode = await response.json();
 				setUrlQrCode(qrcode.qrcodeURL);
 				setActiveUrlImg(true);
-			} else {
-				const error = await response.json();
-				console.log("Fatal error1: ", error.message);
 			}
 		}
 		catch (error) {
-				console.error(error);
+			console.error(error);
 		}
 	}
 

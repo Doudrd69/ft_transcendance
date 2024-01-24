@@ -92,16 +92,35 @@ export class GameService {
     }
 
     async endOfGame(game: Game, gameInstance: game_instance): Promise<Game> {
+        console.log("==== END OF GAME ====");
         const UserOne: User = await this.usersRepository.findOne({ where: { socketGame: gameInstance.players[0] } })
         const UserTwo: User = await this.usersRepository.findOne({ where: { socketGame: gameInstance.players[1] } })
         UserOne.inGame = false;
         UserTwo.inGame = false;
-        this.usersRepository.save(UserOne);
-        this.usersRepository.save(UserTwo);
+
+        console.log("Before U1: ", UserOne.victory, UserOne.defeat);
+        console.log("Before U2: ", UserTwo.victory, UserTwo.defeat);
+        if (game.scoreOne > game.scoreTwo) {
+            UserOne.victory += 1;
+            UserTwo.defeat += 1;
+        }
+        else {
+            UserOne.defeat += 1;
+            UserTwo.victory += 1;
+        }
+
+        await this.usersRepository.save(UserOne);
+        await this.usersRepository.save(UserTwo);
+
+        console.log("After U1: ", UserOne.victory, UserOne.defeat);
+        console.log("After U2: ", UserTwo.victory, UserTwo.defeat);
+
+        game.playerOneID = String(UserOne.id);
+        game.playerTwoID = String(UserTwo.id);
         game.gameEnd = true;
         game.scoreOne = gameInstance.player1_score;
         game.scoreTwo = gameInstance.player2_score;
-        this.gameRepository.save(game);
+        await this.gameRepository.save(game);
         return (game);
     }
 
