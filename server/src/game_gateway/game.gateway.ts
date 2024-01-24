@@ -189,8 +189,8 @@ export class GameGateway {
         if (gameInstance.game_has_ended === true) {
             this.game = await this.GameService.getGameByID(gameInstance.gameID);
             if (this.game.gameEnd !== true) {
-                this.GameService.endOfGame(this.game, gameInstance);
-                console.log("Save Game");
+                await this.GameService.endOfGame(this.game, gameInstance);
+                console.log("Game saved");
             }
         }
     }
