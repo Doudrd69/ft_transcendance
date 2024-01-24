@@ -60,6 +60,7 @@ interface ChatState {
 	currentRoom: string | null;
 	currentUserList: any;
 	isAdmin: boolean;
+	isOwner: boolean;
 	currentIsAdmin: boolean;
 	showAddCreateChannel:boolean;
 	showOptionsChannel:boolean;
@@ -76,6 +77,7 @@ interface ChatState {
 	showPasswordChange:boolean;
 	dontcancel:boolean;
 	showBackComponent: boolean;
+	showTimer: boolean;
 	[key: string]: boolean  | number | string | null | userList[];
 }
 
@@ -114,6 +116,7 @@ const initialState: ChatState = {
 	showPassword: false,
 	showAdmin: false,
 	isAdmin: false,
+	isOwner: false,
 	currentOptionChannelName:'',
 	showOptionsUserChannelOwner: false,
 	showOptionsUserChannel: false,
@@ -122,6 +125,7 @@ const initialState: ChatState = {
 	dontcancel:false,
 	showBackComponent: true,
 	currentChannelBool: false,
+	showTimer: false,
 
 };
 
