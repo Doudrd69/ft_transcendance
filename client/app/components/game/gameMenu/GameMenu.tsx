@@ -37,8 +37,6 @@ const Menu = (socket: { socket: Socket }) => {
     const handleStartClick = async () => {
         const currentUserId = sessionStorage.getItem("currentUserId");
         const currentUserLogin = sessionStorage.getItem("currentUserLogin");
-
-
         if (gameSocket.connected) {
             
             gameSocket.emit('join-matchmaking', currentUserLogin);

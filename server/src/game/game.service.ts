@@ -28,7 +28,7 @@ export class GameService {
         
         ) { }
         
-    userGameSockets : { [userId: string]: string[] };
+    userGameSockets : { [userId: string]: string };
     
     async createGame(player1ID: string, player2ID: string): Promise<Game> {
 
@@ -112,23 +112,32 @@ export class GameService {
         return gametab.find(instance => instance.gameID === gameID);
     }
 
-    userHaveAlreadyGameSocketsTab(userId: string) {
+    userHasAlreadyGameSockets(userId: string) {
         if (this.userGameSockets[userId])
             return true;
         return false;
     }
 
-    addGameSocketInTab(myUserGameSocktets: string[], gameSocketId: string, userGameSockets: userGameSockets) {
-        myUserGameSocktets.push(gameSocketId);
-        userGameSockets.gameSocketsId = myUserGameSocktets;
-        return myUserGameSocktets;
+    addGameSocket(gameSocketId: string, userId: string) {
+        this.userGameSockets[userId].push(gameSocketId);
     }
 
-    getMyGameSocketsTab(userId: string) {
+    getMyGameSockets(userId: string) {
         return this.userGameSockets[userId];
+    }
+    createNewGameSockets(userId: string) {
+        this.userGameSockets[userId] = [];
     }
 
     getUserGameSocketsGate(userGameSocketsGate: userGameSockets[], userId: string) {
         return userGameSocketsGate.find(instance => instance.userId === userId);
+    }
+
+    newUserGameSocketsGate(userId: string) {
+        const newUserGameSockets: userGameSockets = {
+            userId: userId,
+            gameSocketsId: null
+        }
+        return newUserGameSockets;
     }
  }

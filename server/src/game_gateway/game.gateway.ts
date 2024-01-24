@@ -14,11 +14,6 @@ export interface vector_instance {
     y: number;
 }
 
-export interface userGameSockets {
-    userId: string;
-    gameSocketsId: string[];
-}
-
 export interface ball_instance {
     position: vector_instance;
     speed: vector_instance;
@@ -73,7 +68,6 @@ export class GameGateway {
     game: Game;
     paddle: Paddle;
     game_instance: game_instance[];
-    userGameSockets: userGameSockets[];
 
     constructor(
         private readonly GameService: GameService,
@@ -81,27 +75,24 @@ export class GameGateway {
         private readonly GameEngineceService: GameEngineService,
     ) {
         this.game_instance = [];
-        this.userGameSockets = [];
     }
 
     private connectedUsers: { [userId: string]: Socket } = {};
 
 
     handleConnection(@ConnectedSocket() client: Socket, @MessageBody() data: { userId: string}) {
+        // le userid sera change par client.userid apres
         console.log(`GameGtw client connected : ${client.id}`);
-        if (this.GameService.userHaveAlreadyGameSocketsTab) {
-            const myUserGameSocktets = this.GameService.getMyGameSocketsTab(data.userId);
-            const userGameSockets: userGameSockets = this.GameService.getUserGameSocketsGate(this.userGameSockets, data.userId)
-            this.GameService.addGameSocketInTab(myUserGameSocktets, client.id, userGameSockets)
+        if (this.GameService.userHasAlreadyGameSockets(data.userId)) {
+            // si deja alors emit already game in progress ou inmatchmaking
+            this.GameService.addGameSocket(client.id, data.userId);
         }
 
         else {
-            // const gameInstance: game_instance = this.GameEngineceService.createGameInstance(this.game);
-            //     this.game_instance.push(gameInstance);
-            // cree un tabsock et push la socket
+            this.GameService.createNewGameSockets(data.userId);
+            this.GameService.addGameSocket(client.id, data.userId);
         }
         this.connectedUsers[client.id] = client;
-        // client.join(`user_game_${client.id}`);
     }
 
     handleDisconnect(@ConnectedSocket() client: Socket) {
@@ -230,13 +221,25 @@ export class GameGateway {
 
 /** Liste des choses a faire :
  * remettre les reset de game CHECK
- * mettre en place les inGame et les inMatchmaking
- * gerer les disconnects et les fins de game
  * voir pour les multi sockets
+ *  {
+ *      pour le multi socket, j'ai implemente une methode qui stock tout les sockets a la connection
+ *      ce qui va manquer c'est de les retirer aux disconnect
+ *      ensuite quand on aura fini le guard je changerais les userId et pourrait tester
+ *      et changer en multiSocketsPlayer dans tout le code
+ *  }
+ * mettre en place les inGame et les inMatchmaking
+ * {
+ *      j'ai besoin du multiSocketsPlayer pour faire ca
+ * }
+ * gerer les disconnects et les fins de game
+ * {
+ *      a priori je ferais ca avec le In et le multiSocketsPlayer
+ * }
  * essayer d'ameliorer les collisions/ speed (avec gael)
  * creer un game mode
  * faire les game invites
- * regarder ce que je peux enlever du front pour le mettre dans le back
  * faire le front du jeu
+ * regarder ce que je peux enlever du front pour le mettre dans le back
  * casser le jeu pour debug
  */

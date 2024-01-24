@@ -109,10 +109,10 @@ export class AuthService {
 				}
 			}
 			else {
-				throw ("Fatal error: 42 API request failed");
+				throw (`Fatal error: 42 API request failed, ${response.status}, ${response.statusText}`);
 			}
 		} catch (error) {
-			console.error("-- Request to API FAILED --");
+			console.error("-- Request to API FAILED --", error);
 			throw error;
 		}
 	}
