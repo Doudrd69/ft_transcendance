@@ -28,22 +28,12 @@ interface FriendRequestDto {
 const GeneralComponent = () => {
 
     const { globalState, dispatch } = useGlobal();
-
-	// faire comme le usersocket
-	const gameSocket = io('http://localhost:3001/game', {
-		autoConnect: false,
-	})
-
 	const [showLogin, setShowLogin] = useState(true);
 	const [show2FAForm, setShow2FAForm] = useState(false);
 	const [authValidated, setAuthValidated] = useState(false);
 
 	const searchParams = useSearchParams();
 	const code = searchParams.get('code');
-
-	if (authValidated) {
-		gameSocket.connect();
-	}
 
 	const friendRequestValidation = async (friendRequestDto: FriendRequestDto) => {
 
@@ -73,8 +63,8 @@ const GeneralComponent = () => {
 			You received a friend request from  {friendRequestDto.initiatorLogin}
 			<button style={{ padding: '5px '}} onClick={() => {
 				friendRequestValidation(friendRequestDto);
-				closeToast
-				}}>
+				closeToast;
+			}}>
 			Accept
 			</button>
 				<button style={{ padding: '5px '}} onClick={closeToast}>Deny</button>
@@ -255,20 +245,21 @@ const GeneralComponent = () => {
 	// Game socket handler
 	useEffect(() => {
 
-		gameSocket.on('connect', () => {
-			console.log('GameSocket new connection : ', gameSocket.id);
-			gameSocket.emit('linkSocketWithUser', sessionStorage.getItem("currentUserLogin"));
+		globalState.gameSocket?.on('connect', () => {
+			console.log('GameSocket new connection : ', globalState.gameSocket?.id);
+			globalState.gameSocket?.emit('linkSocketWithUser', sessionStorage.getItem("currentUserLogin"));
 		})
 
-		gameSocket.on('disconnect', () => {
-			console.log('GameSocket disconnected from the server : ', gameSocket.id);
+		globalState.gameSocket?.on('disconnect', () => {
+			console.log('GameSocket? disconnected from the server : ', globalState.gameSocket?.id);
 		})
 
 		return () => {
-			gameSocket.off('connect');
-			gameSocket.off('disconnect');
+			globalState.gameSocket?.off('connect');
+			globalState.gameSocket?.off('disconnect');
 		}
-	}, [gameSocket])
+
+	}, [globalState?.gameSocket])
 
 	// Login form useEffect
 	useEffect(() => {
@@ -296,7 +287,7 @@ const GeneralComponent = () => {
 						<>
 						{/* <SetComponent/> */}
 						<Header/>
-						<BodyComponent gameSocket={gameSocket}/>
+						<BodyComponent/>
 					</>
 					)}	
 			</>

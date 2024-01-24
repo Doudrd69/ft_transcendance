@@ -2,19 +2,20 @@ import './GameStart.css'
 import React from 'react';
 import { useGame } from '../../GameContext';
 import { Socket } from 'socket.io-client'
+import { useGlobal } from '@/app/GlobalContext';
 
-const MatchMaking = (socket: {socket: Socket}) => {
+const MatchMaking = () => {
 
-	const gameSocket = socket.socket;
-    const { state, dispatch } = useGame();
+    const { state, dispatchGame } = useGame();
+    const { globalState } = useGlobal();
 
 	const handleStartClick = async () => {
 		const currentUserLogin = sessionStorage.getItem("currentUserLogin");
 	
-		if (gameSocket.connected) {
+		if (globalState.gameSocket?.connected) {
 			console.log("joueur leave")
-			gameSocket.emit('leave-matchmaking', currentUserLogin);
-			gameSocket.off('message');
+			globalState.gameSocket?.emit('leave-matchmaking', currentUserLogin);
+			globalState.gameSocket?.off('message');
 		}
 		else {
 			console.log("GameSocket pas connecté");
@@ -34,7 +35,7 @@ const MatchMaking = (socket: {socket: Socket}) => {
                     <label>●</label>
                 </div>
             </div>
-                    <button className={`cancel-button ${state.showGameMenu ? 'clicked' : ''}`} onClick={() =>{ handleStartClick(); dispatch({ type: 'TOGGLE', payload: 'showGameMenu'})}}>Cancel</button>
+                    <button className={`cancel-button ${state.showGameMenu ? 'clicked' : ''}`} onClick={() =>{ handleStartClick(); dispatchGame({ type: 'TOGGLE', payload: 'showGameMenu'})}}>Cancel</button>
         </div>
     );
 };

@@ -68,11 +68,14 @@ const ChannelListComponent: React.FC = () => {
 
 	useEffect(() => {
 
-		globalState.userSocket?.on('userIsBan', () => {
-			dispatch({ type: 'DISABLE', payload: 'showChannel' });
-			dispatch({ type: 'ACTIVATE', payload: 'showChannelList' });
-			loadDiscussions();
-		});
+		if (globalState?.userSocket) {
+			console.log("OUAIS ON ETS LA");
+			globalState.userSocket?.on('userIsBan', () => {
+				dispatch({ type: 'DISABLE', payload: 'showChannel' });
+				dispatch({ type: 'ACTIVATE', payload: 'showChannelList' });
+				loadDiscussions();
+			});
+		}
 
 		globalState.userSocket?.on('channelDeleted', ( data: {roomName: string, roomID: string} ) => {
 			const { roomName, roomID } = data;

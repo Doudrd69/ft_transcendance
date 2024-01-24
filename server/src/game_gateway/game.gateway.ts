@@ -7,6 +7,8 @@ import { GameEngineService } from 'src/game/gameEngine.service';
 import { BallService } from 'src/game/gameObject/ball.service';
 import { PaddleService } from 'src/game/gameObject/paddle.service';
 import { MatchmakingService } from 'src/game/matchmaking/matchmaking.service';
+import { GatewayGuard } from 'src/gateway/Gatewayguard.guard';
+import { UseGuards } from '@nestjs/common'
 
 export interface vector_instance {
     x: number;
@@ -62,6 +64,7 @@ let gameInstance: game_instance | null = null;
     cors: {
         origin: ['http://localhost:3000']
     },
+    middlewares: [GatewayGuard],
 })
 
 
@@ -98,16 +101,19 @@ export class GameGateway {
     }
 
     @SubscribeMessage('linkSocketWithUser')
+    @UseGuards(GatewayGuard)
     handleLinkSocketWithUser(client: Socket, playerLogin: string) {
         this.GameService.linkSocketIDWithUser(client.id, playerLogin);
     }
 
     @SubscribeMessage('Game')
+    @UseGuards(GatewayGuard)
     handleGame(@ConnectedSocket() client: Socket, data: string): void {
         this.server.emit('message', data); // Diffuse à tous les clients dans le namespace 'game'
     }
 
     @SubscribeMessage('join-matchmaking')
+    @UseGuards(GatewayGuard)
     async handleJoinMatchmaking(@ConnectedSocket() client: Socket, @MessageBody() data: { playerLogin: string}) {
         console.log("JOINMATCHMAKING");
         // faire un if check inmatchmaking ou ingame false 
@@ -147,6 +153,7 @@ export class GameGateway {
     }
 
     @SubscribeMessage('playerJoined')
+    @UseGuards(GatewayGuard)
     async handleStartGame(@ConnectedSocket() client: Socket, @MessageBody() data: { gameId: number }) {
         const gameInstance: game_instance = this.GameService.getGameInstance(this.game_instance, data.gameId);
         if (gameInstance) {
@@ -181,6 +188,7 @@ export class GameGateway {
     }
 
     @SubscribeMessage('leave-matchmaking')
+    @UseGuards(GatewayGuard)
     handleLeaveMatchmaking(@ConnectedSocket() client: Socket, playerLogin: string): string {
         console.log("leaveMATCHMAKING");
         this.MatchmakingService.leave(playerLogin);
@@ -188,6 +196,7 @@ export class GameGateway {
     }
 
     @SubscribeMessage('gameInputDown')
+    @UseGuards(GatewayGuard)
     async handlePaddleMove(@ConnectedSocket() client: Socket, @MessageBody() data: { input: string, gameID: number }) {
         const gameInstance: game_instance = this.GameService.getGameInstance(this.game_instance, data.gameID);
         if (gameInstance) {
@@ -198,6 +207,7 @@ export class GameGateway {
     }
 
     @SubscribeMessage('gameInputUp')
+    @UseGuards(GatewayGuard)
     async handlePaddleStop(@ConnectedSocket() client: Socket, @MessageBody() data: { input: string, gameID: number }) {
         const gameInstance: game_instance = this.GameService.getGameInstance(this.game_instance, data.gameID);
         if (gameInstance) {

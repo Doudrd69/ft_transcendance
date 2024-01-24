@@ -8,24 +8,19 @@ import PongComponent from './gamePong/GamePong';
 import SettingsDisplay from './gameMenu/gameSettings/settingsDisplay/SettingsDisplay';
 import SettingsGame from './gameMenu/gameSettings/settingsGame/SettingsGame';
 import SettingsKeyboard from './gameMenu/gameSettings/settingsKeyboard/SettingsKeyboard';
-import { Socket } from 'socket.io-client'
 
-const GameComponent = (socket: {socket: Socket}) => {
+const GameComponent = () => {
 
-	const { state, dispatch } = useGame();
+	const { state } = useGame();
 
 	const renderComponent = (component: React.ReactNode, condition: boolean) =>
 	  condition ? component : null;
 
 	return (
 	  		<div className="right-half">
-				{renderComponent(<MatchMakingComponent socket={socket.socket} />, state.showGameMatchmaking)}
-				{renderComponent(<GameMenuComponent socket={socket.socket} />, state.showGameMenu)}
-				{renderComponent(<SettingsComponent/>, state.showGameSettings)}
-				{renderComponent(<SettingsDisplay/>, state.showSettingsDisplay)}
-				{renderComponent(<SettingsGame/>, state.showSettingsGame)}
-				{renderComponent(<SettingsKeyboard/>, state.showSettingsKeyboard)}
-				{renderComponent(<PongComponent socket={socket.socket}/>, state.showGame)}
+				{renderComponent(<MatchMakingComponent />, state.showGameMatchmaking)}
+				{renderComponent(<GameMenuComponent/>, state.showGameMenu)}
+				{renderComponent(<PongComponent />, state.showGame)}
 	  		</div>
 	);
   };
