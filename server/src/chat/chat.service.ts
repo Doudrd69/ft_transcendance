@@ -182,6 +182,7 @@ export class ChatService {
 										isAdmin: group.isAdmin,
 										isBan: group.isBan,
 										isMute: group.isMute,
+										blockList: user_.blockedUsers,
 									});
 							}
 						});
@@ -943,7 +944,7 @@ export class ChatService {
 			}
 		}
 		
-		return ;
+		return conversationCheck;
 	}
 
 	async createPrivateConversation(DMcreationDto: DMcreationDto): Promise<Conversation> {
