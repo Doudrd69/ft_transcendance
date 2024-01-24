@@ -21,6 +21,4 @@ export class FriendRequestDto {
 	@IsAlphanumeric()
 	@Matches(/^[^"';%()|<>\\]*$/)
 	recipientLogin: string;
-
-	recipientID?: number;
 }

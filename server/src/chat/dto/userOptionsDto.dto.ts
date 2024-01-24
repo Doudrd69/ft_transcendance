@@ -7,13 +7,15 @@ import {
 	IsString,
 	Length,
 	Matches,
-	Max
+	Max,
+	IsInt,
 } from 'class-validator';
 
 export class UserOptionsDto {
    
-    @IsNotEmpty()
+	@IsNotEmpty()
 	@IsPositive()
+	@IsInt()
 	@Max(1000)
 	conversationID: number;
 
@@ -31,6 +33,7 @@ export class UserOptionsDto {
 
 	@IsNotEmpty()
 	@IsPositive()
+	@IsInt()
 	@Max(1000)
 	from: number;
 }

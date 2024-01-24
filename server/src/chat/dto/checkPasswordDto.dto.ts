@@ -1,23 +1,24 @@
 import {
 	IsAlpha,
 	IsAscii,
-	IsBoolean,
 	IsNotEmpty,
-	IsPositive, // Checks if the string contains the seed: @Contains(seed: string)
+	IsPositive,
 	IsString,
 	Length,
 	Matches,
-	Max
+	Max,
+	IsInt,
 } from 'class-validator';
 
 export class CheckPasswordDto {
-   
-    @IsNotEmpty()
+
+	@IsNotEmpty()
 	@IsPositive()
+	@IsInt()
 	@Max(1000)
 	conversationID: number;
 
-    @IsNotEmpty()
+	@IsNotEmpty()
 	@Length(6, 20)
 	@IsAscii()
 	@IsAlpha()

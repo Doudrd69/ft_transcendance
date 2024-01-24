@@ -7,18 +7,21 @@ import {
 	IsString,
 	Length,
 	Matches,
-	Max
+	Max,
+	IsInt,
 } from 'class-validator';
 
 export class UpdateConversationDto {
 
-    @IsNotEmpty()
+	@IsNotEmpty()
 	@IsPositive()
+	@IsInt()
 	@Max(1000)
 	conversationID: number;
 
 	@IsNotEmpty()
 	@IsPositive()
+	@IsInt()
 	@Max(1000)
 	userID: number;
 

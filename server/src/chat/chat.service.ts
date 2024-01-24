@@ -16,7 +16,6 @@ import { group } from 'console';
 import { ChannelOptionsDto } from './dto/channelOptionsDto.dto';
 import { QuitConversationDto } from './dto/quitConversationDto.dto';
 import { FormatInputPathObject } from 'path';
-import { GroupDto } from './dto/group.dto';
 import { UpdateIsPublicDto } from './dto/updateIsPublicDto.dto';
 import { UpdateProtectFalseDto } from './dto/updateProtectFalseDto.dto';
 import { DeleteConversationDto } from './dto/deleteConversationDto.dto';
