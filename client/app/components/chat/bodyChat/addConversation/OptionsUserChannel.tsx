@@ -364,7 +364,7 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 				});
 				// Emit to refresh DM list
 				globalState.userSocket?.emit('refreshUser', {
-					userToRefresh: user.username,
+					userToRefresh: user.login,
 					target: 'refreshDmList',
 					status: true
 				});

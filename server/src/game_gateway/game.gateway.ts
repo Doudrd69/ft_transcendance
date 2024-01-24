@@ -13,21 +13,25 @@ export interface vector_instance {
     y: number;
 }
 
+// export interface key_instance {
+//     up: boolean;
+//     down: boolean;
+// }
+
 export interface ball_instance {
     position: vector_instance;
     speed: vector_instance;
     r: number;
     alive: boolean;
     elasticity: number;
-    goal: number;
+    player1Scored: boolean;
+    player2Scored: boolean;
 }
 
 export interface paddle_instance {
-    x: number;
-    y: number;
     speed: number;
-    up: boolean;
-    down: boolean;
+    ArrowUp: boolean;
+    ArrowDown: boolean;
     is_a_paddle: boolean;
     length: number;
     start: vector_instance;
@@ -35,7 +39,7 @@ export interface paddle_instance {
     number: number;
 }
 
-export interface Game_instance {
+export interface game_instance {
     gameID: number;
     playersLogin: string[];
     player1_score: number;
@@ -47,9 +51,12 @@ export interface Game_instance {
     ball: ball_instance;
     paddles: paddle_instance[];
     victory_condition: number;
+    player1Joined: boolean;
+    player2Joined: boolean;
+    pause: boolean;
 }
 
-let gameInstance: Game_instance | null = null;
+let gameInstance: game_instance | null = null;
 @WebSocketGateway({
     namespace: 'game',
     cors: {
@@ -64,16 +71,12 @@ export class GameGateway {
     server: Server;
     game: Game;
     paddle: Paddle;
-    game_instance: Game_instance[];
-    //   MatchmakingService: MatchmakingService;
-    //   GameService: GameService;
+    game_instance: game_instance[];
 
     constructor(
         private readonly GameService: GameService,
         private readonly MatchmakingService: MatchmakingService,
-        private readonly GameEnginceService: GameEngineService,
-        private readonly PaddleService: PaddleService,
-        private readonly BallService: BallService,
+        private readonly GameEngineceService: GameEngineService,
     ) {
         this.game_instance = [];
     }
@@ -105,7 +108,7 @@ export class GameGateway {
     }
 
     @SubscribeMessage('join-matchmaking')
-    async handleJoinMatchmaking(client: Socket, playerLogin: string): Promise<String> {
+    async handleJoinMatchmaking(@ConnectedSocket() client: Socket, @MessageBody() data: { playerLogin: string}) {
         console.log("JOINMATCHMAKING");
         // faire un if check inmatchmaking ou ingame false 
         this.MatchmakingService.join(client.id);
@@ -115,7 +118,7 @@ export class GameGateway {
             for (const pair of pairs) {
                 const socketIDs: [string, string] = [pair[0], pair[1]];
                 this.game = await this.GameService.createGame(pair[0], pair[1]);
-                const gameInstance: Game_instance = this.GameEnginceService.createGameInstance(this.game);
+                const gameInstance: game_instance = this.GameEngineceService.createGameInstance(this.game);
                 this.game_instance.push(gameInstance);
                 this.MatchmakingService.leave(pair[0]);
                 this.MatchmakingService.leave(pair[1]);
@@ -129,7 +132,7 @@ export class GameGateway {
                     scoreTwo: this.game.scoreTwo,
                 });
                 setTimeout(() => {
-                    this.server.to(socketIDs).emit('Game_Start', {
+                    this.server.to(socketIDs).emit('gameStart', {
                         gameId: this.game.gameId,
                         playerOneID: this.game.playerOneID,
                         playerTwoID: this.game.playerTwoID,
@@ -141,9 +144,41 @@ export class GameGateway {
                 }, 1000);
             }
         }
-        return (playerLogin);
     }
 
+    @SubscribeMessage('playerJoined')
+    async handleStartGame(@ConnectedSocket() client: Socket, @MessageBody() data: { gameId: number }) {
+        const gameInstance: game_instance = this.GameService.getGameInstance(this.game_instance, data.gameId);
+        if (gameInstance) {
+            this.GameService.playerJoined(client.id, gameInstance)
+            if (this.GameService.everyPlayersJoined(gameInstance)) {
+                setTimeout(() => {
+                    const gameLoop = setInterval(() => {
+                        this.executeGameTick(gameLoop, gameInstance)
+                    }, 16)
+                }, 3000);
+            }
+        }
+    }
+
+    executeGameTick(gameLoop: NodeJS.Timeout, gameInstance: game_instance) {
+        if (gameInstance.game_has_ended === true) {
+            clearInterval(gameLoop);
+            if (this.game.gameEnd !== true) {
+                this.GameService.endOfGame(this.game, gameInstance);
+                console.log("Save Game");
+            }
+        }
+        this.GameEngineceService.processInput(gameInstance);
+        this.GameEngineceService.updateGameInstance(gameInstance, this.server);
+        this.server.to([gameInstance.players[0], gameInstance.players[1]]).emit('GameUpdate', {
+            BallPosition: { x: gameInstance.ball.position.x, y: gameInstance.ball.position.y },
+            scoreOne: gameInstance.player1_score,
+            scoreTwo: gameInstance.player2_score,
+            paddleOne: { x: gameInstance.paddles[0].start.x - 0.025, y: gameInstance.paddles[0].start.y },
+            paddleTwo: { x: gameInstance.paddles[1].start.x, y: gameInstance.paddles[1].start.y },
+        })
+    }
 
     @SubscribeMessage('leave-matchmaking')
     handleLeaveMatchmaking(@ConnectedSocket() client: Socket, playerLogin: string): string {
@@ -152,50 +187,35 @@ export class GameGateway {
         return (playerLogin);
     }
 
-    @SubscribeMessage('Game_Input')
+    @SubscribeMessage('gameInputDown')
     async handlePaddleMove(@ConnectedSocket() client: Socket, @MessageBody() data: { input: string, gameID: number }) {
-        for (let i = 0; i < this.game_instance.length; i++) {
-            gameInstance = this.game_instance[i];
-            if (gameInstance.gameID === data.gameID) {
-                if (gameInstance.ball.goal !== 3) {
-                    this.GameEnginceService.game_input(data.input, gameInstance, client.id);
-                    this.server.to([gameInstance.players[0], gameInstance.players[1]]).emit('GamePaddleUpdate', {
-                        BallPosition: { x: gameInstance.ball.position.x, y: gameInstance.ball.position.y },
-                        scoreOne: gameInstance.player1_score,
-                        scoreTwo: gameInstance.player2_score,
-                        paddleOne: { x: gameInstance.paddles[0].x - 0.025, y: gameInstance.paddles[0].y },
-                        paddleTwo: { x: gameInstance.paddles[1].x, y: gameInstance.paddles[1].y },
-                    })
-                }
-                break;
+        const gameInstance: game_instance = this.GameService.getGameInstance(this.game_instance, data.gameID);
+        if (gameInstance) {
+            if (gameInstance.pause !== true) {
+                this.GameEngineceService.switchInputDown(data.input, gameInstance, client.id);
             }
         }
     }
 
-    @SubscribeMessage('GameBackUpdate')
-    async handleGameUpdate(client: Socket, @MessageBody() data: { gameID: number }) {
-        for (let i = 0; i < this.game_instance.length; i++) {
-            gameInstance = this.game_instance[i];
-            if (gameInstance.gameID === data.gameID) {
-                if (gameInstance.game_has_ended !== true)
-                    
-                    this.GameEnginceService.updateGameInstance(gameInstance, this.server);
-                this.server.to([gameInstance.players[0], gameInstance.players[1]]).emit('GameBallUpdate', {
-                    BallPosition: { x: gameInstance.ball.position.x, y: gameInstance.ball.position.y },
-                    scoreOne: gameInstance.player1_score,
-                    scoreTwo: gameInstance.player2_score,
-                    paddleOne: { x: gameInstance.paddles[0].x - 0.025, y: gameInstance.paddles[0].y },
-                    paddleTwo: { x: gameInstance.paddles[1].x, y: gameInstance.paddles[1].y },
-                })
-                break;
-            }
+    @SubscribeMessage('gameInputUp')
+    async handlePaddleStop(@ConnectedSocket() client: Socket, @MessageBody() data: { input: string, gameID: number }) {
+        const gameInstance: game_instance = this.GameService.getGameInstance(this.game_instance, data.gameID);
+        if (gameInstance) {
+            this.GameEngineceService.switchInputUp(data.input, gameInstance, client.id);
         }
-        if (gameInstance.game_has_ended === true) {
-            this.game = await this.GameService.getGameByID(gameInstance.gameID);
-            if (this.game.gameEnd !== true) {
-                this.GameService.endOfGame(this.game, gameInstance);
-                console.log("Save Game");
-            }
-        }
+
     }
 }
+
+/** Liste des choses a faire :
+ * remettre les reset de game
+ * mettre en place les inGame et les inMatchmaking
+ * gerer les disconnects et les fins de game
+ * voir pour les multi sockets
+ * essayer d'ameliorer les collisions/ speed (avec gael)
+ * creer un game mode
+ * faire les game invites
+ * regarder ce que je peux enlever du front pour le mettre dans le back
+ * faire le front du jeu
+ * casser le jeu pour debug
+ */

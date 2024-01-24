@@ -7,8 +7,6 @@ import { Game } from '../entities/games.entity';
 @Injectable()
 export class MatchmakingService {
     constructor(
-        @InjectRepository(Game)
-        private gameRepository: Repository<Game>,
         @InjectRepository(User)
         private usersRepository: Repository<User>,
 
@@ -25,13 +23,6 @@ export class MatchmakingService {
 			console.log("one pair FIND");
         }
 		return pairs;
-        // return new Promise((resolve, reject) => {
-		// 	if (pairs.length >= 2) {
-		// 	  resolve(pairs);
-		// 	} else {
-		// 	  reject('Not enough players');
-		// 	}
-		// });
 	}
 		
 

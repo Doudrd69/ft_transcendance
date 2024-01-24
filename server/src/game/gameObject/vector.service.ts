@@ -47,15 +47,15 @@ export class VectorService {
 		return (newVector);
 	}
 
-	mag(vector: vector_instance) {
+	norm(vector: vector_instance) {
 		return Math.sqrt(vector.x * vector.x + vector.y * vector.y);
 	}
 
 	normalize(vector: vector_instance) {
 		const newVector: vector_instance = { x: 0, y: 0}
-		if (this.mag(vector) === 0)
+		if (this.norm(vector) === 0)
 			return (newVector)
-		const neueVector = { x:vector.x / this.mag(vector), y: vector.y / this.mag(vector)}
+		const neueVector = { x:vector.x / this.norm(vector), y: vector.y / this.norm(vector)}
 		return (neueVector);
 	}
 

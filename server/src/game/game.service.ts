@@ -6,13 +6,13 @@ import { GameModule } from './game.module';
 import { env } from 'process';
 import { User } from 'src/users/entities/users.entity';
 import { Paddle } from './entities/paddle.entity';
-import { Game_instance } from 'src/game_gateway/game.gateway';
+import { game_instance } from 'src/game_gateway/game.gateway';
 
 
 interface BallPosition {
-	x: number,
-	y: number,
-	r: number,
+    x: number,
+    y: number,
+    r: number,
 }
 
 
@@ -24,7 +24,7 @@ export class GameService {
         @InjectRepository(User)
         private usersRepository: Repository<User>,
 
-        
+
     ) { }
 
     async createGame(player1ID: string, player2ID: string): Promise<Game> {
@@ -72,12 +72,26 @@ export class GameService {
         // peut etre supprimer les game interrompu
     }
 
+    playerJoined(playerID: string, gameInstance: game_instance) {
+        if (playerID === gameInstance.players[0])
+            gameInstance.player1Joined = true;
+        if (playerID === gameInstance.players[1])
+            gameInstance.player2Joined = true;
+    }
+
+
+    everyPlayersJoined(gameInstance: game_instance) {
+        if (gameInstance.player1Joined === true && gameInstance.player2Joined === true)
+            return true;
+        return false;
+    }
+
     async getGameByID(gameID: number): Promise<Game> {
         const game: Game = await this.gameRepository.findOne({ where: { gameId: gameID } })
         return (game);
     }
 
-    async endOfGame(game: Game, gameInstance: Game_instance): Promise<Game> {
+    async endOfGame(game: Game, gameInstance: game_instance): Promise<Game> {
         const UserOne: User = await this.usersRepository.findOne({ where: { socketGame: gameInstance.players[0] } })
         const UserTwo: User = await this.usersRepository.findOne({ where: { socketGame: gameInstance.players[1] } })
         UserOne.inGame = false;
@@ -91,4 +105,7 @@ export class GameService {
         return (game);
     }
 
+    getGameInstance(gametab: game_instance[], gameID: number) {
+        return gametab.find(instance => instance.gameID === gameID);;
+    }
 }

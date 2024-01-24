@@ -22,23 +22,21 @@ export class PaddleService {
 	) {}
 
 	async updatePaddlePosition(paddle: paddle_instance) {
-		if (paddle.up) {
-			paddle.y -= paddle.speed;
+		if (paddle.ArrowUp) {
 			paddle.start.y -= paddle.speed;
 			paddle.end.y -= paddle.speed;
-			if (paddle.y < 0)
-				paddle.y = 0;
+			if (paddle.start.y < 0) {
 				paddle.start.y = 0;
-				paddle.end.y = 0;
+				paddle.end.y = paddle.length; 
+			}
 		}
-		else if (paddle.down) {
-			paddle.y -= (paddle.speed * -1);
-			paddle.start.y -= (paddle.speed * -1);
-			paddle.end.y -= (paddle.speed * -1);
-			if (paddle.y > 1 - paddle.length)
-				paddle.y = 1 - paddle.length;
+		else if (paddle.ArrowDown) {
+			paddle.start.y += paddle.speed;
+			paddle.end.y += paddle.speed;
+			if (paddle.end.y > 1) {
 				paddle.start.y = 1 - paddle.length;
-				paddle.end.y = 1 - paddle.length;
+				paddle.end.y = 1;
+			}
 		}
 	}
 
@@ -46,17 +44,32 @@ export class PaddleService {
         return (this.VectorService.normalize(this.VectorService.sub(paddle.end, paddle.start)));
     }
 
-	process_input (paddle: paddle_instance, input: string) {
+	processInputUp (paddle: paddle_instance, input: string) {
         if (input === "ArrowUp" || input === "w") {
-            paddle.up = !paddle.up;
-            if (paddle.up) {
-                paddle.down = false;
+            paddle.ArrowUp = false;
+            if (paddle.ArrowUp) {
+                paddle.ArrowDown = false;
             }
         }
 		if (input === "ArrowDown" || input === "s") {
-            paddle.down = !paddle.down;
-            if (paddle.down) {
-                paddle.up = false;
+            paddle.ArrowDown = false;
+            if (paddle.ArrowDown) {
+                paddle.ArrowUp = false;
+            }
+        }
+    }
+
+	processInputDown (paddle: paddle_instance, input: string) {
+        if (input === "ArrowUp" || input === "w") {
+            paddle.ArrowUp = true;
+            if (paddle.ArrowUp) {
+                paddle.ArrowDown = false;
+            }
+        }
+		if (input === "ArrowDown" || input === "s") {
+            paddle.ArrowDown = true;
+            if (paddle.ArrowDown) {
+                paddle.ArrowUp = false;
             }
         }
     }

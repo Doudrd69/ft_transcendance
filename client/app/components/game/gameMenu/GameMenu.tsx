@@ -14,25 +14,50 @@ const Menu = (socket: { socket: Socket }) => {
 
     interface Game {
         gameId: number;
+        playerOneLogin: string,
+        playerTwoLogin: string,
         playerOneID: string;
         playerTwoID: string;
         scoreOne: number;
         scoreTwo: number;
     }
+
+    const defaultGame: Game = {
+        gameId: 1234,
+        playerOneID: "Mattheo",
+        playerTwoID: "Edouard",
+        playerOneLogin: "Mattheo",
+        playerTwoLogin: "Edouard",
+        scoreOne: 0,
+        scoreTwo: 0,
+    };
+
+    const [Game, setGame] = useState<Game>(defaultGame);
         
     const handleStartClick = async () => {
         const currentUserLogin = sessionStorage.getItem("currentUserLogin");
 
+
         if (gameSocket.connected) {
-            // gameSocket.emit('linkSocketWithUser', sessionStorage.getItem("currentUserLogin"));
+            
             gameSocket.emit('join-matchmaking', currentUserLogin);
             await gameSocket.on('joinGame', (game: Game) => {
+                setGame((prevState) => ({
+                    ...prevState,
+                    gameId: Game.gameId,
+                    playerOneID: Game.playerOneID,
+                    playerTwoID: Game.playerTwoID,
+                    playerOneLogin: Game.playerOneLogin,
+                    playerTwoLogin: Game.playerTwoLogin,
+                    scoreOne: Game.scoreOne,
+                    scoreTwo: Game.scoreTwo,
+                }));
                 dispatch({
                     type: 'TOGGLE',
                     payload: 'showGame',
                 });
                 state.showGame = true;
-                gameSocket.emit('Start_Game', (game: Game))
+                gameSocket.emit('playerJoined', {gameId: game.gameId})
             })
         }   
         else {
