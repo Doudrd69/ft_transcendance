@@ -132,7 +132,14 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		else
 			client.join(roomName);
 
-		this.server.to(roomName + roomID).emit('userJoinedRoom', `User has joined ${roomName}${roomID}`);
+		const notif = {
+			from: 'Server',
+			content: `${client.id} has joined the conversation!`,
+			post_datetime: new Date(),
+			conversationID: roomID,
+		}
+
+		this.server.to(roomName + roomID).emit('userJoinedRoom', notif);
 
 		return ;
 	}

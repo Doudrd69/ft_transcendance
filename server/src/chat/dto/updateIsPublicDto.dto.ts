@@ -1,25 +1,19 @@
 import {
-	IsAlpha,
-	IsAscii,
-	IsBoolean,
-	IsNotEmpty,
-	IsPositive, // Checks if the string contains the seed: @Contains(seed: string)
-	IsString,
-	Length,
-	Matches,
 	IsInt,
+	IsNotEmpty,
+	IsPositive,
 	Max
 } from 'class-validator';
 
 export class UpdateIsPublicDto {
-   
-    @IsNotEmpty()
+
+	@IsNotEmpty()
 	@IsPositive()
 	@Max(1000)
 	@IsInt()
 	conversationID: number;
 
-    @IsNotEmpty()
+	@IsNotEmpty()
 	@IsPositive()
 	@Max(1000)
 	@IsInt()
