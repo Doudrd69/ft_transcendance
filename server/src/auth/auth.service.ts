@@ -172,7 +172,7 @@ export class AuthService {
 			return { qrcodeURL };
 		}
 		catch (error) {
-			throw new Error("Fatal error: " + error);
+			throw new Error("Fatal errorr: " + error);
 		}
 	}
 

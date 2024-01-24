@@ -10,7 +10,7 @@ interface AvatarImageProps {
 const AvatarImageComponent: React.FC<AvatarImageProps> = ({ className, refresh, name}) => {
 
 	const { globalState, dispatch } = useGlobal();
-	const defaultAvatar = 'https://uxwing.com/wp-content/themes/uxwing/download/peoples-avatars/corporate-user-icon.png';
+	const defaultAvatar = 'http://localhost:3001/avatars/avatar.png';
 
 	const [isDefault, setDefault] = useState(true);
 	const userLogin = name;

@@ -58,7 +58,7 @@ const GlobalSettingsComponent: React.FC = () => {
 				setActiveUrlImg(true);
 			} else {
 				const error = await response.json();
-				console.log("Fatal error: ", error.message);
+				console.log("Fatal error1: ", error.message);
 			}
 		}
 		catch (error) {
