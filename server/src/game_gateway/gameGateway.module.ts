@@ -7,7 +7,6 @@ import { Friendship } from 'src/users/entities/friendship.entity';
 import { ChatService } from 'src/chat/chat.service';
 import { Conversation } from 'src/chat/entities/conversation.entity';
 import { GameService } from 'src/game/game.service';
-import { GameGateway } from './game.gateway';
 import { GameController } from 'src/game/game.controller';
 import { MatchmakingService } from 'src/game/matchmaking/matchmaking.service';
 import { Game } from 'src/game/entities/games.entity';
@@ -18,6 +17,7 @@ import { Ball } from 'src/game/entities/ball.entity';
 import { BallService } from 'src/game/gameObject/ball.service';
 import { VectorService } from 'src/game/gameObject/vector.service';
 import { Vector } from 'src/game/entities/vector.entity';
+import { GameGateway } from './game.gateway';
 
 
 @Module({

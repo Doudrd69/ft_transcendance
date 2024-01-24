@@ -70,10 +70,3 @@ imports: [
 	providers: [AppService],
 })
 export class AppModule {}
-
-// export class AppModule implements NestModule {
-// 	configure(consumer: MiddlewareConsumer) {
-// 	  consumer
-// 		.apply(GatewayMiddleware)
-// 		.forRoutes('cats' ou RandomController);
-// }
