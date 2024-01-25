@@ -8,7 +8,7 @@ const PasswordComponent: React.FC = () => {
 
 	const [password, setPassword] = useState('');
 
-	const { state, dispatch } = useChat();
+	const { chatState, chatDispatch } = useChat();
 	const { globalState } = useGlobal();
 
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -19,7 +19,7 @@ const PasswordComponent: React.FC = () => {
 		try {
 			e.preventDefault();
 			const checkPasswordDto = {
-				conversationID: state.currentConversationID,
+				conversationID: chatState.currentConversationID,
 				userInput: password,
 				username: sessionStorage.getItem("currentUserLogin"),
 			}
@@ -37,9 +37,9 @@ const PasswordComponent: React.FC = () => {
 				const passwordValidated = await response.json();
 				if (globalState.userSocket?.connected) {
 					globalState.userSocket?.emit('refreshUserChannelList', { userToRefresh: sessionStorage.getItem("currentUserLogin") });
-					globalState.userSocket?.emit('joinRoom', { roomName: state.currentConversation, roomID: state.currentConversationID });
+					globalState.userSocket?.emit('joinRoom', { roomName: chatState.currentConversation, roomID: chatState.currentConversationID });
 				}
-				dispatch({ type: 'DISABLE', payload: 'showPassword' });
+				chatDispatch({ type: 'DISABLE', payload: 'showPassword' });
 			}
 		}
 		catch (error) {
@@ -48,8 +48,8 @@ const PasswordComponent: React.FC = () => {
 	}
 
 	const handleClosePassword = () => {
-		dispatch({ type: 'DISABLE', payload: 'showPassword' });
-		dispatch({ type: 'ACTIVATE', payload: 'showAddChannel' });
+		chatDispatch({ type: 'DISABLE', payload: 'showPassword' });
+		chatDispatch({ type: 'ACTIVATE', payload: 'showAddChannel' });
 	};
 
 	useEffect(() => {

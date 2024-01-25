@@ -3,14 +3,14 @@ import React from 'react';
 import { useChat } from '../../ChatContext';
 
 const ChannelButtonComponent: React.FC = () => {
-  const { state, dispatch } = useChat();
+  const { chatState, chatDispatch } = useChat();
 
   return (
 	<button
-	  className={`main-button-channel ${state.showChannelList ? 'clicked' : ''}`}
+	  className={`main-button-channel ${chatState.showChannelList ? 'clicked' : ''}`}
 	  onClick={() => {
-	  dispatch({ type: 'TOGGLE', payload: 'showChannelList' })
-	  dispatch({type: 'ACTIVATE', payload: 'showBackComponent'})}}>
+	  chatDispatch({ type: 'TOGGLE', payload: 'showChannelList' })
+	  chatDispatch({type: 'ACTIVATE', payload: 'showBackComponent'})}}>
 	  Channel
 	</button>
   );

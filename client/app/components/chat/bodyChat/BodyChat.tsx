@@ -9,16 +9,16 @@ import ChatFriendsListComponent from './chatFriendsList/ChatFriendsList';
 
 const BodyChatComponent: React.FC = () => {
 
-	const { state } = useChat();
+	const { chatState } = useChat();
 
 	const renderComponent = (component: React.ReactNode, condition: boolean) =>
 	  condition ? component : null;
 
 	return (
 		<div className="powerlifter">
-			{renderComponent(<ChatUserComponent />, state.showChat || state.showChatList)}
-			{renderComponent(<ChatChannelComponent />, state.showChannel || state.showChannelList)}
-			{renderComponent(<ChatFriendsListComponent />, state.showFriendsList)}
+			{renderComponent(<ChatUserComponent />, chatState.showChat || chatState.showChatList)}
+			{renderComponent(<ChatChannelComponent />, chatState.showChannel || chatState.showChannelList)}
+			{renderComponent(<ChatFriendsListComponent />, chatState.showFriendsList)}
 		</div>
 	)
 };

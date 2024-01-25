@@ -18,33 +18,33 @@ interface User {
 }
 
 const IdDiscussionComponent: React.FC = () => {
-	const { state, dispatch } = useChat();
+	const { chatState, chatDispatch } = useChat();
 	const [me, setMe] = useState<User>();
 	var id;
-	if (state.currentChannelBool)
+	if (chatState.currentChannelBool)
 	{
 		console.log("coucou");
-		id = `${state.currentConversation}#${state.currentConversationID}`;
+		id = `${chatState.currentConversation}#${chatState.currentConversationID}`;
 	}
 	else
-		id = state.currentConversation;
-	console.log("isAdmin", state.isAdmin);
+		id = chatState.currentConversation;
+	console.log("isAdmin", chatState.isAdmin);
 	return (
 		<div className='bloc-id'>
 			<p className="id">{id}</p>
-			{state.currentChannelBool && state.isAdmin &&
+			{chatState.currentChannelBool && chatState.isAdmin &&
 				<img
 					className='image-id'
 					src='settings.png'
 					onClick={() => { 
-						dispatch({ type: 'ACTIVATE', payload: 'dontcandcel' });
-						dispatch({ type: 'ACTIVATE', payload: 'showOptionChannel' });
-						dispatch({ type: 'DISABLE', payload: 'showBackComponent' });
+						chatDispatch({ type: 'ACTIVATE', payload: 'dontcandcel' });
+						chatDispatch({ type: 'ACTIVATE', payload: 'showOptionChannel' });
+						chatDispatch({ type: 'DISABLE', payload: 'showBackComponent' });
 					}}
 				/>
 			}
-			{state.showPasswordChange && <PasswordChangeComponent />}
-			{state.showOptionChannel && <OptionsChannel title="CHANNEL OPTION"/>}
+			{chatState.showPasswordChange && <PasswordChangeComponent />}
+			{chatState.showOptionChannel && <OptionsChannel title="CHANNEL OPTION"/>}
 		</div>
 		);
 };

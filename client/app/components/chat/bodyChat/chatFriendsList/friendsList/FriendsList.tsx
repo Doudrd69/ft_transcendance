@@ -21,7 +21,7 @@ interface Conversation {
 
 const FriendsListComponent: React.FC = () => {
 	
-	const {state, dispatch} = useChat();
+	const { chatState, chatDispatch } = useChat();
 	const { globalState } = useGlobal();
 	const [showTabFriendsList, setTabFriendsList] = useState(false);
 	const [activeIndex, setActiveIndex] = useState<number | null>(null);
@@ -59,7 +59,7 @@ const FriendsListComponent: React.FC = () => {
 	useEffect(() => {
 		console.log("Loading friend list...");
 		loadFriendList();
-	}, [state.refreshFriendsList]);
+	}, [chatState.refreshFriendsList]);
 
 	useEffect(() => {
 
@@ -97,12 +97,12 @@ const FriendsListComponent: React.FC = () => {
 			<button
 				className="button-friends-list-add"
 				onClick={() => {
-				dispatch({ type: 'ACTIVATE', payload: 'showAddFriend' });
+				chatDispatch({ type: 'ACTIVATE', payload: 'showAddFriend' });
 			}}
 			>
 			+
 			</button>
-			{state.showAddFriend && <AddFriendComponent updateFriends={loadFriendList} title="ADD NEW FRIEND"/>}
+			{chatState.showAddFriend && <AddFriendComponent updateFriends={loadFriendList} title="ADD NEW FRIEND"/>}
 			{friendList.map((friend: FriendShip, id: number) => (
 			<div className="tab-and-userclicked" key={id}>
 				<div className="bloc-button-friendslist">

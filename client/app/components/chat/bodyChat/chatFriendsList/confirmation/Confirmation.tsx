@@ -8,10 +8,10 @@ interface ConfirmationComponentProps {
 }
   
 const ConfirmationComponent: React.FC<ConfirmationComponentProps> = ({ phrase, functionToExecute }) => {
-	const {state, dispatch} = useChat();
+	const { chatState, chatDispatch } = useChat();
 
 	const handleCancel = () => {
-		dispatch({ type: 'DISABLE', payload: 'showConfirmation' })
+		chatDispatch({ type: 'DISABLE', payload: 'showConfirmation' })
 	};
 
 	useEffect(() => {
