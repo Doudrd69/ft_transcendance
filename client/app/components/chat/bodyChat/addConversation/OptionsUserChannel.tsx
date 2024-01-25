@@ -64,10 +64,12 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 
 		if (response.ok) {
 			setBlock(true);
-			globalState.userSocket?.emit('joinRoom', { roomName: `whoblocked${user.login}`, roomID: '' } );
-			globalState.userSocket?.emit('refreshChannel', {
-				channel: state.currentConversation + state.currentConversationID,
-			});
+			if (globalState.userSocket && chatState.currentConversation && chatState.currentConversationID) {
+				globalState.userSocket?.emit('joinRoom', { roomName: `whoblocked${user.login}`, roomID: '' } );
+				globalState.userSocket?.emit('refreshChannel', {
+					channel: chatState.currentConversation + chatState.currentConversationID,
+				});
+			}
 
 			console.log("block");
 		}
@@ -96,10 +98,12 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 			setBlock(false);
 
 			console.log("unblock");
-			globalState.userSocket?.emit('leaveRoom', { roomName: `whoblocked${user.login}`, roomID: '' } );
-			globalState.userSocket?.emit('refreshChannel', {
-				channel: state.currentConversation + state.currentConversationID,
-			});
+			if (globalState.userSocket && chatState.currentConversation && chatState.currentConversationID) {
+				globalState.userSocket?.emit('leaveRoom', { roomName: `whoblocked${user.login}`, roomID: '' } );
+				globalState.userSocket?.emit('refreshChannel', {
+					channel: chatState.currentConversation + chatState.currentConversationID,
+				});
+			}
 		}
 		else {
 			console.error("Fatal error");
