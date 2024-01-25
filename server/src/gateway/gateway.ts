@@ -276,6 +276,7 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	@UseGuards(GatewayGuard)
 	handleChannelrRefresh(@MessageBody() data: { channel: string } ) {
 		const { channel } = data;
+		console.log("refreshing channel");
 		this.server.to(channel).emit('refresh_channel');
 	}
 }

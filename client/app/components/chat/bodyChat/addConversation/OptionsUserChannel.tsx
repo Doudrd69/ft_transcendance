@@ -53,8 +53,6 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 			recipientLogin: user.login,
 		}
 
-		console.log("dto++> ", BlockUserDto);
-
 		const response = await fetch(`http://localhost:3001/users/blockUser`, {
 			method: 'POST',
 			headers: {
@@ -66,6 +64,11 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 
 		if (response.ok) {
 			setBlock(true);
+			console.log("refreshing --> ", state.currentConversation, state.currentConversationID);
+			globalState.userSocket?.emit('joinRoom', { roomName: `whoblocked${user.login}`, roomID: '' } );
+			globalState.userSocket?.emit('refreshChannel', {
+				channel: state.currentConversation + state.currentConversationID,
+			});
 
 			console.log("block");
 		}
@@ -94,6 +97,10 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 			setBlock(false);
 
 			console.log("unblock");
+			globalState.userSocket?.emit('leaveRoom', { roomName: `whoblocked${user.login}`, roomID: '' } );
+			globalState.userSocket?.emit('refreshChannel', {
+				channel: state.currentConversation + state.currentConversationID,
+			});
 		}
 		else {
 			console.error("Fatal error");
