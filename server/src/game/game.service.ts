@@ -26,11 +26,14 @@ export class GameService {
         private usersRepository: Repository<User>,
         
         
-        ) { }
+        ) { 
+
+            this.userGameSockets = {};
+        }
         
-    userGameSockets : { [userLogin: string]: string };
+        userGameSockets : { [userLogin: string]: string };
     
-    async createGame(player1ID: string, player2ID: string): Promise<Game> {
+        async createGame(player1ID: string, player2ID: string): Promise<Game> {
 
         console.log("Creating new GAME...");
         const playersLogin: [string, string] = await this.getLoginByIDpairStartGame(player1ID, player2ID);
@@ -166,17 +169,21 @@ export class GameService {
     }
 
     userHasAlreadyGameSockets(userLogin: string) {
-        // console.log(`login: ${userLogin}`)
-        // if (typeof(this.userGameSockets[userLogin]) == "undefined")
-        //     return false;
-        // console.log(`"undefined"`)
-        // if (typeof(this.userGameSockets[userLogin]) == undefined)
-        //     return false;
-        // console.log(`undefined`)
-        // if (this.userGameSockets[userLogin] === null)
-        //     return false;
-        //     console.log(`null`)
-        return false;
+        console.log(`login: ${userLogin}`)
+        if (typeof(this.userGameSockets[userLogin]) == "undefined") {
+            console.log(`"undefined"`)
+            return false;
+        }
+        if (typeof(this.userGameSockets[userLogin]) == undefined) {
+            console.log(`undefined`)
+            return false;
+        }
+        if (this.userGameSockets[userLogin] === null) {
+            console.log(`null`)
+            return false;
+        }
+        console.log(`pipi`);
+        return true;
     }
 
     addGameSocket(gameSocketId: string, userLogin: string) {

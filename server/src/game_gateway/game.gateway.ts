@@ -117,7 +117,7 @@ export class GameGateway {
 
     @SubscribeMessage('linkSocketWithUser')
     @UseGuards(GatewayGuard)
-    handleLinkSocketWithUser(client: Socket, @MessageBody() data: {playerLogin: string}) {
+    handleLinkSocketWithUser(@ConnectedSocket() client: Socket, @MessageBody() data: {playerLogin: string}) {
         console.log("Linking socket to user ", data.playerLogin);
         if (this.GameService.userHasAlreadyGameSockets(data.playerLogin)) {
             // si deja alors emit already game in progress ou inmatchmaking et disconnect sa socket
@@ -266,13 +266,13 @@ export class GameGateway {
  * }
  * mettre en place les inGame et les inMatchmaking
  * {
- *      j'ai pas besoin du multiSocketsPlayer pour faire ca
+ *      a verifier
  * }
  * gerer les disconnects et les fins de game
  * {
- *      no
+ *      a verifier
  * }
- * essayer d'ameliorer les collisions/ speed (avec gael)
+ * essayer d'ameliorer les collisions/ speed (avec gael) atester
  * creer un game mode
  * faire les game invites
  * faire le front du jeu
