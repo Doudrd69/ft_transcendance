@@ -19,6 +19,16 @@ import GameHeader from './components/game/GameHeader';
 import { useGlobal } from './GlobalContext';
 // import { useChat } from './components/chat/ChatContext';
 
+interface Game {
+	gameId: number;
+	playerOneLogin: string,
+	playerTwoLogin: string,
+	playerOneID: string;
+	playerTwoID: string;
+	scoreOne: number;
+	scoreTwo: number;
+}
+
 interface FriendRequestDto {
 	recipientID: number,
 	recipientLogin: string;
@@ -31,6 +41,7 @@ const GeneralComponent = () => {
 	const [showLogin, setShowLogin] = useState(true);
 	const [show2FAForm, setShow2FAForm] = useState(false);
 	const [authValidated, setAuthValidated] = useState(false);
+	const [Game, setGame] = useState<Game>();
 
 	const searchParams = useSearchParams();
 	const code = searchParams.get('code');
@@ -249,14 +260,37 @@ const GeneralComponent = () => {
 			console.log('GameSocket new connection : ', globalState.gameSocket?.id);
 			globalState.gameSocket?.emit('linkSocketWithUser', sessionStorage.getItem("currentUserLogin"));
 		})
-
+		
 		globalState.gameSocket?.on('disconnect', () => {
 			console.log('GameSocket? disconnected from the server : ', globalState.gameSocket?.id);
 		})
+		
+		globalState.gameSocket?.on('connectionDone', () => {
+			console.log("Emitting join-matchmaking");
+			globalState.gameSocket?.emit('join-matchmaking',{ playerLogin: sessionStorage.getItem("currentUserLogin") });
+		});
+
+		globalState.gameSocket?.on('joinGame', (game: Game) => {
+            console.log("JOIN GAME");
+            setGame((prevState: Game | undefined) => ({
+                ...prevState,
+                gameId: game.gameId,
+                playerOneID: game.playerOneID,
+                playerTwoID: game.playerTwoID,
+                playerOneLogin: game.playerOneLogin,
+                playerTwoLogin: game.playerTwoLogin,
+                scoreOne: game.scoreOne,
+                scoreTwo: game.scoreTwo,
+            }));
+            globalState.gameSocket?.emit('playerJoined', {gameId: game.gameId})
+        })
+
 
 		return () => {
 			globalState.gameSocket?.off('connect');
 			globalState.gameSocket?.off('disconnect');
+			globalState.gameSocket?.off('connectionDone');
+			globalState.gameSocket?.off('joinGame');
 		}
 
 	}, [globalState?.gameSocket])

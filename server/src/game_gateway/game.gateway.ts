@@ -87,7 +87,7 @@ export class GameGateway {
     private connectedUsers: { [userId: string]: Socket } = {};
 
 
-    handleConnection(@ConnectedSocket() client: Socket, playerlogin: string) {
+    handleConnection(@ConnectedSocket() client: Socket) {
         console.log(`GameGtw client connected : ${client.id}`);
         this.connectedUsers[client.id] = client;
         // client.join(`user_game_${client.id}`);
@@ -103,7 +103,12 @@ export class GameGateway {
     @SubscribeMessage('linkSocketWithUser')
     @UseGuards(GatewayGuard)
     handleLinkSocketWithUser(client: Socket, playerLogin: string) {
+        console.log("Linking socket to user ", playerLogin);
         this.GameService.linkSocketIDWithUser(client.id, playerLogin);
+        console.log("Link OK --> joining personnal room");
+        // creating a personnal room so we can emit to the user
+        client.join(playerLogin);
+        this.server.to(playerLogin).emit('connectionDone');
     }
 
     @SubscribeMessage('Game')
@@ -115,19 +120,26 @@ export class GameGateway {
     @SubscribeMessage('join-matchmaking')
     @UseGuards(GatewayGuard)
     async handleJoinMatchmaking(@ConnectedSocket() client: Socket, @MessageBody() data: { playerLogin: string}) {
-        console.log("JOINMATCHMAKING");
-        // faire un if check inmatchmaking ou ingame false 
+        const { playerLogin } = data;
+        console.log(`== ${playerLogin} JOINS MATCHMAKING ==`);
+ 
         this.MatchmakingService.join(client.id);
-        const enoughPlayers = this.MatchmakingService.IsThereEnoughPairs();
+        const enoughPlayers = await this.MatchmakingService.IsThereEnoughPairs();
+
+        console.log("Ready to start: ", enoughPlayers);
         if (enoughPlayers) {
             const pairs: [string, string][] = await this.MatchmakingService.getPlayersPairs();
             for (const pair of pairs) {
                 const socketIDs: [string, string] = [pair[0], pair[1]];
                 this.game = await this.GameService.createGame(pair[0], pair[1]);
+                if (!this.game)
+                    throw new Error("Fatal error");
                 const gameInstance: game_instance = this.GameEngineceService.createGameInstance(this.game);
                 this.game_instance.push(gameInstance);
                 this.MatchmakingService.leave(pair[0]);
                 this.MatchmakingService.leave(pair[1]);
+                console.log("SOCKET IDs: ", socketIDs);
+                this.server.to(socketIDs).emit('setgame');
                 this.server.to(socketIDs).emit('joinGame', {
                     gameId: this.game.gameId,
                     playerOneID: this.game.playerOneID,
@@ -189,10 +201,12 @@ export class GameGateway {
 
     @SubscribeMessage('leave-matchmaking')
     @UseGuards(GatewayGuard)
-    handleLeaveMatchmaking(@ConnectedSocket() client: Socket, playerLogin: string): string {
-        console.log("leaveMATCHMAKING");
-        this.MatchmakingService.leave(playerLogin);
-        return (playerLogin);
+    async handleLeaveMatchmaking(@ConnectedSocket() client: Socket, @MessageBody() data: { playerLogin: string }) {
+        const { playerLogin } = data;
+        console.log(`== Client ${client.id} (${playerLogin}) left (queue) matchmaking ==`);
+        await this.MatchmakingService.leave(playerLogin);
+        console.log("emit leave-game");
+        this.server.to(playerLogin).emit('leave-game');
     }
 
     @SubscribeMessage('gameInputDown')

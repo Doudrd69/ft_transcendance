@@ -30,57 +30,29 @@ const Menu = () => {
         scoreOne: 0,
         scoreTwo: 0,
     };
-
-    const [Game, setGame] = useState<Game>(defaultGame);
         
-    const handleStartClick = async () => {
+    const handleStartClick = () => {
 
-        const currentUserLogin = sessionStorage.getItem("currentUserLogin");
+        try {
 
-        const gameSocket = io('http://localhost:3001/game', {
-            autoConnect: false,
-            auth: {
-                token: sessionStorage.getItem("jwt"),
-            }
-        });
-        gameSocket.connect();
-        dispatch({ type: 'SET_GAME_SOCKET', payload: gameSocket });
-        dispatchGame({ type: 'TOGGLE', payload: 'showGameMatchmaking' });
-        if (gameSocket.connected) {
-            globalState.gameSocket?.emit('join-matchmaking', currentUserLogin);
-        }   
-        else {
-            console.log("GameSocket pas connecté");
+            const gameSocket = io('http://localhost:3001/game', {
+                autoConnect: false,
+                auth: {
+                    token: sessionStorage.getItem("jwt"),
+                }
+            });
+            gameSocket.connect();
+
+            dispatch({ type: 'SET_GAME_SOCKET', payload: gameSocket });
+            dispatchGame({ type: 'TOGGLE', payload: 'showGameMatchmaking' });
+    
+            // console.log("After Dispatch: ", globalState?.gameSocket);
+
+        } catch (error) {
+            console.error(error);
         }
         
     };
-    
-    useEffect(() => {
-        
-        globalState.gameSocket?.on('joinGame', (game: Game) => {
-            setGame((prevState) => ({
-                ...prevState,
-                gameId: Game.gameId,
-                playerOneID: Game.playerOneID,
-                playerTwoID: Game.playerTwoID,
-                playerOneLogin: Game.playerOneLogin,
-                playerTwoLogin: Game.playerTwoLogin,
-                scoreOne: Game.scoreOne,
-                scoreTwo: Game.scoreTwo,
-            }));
-            dispatchGame({
-                type: 'TOGGLE',
-                payload: 'showGame',
-            });
-            state.showGame = true;
-            globalState.gameSocket?.emit('playerJoined', {gameId: game.gameId})
-        })
-
-        return () => {
-            globalState.gameSocket?.off('joinGame');
-        }
-
-    }, [globalState?.gameSocket]);
 
     return (
         <div className="background-game">

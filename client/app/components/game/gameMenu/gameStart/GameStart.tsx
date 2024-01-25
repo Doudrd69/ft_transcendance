@@ -1,5 +1,5 @@
 import './GameStart.css'
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useGame } from '../../GameContext';
 import { Socket } from 'socket.io-client'
 import { useGlobal } from '@/app/GlobalContext';
@@ -9,19 +9,40 @@ const MatchMaking = () => {
     const { state, dispatchGame } = useGame();
     const { globalState } = useGlobal();
 
-	const handleStartClick = async () => {
-		const currentUserLogin = sessionStorage.getItem("currentUserLogin");
-	
+	const handleLeave= () => {
+
 		if (globalState.gameSocket?.connected) {
-			console.log("joueur leave")
-			globalState.gameSocket?.emit('leave-matchmaking', currentUserLogin);
-			globalState.gameSocket?.off('message');
+			console.log("Player leaves matchmaking")
+			globalState.gameSocket?.emit('leave-matchmaking', { playerLogin: sessionStorage.getItem("currentUserLogin") });
 		}
 		else {
-			console.log("GameSocket pas connecté");
+			console.log("ERROR: GameSocket pas connecté (leave matchmaking)");
 		}
 	};
 	
+    useEffect(() => {
+
+        globalState.gameSocket?.on('leave-game', () => {
+            console.log("Event leave-game");
+            globalState.gameSocket?.disconnect();
+            dispatchGame({ type: 'TOGGLE', payload: 'showGameMenu'});
+        });
+            
+        globalState.gameSocket?.on('setgame', () => {
+            console.log("SET GAME");
+            dispatchGame({
+                type: 'TOGGLE',
+                payload: 'showGame',
+            });
+            state.showGame = true;
+        });
+
+        return () => {
+            globalState.gameSocket?.off('leave-game');
+            globalState.gameSocket?.off('setgame');
+         }
+
+    }, [globalState?.gameSocket]);
 
     return (
         <div className="matchmakingClass">
@@ -35,7 +56,9 @@ const MatchMaking = () => {
                     <label>●</label>
                 </div>
             </div>
-                    <button className={`cancel-button ${state.showGameMenu ? 'clicked' : ''}`} onClick={() =>{ handleStartClick(); dispatchGame({ type: 'TOGGLE', payload: 'showGameMenu'})}}>Cancel</button>
+                    <button className={`cancel-button ${state.showGameMenu ? 'clicked' : ''}`} onClick={() => {
+                        handleLeave();
+                    }}>Cancel</button>
         </div>
     );
 };
