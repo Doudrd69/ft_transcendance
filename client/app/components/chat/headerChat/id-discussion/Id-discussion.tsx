@@ -7,27 +7,32 @@ import PasswordChangeComponent from './PasswordChange';
 
 
 
-interface user{
+interface User {
 	id: number;
-	login : string;
+	login: string;
+	avatarURL: string;
 	isAdmin: boolean;
+	isMute: boolean;
+	isBan: boolean;
 	isOwner: boolean;
 }
 
 const IdDiscussionComponent: React.FC = () => {
 	const { state, dispatch } = useChat();
+	const [me, setMe] = useState<User>();
 	var id;
-
 	if (state.currentChannelBool)
 	{
+		console.log("coucou");
 		id = `${state.currentConversation}#${state.currentConversationID}`;
 	}
 	else
 		id = state.currentConversation;
+	console.log("isAdmin", state.isAdmin);
 	return (
 		<div className='bloc-id'>
 			<p className="id">{id}</p>
-			{state.currentIsAdmin &&
+			{state.currentChannelBool && state.isAdmin &&
 				<img
 					className='image-id'
 					src='settings.png'

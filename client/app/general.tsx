@@ -19,6 +19,16 @@ import GameHeader from './components/game/GameHeader';
 import { useGlobal } from './GlobalContext';
 // import { useChat } from './components/chat/ChatContext';
 
+interface Game {
+	gameId: number;
+	playerOneLogin: string,
+	playerTwoLogin: string,
+	playerOneID: string;
+	playerTwoID: string;
+	scoreOne: number;
+	scoreTwo: number;
+}
+
 interface FriendRequestDto {
 	recipientID: number,
 	recipientLogin: string;
@@ -28,30 +38,13 @@ interface FriendRequestDto {
 const GeneralComponent = () => {
 
     const { globalState, dispatch } = useGlobal();
-
-	// faire comme le usersocket
-	const gameSocket = io('http://localhost:3001/game', {
-		autoConnect: false,
-	})
-
 	const [showLogin, setShowLogin] = useState(true);
 	const [show2FAForm, setShow2FAForm] = useState(false);
 	const [authValidated, setAuthValidated] = useState(false);
+	const [Game, setGame] = useState<Game>();
 
 	const searchParams = useSearchParams();
 	const code = searchParams.get('code');
-
-	if (authValidated) {
-		const currentUserId = sessionStorage.getItem("currentUserId");
-		console.log("Login done: gameSocket connection");
-		gameSocket.connect();
-		if (gameSocket.connected) {
-			console.log("gameSocket connection success");
-		}
-		else {
-			console.log("gameSocket error");
-		}
-	}
 
 	const friendRequestValidation = async (friendRequestDto: FriendRequestDto) => {
 
@@ -78,14 +71,14 @@ const GeneralComponent = () => {
 
 	const FriendRequestReceived = ({ closeToast, toastProps, friendRequestDto }: any) => (
 		<div>
-		  	You received a friend request from  {friendRequestDto.initiatorLogin}
+			You received a friend request from  {friendRequestDto.initiatorLogin}
 			<button style={{ padding: '5px '}} onClick={() => {
 				friendRequestValidation(friendRequestDto);
-				closeToast
-				}}>
+				closeToast;
+			}}>
 			Accept
 			</button>
-		 	 <button style={{ padding: '5px '}} onClick={closeToast}>Deny</button>
+				<button style={{ padding: '5px '}} onClick={closeToast}>Deny</button>
 		</div>
 	)
 
@@ -179,13 +172,13 @@ const GeneralComponent = () => {
 			globalState.userSocket?.on('friendRequest', (friendRequestDto: FriendRequestDto) => {
 				toast(<FriendRequestReceived friendRequestDto={friendRequestDto}/>);
 			});
-	
+
 			globalState.userSocket?.on('friendRequestAcceptedNotif', (data: { roomName: string, roomID: string, initiator: string, recipient: string }) => {
 				const { roomName, roomID, initiator, recipient } = data;
 				toast(<FriendRequestAccepted friend={recipient}/>);
 				globalState.userSocket?.emit('joinRoom', {roomName: roomName, roomID: roomID});
 			})
-	
+
 			globalState.userSocket?.on('userJoinedRoom', (notification: string) => {
 				console.log("User socket in main: ", globalState.userSocket?.id);
 				console.log("Notif from server: ", notification);
@@ -198,7 +191,7 @@ const GeneralComponent = () => {
 					toast.warn(`You are ban from ${roomName}`);
 				}
 			});
-	
+
 			globalState.userSocket?.on('userIsUnban', ( data: { roomName: string, roomID: string } ) => {
 				const { roomName, roomID } = data; 
 				if (roomName && roomID) {
@@ -216,7 +209,7 @@ const GeneralComponent = () => {
 				const { convID, convName } = data;
 				globalState.userSocket?.emit('joinRoom', {roomName: convName, roomID: convID});
 			});
-	
+
 			return () => {
 				globalState.userSocket?.off('friendRequest');
 				globalState.userSocket?.off('friendRequestAcceptedNotif');
@@ -242,15 +235,15 @@ const GeneralComponent = () => {
 			globalState.userSocket?.on('disconnect', () => {
 				console.log('UserSocket disconnected from the server : ', globalState.userSocket?.id);
 			})
-	
+
 			globalState.userSocket?.on('newConnection', (notif: string) => {
 				toast(notif);
 			})
-	
+
 			globalState.userSocket?.on('newDeconnection', (notif: string) => {
 				toast(notif);
 			})
-	
+
 			return () => {
 				globalState.userSocket?.off('connect');
 				globalState.userSocket?.off('disconnect');
@@ -262,20 +255,45 @@ const GeneralComponent = () => {
 
 	// Game socket handler
 	useEffect(() => {
-		gameSocket.on('connect', () => {
-			console.log('GameSocket new connection : ', gameSocket.id);
-			gameSocket.emit('linkSocketWithUser', sessionStorage.getItem("currentUserLogin"));
-		})
 
-		gameSocket.on('disconnect', () => {
-			console.log('GameSocket disconnected from the server : ', gameSocket.id);
+		globalState.gameSocket?.on('connect', () => {
+			console.log('GameSocket new connection : ', globalState.gameSocket?.id);
+			globalState.gameSocket?.emit('linkSocketWithUser', sessionStorage.getItem("currentUserLogin"));
 		})
+		
+		globalState.gameSocket?.on('disconnect', () => {
+			console.log('GameSocket? disconnected from the server : ', globalState.gameSocket?.id);
+		})
+		
+		globalState.gameSocket?.on('connectionDone', () => {
+			console.log("Emitting join-matchmaking");
+			globalState.gameSocket?.emit('join-matchmaking',{ playerLogin: sessionStorage.getItem("currentUserLogin") });
+		});
+
+		globalState.gameSocket?.on('joinGame', (game: Game) => {
+            console.log("JOIN GAME");
+            setGame((prevState: Game | undefined) => ({
+                ...prevState,
+                gameId: game.gameId,
+                playerOneID: game.playerOneID,
+                playerTwoID: game.playerTwoID,
+                playerOneLogin: game.playerOneLogin,
+                playerTwoLogin: game.playerTwoLogin,
+                scoreOne: game.scoreOne,
+                scoreTwo: game.scoreTwo,
+            }));
+            globalState.gameSocket?.emit('playerJoined', {gameId: game.gameId})
+        })
+
 
 		return () => {
-			gameSocket.off('connect');
-			gameSocket.off('disconnect');
+			globalState.gameSocket?.off('connect');
+			globalState.gameSocket?.off('disconnect');
+			globalState.gameSocket?.off('connectionDone');
+			globalState.gameSocket?.off('joinGame');
 		}
-	}, [gameSocket])
+
+	}, [globalState?.gameSocket])
 
 	// Login form useEffect
 	useEffect(() => {
@@ -291,22 +309,22 @@ const GeneralComponent = () => {
 	// 	if (sessionStorage.getItem("currentUserLogin") != null)
 	// 		setShowLogin(false);
 	// });
-	
+
 		return (
-            <>
-                <ToastContainer />
-                    {showLogin ? (
-                    <Authentificationcomponent />
-                    ) : show2FAForm ? (
-                    <TFAComponent on2FADone={handle2FADone} />
-                    ) : (
-                        <>
-                        {/* <SetComponent/> */}
-                        <Header/>
-                        <BodyComponent gameSocket={gameSocket}/>
-                    </>
-                    )}	
-            </>      
-		  );
+			<>
+				<ToastContainer />
+					{showLogin ? (
+					<Authentificationcomponent />
+					) : show2FAForm ? (
+					<TFAComponent on2FADone={handle2FADone} />
+					) : (
+						<>
+						{/* <SetComponent/> */}
+						<Header/>
+						<BodyComponent/>
+					</>
+					)}	
+			</>
+			);
 }
 export default GeneralComponent;

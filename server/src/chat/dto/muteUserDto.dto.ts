@@ -3,19 +3,19 @@ import {
 	IsAscii,
 	IsBoolean,
 	IsNotEmpty,
-	IsPositive, // Checks if the string contains the seed: @Contains(seed: string)
+	IsPositive,
 	IsString,
 	Length,
 	Matches,
 	Max,
-    IsDate,
+	IsInt,
 } from 'class-validator';
-import { isDate } from 'util/types';
 
 export class MuteUserDto {
-   
-    @IsNotEmpty()
+
+	@IsNotEmpty()
 	@IsPositive()
+	@IsInt()
 	@Max(1000)
 	conversationID: number;
 
@@ -33,8 +33,13 @@ export class MuteUserDto {
 
 	@IsNotEmpty()
 	@IsPositive()
+	@IsInt()
 	@Max(1000)
 	from: number;
 
-    mutedUntil: number;
+	@IsNotEmpty()
+	@IsPositive()
+	@IsInt()
+	@Max(1000)
+	mutedUntil: number;
 }

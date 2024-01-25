@@ -5,13 +5,15 @@ import {
 	IsPositive,
 	Length,
 	Matches,
-	Max
+	Max,
+	IsInt,
 } from 'class-validator';
 
 export class UpdateUsernameDto {
 
 	@IsNotEmpty()
 	@IsPositive()
+	@IsInt()
 	@Max(1000)
 	userID: number;
 

@@ -4,6 +4,7 @@ import { setCurrentComponent, useChat } from '../../ChatContext';
 import './AddConversation.css';
 import { RSC } from 'next/dist/client/components/app-router-headers';
 import { useGlobal } from '@/app/GlobalContext';
+import TimerComponent from './Timer';
 
 interface User {
 	id: number;
@@ -13,6 +14,7 @@ interface User {
 	isMute: boolean;
 	isBan: boolean;
 	isOwner: boolean;
+	blockList: string[];
 }
 
 interface OptionsUserChannelProps {
@@ -33,7 +35,70 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 	const [admin, setAdmin] = useState<boolean>(user.isAdmin);
 	const [mute, setMute] = useState<boolean>(user.isMute);
 	const [ban, setBan] = useState<boolean>(user.isBan);
+	const [block, setBlock] = useState<boolean>(false);
+	let isBlocked = false;
 
+	if (me && me.blockList) {
+		isBlocked = !!me.blockList.find((userblock) => userblock === user.login);
+	}
+	
+	if (isBlocked) {
+		setBlock(isBlocked);
+	}
+
+	const blockUser = async() => {
+
+		const BlockUserDto = {
+			initiatorLogin: sessionStorage.getItem("currentUserLogin"),
+			recipientLogin: user.login,
+		}
+
+		console.log("dto++> ", BlockUserDto);
+
+		const response = await fetch(`http://localhost:3001/users/blockUser`, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
+			},
+			body: JSON.stringify(BlockUserDto),
+		});
+
+		if (response.ok) {
+			setBlock(true);
+
+			console.log("block");
+		}
+		else {
+			console.error("Fatal error");
+		}
+	}
+
+	const unblockUser = async() => {
+
+		const BlockUserDto = {
+			initiatorLogin: sessionStorage.getItem("currentUserLogin"),
+			recipientLogin: user.login,
+		}
+
+		const response = await fetch(`http://localhost:3001/users/unblockUser`, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
+			},
+			body: JSON.stringify(BlockUserDto),
+		});
+
+		if (response.ok) {
+			setBlock(false);
+
+			console.log("unblock");
+		}
+		else {
+			console.error("Fatal error");
+		}
+	}
 	const unmuteUser = async() => {
 
 		try {
@@ -64,33 +129,9 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 	}
 	
 	const muteUser = async() => {
+		dispatch({ type: 'ACTIVATE', payload: 'showTimer' });
+		dispatch({ type: 'DISABLE', payload: 'showOptionsUserChannel' });
 
-		try{
-			const muteUserDto = {
-				conversationID: Number(state.currentConversationID),
-				username: user.login,
-				state: true,
-				from: Number(sessionStorage.getItem("currentUserID")),
-				mutedUntil: 5,
-			}
-	
-			const response = await fetch(`http://localhost:3001/chat/muteUser`, {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-					'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
-				},
-				body: JSON.stringify(muteUserDto),
-			});
-		
-			if (response.ok) {
-				user.isMute = !user.isMute;
-				setMute(true);
-			}
-		}
-		catch (error) {
-			console.error(error);
-		}
 	}
 
 	const banUser = async() => {
@@ -214,7 +255,7 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 	const demoteAdminUser = async() => {
 		
 		try{
-
+			console.log(user);
 			const userOptionDto = {
 				conversationID: Number(state.currentConversationID),
 				username: user.login,
@@ -274,6 +315,7 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 					// je quitte le channel donc faut refresh le composant pour les autres
 					dispatch({ type: 'ACTIVATE', payload: 'showChannelList' });
 					dispatch({ type: 'DISABLE', payload: 'showChannel' });
+					dispatch({ type: 'DISABLE', payload: 'showOptionsUserChannel' });
 
 					if (state.currentConversation) {
 						globalState.userSocket?.emit('refreshChannel', {
@@ -315,8 +357,10 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 	}
 	
 	const handleDms = async() => {
+		console.log("ahahahahahahah");
 
 		try {
+		console.log("user ljourand: ", user);
 
 			const createDMConversationDto = {
 				user1: Number(user.id),
@@ -334,8 +378,10 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 	
 			if (response.ok) {
 				const conversation : Conversation = await response.json();
-				
-				dispatch({ type: 'SET_CURRENT_CONVERSATION', payload: conversation.name });
+				let tmp = conversation.name;
+				let conversationName = tmp.replace(me.login, "");
+				console.log("conversationName: ", conversationName);
+				dispatch({ type: 'SET_CURRENT_CONVERSATION', payload: conversationName });
 				dispatch({ type: 'SET_CURRENT_ROOM', payload: conversation.name });
 				dispatch({ type: 'SET_CURRENT_CONVERSATION_ID', payload: conversation.id });
 				
@@ -354,17 +400,19 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 					status: true
 				});
 				
-				// dispatch({ type: 'DISABLE', payload: 'showOptionsUserChannel' });
-				// dispatch({ type: 'DISABLE', payload: 'showOptionsUserChannelOwner' });
-				// dispatch({ type: 'DISABLE', payload: 'showChannel' });
-				// dispatch({ type: 'ACTIVATE', payload: 'showChat' });
-
+				
 				console.log("Conversation created");
 			}
 		}
 		catch (error) {
 			console.log(error);
 		}
+		dispatch({ type: 'ACTIVATE', payload: 'showChat' });
+		dispatch({ type: 'ACTIVATE', payload: 'showBackComponent' });
+		dispatch({ type: 'DISABLE', payload: 'showOptionsUserChannel' });
+		dispatch({ type: 'DISABLE', payload: 'currentChannelBool' });
+		dispatch({ type: 'DISABLE', payload: 'showChannel' });
+		dispatch({ type: 'DISABLE', payload: 'showOptionsUserChannelOwner' });
 	}
 
 	const handleCancel = () => {
@@ -407,21 +455,21 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 									{mute ? (
 										<img className="option-image" src="volume-mute.png" onClick={unmuteUser}/>
 									) : (
-										<img className="option-image" src="unmute.png" onClick={muteUser}/>
+											<img className="option-image" src="unmute.png" onClick={muteUser}/>
 									)}
 									{ban ? (
 										<img className="option-image" src="interdit.png" onClick={unbanUser}/>
-									) : (
-										<img className="option-image-opacity" src="interdit.png" onClick={banUser}/>
-									)}
+										) : (
+											<img className="option-image-opacity" src="interdit.png" onClick={banUser}/>
+											)}
 									</>
 								)
 							}
-							{/* {block ? (
+							{block ? (
 								<img className="option-image" src="block.png" onClick={unblockUser}/>
-							) : (
-								<img className="option-image-opacity" src="block.png" onClick={blockUser}/>
-							)} */}
+								) : (
+									<img className="option-image-opacity" src="block.png" onClick={blockUser}/>
+								)}
 						</div>
 					)}
 					<img className="option-image" src="logoutred.png" onClick={handleLeaveChannel}/>

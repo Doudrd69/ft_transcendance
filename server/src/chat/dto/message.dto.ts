@@ -3,7 +3,10 @@ import {
 	IsNotEmpty,
 	IsString,
 	Length,
-	Matches
+	Matches,
+	IsInt,
+	IsPositive,
+	Max,
 } from 'class-validator';
 
 export class MessageDto {
@@ -15,14 +18,16 @@ export class MessageDto {
 	@IsNotEmpty()
 	@IsString()
 	@IsAscii()
-	@Matches(/^[^"';%()|<>\\]*$/)
+	@Matches(/^[^";%()|<>\\]*$/)
 	@Length(1, 180)
 	content: string;
 
 	@IsNotEmpty()
-	// @IsDate()
 	post_datetime: Date;
 
 	@IsNotEmpty()
+	@IsPositive()
+	@IsInt()
+	@Max(1000)
 	conversationID: number;
 }

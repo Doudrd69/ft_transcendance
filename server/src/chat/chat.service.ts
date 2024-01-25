@@ -16,7 +16,6 @@ import { group } from 'console';
 import { ChannelOptionsDto } from './dto/channelOptionsDto.dto';
 import { QuitConversationDto } from './dto/quitConversationDto.dto';
 import { FormatInputPathObject } from 'path';
-import { GroupDto } from './dto/group.dto';
 import { UpdateIsPublicDto } from './dto/updateIsPublicDto.dto';
 import { UpdateProtectFalseDto } from './dto/updateProtectFalseDto.dto';
 import { DeleteConversationDto } from './dto/deleteConversationDto.dto';
@@ -183,6 +182,7 @@ export class ChatService {
 										isAdmin: group.isAdmin,
 										isBan: group.isBan,
 										isMute: group.isMute,
+										blockList: user_.blockedUsers,
 									});
 							}
 						});
@@ -259,7 +259,7 @@ export class ChatService {
 			}
 			return [];
 		}
-		console.error("Fatal error: user not found");
+		console.error("Fatal error2: user not found");
 		return [];
 	}
 
@@ -326,7 +326,7 @@ export class ChatService {
 			}
 			return [];
 		}
-		console.error("Fatal error: user not found");
+		console.error("Fatal error2: user not found");
 		return [];
 	}
 
@@ -350,7 +350,7 @@ export class ChatService {
 			}
 			return [];
 		}
-		console.error("Fatal error: user not found");
+		console.error("Fatal error1: user not found");
 		return [];
 	}
 
@@ -944,7 +944,7 @@ export class ChatService {
 			}
 		}
 		
-		return ;
+		return conversationCheck;
 	}
 
 	async createPrivateConversation(DMcreationDto: DMcreationDto): Promise<Conversation> {
@@ -1025,7 +1025,7 @@ export class ChatService {
 			return conv;
 		}
 
-		throw new Error("Fatal error: user not found");
+		throw new Error("Fatal error3: user not found");
 	}
 
 

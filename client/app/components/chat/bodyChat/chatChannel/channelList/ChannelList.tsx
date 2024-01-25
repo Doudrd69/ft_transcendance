@@ -35,7 +35,7 @@ const ChannelListComponent: React.FC = () => {
 
 	const [conversations, setConversations] = useState<Conversation[]>([]);
 	const [isAdmin, setIsAdmin] = useState<boolean[]>([]);
-	const [userList, setUserList] = useState<User[]>([]);
+	const [userList, setUserList] = useState<User[][]>([]);
 	
 
 	const loadDiscussions = async () => {
@@ -68,16 +68,25 @@ const ChannelListComponent: React.FC = () => {
 
 	useEffect(() => {
 
-		globalState.userSocket?.on('userIsBan', () => {
-			dispatch({ type: 'DISABLE', payload: 'showChannel' });
-			dispatch({ type: 'ACTIVATE', payload: 'showChannelList' });
+		if (globalState?.userSocket) {
+			console.log("OUAIS ON ETS LA");
+			globalState.userSocket?.on('userIsBan', () => {
+				dispatch({ type: 'DISABLE', payload: 'showChannel' });
+				dispatch({ type: 'ACTIVATE', payload: 'showChannelList' });
+				loadDiscussions();
+			});
+		}
+
+		globalState.userSocket?.on('channelDeleted', ( data: {roomName: string, roomID: string} ) => {
+			const { roomName, roomID } = data;
 			loadDiscussions();
+			globalState.userSocket?.emit('leaveRoom', { roomName: roomName, roomID: roomID });
+			dispatch({ type: 'ACTIVATE', payload: 'showChannelList' });
 		});
 
 		globalState.userSocket?.on('userIsUnban', () => {
 			loadDiscussions();
 		});
-
 		// seul event rfreshChannelList est ici donc besoin de rien
 		globalState.userSocket?.on('refreshChannelList', () => {
 			loadDiscussions();
@@ -87,6 +96,7 @@ const ChannelListComponent: React.FC = () => {
 			globalState.userSocket?.off('banUser');
 			globalState.userSocket?.off('refreshChannelList');
 			globalState.userSocket?.off('refreshChannel');
+			globalState.userSocket?.off('channelDeleted');
 		}
 
 	}, [globalState?.userSocket]);
@@ -114,7 +124,7 @@ const ChannelListComponent: React.FC = () => {
 			};
 	}, []);
 
-	const handleConv = (conversation: Conversation, user: User, index: number) => {
+	const handleConv = (conversation: Conversation, user: User[], index: number) => {
 		dispatch({ type: 'SET_CURRENT_CONVERSATION', payload: conversation.name });
 		dispatch(setCurrentComponent('showChannelList'));
 		dispatch({ type: 'SET_CURRENT_CONVERSATION_ID', payload: conversation.id });
@@ -122,8 +132,19 @@ const ChannelListComponent: React.FC = () => {
 		dispatch({ type: 'SET_CURRENT_CONVERSATION_IS_PROTECTED', payload: conversation.isProtected });
 		dispatch({ type: 'ACTIVATE', payload: 'currentChannelBool' });
 		dispatch({ type: 'ACTIVATE', payload: 'dontcancel' });
+		console.log("user", user);
 		if(isAdmin[index])
+		{
 			dispatch({ type: 'ACTIVATE', payload: 'showAdmin' });
+			dispatch({ type: 'ACTIVATE', payload: 'isAdmin' });
+		}
+		const me = user.filter((user: User) => user.login === sessionStorage.getItem("currentUserLogin"));
+		console.log("me", me);
+		console.log("m2", me[0].isOwner);
+
+		if(me[0].isOwner)
+			dispatch({ type: 'ACTIVATE', payload: 'isOwner' });
+		
 		dispatch({ type: 'DISABLE', payload: 'showChannelList' });
 		dispatch({ type: 'ACTIVATE', payload: 'showChannel' });
 	
@@ -163,6 +184,7 @@ const ChannelListComponent: React.FC = () => {
 					key={index}
 					className="button-channel-list"
 					onClick={() => {
+							console.log("userList", userList);
 							handleConv(conversation, userList[index], index);
 							if(isAdmin[index])
 								state.currentIsAdmin = true;

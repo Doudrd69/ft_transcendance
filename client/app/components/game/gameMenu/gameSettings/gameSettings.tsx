@@ -4,15 +4,15 @@ import { useGame } from '../../GameContext';
 
 const Settings: React.FC = () => {
 
-    const { state, dispatch } = useGame();
+    const { state, dispatchGame } = useGame();
 
     const handleToggleSettingsGame = () => {
 
-        dispatch({
+        dispatchGame({
             type: 'TOGGLE',
             payload: 'showSettingsGame',
         });
-        dispatch({
+        dispatchGame({
             type: 'ACTIVATE',
             payload: 'showGameSettings',
         });
@@ -20,11 +20,11 @@ const Settings: React.FC = () => {
 
     const handleToggleSettingsDisplay = () => {
 
-        dispatch({
+        dispatchGame({
             type: 'TOGGLE',
             payload: 'showSettingsDisplay',
         });
-        dispatch({
+        dispatchGame({
             type: 'ACTIVATE',
             payload: 'showGameSettings',
         });
@@ -32,11 +32,11 @@ const Settings: React.FC = () => {
 
     const handleToggleSettingsKeyboard = () => {
 
-        dispatch({
+        dispatchGame({
             type: 'TOGGLE',
             payload: 'showSettingsKeyboard',
         });
-        dispatch({
+        dispatchGame({
             type: 'ACTIVATE',
             payload: 'showGameSettings',
         });
@@ -52,7 +52,7 @@ const Settings: React.FC = () => {
                 </div>
 
                 <div className="menu-button-container">
-                    <button className={`menu-button ${state.showGameMenu ? 'clicked' : ''}`} onClick={() => dispatch({ type: 'TOGGLE', payload: 'showGameMenu' })}>Menu</button>
+                    <button className={`menu-button ${state.showGameMenu ? 'clicked' : ''}`} onClick={() => dispatchGame({ type: 'TOGGLE', payload: 'showGameMenu' })}>Menu</button>
                 </div>
             </div>
         </div>

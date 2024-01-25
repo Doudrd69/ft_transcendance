@@ -32,18 +32,22 @@ export class GameService {
     
     async createGame(player1ID: string, player2ID: string): Promise<Game> {
 
-        const game = new Game();
-        console.log("New Game Create");
+        console.log("Creating new GAME...");
         const playersLogin: [string, string] = await this.getLoginByIDpair(player1ID, player2ID);
-        game.playerOneID = player1ID;
-        game.playerTwoID = player2ID;
-        game.playerOneLogin = playersLogin[0];
-        game.playerTwoLogin = playersLogin[1];
-        game.scoreOne = 0;
-        game.scoreTwo = 0;
-        game.gameEnd = false;
-        await this.gameRepository.save(game);
-        return (game);
+        if (playersLogin) {
+            const game = new Game();
+            game.playerOneID = player1ID;
+            game.playerTwoID = player2ID;
+            game.playerOneLogin = playersLogin[0];
+            game.playerTwoLogin = playersLogin[1];
+            game.scoreOne = 0;
+            game.scoreTwo = 0;
+            game.gameEnd = false;
+            await this.gameRepository.save(game);
+            return (game);
+        }
+
+        return ;
     }
 
 
@@ -52,22 +56,30 @@ export class GameService {
         const Player: User = await this.usersRepository.findOne({ where: { login: playerLogin } })
         if (Player && playerID) {
             Player.socketGame = playerID;
-           await  this.usersRepository.save(Player);
+            await this.usersRepository.save(Player);
         }
+
+        return ;
     }
 
     async getLoginByIDpair(player1ID: string, player2ID: string) {
 
         const UserOne: User = await this.usersRepository.findOne({ where: { socketGame: player1ID } })
         const UserTwo: User = await this.usersRepository.findOne({ where: { socketGame: player2ID } })
-        UserOne.inMatchmaking = false;
-        UserOne.inGame = true;
-        UserTwo.inMatchmaking = false;
-        UserTwo.inGame = true;
-        await this.usersRepository.save(UserOne);
-        await this.usersRepository.save(UserTwo);
-        const playersLogin: [string, string] = [UserOne.login, UserTwo.login]
-        return (playersLogin);
+
+        console.log("USER ONE: ", UserOne);
+        console.log("USER TWO: ", UserTwo);
+        // UserOne.inMatchmaking = false;
+        // UserOne.inGame = true;
+        // UserTwo.inMatchmaking = false;
+        // UserTwo.inGame = true;
+        // await this.usersRepository.save(UserOne);
+        // await this.usersRepository.save(UserTwo);
+        if (UserOne && UserTwo) {
+            const playersLogin: [string, string] = [UserOne.login, UserTwo.login]
+            console.log("Players login : ", playersLogin);
+            return (playersLogin);
+        }
     }
 
     async deleteGame(playerID: string) {
@@ -95,12 +107,31 @@ export class GameService {
     }
 
     async endOfGame(game: Game, gameInstance: game_instance): Promise<Game> {
+        console.log("==== END OF GAME ====");
         const UserOne: User = await this.usersRepository.findOne({ where: { socketGame: gameInstance.players[0] } })
         const UserTwo: User = await this.usersRepository.findOne({ where: { socketGame: gameInstance.players[1] } })
-        UserOne.inGame = false;
-        UserTwo.inGame = false;
+        // UserOne.inGame = false;
+        // UserTwo.inGame = false;
+
+        console.log("Before U1: ", UserOne.victory, UserOne.defeat);
+        console.log("Before U2: ", UserTwo.victory, UserTwo.defeat);
+        if (game.scoreOne > game.scoreTwo) {
+            UserOne.victory += 1;
+            UserTwo.defeat += 1;
+        }
+        else {
+            UserOne.defeat += 1;
+            UserTwo.victory += 1;
+        }
+
         await this.usersRepository.save(UserOne);
         await this.usersRepository.save(UserTwo);
+
+        console.log("After U1: ", UserOne.victory, UserOne.defeat);
+        console.log("After U2: ", UserTwo.victory, UserTwo.defeat);
+
+        game.playerOneID = String(UserOne.id);
+        game.playerTwoID = String(UserTwo.id);
         game.gameEnd = true;
         game.scoreOne = gameInstance.player1_score;
         game.scoreTwo = gameInstance.player2_score;

@@ -29,6 +29,7 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 	const { state, dispatch } = useChat();
 	if (state.currentUserList) {
 		setMe(state.currentUserList.filter((user: userList) => user.login === sessionStorage.getItem("currentUserLogin")));
+		console.log('me', me);
 	}
 	if (me) {
 		setIsAdmin(me[0].isAdmin);
@@ -183,7 +184,7 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 			<div className="add_container">
 				<h2 className="add__title">{title}</h2>	
 				<div className="option-block">
-					{isAdmin ?
+					{state.isAdmin ?
 						<>
 							{state.currentConversationIsPrivate ?
 								<img className="option-image" src="private.png"  onClick={updateIsPublicFalse}/>
@@ -210,7 +211,7 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 						null
 					}
 					
-					{isOwner &&
+					{state.isOwner &&
 						<img className="option-image" src="closered.png" onClick={() => deleteChannel() }/>}
 				</div>
 			</div>

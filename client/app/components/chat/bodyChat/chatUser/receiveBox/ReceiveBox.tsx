@@ -9,10 +9,11 @@ interface Message {
 	content: string;
 	post_datetime: string;
 	conversationName: string;
+	conversationID?: number;
 }
 
 const ReceiveBoxComponent: React.FC = () => {
-
+	console.log("ReceiveBoxComponent");
 	const { state } = useChat();
 	const { globalState } = useGlobal()
 	const [messages, setMessages] = useState<Message[]>([]);
@@ -67,7 +68,7 @@ const ReceiveBoxComponent: React.FC = () => {
 	useEffect(() => {
 
 		globalState.userSocket?.on('onMessage', (message: Message) => {
-			if (message) {
+			if (message && (message.conversationID == state.currentConversationID)) {
 				setMessages((prevMessages: Message[]) => [...prevMessages, message]);
 			}
 		});
@@ -86,19 +87,15 @@ const ReceiveBoxComponent: React.FC = () => {
 	useEffect(() => {
 		scrollToBottom();
 	}, [messages]);
-
 	return (
-
 		<div ref={messagesContainerRef} className="bloc-discussion-chat">
-			{messages.map((message: Message) => (
-				<>
-					<div className={`message-container ${isMyMessage(message) ? 'my-message' : 'other-message'}`}>
-						<p className="discussion-chat-content">{message.content}</p>
-						<p className="discussion-chat-date">{formatDateTime(message.post_datetime)}</p>
-					</div>
-				</>
+			{messages.map((message: Message, index: number) => (
+			<div key={index} className={`message-container ${isMyMessage(message) ? 'my-message' : 'other-message'}`}>
+				<p className="discussion-chat-content">{message.content}</p>
+				<p className="discussion-chat-date">{formatDateTime(message.post_datetime)}</p>
+			</div>
 			))}
 		</div>
-	)
+	);
 };
 export default ReceiveBoxComponent;

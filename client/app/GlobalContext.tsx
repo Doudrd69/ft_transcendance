@@ -10,6 +10,7 @@ type ActionType =
   | 'SET'
   | 'TOGGLEX'
   | 'SET_SOCKET'
+  | 'SET_GAME_SOCKET'
 
 // Définir l'interface de l'action
 interface Action {
@@ -32,6 +33,7 @@ interface GlobalState {
 	showIsDefault:boolean;
 	avatar:string;
 	userSocket: Socket | undefined;
+	gameSocket: Socket | undefined;
 	[key: string]: boolean | string | Socket | undefined | null;
 }
 
@@ -50,10 +52,11 @@ const initialState: GlobalState = {
 	showIsDefault:false,
 	avatar:"",
 	userSocket: undefined,
+	gameSocket: undefined,
 };
 
 // Réducteur
-const chatReducer = (state: GlobalState, action: Action): GlobalState => {
+const globalReducer = (state: GlobalState, action: Action): GlobalState => {
 	switch (action.type) {
 		case 'ACTIVATE':
 			return { ...state, [action.payload as string]: true };
@@ -78,10 +81,23 @@ const chatReducer = (state: GlobalState, action: Action): GlobalState => {
 			return state;
 		case 'SET_SOCKET':
 			return { ...state, userSocket: action.payload || null };
+		case 'SET_GAME_SOCKET':
+			return { ...state, gameSocket: action.payload || null };
 	  default:
 		return state;
 	}
   };
+  
+  export const setSocket = (payload: Socket | undefined): Action => ({
+	  type: 'SET_SOCKET',
+	  payload,
+  });
+  
+  export const setGameSocket = (payload: Socket | undefined): Action => ({
+	  type: 'SET_GAME_SOCKET',
+	  payload,
+  });
+
 // Contexte
 const GlobalContext = createContext<{
   globalState: GlobalState;
@@ -91,7 +107,7 @@ const GlobalContext = createContext<{
 // Fournisseur de contexte
 export const GlobalProvider: React.FC<{ children: React.ReactNode }> = ({children}) => {
 
-	const [globalState, dispatch] = useReducer(chatReducer, initialState);
+	const [globalState, dispatch] = useReducer(globalReducer, initialState);
 	
 	return (
 		<GlobalContext.Provider value={{ globalState, dispatch }}>
@@ -99,11 +115,6 @@ export const GlobalProvider: React.FC<{ children: React.ReactNode }> = ({childre
 		</GlobalContext.Provider>
 	);
 };
-
-export const setSocket = (payload: Socket | undefined): Action => ({
-	type: 'SET_SOCKET',
-	payload,
-});
 
 // Hook personnalisé pour utiliser le contexte
 export const useGlobal = () => {

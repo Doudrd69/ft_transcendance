@@ -1,26 +1,25 @@
 import {
-	IsAlpha,
+	IsAlphanumeric,
 	IsAscii,
 	IsBoolean,
+	IsInt,
 	IsNotEmpty,
-	IsPositive, // Checks if the string contains the seed: @Contains(seed: string)
+	IsPositive,
 	IsString,
 	Length,
 	Matches,
-	IsInt,
-	Max,
-	IsAlphanumeric
+	Max
 } from 'class-validator';
 
 export class ChannelOptionsDto {
-   
-    @IsNotEmpty()
+
+	@IsNotEmpty()
 	@IsPositive()
 	@Max(1000)
 	@IsInt()
 	conversationID: number;
 
-    @IsNotEmpty()
+	@IsNotEmpty()
 	@IsPositive()
 	@Max(1000)
 	@IsInt()
@@ -30,7 +29,7 @@ export class ChannelOptionsDto {
 	@IsBoolean()
 	state: boolean;
 
-    @IsNotEmpty()
+	@IsNotEmpty()
 	@Length(6, 20)
 	@IsAscii()
 	@IsAlphanumeric()

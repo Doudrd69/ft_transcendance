@@ -2,15 +2,14 @@ import './GameMenu.css'
 import MatchMaking from './gameStart/GameStart'
 import Settings from './gameSettings/gameSettings'
 import { useGame } from '../GameContext'
-import React, { useState } from 'react';
-import { Socket } from 'socket.io-client'
+import React, { useState, useEffect } from 'react';
+import { io, Socket } from 'socket.io-client'
+import { useGlobal } from '@/app/GlobalContext';
 
+const Menu = () => {
 
-const Menu = (socket: { socket: Socket }) => {
-
-    const { state, dispatch } = useGame();
-
-    const gameSocket = socket.socket;
+    const { state, dispatchGame } = useGame();
+    const { globalState, dispatch } = useGlobal();
 
     interface Game {
         gameId: number;
@@ -31,41 +30,28 @@ const Menu = (socket: { socket: Socket }) => {
         scoreOne: 0,
         scoreTwo: 0,
     };
-
-    const [Game, setGame] = useState<Game>(defaultGame);
         
-    const handleStartClick = async () => {
-        const currentUserId = sessionStorage.getItem("currentUserId");
-        const currentUserLogin = sessionStorage.getItem("currentUserLogin");
-        if (gameSocket.connected) {
-            
-            gameSocket.emit('join-matchmaking', currentUserLogin);
-            await gameSocket.on('joinGame', (game: Game) => {
-                setGame((prevState) => ({
-                    ...prevState,
-                    gameId: Game.gameId,
-                    playerOneID: Game.playerOneID,
-                    playerTwoID: Game.playerTwoID,
-                    playerOneLogin: Game.playerOneLogin,
-                    playerTwoLogin: Game.playerTwoLogin,
-                    scoreOne: Game.scoreOne,
-                    scoreTwo: Game.scoreTwo,
-                }));
-                dispatch({
-                    type: 'TOGGLE',
-                    payload: 'showGame',
-                });
-                state.showGame = true;
-                gameSocket.emit('playerJoined', {gameId: game.gameId})
-            })
-        }   
-        else {
-            console.log("GameSocket pas connecté");
-        }
+    const handleStartClick = () => {
 
-        return () => {
-            gameSocket.off('joinGame');
+        try {
+
+            const gameSocket = io('http://localhost:3001/game', {
+                autoConnect: false,
+                auth: {
+                    token: sessionStorage.getItem("jwt"),
+                }
+            });
+            gameSocket.connect();
+
+            dispatch({ type: 'SET_GAME_SOCKET', payload: gameSocket });
+            dispatchGame({ type: 'TOGGLE', payload: 'showGameMatchmaking' });
+    
+            // console.log("After Dispatch: ", globalState?.gameSocket);
+
+        } catch (error) {
+            console.error(error);
         }
+        
     };
 
     return (
@@ -74,7 +60,9 @@ const Menu = (socket: { socket: Socket }) => {
                 <h1 className='titleClass'>PONG GAME</h1>
             </div>
             <div className="background-game">
-                <button className={`buttonclass ${state.showGameMatchmaking ? 'clicked' : ''}`} onClick={() => { handleStartClick(); dispatch({ type: 'TOGGLE', payload: 'showGameMatchmaking' }); }}>START GAME</button>
+                <button className={`buttonclass ${state.showGameMatchmaking ? 'clicked' : ''}`} onClick={() => { 
+                    handleStartClick(); 
+                    }}>START GAME</button>
                 {/* <button className="buttonclass" >PROFILE</button> */}
                 {/* <button className={`buttonclass ${state.showGameSettings ? 'clicked' : ''}`} onClick={() => dispatch({ type: 'TOGGLE', payload: 'showGameSettings' })}>SETTINGS</button> */}
             </div>

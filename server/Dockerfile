@@ -6,27 +6,41 @@ WORKDIR /srv/app/admin-server
 
 COPY package*.json ./
 
+COPY script.sh ./
+
+
 RUN npm install	&& \
-	npm install @nestjs/jwt && \
-	npm install @types/node && \
-	npm install @nestjs/typeorm && \
-	npm install @nestjs/serve-static && \
-	npm install pg	&& \
-	npm install bcrypt && \
-	npm install @types/bcrypt && \
-	npm install speakeasy qrcode && \
-	npm install dotenv && \
-	npm install socket.io && \
-	npm install @nestjs/websockets && \
-	npm install @nestjs/platform-socket.io &&\
-	npm install @types/express && \
-	npm install @nestjs/common	&&\
-	npm install @types/multer	&&\
-	npm install @types/image-type &&\
-	npm install jimp@latest	&& \
-	npm install @nestjs/platform-express && \
-	npm install class-validator class-transformer
+	npm install @nestjs/jwt \
+	@types/node \
+	@nestjs/typeorm \
+	@nestjs/serve-static \
+	pg	\
+	bcrypt \
+	@types/bcrypt \
+	speakeasy qrcode \
+	dotenv \
+	socket.io \
+	@nestjs/websockets \
+	@nestjs/platform-socket.io \
+	@types/express \
+	@nestjs/common	\
+	@types/multer	\
+	@types/image-type \
+	jimp@latest	\
+	@nestjs/platform-express \
+	class-validator class-transformer \
+	sudo
+
+# RUN chmod 777 ./script.sh
 
 COPY . .
 
-CMD ["npm", "run", "start:dev"]
+RUN [ "npm", "run", "build" ]
+
+# RUN mkdir -pv dist/users/avatars
+
+COPY ./avatar.png ./dist/users/avatars/avatar.png
+
+# ENTRYPOINT [ "./script.sh" ]
+
+CMD ["npm", "run", "start:prod"]
