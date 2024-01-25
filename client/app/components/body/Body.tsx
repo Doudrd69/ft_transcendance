@@ -11,11 +11,8 @@ import { GameProvider } from '../game/GameContext';
 import GameComponent from '../game/Game';
 import { useGlobal } from '../../GlobalContext';
 
-interface BodyComponentProps {
-	gameSocket: Socket;
-}
 
-const BodyComponent: React.FC<BodyComponentProps> = ({ gameSocket }) => {
+const BodyComponent: React.FC = () => {
 	
 	const { globalState, dispatch } = useGlobal();
 
@@ -28,7 +25,7 @@ const BodyComponent: React.FC<BodyComponentProps> = ({ gameSocket }) => {
 					{renderComponent(<SettingsComponent/>, globalState.showSettings)}
 						<ChatComponent/>
 						<GameProvider>
-							<GameComponent socket={gameSocket}/>
+							<GameComponent />
 						</GameProvider>
 				</div>
 		</>

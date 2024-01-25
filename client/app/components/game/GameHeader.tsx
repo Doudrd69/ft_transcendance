@@ -4,11 +4,11 @@ import GameComponent from './Game';
 import { GameProvider } from './GameContext';
 
 
-const GameHeader = (socket: {socket: Socket}) => {
+const GameHeader = () => {
 	return (
 		<GameProvider>
         <div className="right-half">
-            <GameComponent socket={socket.socket}></GameComponent>
+            <GameComponent></GameComponent>
         </div>
 		</GameProvider>
 	);

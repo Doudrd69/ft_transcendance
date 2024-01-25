@@ -20,26 +20,36 @@ export class MatchmakingService {
 		const pairs: Array<[string, string]> = [];
         for (let i = 0; i < this.playersQueue.length - 1; i += 2) {
             pairs.push([this.playersQueue[i], this.playersQueue[i + 1]]);
-			console.log("one pair FIND");
+			console.log("Found a socket pair");
         }
 		return pairs;
 	}
-		
 
     async join(playerID: string) {
+        console.log("Push queue before: ", this.playersQueue);
 		this.playersQueue.push(playerID);
-        const newUser: User = await this.usersRepository.findOne({ where: { socketGame: playerID } })
-        newUser.inMatchmaking = true;
-        await this.usersRepository.save(newUser);
-		console.log("player rejoin the queue");
+        console.log("Push queue after: ", this.playersQueue);
+        // const newUser: User = await this.usersRepository.findOne({ where: { socketGame: playerID } })
+        // newUser.inMatchmaking = true;
+        // await this.usersRepository.save(newUser);
+		console.log(`${playerID} joins the queue`);
     }
 
 	async leave(playerID: string) {
-        const index = this.playersQueue.findIndex(id => id === playerID);
-        if (index !== -1) {
-            this.playersQueue.splice(index, 1);
-            console.log("player leave the queue");
-        }
+        // const index = this.playersQueue.findIndex(id => id === playerID);
+        // console.log("coucou from leave 1");
+        // if (index !== -1) {
+        //     console.log("coucou from leave 1-2");
+        //     this.playersQueue.splice(index, 1);
+        //     console.log("player leave the queue");
+        // }
+        console.log("Queue before: ", this.playersQueue);
+        const newQueue = this.playersQueue.filter((id: string) => id === playerID);
+        this.playersQueue = newQueue;
+        console.log("Queue After: ", this.playersQueue);
+
+
+        return ;
     }
 
     async IsThereEnoughPairs() {
