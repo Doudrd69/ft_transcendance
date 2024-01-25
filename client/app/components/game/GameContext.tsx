@@ -60,15 +60,15 @@ const GameReducer = (state: GameState, action: Action): GameState => {
 // Contexte
 const GameContext = createContext<{
   state: GameState;
-  dispatch: React.Dispatch<Action>;
+  dispatchGame: React.Dispatch<Action>;
 } | undefined>(undefined);
 
 // Fournisseur de contexte
 export const GameProvider: React.FC<{ children: React.ReactNode }> = ({children}) => {
-	const [state, dispatch] = useReducer(GameReducer, initialState);
+	const [state, dispatchGame] = useReducer(GameReducer, initialState);
 	
 	return (
-		<GameContext.Provider value={{ state, dispatch }}>
+		<GameContext.Provider value={{ state, dispatchGame }}>
 		{children}
 		</GameContext.Provider>
 	);

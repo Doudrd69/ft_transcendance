@@ -10,6 +10,7 @@ type ActionType =
   | 'SET'
   | 'TOGGLEX'
   | 'SET_SOCKET'
+  | 'SET_GAME_SOCKET'
 
 // Définir l'interface de l'action
 interface Action {
@@ -32,6 +33,7 @@ interface GlobalState {
 	showIsDefault:boolean;
 	avatar:string;
 	userSocket: Socket | undefined;
+	gameSocket: Socket | undefined;
 	[key: string]: boolean | string | Socket | undefined | null;
 }
 
@@ -50,6 +52,7 @@ const initialState: GlobalState = {
 	showIsDefault:false,
 	avatar:"",
 	userSocket: undefined,
+	gameSocket: undefined,
 };
 
 // Réducteur
@@ -78,10 +81,23 @@ const globalReducer = (state: GlobalState, action: Action): GlobalState => {
 			return state;
 		case 'SET_SOCKET':
 			return { ...state, userSocket: action.payload || null };
+		case 'SET_GAME_SOCKET':
+			return { ...state, gameSocket: action.payload || null };
 	  default:
 		return state;
 	}
   };
+  
+  export const setSocket = (payload: Socket | undefined): Action => ({
+	  type: 'SET_SOCKET',
+	  payload,
+  });
+  
+  export const setGameSocket = (payload: Socket | undefined): Action => ({
+	  type: 'SET_GAME_SOCKET',
+	  payload,
+  });
+
 // Contexte
 const GlobalContext = createContext<{
   globalState: GlobalState;
@@ -99,11 +115,6 @@ export const GlobalProvider: React.FC<{ children: React.ReactNode }> = ({childre
 		</GlobalContext.Provider>
 	);
 };
-
-export const setSocket = (payload: Socket | undefined): Action => ({
-	type: 'SET_SOCKET',
-	payload,
-});
 
 // Hook personnalisé pour utiliser le contexte
 export const useGlobal = () => {

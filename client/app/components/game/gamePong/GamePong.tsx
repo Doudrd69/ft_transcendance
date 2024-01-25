@@ -2,12 +2,13 @@ import './GamePong.css';
 import React, { useState, useEffect, useRef } from 'react';
 import { useGame } from '../GameContext'
 import { Socket } from 'socket.io-client'
+import { useGlobal } from '@/app/GlobalContext';
 // import { clearInterval } from 'timers';
 
-const PongComponent = (socket: { socket: Socket }) => {
+const PongComponent = () => {
 
-    const { state, dispatch } = useGame();
-    const gameSocket = socket.socket;
+    const { state, dispatchGame } = useGame();
+    const { globalState } = useGlobal();
 
     const [countdown, setCountdown] = useState<number>(3);
     const [blurGame, setBlurGame] = useState<boolean>(true);
@@ -129,7 +130,7 @@ const PongComponent = (socket: { socket: Socket }) => {
 
     useEffect(() => {
 
-        gameSocket.on('gameStart', (Game: Game) => {
+        globalState.gameSocket?.on('gameStart', (Game: Game) => {
             setGameID(Game.gameId);
             setGame((prevState) => ({
                 ...prevState,
@@ -143,7 +144,7 @@ const PongComponent = (socket: { socket: Socket }) => {
             }));
         });
 
-        gameSocket.on('GameUpdate', (gameState: gameState) => {
+        globalState.gameSocket?.on('GameUpdate', (gameState: gameState) => {
             const newGameState: gameState = {
                 BallPosition: { x: gameState.BallPosition!.x * containerWidth || 0.5 * containerWidth, y: gameState.BallPosition!.y * containerHeight || 0.5 * containerHeight  },
                 scoreOne: gameState.scoreOne,
@@ -161,19 +162,19 @@ const PongComponent = (socket: { socket: Socket }) => {
                     if (e.key === 'ArrowUp') {
                         keyState.ArrowUp.down = true;
                         if (Game.pause !== true) {
-                            gameSocket.emit('gameInputDown', { input: "ArrowUp", gameID: gameID });
+                            globalState.gameSocket?.emit('gameInputDown', { input: "ArrowUp", gameID: gameID });
                         }
 
                     } else if (e.key === 'ArrowDown') {
                         keyState.ArrowUp.down = true;
                         if (Game.pause !== true) {
-                            gameSocket.emit('gameInputDown', { input: "ArrowDown", gameID: gameID });
+                            globalState.gameSocket?.emit('gameInputDown', { input: "ArrowDown", gameID: gameID });
                         }
                     }
             }
         };
 
-        gameSocket.on('GameGoal', (gameState: gameState) => {
+        globalState.gameSocket?.on('GameGoal', (gameState: gameState) => {
             const newGameState: gameState = {
                 BallPosition: { x: gameState.BallPosition!.x * containerWidth || 0.5 * containerWidth, y: gameState.BallPosition!.y * containerHeight || 0.5 * containerHeight },
                 scoreOne: gameState.scoreOne,
@@ -194,12 +195,12 @@ const PongComponent = (socket: { socket: Socket }) => {
             }, 3000);
         });
         
-        gameSocket.on('GameEnd', (game: Game) => {
+        globalState.gameSocket?.on('GameEnd', (game: Game) => {
             setGame((prevState) => ({
                 ...prevState,
                 pause: true,
             }));
-            dispatch({
+            dispatchGame({
                 type: 'TOGGLE',
                 payload: 'showGameMenu',
             });
@@ -210,13 +211,13 @@ const PongComponent = (socket: { socket: Socket }) => {
             if (e.key === 'ArrowUp') {
                 if (keyState.ArrowUp.down === true) {
                     keyState.ArrowUp.down = false
-                    gameSocket.emit('gameInputUp', { input: "ArrowUp", gameID: gameID });
+                    globalState.gameSocket?.emit('gameInputUp', { input: "ArrowUp", gameID: gameID });
                 }
             }
             else if (e.key === 'ArrowDown') {
                 if (keyState.ArrowDown.down === true) {
                     keyState.ArrowDown.down = false
-                    gameSocket.emit('gameInputUp', { input: "ArrowDown", gameID: gameID });
+                    globalState.gameSocket?.emit('gameInputUp', { input: "ArrowDown", gameID: gameID });
                 }
             }
         };
@@ -225,14 +226,14 @@ const PongComponent = (socket: { socket: Socket }) => {
         window.addEventListener('keyup', handleKeyUp);
 
         return () => {
-            gameSocket.off('GameBallUpdate');
-            gameSocket.off('GamePaddleUpdate');
-            gameSocket.off('Game_Start');
+            globalState.gameSocket?.off('GameBallUpdate');
+            globalState.gameSocket?.off('GamePaddleUpdate');
+            globalState.gameSocket?.off('Game_Start');
             clearInterval(countdownInterval);
             window.removeEventListener('keydown', handleKeyDown);
             window.removeEventListener('keyup', handleKeyUp);
         };
-    }, [blurGame, gameID, gameSocket, containerWidth, containerHeight, inCountdown]);
+    }, [blurGame, gameID, globalState?.gameSocket, containerWidth, containerHeight, inCountdown]);
 
 
     return (
