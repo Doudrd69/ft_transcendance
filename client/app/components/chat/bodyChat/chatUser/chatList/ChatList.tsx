@@ -15,6 +15,7 @@ interface Conversation {
 	username: string;
 	avatarURL: string;
 	name: string;
+	
 }
 
 const ChatListComponent: React.FC = () => {

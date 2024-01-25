@@ -7,7 +7,6 @@
 	justify-content: space-around;
 }
 
-
 .image-tab{
 	width: 40px;
 	height: auto;
@@ -18,7 +17,6 @@
 	transform: scale(1.2);
 	transition: transform 0.2s ease;
 }
-
 .image-tab-opacity{
 	width: 40px;
 	opacity: 0.5;
