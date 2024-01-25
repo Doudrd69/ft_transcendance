@@ -29,7 +29,7 @@ interface Conversation {
 
 const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) => {
 
-	const { state, dispatch } = useChat();
+	const { chatState, chatDispatch } = useChat();
 	const { globalState } = useGlobal();
 	const [formValue, setFormValue] = useState('');
 	const [admin, setAdmin] = useState<boolean>(user.isAdmin);

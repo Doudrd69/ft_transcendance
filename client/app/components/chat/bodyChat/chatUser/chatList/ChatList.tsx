@@ -19,7 +19,7 @@ interface Conversation {
 
 const ChatListComponent: React.FC = () => {
 
-	const { state, dispatch } = useChat();
+	const { chatState, chatDispatch } = useChat();
 	const { globalState } = useGlobal();
 	const username = sessionStorage.getItem("currentUserLogin");
 	const [activeIndex, setActiveIndex] = useState<number | null>(null);

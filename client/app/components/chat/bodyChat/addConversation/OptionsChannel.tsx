@@ -26,7 +26,7 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 	const [isAdmin, setIsAdmin] = useState<boolean>(false);
 	const [isOwner, setIsOwner] = useState<boolean>(false);
 	const { globalState } = useGlobal();
-	const { state, dispatch } = useChat();
+	const { chatState, chatDispatch } = useChat();
 	if (state.currentUserList) {
 		setMe(state.currentUserList.filter((user: userList) => user.login === sessionStorage.getItem("currentUserLogin")));
 		console.log('me', me);
@@ -159,6 +159,7 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 	}
 
 	const handleCancel = () => {
+
 		dispatch({ type: 'DISABLE', payload: 'showOptionChannel' });
 		dispatch({ type: 'ACTIVATE', payload: 'showBackComponent' });
 		setFormValue('');

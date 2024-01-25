@@ -21,7 +21,7 @@ interface Conversation {
 
 const FriendsListComponent: React.FC = () => {
 	
-	const {state, dispatch} = useChat();
+	const { chatState, chatDispatch } = useChat();
 	const { globalState } = useGlobal();
 	const [showTabFriendsList, setTabFriendsList] = useState(false);
 	const [activeIndex, setActiveIndex] = useState<number | null>(null);

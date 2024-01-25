@@ -12,7 +12,7 @@ import { Socket } from 'socket.io-client';
 
 const HeaderChatComponent: React.FC = () => {
 
-	const { state, dispatch } = useChat();
+	const { chatState, chatDispatch } = useChat();
 	const renderComponent = (component: React.ReactNode, condition: boolean) =>
     	condition ? component : null;
 

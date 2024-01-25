@@ -19,7 +19,7 @@ interface Conversation {
 
 const ListMyChannelComponent: React.FC<ListMyChannelComponentProps> = ({ user, isAdd, title }) => {
 
-	const { state, dispatch } = useChat();
+	const { chatState, chatDispatch } = useChat();
 	const { globalState } = useGlobal();
 
 	const [conversations, setConversations] = useState<Conversation[]>([]);

@@ -16,7 +16,7 @@ const AddConversationComponent: React.FC<AddConversationComponentProps> = ({ loa
 
 	const [formValue, setFormValue] = useState('');
 	const [passwordValue, setPasswordValue] = useState('');
-	const { state, dispatch } = useChat();
+	const { chatState, chatDispatch } = useChat();
 	const [isPassword, setIsPassowrd] = useState(false);
 	const [isPublic, setIsPublic] = useState(true);
 
@@ -79,12 +79,14 @@ const AddConversationComponent: React.FC<AddConversationComponentProps> = ({ loa
 	useEffect(() => {
 		const handleEscape = (event: KeyboardEvent) => {
 			if (event.key === 'Escape') {
-			handleCancel();
+				handleCancel();
 			}
 		};
+	
 		document.addEventListener('keydown', handleEscape);
+	
 		return () => {
-		document.removeEventListener('keydown', handleEscape);
+			document.removeEventListener('keydown', handleEscape);
 		};
 	}, []);
 

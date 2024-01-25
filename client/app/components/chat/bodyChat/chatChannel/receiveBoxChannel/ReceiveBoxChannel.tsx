@@ -29,7 +29,7 @@ interface User {
 
 const ReceiveBoxChannelComponent: React.FC = () => {
 
-	const { state, dispatch } = useChat();
+	const { chatState, chatDispatch } = useChat();
 	const { globalState } = useGlobal();
 	const [messages, setMessages] = useState<Message[]>([]);
 	const messagesContainerRef = useRef<HTMLDivElement>(null);

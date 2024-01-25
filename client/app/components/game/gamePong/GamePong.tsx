@@ -6,7 +6,7 @@ import { Socket } from 'socket.io-client'
 
 const PongComponent = (socket: { socket: Socket }) => {
 
-    const { state, dispatch } = useGame();
+    const { chatState, chatDispatch } = useGame();
     const gameSocket = socket.socket;
 
     const [countdown, setCountdown] = useState<number>(3);
@@ -41,30 +41,33 @@ const PongComponent = (socket: { socket: Socket }) => {
 
     let countdownInterval: NodeJS.Timeout;
 
-    useEffect(() => {
-        const pongContainer = document.querySelector('.pong-container');
-        if (pongContainer) {
-            const handleResize = () => {
-                setContainerWidth(pongContainer.clientWidth);
-                setContainerHeight(pongContainer.clientHeight);
-                const newGameState: gameState = {
-                    BallPosition: { x: gameState.BallPosition!.x * containerWidth || containerWidth / 2, y: gameState.BallPosition!.y * containerHeight || containerHeight / 2 },
-                    scoreOne: gameState.scoreOne,
-                    scoreTwo: gameState.scoreTwo,
-                    paddleOne: { x: gameState.paddleOne!.x * containerWidth, y: gameState.paddleOne!.y * containerHeight, width: containerWidth * 0.025, height: containerHeight * 0.17 },
-                    paddleTwo: { x: gameState.paddleTwo!.x * containerWidth, y: gameState.paddleTwo!.y * containerHeight, width: containerWidth * 0.025, height: containerHeight * 0.17 },
-                }
-                setGameState(newGameState);
-                console.log(`pongcontainer size, x:${pongContainer.clientWidth}, y: ${pongContainer.clientHeight}`);
-            };
-            window.addEventListener('resize', handleResize);
-
-            handleResize();
-            return () => {
-                window.removeEventListener('resize', handleResize);
-            };
-        }
-    }, [blurGame]);
+	useEffect(() => {
+		const pongContainer = document.querySelector('.pong-container');
+		
+		if (pongContainer) {
+			const handleResize = () => {
+				setContainerWidth(pongContainer.clientWidth);
+				setContainerHeight(pongContainer.clientHeight);
+				const newGameState = {
+					BallPosition: { x: gameState.BallPosition!.x * containerWidth || containerWidth / 2, y: gameState.BallPosition!.y * containerHeight || containerHeight / 2 },
+					scoreOne: gameState.scoreOne,
+					scoreTwo: gameState.scoreTwo,
+					paddleOne: { x: gameState.paddleOne!.x * containerWidth, y: gameState.paddleOne!.y * containerHeight, width: containerWidth * 0.025, height: containerHeight * 0.17 },
+					paddleTwo: { x: gameState.paddleTwo!.x * containerWidth, y: gameState.paddleTwo!.y * containerHeight, width: containerWidth * 0.025, height: containerHeight * 0.17 },
+				};
+				setGameState(newGameState);
+				console.log(`pongcontainer size, x:${pongContainer.clientWidth}, y: ${pongContainer.clientHeight}`);
+			};
+			
+			window.addEventListener('resize', handleResize);
+			handleResize();
+			
+			return () => {
+				window.removeEventListener('resize', handleResize);
+			};
+		}
+	}, [blurGame]);
+	
 
     const defaultGameState: gameState = {
         BallPosition: { x: 0.5 * containerWidth, y: 0.5 * containerHeight },

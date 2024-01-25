@@ -12,7 +12,7 @@ interface AddFriendComponentProps {
 const AddFriendComponent: React.FC<AddFriendComponentProps> = ({ updateFriends, title }) => {
 
 	const [formValue, setFormValue] = useState('');
-	const { state, dispatch } = useChat();
+	const { chatState, chatDispatch } = useChat();
 	const { globalState } = useGlobal();
 
 	const handleFriendRequest = async (e: React.FormEvent) => {

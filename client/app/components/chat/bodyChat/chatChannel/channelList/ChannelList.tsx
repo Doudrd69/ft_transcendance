@@ -27,7 +27,7 @@ interface User {
 
 const ChannelListComponent: React.FC = () => {
 
-	const { state, dispatch } = useChat();
+	const { chatState, chatDispatch } = useChat();
 	const { globalState } = useGlobal();
 
 	const userID = Number(sessionStorage.getItem("currentUserID"));
@@ -99,7 +99,6 @@ const ChannelListComponent: React.FC = () => {
 	}, [globalState?.userSocket]);
 
 	useEffect(() => {
-		console.log("Loading conversations...");
 		loadDiscussions();
 
 	}, [state.refreshChannel]);
@@ -115,9 +114,9 @@ const ChannelListComponent: React.FC = () => {
 			}
 		};
 		
-			document.addEventListener('keydown', handleEscape);
-			return () => {
-			  document.removeEventListener('keydown', handleEscape);
+		document.addEventListener('keydown', handleEscape);
+		return () => {
+			document.removeEventListener('keydown', handleEscape);
 			};
 	}, []);
 
@@ -181,7 +180,6 @@ const ChannelListComponent: React.FC = () => {
 					key={index}
 					className="button-channel-list"
 					onClick={() => {
-							console.log("userList", userList);
 							handleConv(conversation, userList[index], index);
 							if(isAdmin[index])
 								state.currentIsAdmin = true;

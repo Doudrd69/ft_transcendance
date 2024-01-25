@@ -22,7 +22,7 @@ interface TimerComponentProps {
 const TimerComponent: React.FC<TimerComponentProps> = ({user}) => {
 	
 	const [timer, setTimer] = useState('');
-	const { state, dispatch } = useChat();
+	const { chatState, chatDispatch } = useChat();
 	
 	const handleChange = async(e: React.ChangeEvent<HTMLInputElement>) => {
 			setTimer(e.target.value);

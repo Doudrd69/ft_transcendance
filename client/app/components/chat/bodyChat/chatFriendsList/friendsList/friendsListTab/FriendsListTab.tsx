@@ -20,7 +20,7 @@ interface FriendsListTabComponentProps {
 
 const FriendsListTabComponent:  React.FC<FriendsListTabComponentProps> = ({user}) => {
 	
-	const {state, dispatch} = useChat();
+	const { chatState, chatDispatch } = useChat();
 	const {globalState} = useGlobal();
 	const [confirmationText, setConfirmationText] = useState('');
 	const [showConfirmation, setShowConfirmation] = useState(false);

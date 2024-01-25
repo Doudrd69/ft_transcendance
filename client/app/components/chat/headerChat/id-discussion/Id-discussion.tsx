@@ -18,7 +18,7 @@ interface User {
 }
 
 const IdDiscussionComponent: React.FC = () => {
-	const { state, dispatch } = useChat();
+	const { chatState, chatDispatch } = useChat();
 	const [me, setMe] = useState<User>();
 	var id;
 	if (state.currentChannelBool)

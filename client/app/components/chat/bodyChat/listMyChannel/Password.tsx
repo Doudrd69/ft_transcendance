@@ -8,7 +8,7 @@ const PasswordComponent: React.FC = () => {
 
 	const [password, setPassword] = useState('');
 
-	const { state, dispatch } = useChat();
+	const { chatState, chatDispatch } = useChat();
 	const { globalState } = useGlobal();
 
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {

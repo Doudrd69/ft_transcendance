@@ -6,7 +6,7 @@ import { useChat } from '../../ChatContext';
 const PasswordChangeComponent: React.FC = () => {
 
 	const [password, setPassword] = useState('');
-	const { state, dispatch } = useChat();
+	const { chatState, chatDispatch } = useChat();
 
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const newPassword = e.target.value;

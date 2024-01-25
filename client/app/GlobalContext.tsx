@@ -53,7 +53,7 @@ const initialState: GlobalState = {
 };
 
 // Réducteur
-const chatReducer = (state: GlobalState, action: Action): GlobalState => {
+const globalReducer = (state: GlobalState, action: Action): GlobalState => {
 	switch (action.type) {
 		case 'ACTIVATE':
 			return { ...state, [action.payload as string]: true };
@@ -91,7 +91,7 @@ const GlobalContext = createContext<{
 // Fournisseur de contexte
 export const GlobalProvider: React.FC<{ children: React.ReactNode }> = ({children}) => {
 
-	const [globalState, dispatch] = useReducer(chatReducer, initialState);
+	const [globalState, dispatch] = useReducer(globalReducer, initialState);
 	
 	return (
 		<GlobalContext.Provider value={{ globalState, dispatch }}>

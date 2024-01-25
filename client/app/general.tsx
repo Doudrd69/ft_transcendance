@@ -17,6 +17,7 @@ import SetComponent from './components/Avatar/SetAvatar';
 import { totalmem } from 'os';
 import GameHeader from './components/game/GameHeader';
 import { useGlobal } from './GlobalContext';
+import { ChatProvider } from './components/chat/ChatContext';
 // import { useChat } from './components/chat/ChatContext';
 
 interface FriendRequestDto {
@@ -293,11 +294,10 @@ const GeneralComponent = () => {
 					) : show2FAForm ? (
 					<TFAComponent on2FADone={handle2FADone} />
 					) : (
-						<>
-						{/* <SetComponent/> */}
-						<Header/>
-						<BodyComponent gameSocket={gameSocket}/>
-					</>
+						<ChatProvider>
+							<Header/>
+							<BodyComponent gameSocket={gameSocket}/>
+						</ChatProvider>
 					)}	
 			</>
 			);

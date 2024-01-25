@@ -4,7 +4,7 @@ import {useChat} from '../../ChatContext'
 import { useEffect } from 'react';
 const BackButtonComponent: React.FC = () => {
 
-	const { state, dispatch } = useChat();
+	const { chatState, chatDispatch } = useChat();
 	const handleCancel = () => {
 			dispatch({ type: 'DISABLE', payload: 'showChat' });
 			dispatch({ type: 'DISABLE', payload: 'showChannel' });
@@ -22,9 +22,8 @@ const BackButtonComponent: React.FC = () => {
 			};
 	
 			document.addEventListener('keydown', handleEscape);
-
 			return () => {
-			  document.removeEventListener('keydown', handleEscape);
+				document.removeEventListener('keydown', handleEscape);
 			};
 	}, []);
 

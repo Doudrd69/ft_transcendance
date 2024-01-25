@@ -3,7 +3,7 @@ import React from 'react';
 import { useChat } from '../../ChatContext';
 
 const FriendsListButtonComponent: React.FC = () => {
-  const { state, dispatch } = useChat();
+  const { chatState, chatDispatch } = useChat();
 
   return (
     <button

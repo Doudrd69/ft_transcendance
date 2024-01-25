@@ -4,7 +4,7 @@ import { useGame } from '../../GameContext';
 
 const Settings: React.FC = () => {
 
-    const { state, dispatch } = useGame();
+    const { chatState, chatDispatch } = useGame();
 
     const handleToggleSettingsGame = () => {
 
