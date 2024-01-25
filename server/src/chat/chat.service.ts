@@ -297,6 +297,7 @@ export class ChatService {
 								username: user.username,
 								avatarURL: user.avatarURL,
 								name: userGroup.conversation.name,
+								onlineStatus: user.isActive,
 							});
 						}
 					})
@@ -306,6 +307,7 @@ export class ChatService {
 
 		return DMList;
 	}
+
 	private async getDMsConversations(userID: number): Promise<Conversation[]> {
 		
 		

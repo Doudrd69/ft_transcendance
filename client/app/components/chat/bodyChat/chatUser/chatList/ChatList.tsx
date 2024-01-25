@@ -51,9 +51,19 @@ const ChatListComponent: React.FC = () => {
 			console.log("Loading DMs...");
 			loadDMs();
 		});
+		
+		globalState.userSocket?.on('newConnection', (notif: string) => {
+			loadDMs();
+		})
+
+		globalState.userSocket?.on('newDeconnection', (notif: string) => {
+			loadDMs();
+		})
 
 		return () => {
 			globalState.userSocket?.off('refreshDmList');
+			globalState.userSocket?.off('newConnection');
+			globalState.userSocket?.off('newDeconnection');
 		}
 
 	}, [globalState?.userSocket]);
