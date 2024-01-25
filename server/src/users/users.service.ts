@@ -440,8 +440,11 @@ export class UsersService {
 		const userToBlock: User = await this.usersRepository.findOne({ where: { username: blockUserDto.recipientLogin } });
 
 		if (user && userToBlock) {
-			user.blockedUsers.push(userToBlock.login);
-			await this.usersRepository.save(user);
+			const checkUserDouble = user.blockedUsers.filter((username: string) => username === userToBlock.username);
+			if (!checkUserDouble) {
+				user.blockedUsers.push(userToBlock.login);
+				await this.usersRepository.save(user);
+			}
 			return true;
 		}
 

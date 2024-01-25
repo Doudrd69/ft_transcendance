@@ -173,6 +173,7 @@ export class AuthService {
 						}
 					});
 				});
+				console.log("returnng qrcode");
 				return { qrcodeURL };
 			}
 		}

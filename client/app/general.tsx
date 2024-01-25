@@ -101,9 +101,6 @@ const GeneralComponent = () => {
 				sessionStorage.setItem("currentUserLogin", payload.login);
 			else
 				sessionStorage.setItem("currentUserLogin", payload.username);
-			if (payload.tfa_enabled) {
-				setShow2FAForm(true);
-			}
 		}
 	}
 
@@ -152,8 +149,10 @@ const GeneralComponent = () => {
 				});
 				userSocket.connect();
 				dispatch({ type: 'SET_SOCKET', payload: userSocket });
+				// d abord la 2fa puis si valide alors setAuthvalidatedTrue
+				if (sessionStorage.getItem("2fa") === "true")
+					setShow2FAForm(true);
 				setAuthValidated(true);
-				// Attention a la 2fa
 				return true;
 			}
 			else

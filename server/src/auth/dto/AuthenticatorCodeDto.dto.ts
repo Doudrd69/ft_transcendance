@@ -8,12 +8,12 @@ import {
 
 export class AuthenticatorCodeDto {
 
-	// @IsNotEmpty()
-	// @IsPositive()
-	// @Max(1000)
+	@IsNotEmpty()
+	@IsPositive()
+	@Max(1000)
 	userID: number;
 
-	// @IsNotEmpty()
-	// @Length(6)
+	@IsNotEmpty()
+	@Length(6)
 	code: string;
 }
