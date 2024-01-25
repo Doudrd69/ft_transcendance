@@ -6,7 +6,7 @@ import { GameModule } from './game.module';
 import { env } from 'process';
 import { User } from 'src/users/entities/users.entity';
 import { Paddle } from './entities/paddle.entity';
-import { game_instance, userGameSockets } from 'src/game_gateway/game.gateway';
+import { game_instance } from 'src/game_gateway/game.gateway';
 
 
 interface BallPosition {
@@ -150,25 +150,25 @@ export class GameService {
     }
 
     addGameSocket(gameSocketId: string, userId: string) {
-        this.userGameSockets[userId].push(gameSocketId);
+        // this.userGameSockets[userId].push(gameSocketId);
     }
 
     getMyGameSockets(userId: string) {
         return this.userGameSockets[userId];
     }
     createNewGameSockets(userId: string) {
-        this.userGameSockets[userId] = [];
+        // this.userGameSockets[userId] = [];
     }
 
-    getUserGameSocketsGate(userGameSocketsGate: userGameSockets[], userId: string) {
-        return userGameSocketsGate.find(instance => instance.userId === userId);
-    }
+    // getUserGameSocketsGate(userGameSocketsGate: userGameSockets[], userId: string) {
+    //     return userGameSocketsGate.find(instance => instance.userId === userId);
+    // }
 
-    newUserGameSocketsGate(userId: string) {
-        const newUserGameSockets: userGameSockets = {
-            userId: userId,
-            gameSocketsId: null
-        }
-        return newUserGameSockets;
-    }
+    // newUserGameSocketsGate(userId: string) {
+    //     const newUserGameSockets: userGameSockets = {
+    //         userId: userId,
+    //         gameSocketsId: null
+    //     }
+    //     return newUserGameSockets;
+    // }
  }

@@ -203,11 +203,11 @@ const PongComponent = () => {
                 payload: 'showGameMenu',
             });
             state.showGameMenu = true;
-            gameSocket.disconnect();
+            globalState.gameSocket?.disconnect();
         });
 
-        gameSocket.on('GameStop', () => {
-            dispatch({
+        globalState.gameSocket?.on('GameStop', () => {
+            dispatchGame({
                 type: 'TOGGLE',
                 payload: 'showGameMenu',
             });

@@ -10,6 +10,7 @@ import { PaddleService } from 'src/game/gameObject/paddle.service';
 import { MatchmakingService } from 'src/game/matchmaking/matchmaking.service';
 import { GatewayGuard } from 'src/gateway/Gatewayguard.guard';
 import { UseGuards } from '@nestjs/common'
+import { ExecutionContext } from '@nestjs/common';
 
 export interface vector_instance {
     x: number;
@@ -79,26 +80,19 @@ export class GameGateway {
     ) {
         this.game_instance = [];
     }
+    
 
     private connectedUsers: { [userId: string]: Socket } = {};
 
 
     handleConnection(@ConnectedSocket() client: Socket) {
         console.log(`GameGtw client connected : ${client.id}`);
-        if (this.GameService.userHasAlreadyGameSockets(data.userId)) {
-            // si deja alors emit already game in progress ou inmatchmaking
-            this.GameService.addGameSocket(client.id, data.userId);
-        }
-
-        else {
-            this.GameService.createNewGameSockets(data.userId);
-            this.GameService.addGameSocket(client.id, data.userId);
-        }
         this.connectedUsers[client.id] = client;
     }
 
     handleDisconnect(@ConnectedSocket() client: Socket) {
         console.log(`GameGtw client disconnected : ${client.id}`);
+        // faire un emit de disconnect, recup son userId et check
         //faire un inmatchmaking fasle et ingamefalse, faire de meme avec le ingame de l'autre joueur (faire un emit pour quitter le jeu)
         //ft quitmatchmaking
         // if ingame :const gameInstance: game_instance = this.GameService.getGameInstance(this.game_instance, data.gameId);
@@ -112,13 +106,24 @@ export class GameGateway {
 
     @SubscribeMessage('linkSocketWithUser')
     @UseGuards(GatewayGuard)
-    handleLinkSocketWithUser(client: Socket, playerLogin: string) {
-        console.log("Linking socket to user ", playerLogin);
-        this.GameService.linkSocketIDWithUser(client.id, playerLogin);
+    handleLinkSocketWithUser(client: Socket, @MessageBody() data: {userId: string, playerLogin: string}) {
+        console.log("Linking socket to user ", data.playerLogin);
+        if (this.GameService.userHasAlreadyGameSockets(data.userId)) {
+            // si deja alors emit already game in progress ou inmatchmaking et disconnect sa socket
+            console.log(`Game or Matchmaking In Progress, InMatchmaking: {mettre le inMatchmaking}, InGame: {mettre le Ingame}`);
+            this.GameService.addGameSocket(client.id, data.userId);
+            return ;
+        }
+
+        else {
+            this.GameService.createNewGameSockets(data.userId);
+            this.GameService.addGameSocket(client.id, data.userId);
+        }
+        this.GameService.linkSocketIDWithUser(client.id, data.playerLogin);
         console.log("Link OK --> joining personnal room");
         // creating a personnal room so we can emit to the user
-        client.join(playerLogin);
-        this.server.to(playerLogin).emit('connectionDone');
+        client.join(data.playerLogin);
+        this.server.to(data.playerLogin).emit('connectionDone');
     }
 
     @SubscribeMessage('Game')
@@ -129,7 +134,7 @@ export class GameGateway {
 
     @SubscribeMessage('join-matchmaking')
     @UseGuards(GatewayGuard)
-    async handleJoinMatchmaking(@ConnectedSocket() client: Socket, @MessageBody() data: { playerLogin: string}) {
+    async handleJoinMatchmaking(@ConnectedSocket() client: Socket, @MessageBody() data: { userId: string, playerLogin: string}) {
         const { playerLogin } = data;
         console.log(`== ${playerLogin} JOINS MATCHMAKING ==`);
  
