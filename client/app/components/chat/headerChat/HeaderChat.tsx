@@ -18,11 +18,11 @@ const HeaderChatComponent: React.FC = () => {
 
 	return (
 		<div className="bloc-btn">
-			{renderComponent(<IdDiscussionComponent />, state.showChat || state.showChannel)}
-			{renderComponent(<BackComponent />, (state.showChat || state.showChannel) && state.showBackComponent)}
-			{renderComponent(<ChatButtonComponent />, !state.showChat && !state.showChannel)}
-			{renderComponent(<ChannelButtonComponent />, !state.showChat && !state.showChannel)}
-			{renderComponent(<FriendsListButtonComponent />, !state.showChat && !state.showChannel)}
+			{renderComponent(<IdDiscussionComponent />, chatState.showChat || chatState.showChannel)}
+			{renderComponent(<BackComponent />, (chatState.showChat || chatState.showChannel) && chatState.showBackComponent)}
+			{renderComponent(<ChatButtonComponent />, !chatState.showChat && !chatState.showChannel)}
+			{renderComponent(<ChannelButtonComponent />, !chatState.showChat && !chatState.showChannel)}
+			{renderComponent(<FriendsListButtonComponent />, !chatState.showChat && !chatState.showChannel)}
 		</div>
 	)
 };

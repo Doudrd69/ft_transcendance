@@ -33,10 +33,10 @@ const ListMyChannelComponent: React.FC<ListMyChannelComponentProps> = ({ user, i
 	};
 
 	const handleCloseList = () => {
-		dispatch({ type: 'DISABLE', payload: 'showListChannelAdd' });
-		dispatch({ type: 'DISABLE', payload: 'showAddChannel' });
-		dispatch({ type: 'DISABLE', payload: 'showCreateChannel' });
-		dispatch({ type: 'DISABLE', payload: 'showAddCreateChannel' });
+		chatDispatch({ type: 'DISABLE', payload: 'showListChannelAdd' });
+		chatDispatch({ type: 'DISABLE', payload: 'showAddChannel' });
+		chatDispatch({ type: 'DISABLE', payload: 'showCreateChannel' });
+		chatDispatch({ type: 'DISABLE', payload: 'showAddCreateChannel' });
 	};
 
 	const loadDiscussions = async () => {
@@ -118,8 +118,8 @@ const ListMyChannelComponent: React.FC<ListMyChannelComponentProps> = ({ user, i
 						channel: conversation.name + conversation.id,
 					});
 
-					dispatch({ type: 'TOGGLEX', payload: 'showAddCreateChannel' });
-					dispatch({ type: 'TOGGLEX', payload: 'showAddChannel' });
+					chatDispatch({ type: 'TOGGLEX', payload: 'showAddCreateChannel' });
+					chatDispatch({ type: 'TOGGLEX', payload: 'showAddChannel' });
 				}
 			}
 		}
@@ -134,7 +134,7 @@ const ListMyChannelComponent: React.FC<ListMyChannelComponentProps> = ({ user, i
 			loadDiscussions();
 		else
 			loadDiscussionsPublic();
-	}, [state.refreshChannel]);
+	}, [chatState.refreshChannel]);
 
 	useEffect(() => {
 		const handleEscape = (event: KeyboardEvent) => {
@@ -162,12 +162,12 @@ const ListMyChannelComponent: React.FC<ListMyChannelComponentProps> = ({ user, i
 								className="button-add-channel-list"
 								onClick={() => {
 									if (conversation.isProtected && isAdd) {
-										dispatch({ type: 'SET_CURRENT_CONVERSATION_ID', payload: conversation.id });
-										dispatch({ type: 'SET_CURRENT_CONVERSATION', payload: conversation.name });
-										dispatch({ type: 'SET_CURRENT_FRIEND', payload: userLogin });
-										dispatch({ type: 'ACTIVATE', payload: 'showPassword' });
-										dispatch({ type: 'DISABLE', payload: 'showAddChannel' });
-										dispatch({ type: 'DISABLE', payload: 'showAddCreateChannel' });
+										chatDispatch({ type: 'SET_CURRENT_CONVERSATION_ID', payload: conversation.id });
+										chatDispatch({ type: 'SET_CURRENT_CONVERSATION', payload: conversation.name });
+										chatDispatch({ type: 'SET_CURRENT_FRIEND', payload: userLogin });
+										chatDispatch({ type: 'ACTIVATE', payload: 'showPassword' });
+										chatDispatch({ type: 'DISABLE', payload: 'showAddChannel' });
+										chatDispatch({ type: 'DISABLE', payload: 'showAddCreateChannel' });
 									}
 									else
 										addUserToConversation(Number(conversation.id), user || 'no-user');

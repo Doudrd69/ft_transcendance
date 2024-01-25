@@ -41,10 +41,10 @@ const AddFriendComponent: React.FC<AddFriendComponentProps> = ({ updateFriends, 
 					return;
 				}
 				
-				dispatch({ type: 'TOGGLEX', payload: 'refreshFriendsList' });
-				dispatch({ type: 'DISABLE', payload: 'showAddChannel' });
-				dispatch({ type: 'DISABLE', payload: 'showAddUser' });
-				dispatch({ type: 'DISABLE', payload: 'showAddFriend' });
+				chatDispatch({ type: 'TOGGLEX', payload: 'refreshFriendsList' });
+				chatDispatch({ type: 'DISABLE', payload: 'showAddChannel' });
+				chatDispatch({ type: 'DISABLE', payload: 'showAddUser' });
+				chatDispatch({ type: 'DISABLE', payload: 'showAddFriend' });
 
 				if (globalState.userSocket?.connected) {
 					globalState.userSocket?.emit('joinRoom', { roomName: data.name, roomID: data.id });
@@ -57,9 +57,9 @@ const AddFriendComponent: React.FC<AddFriendComponentProps> = ({ updateFriends, 
 	};
 
 	const handleCancel = () => {
-		dispatch({ type: 'DISABLE', payload: 'showAddChannel' });
-		dispatch({ type: 'DISABLE', payload: 'showAddUser' });
-		dispatch({ type: 'DISABLE', payload: 'showAddFriend' });
+		chatDispatch({ type: 'DISABLE', payload: 'showAddChannel' });
+		chatDispatch({ type: 'DISABLE', payload: 'showAddUser' });
+		chatDispatch({ type: 'DISABLE', payload: 'showAddFriend' });
 		setFormValue('');
 	};
 

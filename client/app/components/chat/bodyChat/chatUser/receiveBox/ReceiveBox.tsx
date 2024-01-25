@@ -14,7 +14,7 @@ interface Message {
 
 const ReceiveBoxComponent: React.FC = () => {
 	console.log("ReceiveBoxComponent");
-	const { state } = useChat();
+	const { chatState } = useChat();
 	const { globalState } = useGlobal()
 	const [messages, setMessages] = useState<Message[]>([]);
 	const messagesContainerRef = useRef<HTMLDivElement>(null);
@@ -48,7 +48,7 @@ const ReceiveBoxComponent: React.FC = () => {
 	const getMessage = async () => {
 
 		try {
-			const response = await fetch(`http://localhost:3001/chat/getMessages/${state.currentConversationID}`, {
+			const response = await fetch(`http://localhost:3001/chat/getMessages/${chatState.currentConversationID}`, {
 				method: 'GET',
 				headers: {
 					'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
@@ -68,7 +68,7 @@ const ReceiveBoxComponent: React.FC = () => {
 	useEffect(() => {
 
 		globalState.userSocket?.on('onMessage', (message: Message) => {
-			if (message && (message.conversationID == state.currentConversationID)) {
+			if (message && (message.conversationID == chatState.currentConversationID)) {
 				setMessages((prevMessages: Message[]) => [...prevMessages, message]);
 			}
 		});

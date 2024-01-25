@@ -5,9 +5,11 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import AvatarImageComponent from '../Avatar/Avatar';
 import { validate, validateOrReject } from 'class-validator';
+import { useChat } from '../chat/ChatContext';
 
 
 const HeaderComponent: React.FC = () => {
+	const {chatDispatch} = useChat();
 	const { globalState, dispatch } = useGlobal();
 	const uploadAvatar =  () => {
 		dispatch({ type: 'ACTIVATE', payload: 'showUploadAvatar' });
@@ -28,14 +30,14 @@ const HeaderComponent: React.FC = () => {
 					if (!globalState.showSettings) {
 						dispatch({ type: 'TOGGLEX', payload: 'showSettings' });
 						dispatch({ type: 'ACTIVATE', payload: 'showProfilsSettings'});
-						dispatch({ type: 'DISABLE', payload: 'showBackComponent' });
+						chatDispatch({ type: 'DISABLE', payload: 'showBackComponent' });
 					} 
 					else {
 						dispatch({ type: 'DISABLE', payload: 'showSettings' });
 						dispatch({ type: 'DISABLE', payload: 'showGeneralSettings'});
 						dispatch({ type: 'DISABLE', payload: 'showProfilsSettings'});
 						dispatch({ type: 'DISABLE', payload: 'showGameSettings'});
-					dispatch({ type: 'DISABLE', payload: 'showBackComponent' });
+						chatDispatch({ type: 'DISABLE', payload: 'showBackComponent' });
 
 					}}}>
 					{renderComponent(<AvatarImageComponent className="profils" refresh={globalState.showRefresh}/>, globalState.showUploadAvatar)}

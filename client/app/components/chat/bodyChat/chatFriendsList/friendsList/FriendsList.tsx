@@ -27,7 +27,7 @@ const FriendsListComponent: React.FC = () => {
 	const [activeIndex, setActiveIndex] = useState<number | null>(null);
 	const [friendList, setFriendList] = useState<FriendShip[]>([]);
 	const username = sessionStorage.getItem("currentUserLogin");
-	console.log("refreshFriendsList0", state.refreshFriendsList);
+	console.log("refreshFriendsList0", chatState.refreshFriendsList);
 
 	const disableTabFriendsList = () => setTabFriendsList(false);
 
@@ -59,9 +59,9 @@ const FriendsListComponent: React.FC = () => {
 
 	useEffect(() => {
 		console.log("Loading friend list...");
-		console.log("refreshFriendsList3", state.refreshFriendsList);
+		console.log("refreshFriendsList3", chatState.refreshFriendsList);
 		loadFriendList();
-	}, [state.refreshFriendsList]);
+	}, [chatState.refreshFriendsList]);
 
 	useEffect(() => {
 
@@ -87,12 +87,12 @@ const FriendsListComponent: React.FC = () => {
 			<button
 				className="button-friends-list-add"
 				onClick={() => {
-				dispatch({ type: 'ACTIVATE', payload: 'showAddFriend' });
+				chatDispatch({ type: 'ACTIVATE', payload: 'showAddFriend' });
 			}}
 			>
 			+
 			</button>
-			{state.showAddFriend && <AddFriendComponent updateFriends={loadFriendList} title="ADD NEW FRIEND"/>}
+			{chatState.showAddFriend && <AddFriendComponent updateFriends={loadFriendList} title="ADD NEW FRIEND"/>}
 			{friendList.map((friend: FriendShip, id: number) => (
 			<div className="tab-and-userclicked" key={id}>
 				<div className="bloc-button-friendslist">

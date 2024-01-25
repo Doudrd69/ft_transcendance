@@ -33,7 +33,7 @@ const TimerComponent: React.FC<TimerComponentProps> = ({user}) => {
 		try{
 			e.preventDefault();
 			const muteUserDto = {
-				conversationID: Number(state.currentConversationID),
+				conversationID: Number(chatState.currentConversationID),
 				username: user.login,
 				state: true,
 				from: Number(sessionStorage.getItem("currentUserID")),
@@ -51,7 +51,7 @@ const TimerComponent: React.FC<TimerComponentProps> = ({user}) => {
 		
 			if (response.ok) {
 				user.isMute = !user.isMute;
-				dispatch({ type: 'DISABLE' , payload: 'showTimer'});
+				chatDispatch({ type: 'DISABLE' , payload: 'showTimer'});
 
 			}
 		}
@@ -61,8 +61,8 @@ const TimerComponent: React.FC<TimerComponentProps> = ({user}) => {
 	}
 
 	const handleCancel = () => {
-		dispatch({ type: 'DISABLE' , payload: 'showTimer'});
-		dispatch({ type: 'ACTIVATE' , payload: 'showBackComponent'});
+		chatDispatch({ type: 'DISABLE' , payload: 'showTimer'});
+		chatDispatch({ type: 'ACTIVATE' , payload: 'showBackComponent'});
 		setTimer('');
 	};
 

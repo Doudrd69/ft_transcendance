@@ -6,7 +6,7 @@ import { Socket } from 'socket.io-client'
 const MatchMaking = (socket: {socket: Socket}) => {
 
 	const gameSocket = socket.socket;
-    const { chatState, chatDispatch } = useGame();
+    const { state, dispatch } = useGame();
 
 	const handleStartClick = async () => {
 		const currentUserLogin = sessionStorage.getItem("currentUserLogin");

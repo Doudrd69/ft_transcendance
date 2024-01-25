@@ -7,7 +7,7 @@ import { Socket } from 'socket.io-client'
 import { useChat } from '../chat/ChatContext';
 
 const SettingsComponent: React.FC = () => {
-	// const {dispatch} = useChat();
+	const {chatDispatch} = useChat();
 	const { dispatch } = useGlobal();
 	useEffect(() => {
 		const handleEscape = (event: KeyboardEvent) => {
@@ -26,7 +26,7 @@ const SettingsComponent: React.FC = () => {
 		dispatch({ type: 'DISABLE', payload: 'showGeneralSettings'});
 		dispatch({ type: 'DISABLE', payload: 'showProfilsSettings'});
 		dispatch({ type: 'DISABLE', payload: 'showGameSettings'});
-		dispatch({ type: 'ACTIVATE', payload: 'showBackComponent' });
+		chatDispatch({ type: 'ACTIVATE', payload: 'showBackComponent' });
 
 	};
 	return (

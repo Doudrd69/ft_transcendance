@@ -12,7 +12,7 @@ import { Socket } from 'socket.io-client'
 
 const GameComponent = (socket: {socket: Socket}) => {
 
-	const { chatState, chatDispatch } = useGame();
+	const { state, dispatch } = useGame();
 
 	const renderComponent = (component: React.ReactNode, condition: boolean) =>
 	  condition ? component : null;

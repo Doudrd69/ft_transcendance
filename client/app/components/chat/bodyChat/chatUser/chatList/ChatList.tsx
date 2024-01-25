@@ -61,7 +61,7 @@ const ChatListComponent: React.FC = () => {
 	useEffect(() => {
 		console.log("Loading DMs...");
 		loadDMs();
-	}, [state.refreshFriendList]);
+	}, [chatState.refreshFriendList]);
 
 	const timestamp = new Date().getTime();
 
@@ -75,12 +75,12 @@ const ChatListComponent: React.FC = () => {
 					alt="User Avatar"
 					/>
 			  		<div className={`amies ${activeIndex === id ? 'active' : ''}`} onClick={() => {
-						  dispatch({ type: 'SET_CURRENT_CONVERSATION', payload: dm.username});
-						  dispatch({ type: 'SET_CURRENT_ROOM', payload: dm.name});
-						  dispatch({ type: 'SET_CURRENT_CONVERSATION_ID', payload: dm.id});
-						  dispatch({ type: 'DISABLE', payload: 'showChatList' });
-						  dispatch({ type: 'ACTIVATE', payload: 'showChat' });
-						  dispatch(setCurrentComponent('showChatList'));
+						  chatDispatch({ type: 'SET_CURRENT_CONVERSATION', payload: dm.username});
+						  chatDispatch({ type: 'SET_CURRENT_ROOM', payload: dm.name});
+						  chatDispatch({ type: 'SET_CURRENT_CONVERSATION_ID', payload: dm.id});
+						  chatDispatch({ type: 'DISABLE', payload: 'showChatList' });
+						  chatDispatch({ type: 'ACTIVATE', payload: 'showChat' });
+						  chatDispatch(setCurrentComponent('showChatList'));
 
 						}}>
 						{dm.username}

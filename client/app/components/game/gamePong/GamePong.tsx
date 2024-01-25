@@ -6,7 +6,7 @@ import { Socket } from 'socket.io-client'
 
 const PongComponent = (socket: { socket: Socket }) => {
 
-    const { chatState, chatDispatch } = useGame();
+    const { state, dispatch } = useGame();
     const gameSocket = socket.socket;
 
     const [countdown, setCountdown] = useState<number>(3);

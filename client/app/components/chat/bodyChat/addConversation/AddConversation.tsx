@@ -52,9 +52,9 @@ const AddConversationComponent: React.FC<AddConversationComponentProps> = ({ loa
 				}
 		
 				console.log("Conversation successfully created");
-				dispatch({ type: 'DISABLE', payload: 'showCreateChannel' });
-				dispatch({ type: 'DISABLE', payload: 'showAddCreateChannel' });
-				dispatch({ type: 'TOGGLEX', payload: 'refreshChannel'});
+				chatDispatch({ type: 'DISABLE', payload: 'showCreateChannel' });
+				chatDispatch({ type: 'DISABLE', payload: 'showAddCreateChannel' });
+				chatDispatch({ type: 'TOGGLEX', payload: 'refreshChannel'});
 				
 			}
 		}
@@ -64,13 +64,13 @@ const AddConversationComponent: React.FC<AddConversationComponentProps> = ({ loa
 	};
 
 	const handleCancel = () => {
-		dispatch({ type: 'DISABLE', payload: 'showAddChannel' });
-		dispatch({ type: 'DISABLE', payload: 'showAddUser' });
-		dispatch({ type: 'DISABLE', payload: 'showAddFriend' });
-		dispatch({ type: 'DISABLE', payload: 'showListChannelAdd' });
-		dispatch({ type: 'DISABLE', payload: 'showAddChannel' });
-		dispatch({ type: 'DISABLE', payload: 'showCreateChannel' });
-		dispatch({ type: 'DISABLE', payload: 'showAddCreateChannel' });
+		chatDispatch({ type: 'DISABLE', payload: 'showAddChannel' });
+		chatDispatch({ type: 'DISABLE', payload: 'showAddUser' });
+		chatDispatch({ type: 'DISABLE', payload: 'showAddFriend' });
+		chatDispatch({ type: 'DISABLE', payload: 'showListChannelAdd' });
+		chatDispatch({ type: 'DISABLE', payload: 'showAddChannel' });
+		chatDispatch({ type: 'DISABLE', payload: 'showCreateChannel' });
+		chatDispatch({ type: 'DISABLE', payload: 'showAddCreateChannel' });
 		setFormValue('');
 		setIsPublic(true);
 		setPasswordValue('');

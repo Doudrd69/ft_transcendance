@@ -8,10 +8,10 @@ const ChatButtonComponent: React.FC = () => {
 
   return (
     <button
-      className={`main-button-chat ${state.showChatList ? 'clicked' : ''}`}
+      className={`main-button-chat ${chatState.showChatList ? 'clicked' : ''}`}
       onClick={() => {
-		dispatch({ type: 'TOGGLE', payload: 'showChatList' })
-		dispatch({type: 'ACTIVATE', payload: 'showBackComponent'})
+		chatDispatch({ type: 'TOGGLE', payload: 'showChatList' })
+		chatDispatch({type: 'ACTIVATE', payload: 'showBackComponent'})
 	  }}>
 		DM
     </button>

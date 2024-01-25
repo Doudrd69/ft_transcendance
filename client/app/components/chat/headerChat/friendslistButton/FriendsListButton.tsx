@@ -7,8 +7,8 @@ const FriendsListButtonComponent: React.FC = () => {
 
   return (
     <button
-      className={`main-button-friendslist ${state.showFriendsList ? 'clicked' : ''}`}
-      onClick={() => dispatch({ type: 'TOGGLE', payload: 'showFriendsList' })}
+      className={`main-button-friendslist ${chatState.showFriendsList ? 'clicked' : ''}`}
+      onClick={() => chatDispatch({ type: 'TOGGLE', payload: 'showFriendsList' })}
     >
       Friends
     </button>

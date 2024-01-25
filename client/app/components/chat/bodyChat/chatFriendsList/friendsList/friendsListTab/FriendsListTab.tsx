@@ -47,7 +47,7 @@ const FriendsListTabComponent:  React.FC<FriendsListTabComponentProps> = ({user}
 		
 		if (response.ok) {
 			user.isBlocked = true;
-			dispatch({ type: 'DISABLE', payload: 'showConfirmation' })
+			chatDispatch({ type: 'DISABLE', payload: 'showConfirmation' })
 			globalState.userSocket?.emit('joinRoom', { roomName: `whoblocked${user.username}`, roomID: '' } );
 		}
 		}
@@ -76,7 +76,7 @@ const FriendsListTabComponent:  React.FC<FriendsListTabComponentProps> = ({user}
 			user.isBlocked = false;
 
 			globalState.userSocket?.emit('leaveRoom', { roomName: `whoblocked${user.username}`, roomID: '' } );
-			dispatch({ type: 'DISABLE', payload: 'showConfirmation' })
+			chatDispatch({ type: 'DISABLE', payload: 'showConfirmation' })
 		}
 		}
 		catch (error) {
@@ -87,7 +87,7 @@ const FriendsListTabComponent:  React.FC<FriendsListTabComponentProps> = ({user}
 	const handleTabClick = (text: string, functionToExecute: any) => {
 		setConfirmationText(text);
 		setFunctionToExecute(() => functionToExecute);
-		dispatch({ type: 'ACTIVATE', payload: 'showConfirmation' });
+		chatDispatch({ type: 'ACTIVATE', payload: 'showConfirmation' });
 	};
 
 	const gameInvite = () => {
@@ -115,8 +115,8 @@ const FriendsListTabComponent:  React.FC<FriendsListTabComponentProps> = ({user}
 				const data = await response.json();
 				if (data.accepted)
 					setAccepted(data.accepted);
-				dispatch({ type: 'TOGGLEX', payload: 'refreshFriendsList' });
-				dispatch({ type: 'DISABLE', payload: 'showConfirmation' });
+				chatDispatch({ type: 'TOGGLEX', payload: 'refreshFriendsList' });
+				chatDispatch({ type: 'DISABLE', payload: 'showConfirmation' });
 
 
 				globalState.userSocket?.emit('refreshUser', {
@@ -134,7 +134,7 @@ const FriendsListTabComponent:  React.FC<FriendsListTabComponentProps> = ({user}
 		<>
 			<div className="bloc-tab">
 				<img className='image-tab' src="ping-pong.png" onClick={() => handleTabClick(`Etes vous sur de vouloir défier ${user.username} ?`, gameInvite)} />
-				<img className='image-tab' src="ajouter-un-groupe.png" onClick={() => dispatch({ type: 'ACTIVATE', payload: 'showListChannelAdd' })} />
+				<img className='image-tab' src="ajouter-un-groupe.png" onClick={() => chatDispatch({ type: 'ACTIVATE', payload: 'showListChannelAdd' })} />
 				<img className='image-tab' src="stats.png"/>
 				{user.isBlocked ? (
 					<img className='image-tab' src="block.png" onClick={() => handleTabClick(`Etes vous sur de vouloir bloquer ${user.username} ?`, unblockUser)}/>
@@ -144,10 +144,10 @@ const FriendsListTabComponent:  React.FC<FriendsListTabComponentProps> = ({user}
 				}
 				<img className='image-tab' src="closered.png" onClick={() => handleTabClick(`Etes vous sur de vouloir supprimer de votre liste d'amies ${user.username} ?`, removeFriends)}/>
 			</div>
-			{state.showConfirmation && (
+			{chatState.showConfirmation && (
 				<ConfirmationComponent phrase={confirmationText} functionToExecute={funtionToExecute}/>
 			)}
-			{state.showListChannelAdd && (
+			{chatState.showListChannelAdd && (
 				<ListMyChannelComponent user={user.username}  title={`INVITE ${user.username} TO MY CHANNEL`}/>
 			)}
 		</>

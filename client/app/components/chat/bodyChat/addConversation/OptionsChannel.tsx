@@ -27,8 +27,8 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 	const [isOwner, setIsOwner] = useState<boolean>(false);
 	const { globalState } = useGlobal();
 	const { chatState, chatDispatch } = useChat();
-	if (state.currentUserList) {
-		setMe(state.currentUserList.filter((user: userList) => user.login === sessionStorage.getItem("currentUserLogin")));
+	if (chatState.currentUserList) {
+		setMe(chatState.currentUserList.filter((user: userList) => user.login === sessionStorage.getItem("currentUserLogin")));
 		console.log('me', me);
 	}
 	if (me) {
@@ -41,7 +41,7 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 
 		try {
 			const channelOptionDto = {
-				conversationID: Number(state.currentConversationID),
+				conversationID: Number(chatState.currentConversationID),
 				userID: Number(sessionStorage.getItem("currentUserID")),
 			}
 
@@ -55,7 +55,7 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 			});
 
 			if (response.ok) {
-				dispatch({ type: 'ACTIVATE', payload: 'currentConversationIsPrivate' });
+				chatDispatch({ type: 'ACTIVATE', payload: 'currentConversationIsPrivate' });
 			}
 		}
 		catch (error) {
@@ -66,7 +66,7 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 
 		try {
 			const channelOptionDto = {
-				conversationID: Number(state.currentConversationID),
+				conversationID: Number(chatState.currentConversationID),
 				userID: Number(sessionStorage.getItem("currentUserID")),
 			}
 
@@ -80,7 +80,7 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 			});
 
 			if (response.ok) {
-				dispatch({ type: 'DISABLE', payload: 'currentConversationIsPrivate' });
+				chatDispatch({ type: 'DISABLE', payload: 'currentConversationIsPrivate' });
 			}
 		}
 		catch (error) {
@@ -92,7 +92,7 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 
 		try{
 			const channelOptionDto = {
-				conversationID: Number(state.currentConversationID),
+				conversationID: Number(chatState.currentConversationID),
 				userID: Number(sessionStorage.getItem("currentUserID")),
 			}
 	
@@ -109,14 +109,14 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 
 				// makes everyone in the channel leave + refresh component
 				globalState.userSocket?.emit('deleteChannel', {
-					roomName: state.currentConversation,
-					roomID: state.currentConversationID,
+					roomName: chatState.currentConversation,
+					roomID: chatState.currentConversationID,
 				});
 
-				dispatch({ type: 'DISABLE', payload: 'showOptionChannel' });
-				dispatch({ type: 'DISABLE', payload: 'showChannel' });
-				dispatch({ type: 'ACTIVATE', payload: 'showBackComponent' });
-				dispatch({ type: 'ACTIVATE', payload: 'showChannelList' });
+				chatDispatch({ type: 'DISABLE', payload: 'showOptionChannel' });
+				chatDispatch({ type: 'DISABLE', payload: 'showChannel' });
+				chatDispatch({ type: 'ACTIVATE', payload: 'showBackComponent' });
+				chatDispatch({ type: 'ACTIVATE', payload: 'showChannelList' });
 			}
 		}
 		catch (error) {
@@ -128,9 +128,9 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 
 		try{
 			const channelOptionDto = {
-				conversationID: Number(state.currentConversationID),
+				conversationID: Number(chatState.currentConversationID),
 				userID: Number(sessionStorage.getItem("currentUserID")),
-				state: state.currentConversationIsProtected,
+				state: chatState.currentConversationIsProtected,
 			}
 
 			const response = await fetch(`http://localhost:3001/chat/updateIsProtectedFalse`, {
@@ -145,7 +145,7 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 			if (response.ok) {
 				const status = await response.json();
 				if (status) {
-					dispatch({ type: 'DISABLE', payload: 'currentConversationIsProtected' });
+					chatDispatch({ type: 'DISABLE', payload: 'currentConversationIsProtected' });
 				}
 				else {
 					console.log("User is not admin on this channel");
@@ -160,8 +160,8 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 
 	const handleCancel = () => {
 
-		dispatch({ type: 'DISABLE', payload: 'showOptionChannel' });
-		dispatch({ type: 'ACTIVATE', payload: 'showBackComponent' });
+		chatDispatch({ type: 'DISABLE', payload: 'showOptionChannel' });
+		chatDispatch({ type: 'ACTIVATE', payload: 'showBackComponent' });
 		setFormValue('');
 	};
 
@@ -185,34 +185,34 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 			<div className="add_container">
 				<h2 className="add__title">{title}</h2>	
 				<div className="option-block">
-					{state.isAdmin ?
+					{chatState.isAdmin ?
 						<>
-							{state.currentConversationIsPrivate ?
+							{chatState.currentConversationIsPrivate ?
 								<img className="option-image" src="private.png"  onClick={updateIsPublicFalse}/>
 								:
 								<img className="option-image" src="public.png" onClick={updateIsPublicTrue}/>
 							}
-							{state.currentConversationIsProtected &&
+							{chatState.currentConversationIsProtected &&
 								<img className="option-image" src="upload-password.png"  onClick={() => { 
-									if (state.currentConversationIsProtected)
-										dispatch({ type: 'ACTIVATE', payload: 'showPasswordChange' });
-										dispatch({ type: 'DISABLE', payload: 'showOptionChannel' });
+									if (chatState.currentConversationIsProtected)
+										chatDispatch({ type: 'ACTIVATE', payload: 'showPasswordChange' });
+										chatDispatch({ type: 'DISABLE', payload: 'showOptionChannel' });
 								}}/>
 							}
-							{state.currentConversationIsProtected ?
+							{chatState.currentConversationIsProtected ?
 								<img className="option-image" src="password.png" onClick={updateIsProtectedFalse}/>
 								:
 								<img className="option-image" src="no-password.png"
 								onClick={() => { 
-										dispatch({ type: 'ACTIVATE', payload: 'showPasswordChange' });
-										dispatch({ type: 'DISABLE', payload: 'showOptionChannel' });
+										chatDispatch({ type: 'ACTIVATE', payload: 'showPasswordChange' });
+										chatDispatch({ type: 'DISABLE', payload: 'showOptionChannel' });
 								}}/>}
 						</> 
 						:
 						null
 					}
 					
-					{state.isOwner &&
+					{chatState.isOwner &&
 						<img className="option-image" src="closered.png" onClick={() => deleteChannel() }/>}
 				</div>
 			</div>

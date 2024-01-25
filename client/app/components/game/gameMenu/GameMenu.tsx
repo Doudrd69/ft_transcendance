@@ -8,7 +8,7 @@ import { Socket } from 'socket.io-client'
 
 const Menu = (socket: { socket: Socket }) => {
 
-    const { chatState, chatDispatch } = useGame();
+    const { state, dispatch } = useGame();
 
     const gameSocket = socket.socket;
 
