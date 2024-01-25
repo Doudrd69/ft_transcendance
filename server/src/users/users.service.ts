@@ -522,6 +522,7 @@ export class UsersService {
 				id: element.friend ? element.friend.id : element.initiator ? element.initiator.id : -1,
 				username: element.friend ? element.friend.username : element.initiator ? element.initiator.username : 'unknown user',
 				isBlocked: blockStatus,
+				onlineStatus:  element.friend ? element.friend.isActive : element.initiator ? element.initiator.isActive : false,
 			});
 		});
 

@@ -64,7 +64,6 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 
 		if (response.ok) {
 			setBlock(true);
-			console.log("refreshing --> ", state.currentConversation, state.currentConversationID);
 			globalState.userSocket?.emit('joinRoom', { roomName: `whoblocked${user.login}`, roomID: '' } );
 			globalState.userSocket?.emit('refreshChannel', {
 				channel: state.currentConversation + state.currentConversationID,
