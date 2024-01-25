@@ -11,6 +11,7 @@ interface FriendShip {
 	id: number;
 	username: string;
 	isBlocked: boolean;
+	onlineStatus: boolean;
 }
 
 interface Conversation {
@@ -111,7 +112,12 @@ const FriendsListComponent: React.FC = () => {
 							className={`profil-friendslist`}
 							alt="User Avatar"
 						/>
-						<div className={`amies ${activeIndex === id ? 'active' : ''}`} onClick={() => activateTabFriendsList(id)}>
+						<div className="amies" onClick={() => activateTabFriendsList(id)}>
+							{friend.onlineStatus ? 
+								<div className="online" />
+								:
+								<div className="offline" />
+							}
 							{friend.username}
 						</div>
 				</div>
