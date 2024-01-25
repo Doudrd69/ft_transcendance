@@ -29,10 +29,12 @@ export class MatchmakingService {
         console.log("Push queue before: ", this.playersQueue);
 		this.playersQueue.push(playerID);
         console.log("Push queue after: ", this.playersQueue);
-        // const newUser: User = await this.usersRepository.findOne({ where: { socketGame: playerID } })
-        // newUser.inMatchmaking = true;
-        // await this.usersRepository.save(newUser);
-		console.log(`${playerID} joins the queue`);
+        const newUser: User = await this.usersRepository.findOne({ where: { gameSocketId: playerID } })
+        if (!newUser)
+            console.log(`No User for this gameSocketId: ${playerID}`);
+        newUser.inMatchmaking = true;
+        await this.usersRepository.save(newUser);
+		console.log(`${newUser.login} joins the queue`);
     }
 
 	async leave(playerID: string) {

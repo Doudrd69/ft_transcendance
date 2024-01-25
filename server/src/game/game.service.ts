@@ -28,12 +28,12 @@ export class GameService {
         
         ) { }
         
-    userGameSockets : { [userId: string]: string };
+    userGameSockets : { [userLogin: string]: string };
     
     async createGame(player1ID: string, player2ID: string): Promise<Game> {
 
         console.log("Creating new GAME...");
-        const playersLogin: [string, string] = await this.getLoginByIDpair(player1ID, player2ID);
+        const playersLogin: [string, string] = await this.getLoginByIDpairStartGame(player1ID, player2ID);
         if (playersLogin) {
             const game = new Game();
             game.playerOneID = player1ID;
@@ -50,31 +50,52 @@ export class GameService {
         return ;
     }
 
+    getUserLoginWithSocketId(socketId: string) {
+        for (const [userLogin, socketIdValue] of Object.entries(this.userGameSockets)) {
+            if (socketIdValue === socketId) {
+                console.log(`getUserIdWithSocketId: ${userLogin}`);
+              return userLogin;
+            }
+        }
+        return (null);
+    }
+
+    async getUserWithUserLogin(userLogin: string): Promise<User> {
+        const user: User = await this.usersRepository.findOne({ where: { login: userLogin } });
+        return (user);
+    }
+
+    async userInGameOrInMacthmaking(user: User)
+    {
+        if (user.inGame === true || user.inMatchmaking === true)
+            return true;
+        return false;
+    }
 
     async linkSocketIDWithUser(playerID: string, playerLogin: string) {
 
         const Player: User = await this.usersRepository.findOne({ where: { login: playerLogin } })
         if (Player && playerID) {
-            Player.socketGame = playerID;
+            Player.gameSocketId = playerID;
             await this.usersRepository.save(Player);
         }
 
         return ;
     }
 
-    async getLoginByIDpair(player1ID: string, player2ID: string) {
+    async getLoginByIDpairStartGame(player1ID: string, player2ID: string) {
 
-        const UserOne: User = await this.usersRepository.findOne({ where: { socketGame: player1ID } })
-        const UserTwo: User = await this.usersRepository.findOne({ where: { socketGame: player2ID } })
+        const UserOne: User = await this.usersRepository.findOne({ where: { gameSocketId: player1ID } })
+        const UserTwo: User = await this.usersRepository.findOne({ where: { gameSocketId: player2ID } })
 
         console.log("USER ONE: ", UserOne);
         console.log("USER TWO: ", UserTwo);
-        // UserOne.inMatchmaking = false;
-        // UserOne.inGame = true;
-        // UserTwo.inMatchmaking = false;
-        // UserTwo.inGame = true;
-        // await this.usersRepository.save(UserOne);
-        // await this.usersRepository.save(UserTwo);
+        UserOne.inMatchmaking = false;
+        UserOne.inGame = true;
+        UserTwo.inMatchmaking = false;
+        UserTwo.inGame = true;
+        await this.usersRepository.save(UserOne);
+        await this.usersRepository.save(UserTwo);
         if (UserOne && UserTwo) {
             const playersLogin: [string, string] = [UserOne.login, UserTwo.login]
             console.log("Players login : ", playersLogin);
@@ -108,10 +129,11 @@ export class GameService {
 
     async endOfGame(game: Game, gameInstance: game_instance): Promise<Game> {
         console.log("==== END OF GAME ====");
-        const UserOne: User = await this.usersRepository.findOne({ where: { socketGame: gameInstance.players[0] } })
-        const UserTwo: User = await this.usersRepository.findOne({ where: { socketGame: gameInstance.players[1] } })
-        // UserOne.inGame = false;
-        // UserTwo.inGame = false;
+        const UserOne: User = await this.usersRepository.findOne({ where: { gameSocketId: gameInstance.players[0] } })
+        const UserTwo: User = await this.usersRepository.findOne({ where: { gameSocketId: gameInstance.players[1] } })
+        UserOne.inGame = false;
+        UserTwo.inGame = false;
+        // delete les sockets et le userLoginsocketsomposr
 
         console.log("Before U1: ", UserOne.victory, UserOne.defeat);
         console.log("Before U2: ", UserTwo.victory, UserTwo.defeat);
@@ -143,32 +165,57 @@ export class GameService {
         return gametab.find(instance => instance.gameID === gameID);
     }
 
-    userHasAlreadyGameSockets(userId: string) {
-        if (this.userGameSockets[userId])
-            return true;
+    userHasAlreadyGameSockets(userLogin: string) {
+        // console.log(`login: ${userLogin}`)
+        // if (typeof(this.userGameSockets[userLogin]) == "undefined")
+        //     return false;
+        // console.log(`"undefined"`)
+        // if (typeof(this.userGameSockets[userLogin]) == undefined)
+        //     return false;
+        // console.log(`undefined`)
+        // if (this.userGameSockets[userLogin] === null)
+        //     return false;
+        //     console.log(`null`)
         return false;
     }
 
-    addGameSocket(gameSocketId: string, userId: string) {
-        // this.userGameSockets[userId].push(gameSocketId);
+    addGameSocket(gameSocketId: string, userLogin: string) {
+        this.userGameSockets[userLogin] = gameSocketId;
     }
 
-    getMyGameSockets(userId: string) {
-        return this.userGameSockets[userId];
+    getMyGameSockets(userLogin: string) {
+        return this.userGameSockets[userLogin];
     }
-    createNewGameSockets(userId: string) {
-        // this.userGameSockets[userId] = [];
+    createNewGameSockets(userLogin: string) {
+        this.userGameSockets[userLogin] = null;
     }
 
-    // getUserGameSocketsGate(userGameSocketsGate: userGameSockets[], userId: string) {
-    //     return userGameSocketsGate.find(instance => instance.userId === userId);
-    // }
+    async deconnectUserMatchmaking(user: User, userLogin: string) {
+        user.inMatchmaking = false;
+        this.userGameSockets[userLogin] = null;
+        await this.usersRepository.save(user);
+    }
 
-    // newUserGameSocketsGate(userId: string) {
-    //     const newUserGameSockets: userGameSockets = {
-    //         userId: userId,
-    //         gameSocketsId: null
-    //     }
-    //     return newUserGameSockets;
-    // }
+    async getGameWithUserLogin(userLogin: string): Promise<Game> {
+        const gameOne = await this.gameRepository.findOne({ where: { playerOneID: this.userGameSockets[userLogin] } })
+        if (gameOne) {
+            return gameOne;
+        }
+        const gameTwo = await this.gameRepository.findOne({ where: { playerTwoID: this.userGameSockets[userLogin] } })
+        if (gameTwo)
+            return gameTwo;
+        else
+            throw new Error("Fatal error");
+    }
+
+    async getOtherUser(game: Game, user: User) {
+        let otherUser;
+        if (user.login === game.playerOneLogin) {
+            otherUser = await this.usersRepository.findOne({ where: { login: user.login } })
+        }
+        else if (user.login === game.playerOneLogin) {
+            otherUser = await this.usersRepository.findOne({ where: { login: user.login } })
+        }
+    }
+
  }

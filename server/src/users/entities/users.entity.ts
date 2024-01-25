@@ -9,7 +9,7 @@ export class User {
 	id: number;
 
 	@Column({ default: "1234"})
-	  socketGame: string;
+	gameSocketId: string;
 
 	@Column({ default: false })
 	inMatchmaking: boolean;
