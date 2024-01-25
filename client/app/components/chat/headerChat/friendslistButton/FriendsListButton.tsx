@@ -3,12 +3,12 @@ import React from 'react';
 import { useChat } from '../../ChatContext';
 
 const FriendsListButtonComponent: React.FC = () => {
-  const { state, dispatch } = useChat();
+  const { chatState, chatDispatch } = useChat();
 
   return (
     <button
-      className={`main-button-friendslist ${state.showFriendsList ? 'clicked' : ''}`}
-      onClick={() => dispatch({ type: 'TOGGLE', payload: 'showFriendsList' })}
+      className={`main-button-friendslist ${chatState.showFriendsList ? 'clicked' : ''}`}
+      onClick={() => chatDispatch({ type: 'TOGGLE', payload: 'showFriendsList' })}
     >
       Friends
     </button>

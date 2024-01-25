@@ -4,13 +4,13 @@ import {useChat} from '../../ChatContext'
 import { useEffect } from 'react';
 const BackButtonComponent: React.FC = () => {
 
-	const { state, dispatch } = useChat();
+	const { chatState, chatDispatch } = useChat();
 	const handleCancel = () => {
-			dispatch({ type: 'DISABLE', payload: 'showChat' });
-			dispatch({ type: 'DISABLE', payload: 'showChannel' });
-			dispatch({ type: 'DISABLE', payload: 'showOptionsUserChannel' });
-			dispatch({ type: 'DISABLE', payload: 'showOptionsChannel' });
-			dispatch({ type: 'ACTIVATE', payload: state.currentComponent });
+			chatDispatch({ type: 'DISABLE', payload: 'showChat' });
+			chatDispatch({ type: 'DISABLE', payload: 'showChannel' });
+			chatDispatch({ type: 'DISABLE', payload: 'showOptionsUserChannel' });
+			chatDispatch({ type: 'DISABLE', payload: 'showOptionsChannel' });
+			chatDispatch({ type: 'ACTIVATE', payload: chatState.currentComponent });
 	};
 
 
@@ -22,9 +22,8 @@ const BackButtonComponent: React.FC = () => {
 			};
 	
 			document.addEventListener('keydown', handleEscape);
-
 			return () => {
-			  document.removeEventListener('keydown', handleEscape);
+				document.removeEventListener('keydown', handleEscape);
 			};
 	}, []);
 

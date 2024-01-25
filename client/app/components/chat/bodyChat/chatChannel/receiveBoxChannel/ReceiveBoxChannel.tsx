@@ -29,7 +29,7 @@ interface User {
 
 const ReceiveBoxChannelComponent: React.FC = () => {
 
-	const { state, dispatch } = useChat();
+	const { chatState, chatDispatch } = useChat();
 	const { globalState } = useGlobal();
 	const [messages, setMessages] = useState<Message[]>([]);
 	const messagesContainerRef = useRef<HTMLDivElement>(null);
@@ -64,7 +64,7 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 
 	const getMessages = async () => {
 		try {
-		const response = await fetch(`http://localhost:3001/chat/getMessages/${state.currentConversationID}`, {
+		const response = await fetch(`http://localhost:3001/chat/getMessages/${chatState.currentConversationID}`, {
 			method: 'GET',
 			headers: {
 			'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
@@ -83,7 +83,7 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 	const loadUserList = async () => {
 
 		try {
-			const response = await fetch(`http://localhost:3001/chat/getUserlist/${state.currentConversationID}`, {
+			const response = await fetch(`http://localhost:3001/chat/getUserlist/${chatState.currentConversationID}`, {
 				method: 'GET',
 				headers: {
 				'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
@@ -111,20 +111,20 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 		});
 
 		globalState.userSocket?.on('onMessage', (message: Message) => {
-			if (message && (message.conversationID == state.currentConversationID))
+			if (message && (message.conversationID == chatState.currentConversationID))
 				setMessages((prevMessages: Message[]) => [...prevMessages, message]);
 		});
 
 		globalState.userSocket?.on('kickUser', ( data: {roomName: string, roomID: string} ) => {
 			const { roomName, roomID } = data;
-			dispatch({ type: 'DISABLE', payload: 'showChannel' });
+			chatDispatch({ type: 'DISABLE', payload: 'showChannel' });
 		});
 
 		globalState.userSocket?.on('channelDeleted', ( data: {roomName: string, roomID: string} ) => {
 			const { roomName, roomID } = data;
 			globalState.userSocket?.emit('leaveRoom', { roomName: roomName, roomID: roomID });
-			dispatch({ type: 'DISABLE', payload: 'showChannel' });
-			dispatch({ type: 'ACTIVATE', payload: 'showChannelList' });
+			chatDispatch({ type: 'DISABLE', payload: 'showChannel' });
+			chatDispatch({ type: 'ACTIVATE', payload: 'showChannelList' });
 		});
 
 		globalState.userSocket?.on('refresh_channel', () => {
@@ -168,13 +168,13 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 						src={`http://localhost:3001${ownerUser?.avatarURL}`}
 						onClick={() => {
 							{console.log("ownerUser", ownerUser?.avatarURL)}
-						  dispatch({ type: 'ACTIVATE', payload: 'dontcandcel' });
-						  dispatch({ type: 'ACTIVATE', payload: 'showOptionsUserChannelOwner' });
-						  dispatch({ type: 'SET_CURRENT_OPTION_CHANNEL_NAME', payload: ownerUser?.login });
-						  dispatch({ type: 'DISABLE', payload: 'showBackComponent' });
+						  chatDispatch({ type: 'ACTIVATE', payload: 'dontcandcel' });
+						  chatDispatch({ type: 'ACTIVATE', payload: 'showOptionsUserChannelOwner' });
+						  chatDispatch({ type: 'SET_CURRENT_OPTION_CHANNEL_NAME', payload: ownerUser?.login });
+						  chatDispatch({ type: 'DISABLE', payload: 'showBackComponent' });
 						}} />
 					</div>
-					{state.showOptionsUserChannelOwner && ownerUser &&
+					{chatState.showOptionsUserChannelOwner && ownerUser &&
 					  currentUser && <OptionsUserChannel user={ownerUser} me={currentUser} />}
 				  </div>
 				</div>
@@ -189,10 +189,10 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 							  className='img-list-users-channel-admin'
 							  src={`http://localhost:3001${user.avatarURL}`}
 							  onClick={() => {
-								dispatch({ type: 'ACTIVATE', payload: 'dontcandcel' });
-								dispatch({ type: 'ACTIVATE', payload: 'showOptionsUserChannel' });
-								dispatch({ type: 'SET_CURRENT_OPTION_CHANNEL_NAME', payload: user.login });
-								dispatch({ type: 'DISABLE', payload: 'showBackComponent' });
+								chatDispatch({ type: 'ACTIVATE', payload: 'dontcandcel' });
+								chatDispatch({ type: 'ACTIVATE', payload: 'showOptionsUserChannel' });
+								chatDispatch({ type: 'SET_CURRENT_OPTION_CHANNEL_NAME', payload: user.login });
+								chatDispatch({ type: 'DISABLE', payload: 'showBackComponent' });
 							  }} />
 						  </>
 						}
@@ -201,13 +201,13 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 							className='img-list-users-channel'
 							src={`http://localhost:3001${user.avatarURL}`}
 							onClick={() => {
-							  dispatch({ type: 'ACTIVATE', payload: 'dontcandcel' });
-							  dispatch({ type: 'ACTIVATE', payload: 'showOptionsUserChannel' });
-							  dispatch({ type: 'SET_CURRENT_OPTION_CHANNEL_NAME', payload: user.login });
-							  dispatch({ type: 'DISABLE', payload: 'showBackComponent' });
+							  chatDispatch({ type: 'ACTIVATE', payload: 'dontcandcel' });
+							  chatDispatch({ type: 'ACTIVATE', payload: 'showOptionsUserChannel' });
+							  chatDispatch({ type: 'SET_CURRENT_OPTION_CHANNEL_NAME', payload: user.login });
+							  chatDispatch({ type: 'DISABLE', payload: 'showBackComponent' });
 							}} />}
 					  </div>
-					  {state.showOptionsUserChannel && !user.isOwner && currentUser &&
+					  {chatState.showOptionsUserChannel && !user.isOwner && currentUser &&
 						(<OptionsUserChannel user={user} me={currentUser} />)
 					  }
 					</div>
@@ -232,7 +232,7 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 				  </div>
 				))}
 			  </div>
-			  {state.showTimer && currentUser && <TimerComponent user={currentUser}/>}
+			  {chatState.showTimer && currentUser && <TimerComponent user={currentUser}/>}
 			</>
 		);
 };

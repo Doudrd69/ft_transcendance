@@ -6,7 +6,7 @@ import { useChat } from '../../ChatContext';
 const PasswordChangeComponent: React.FC = () => {
 
 	const [password, setPassword] = useState('');
-	const { state, dispatch } = useChat();
+	const { chatState, chatDispatch } = useChat();
 
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const newPassword = e.target.value;
@@ -18,9 +18,9 @@ const PasswordChangeComponent: React.FC = () => {
 		try {
 
 			const channelOptionDto = {
-				conversationID: Number(state.currentConversationID),
+				conversationID: Number(chatState.currentConversationID),
 				userID: Number(sessionStorage.getItem("currentUserID")),
-				state: state.currentConversationIsProtected,
+				state: chatState.currentConversationIsProtected,
 				password: password,
 			}
 
@@ -34,10 +34,10 @@ const PasswordChangeComponent: React.FC = () => {
 			});
 	
 			if (response.ok) {
-				dispatch({ type: 'ACTIVATE', payload: 'currentConversationIsProtected' });
-				dispatch({ type: 'ACTIVATE', payload: 'showOptionUseChannel' });
-				dispatch({ type: 'ACTIVATE', payload: 'showBackComponent' });
-				dispatch({ type: 'DISABLE', payload: 'showPasswordChange' });
+				chatDispatch({ type: 'ACTIVATE', payload: 'currentConversationIsProtected' });
+				chatDispatch({ type: 'ACTIVATE', payload: 'showOptionUseChannel' });
+				chatDispatch({ type: 'ACTIVATE', payload: 'showBackComponent' });
+				chatDispatch({ type: 'DISABLE', payload: 'showPasswordChange' });
 			};} 
 			catch (error) {
 				console.log(error);
@@ -45,8 +45,8 @@ const PasswordChangeComponent: React.FC = () => {
 	}
 
 	const handleClosePassword = () => {
-		dispatch({ type: 'ACTIVATE', payload: 'showOptionChannel' });
-		dispatch({ type: 'DISABLE', payload: 'showPasswordChange' });
+		chatDispatch({ type: 'ACTIVATE', payload: 'showOptionChannel' });
+		chatDispatch({ type: 'DISABLE', payload: 'showPasswordChange' });
 	};
 
 	useEffect(() => {

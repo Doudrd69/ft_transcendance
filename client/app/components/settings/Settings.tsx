@@ -4,13 +4,11 @@ import HeaderSettingsComponent from './headerSettings/HearderSettings';
 import BodySettingsComponent from './bodySettings/BodySettings';
 import { useGlobal } from '@/app/GlobalContext';
 import { Socket } from 'socket.io-client'
+import { useChat } from '../chat/ChatContext';
 
 const SettingsComponent: React.FC = () => {
-
+	const {chatDispatch} = useChat();
 	const { dispatch } = useGlobal();
-
-	// dispatch({ type: 'DISABLE', payload: 'showBackComponent' });
-
 	useEffect(() => {
 		const handleEscape = (event: KeyboardEvent) => {
 			if (event.key === 'Escape') {
@@ -23,13 +21,12 @@ const SettingsComponent: React.FC = () => {
 			  document.removeEventListener('keydown', handleEscape);
 			};
 	}, []);
-
 	const handleCloseSettings = () => {
 		dispatch({ type: 'DISABLE' , payload: 'showSettings' });
 		dispatch({ type: 'DISABLE', payload: 'showGeneralSettings'});
 		dispatch({ type: 'DISABLE', payload: 'showProfilsSettings'});
 		dispatch({ type: 'DISABLE', payload: 'showGameSettings'});
-		dispatch({ type: 'ACTIVATE', payload: 'showBackComponent' });
+		chatDispatch({ type: 'ACTIVATE', payload: 'showBackComponent' });
 
 	};
 	return (

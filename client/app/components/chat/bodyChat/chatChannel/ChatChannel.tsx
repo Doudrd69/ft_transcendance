@@ -9,7 +9,7 @@ import { Socket } from 'socket.io-client'
 
 const ChatChannelComponent: React.FC = () => {
 
-  const { state } = useChat();
+  const { chatState } = useChat();
 
   const renderComponent = (component: React.ReactNode, condition: boolean) =>
     condition ? component : null;
@@ -17,9 +17,9 @@ const ChatChannelComponent: React.FC = () => {
   return (
     <div className="chat-channel">
 
-      {renderComponent(<ChannelListComponent />, state.showChannelList)}
-      {renderComponent(<ReceiveBoxChannelComponent />, state.showChannel)}
-      {renderComponent(<SendBoxChannelComponent />, state.showChannel)}
+      {renderComponent(<ChannelListComponent />, chatState.showChannelList)}
+      {renderComponent(<ReceiveBoxChannelComponent />, chatState.showChannel)}
+      {renderComponent(<SendBoxChannelComponent />, chatState.showChannel)}
     </div>
   );
 };
