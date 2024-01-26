@@ -151,8 +151,7 @@ export class AuthService {
 		throw new Error("Fatal error");
 	}
 
-	// on genere le secret si on en a pas
-	// et au premier coup, si tout est bon on enregistre le temp_secret comme secret onn
+	// On genere le qrcode a la demande d'activation de la 2fa
 	async activate2FA(requestTfaDto: RequestTfaDto) {
 
 		try {
