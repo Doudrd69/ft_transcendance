@@ -104,6 +104,7 @@ const PongComponent = () => {
     };
 
     const [Game, setGame] = useState<Game>(defaultGame);
+    const currentUserId = sessionStorage.getItem("currentUserId");
 
 
     useEffect(() => {
@@ -205,6 +206,16 @@ const PongComponent = () => {
                 payload: 'showGameMenu',
             });
             state.showGameMenu = true;
+            globalState.gameSocket?.disconnect();
+        });
+
+        globalState.gameSocket?.on('GameStop', () => {
+            dispatchGame({
+                type: 'TOGGLE',
+                payload: 'showGameMenu',
+            });
+            state.showGameMenu = true;
+            globalState.gameSocket?.disconnect();
         });
 
         const handleKeyUp = (e: KeyboardEvent) => {

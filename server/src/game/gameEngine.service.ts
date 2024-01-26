@@ -16,6 +16,7 @@ export class GameEngineService {
 	createGameInstance(game: Game) {
 		let signe = (Math.random() - 0.5) > 0 ? 1 : -1;
 		const newGame: game_instance = {
+			stop: false,
 			pause: false,
 			player1Joined: false,
 			player2Joined: false,
@@ -29,7 +30,7 @@ export class GameEngineService {
 				speed: { x: (signe / 100) * 0.177 * 1.5, y: (Math.random() - 0.5) * Math.random() / 60 },
 				r: 0.02,
 				alive: true,
-				elasticity: 1.02,
+				elasticity: 1.15,
 			},
 			player1_score: 0,
 			player2_score: 0,
@@ -97,6 +98,7 @@ export class GameEngineService {
 	}
 
 	resetGamePause(gameInstance: game_instance, server: any) {
+		console.log(gameInstance.ball.speed.x);
 		gameInstance.ball.player1Scored = false;
 		gameInstance.ball.player2Scored = false;
 		gameInstance.pause = true;
