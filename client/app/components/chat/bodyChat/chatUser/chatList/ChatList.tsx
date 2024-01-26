@@ -15,7 +15,7 @@ interface Conversation {
 	username: string;
 	avatarURL: string;
 	name: string;
-	
+	onlineStatus: boolean;
 }
 
 const ChatListComponent: React.FC = () => {
@@ -27,7 +27,6 @@ const ChatListComponent: React.FC = () => {
 	const [dm, setDm] = useState<Conversation[]>([]);
   
 	const loadDMs = async () => {
-
 		try {
 			const requestDms = await fetch(`http://localhost:3001/chat/getDMsConversations/${sessionStorage.getItem("currentUserID")}`, {
 				method: 'GET',
@@ -86,14 +85,18 @@ const ChatListComponent: React.FC = () => {
 					alt="User Avatar"
 					/>
 			  		<div className={`amies ${activeIndex === id ? 'active' : ''}`} onClick={() => {
-						  chatDispatch({ type: 'SET_CURRENT_CONVERSATION', payload: dm.username});
-						  chatDispatch({ type: 'SET_CURRENT_ROOM', payload: dm.name});
-						  chatDispatch({ type: 'SET_CURRENT_CONVERSATION_ID', payload: dm.id});
-						  chatDispatch({ type: 'DISABLE', payload: 'showChatList' });
-						  chatDispatch({ type: 'ACTIVATE', payload: 'showChat' });
-						  chatDispatch(setCurrentComponent('showChatList'));
-
+						chatDispatch({ type: 'SET_CURRENT_CONVERSATION', payload: dm.username});
+						chatDispatch({ type: 'SET_CURRENT_ROOM', payload: dm.name});
+						chatDispatch({ type: 'SET_CURRENT_CONVERSATION_ID', payload: dm.id});
+						chatDispatch({ type: 'DISABLE', payload: 'showChatList' });
+						chatDispatch({ type: 'ACTIVATE', payload: 'showChat' });
+						chatDispatch(setCurrentComponent('showChatList'));
 						}}>
+						{dm.onlineStatus ? 
+							<div className="online" />
+							:
+							<div className="offline" />
+						}
 						{dm.username}
 					</div>
 				</div>

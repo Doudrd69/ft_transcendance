@@ -128,15 +128,12 @@ const ChannelListComponent: React.FC = () => {
 		chatDispatch({ type: 'SET_CURRENT_CONVERSATION_IS_PROTECTED', payload: conversation.isProtected });
 		chatDispatch({ type: 'ACTIVATE', payload: 'currentChannelBool' });
 		chatDispatch({ type: 'ACTIVATE', payload: 'dontcancel' });
-		console.log("user", user);
 		if(isAdmin[index])
 		{
 			chatDispatch({ type: 'ACTIVATE', payload: 'showAdmin' });
 			chatDispatch({ type: 'ACTIVATE', payload: 'isAdmin' });
 		}
 		const me = user.filter((user: User) => user.login === sessionStorage.getItem("currentUserLogin"));
-		console.log("me", me);
-		console.log("m2", me[0].isOwner);
 
 		if(me[0].isOwner)
 			chatDispatch({ type: 'ACTIVATE', payload: 'isOwner' });
