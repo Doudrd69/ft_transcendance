@@ -35,11 +35,5 @@ export class MuteUserDto {
 	@IsPositive()
 	@IsInt()
 	@Max(1000)
-	from: number;
-
-	@IsNotEmpty()
-	@IsPositive()
-	@IsInt()
-	@Max(1000)
 	mutedUntil: number;
 }

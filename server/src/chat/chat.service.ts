@@ -529,13 +529,13 @@ export class ChatService {
 	/***					USER CHANNEL OPTIONS				***/
 	/**************************************************************/
 
-	async updateUserMuteStatusFromConversation(muteUserDto: MuteUserDto): Promise<boolean> {
+	async updateUserMuteStatusFromConversation(muteUserDto: MuteUserDto, userID: number): Promise<boolean> {
 
 		const userToMute : User = await this.usersRepository.findOne({
 			where: { username: muteUserDto.username },
 			relations: ["groups"],
 		});
-		const user = await this.usersRepository.findOne({ where: { id: muteUserDto.from } });
+		const user = await this.usersRepository.findOne({ where: { id: userID } });
 		const conversation = await this.conversationRepository.findOne({ where: { id: muteUserDto.conversationID } });
 		const userGroup = await this.getRelatedGroup(user, conversation);
 		if (userGroup.isBan) {
@@ -559,13 +559,13 @@ export class ChatService {
 		throw new Error("Fatal error");
 	}
 
-	async updateUserUnmuteStatusFromConversation(muteUserDto: UserOptionsDto): Promise<boolean> {
+	async updateUserUnmuteStatusFromConversation(muteUserDto: UserOptionsDto, userID: number): Promise<boolean> {
 
 		const userToMute : User = await this.usersRepository.findOne({
-			where: { username: muteUserDto.username },
+			where: { id: muteUserDto.target },
 			relations: ["groups"],
 		});
-		const user = await this.usersRepository.findOne({ where: { id: muteUserDto.from } });
+		const user = await this.usersRepository.findOne({ where: { id: userID } });
 		const conversation = await this.conversationRepository.findOne({ where: { id: muteUserDto.conversationID } });
 		const userGroup = await this.getRelatedGroup(user, conversation);
 		if (userGroup.isBan) {
@@ -585,14 +585,14 @@ export class ChatService {
 		throw new Error("Fatal error");
 	}
 
-	async updateUserBanStatusFromConversation(banUserDto: UserOptionsDto): Promise<boolean> {
+	async updateUserBanStatusFromConversation(banUserDto: UserOptionsDto, userID: number): Promise<boolean> {
 
 		const userToBan : User = await this.usersRepository.findOne({
-			where: { username: banUserDto.username },
+			where: { id: banUserDto.target },
 			relations: ["groups"],
 		});
 
-		const user = await this.usersRepository.findOne({ where: { id: banUserDto.from } });
+		const user = await this.usersRepository.findOne({ where: { id: userID} });
 		const conversation = await this.conversationRepository.findOne({ where: { id: banUserDto.conversationID } });
 		const userGroup = await this.getRelatedGroup(user, conversation);
 		if (userGroup.isBan) {
@@ -621,13 +621,13 @@ export class ChatService {
 		throw new Error("Fatal error");
 	}
 
-	async updateUserUnbanStatusFromConversation(banUserDto: UserOptionsDto): Promise<boolean> {
+	async updateUserUnbanStatusFromConversation(banUserDto: UserOptionsDto, userID: number): Promise<boolean> {
 
 		const userToUnban : User = await this.usersRepository.findOne({
-			where: { username: banUserDto.username },
+			where: { id: banUserDto.target },
 			relations: ["groups"],
 		});
-		const user = await this.usersRepository.findOne({ where: { id: banUserDto.from } });
+		const user = await this.usersRepository.findOne({ where: { id: userID} });
 		const conversation = await this.conversationRepository.findOne({ where: { id: banUserDto.conversationID } });
 		const userGroup = await this.getRelatedGroup(user, conversation);
 		if (userGroup.isBan) {
@@ -656,13 +656,13 @@ export class ChatService {
 		throw new Error("Fatal error");
 	}
 
-	async updateUserAdminStatusFromConversationTrue(promoteUserToAdminDto: UserOptionsDto): Promise<boolean> {
+	async updateUserAdminStatusFromConversationTrue(promoteUserToAdminDto: UserOptionsDto, userID: number): Promise<boolean> {
 
 		const userToPromote : User = await this.usersRepository.findOne({
-			where: { username: promoteUserToAdminDto.username },
+			where: { id: promoteUserToAdminDto.target },
 			relations: ['groups'],
 		});
-		const user = await this.usersRepository.findOne({ where: { id: promoteUserToAdminDto.from } });
+		const user = await this.usersRepository.findOne({ where: { id: userID } });
 		if (user.id == userToPromote.id) {
 			return false;
 		}
@@ -695,14 +695,14 @@ export class ChatService {
 		throw new Error("Fatal error");
 	}
 
-	async updateUserAdminStatusFromConversationFalse(promoteUserToAdminDto: UserOptionsDto): Promise<boolean> {
+	async updateUserAdminStatusFromConversationFalse(promoteUserToAdminDto: UserOptionsDto, userID: number): Promise<boolean> {
 
 		const userToPromote : User = await this.usersRepository.findOne({
-			where: { username: promoteUserToAdminDto.username },
+			where: { id: promoteUserToAdminDto.target },
 			relations: ['groups'],
 		});
 
-		const user = await this.usersRepository.findOne({ where: { id: promoteUserToAdminDto.from } });
+		const user = await this.usersRepository.findOne({ where: { id: userID } });
 		const conversation = await this.conversationRepository.findOne({ where: { id: promoteUserToAdminDto.conversationID } });
 		const userGroup = await this.getRelatedGroup(user, conversation);
 		if (userGroup.isBan) {
@@ -860,7 +860,7 @@ export class ChatService {
 		throw new Error("Fatal error");
 	}
 
-	async kickUserFromConversation(kickUserDto: kickUserDto) {
+	async kickUserFromConversation(kickUserDto: kickUserDto, userID: number) {
 
 		const userToKick : User = await this.usersRepository.findOne({
 			where: { id: kickUserDto.userToKickID },
@@ -868,7 +868,7 @@ export class ChatService {
 		});
 
 		const userInitiator : User = await this.usersRepository.findOne({
-			where: { id: kickUserDto.initiatorID },
+			where: { id: userID },
 			relations: ["groups", "groups.conversation"],
 		}); 
 
@@ -877,8 +877,8 @@ export class ChatService {
 		});
 
 		const kickGroup = await this.getRelatedGroup(userToKick, conversation);
-		const initiatorGroup = await this.getRelatedGroup(userInitiator, conversation);
-		if (initiatorGroup.isAdmin) {
+		const initiatorGroup = await this.getRelatedGroup(userInitiator, conversation); 
+		if (kickGroup && initiatorGroup && initiatorGroup.isAdmin) {
 			if (kickGroup && !kickGroup.isOwner) {
 				const dto : QuitConversationDto = {
 					conversationID: conversation.id,

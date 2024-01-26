@@ -84,50 +84,58 @@ export class ChatController {
 	@UseGuards(AuthGuard)
 	@HttpCode(HttpStatus.OK)
 	@Post('kickUser')
-	kickUserFromConversation(@Body() kickUserDto: kickUserDto): Promise<boolean>{
-		return this.chatService.kickUserFromConversation(kickUserDto);
+	kickUserFromConversation(@Req() req, @Body() kickUserDto: kickUserDto): Promise<boolean>{
+		const { user } = req;
+		return this.chatService.kickUserFromConversation(kickUserDto, user.id);
 	}
 
 	@UseGuards(AuthGuard)
 	@HttpCode(HttpStatus.OK)
 	@Post('banUser')
-	banUserFromConversation(@Body() userOptionsDto: UserOptionsDto): Promise<boolean>{
-		return this.chatService.updateUserBanStatusFromConversation(userOptionsDto);
+	banUserFromConversation(@Req() req, @Body() userOptionsDto: UserOptionsDto): Promise<boolean> {
+		const { user } = req;
+		return this.chatService.updateUserBanStatusFromConversation(userOptionsDto, user.id);
 	}
 
 	@UseGuards(AuthGuard)
 	@HttpCode(HttpStatus.OK)
 	@Post('unbanUser')
-	unbanUserFromConversation(@Body() userOptionsDto: UserOptionsDto): Promise<boolean>{
-		return this.chatService.updateUserUnbanStatusFromConversation(userOptionsDto);
+	unbanUserFromConversation(@Req() req, @Body() userOptionsDto: UserOptionsDto): Promise<boolean>{
+		const { user } = req;
+		return this.chatService.updateUserUnbanStatusFromConversation(userOptionsDto, user.id);
 	}
 
 	@UseGuards(AuthGuard)
 	@HttpCode(HttpStatus.OK)
 	@Post('muteUser')
-	muteUserFromConversation(@Body() muteUserDto: MuteUserDto): Promise<boolean> {
-		return this.chatService.updateUserMuteStatusFromConversation(muteUserDto);
+	muteUserFromConversation(@Req() req, @Body() muteUserDto: MuteUserDto): Promise<boolean> {
+		const { user } = req;
+		return this.chatService.updateUserMuteStatusFromConversation(muteUserDto, user.id);
 	}
 
 	@UseGuards(AuthGuard)
 	@HttpCode(HttpStatus.OK)
 	@Post('unmuteUser')
-	unmuteUserFromConversation(@Body() userOptionsDto: UserOptionsDto): Promise<boolean> {
-		return this.chatService.updateUserUnmuteStatusFromConversation(userOptionsDto);
+	unmuteUserFromConversation(@Req() req, @Body() userOptionsDto: UserOptionsDto): Promise<boolean> {
+		const { user } = req;
+		return this.chatService.updateUserUnmuteStatusFromConversation(userOptionsDto, user.id);
 	}
 
 	@UseGuards(AuthGuard)
 	@HttpCode(HttpStatus.OK)
 	@Post('promoteAdminUser')
-	promoteadminUserFromConversation(@Body() userOptionsDto: UserOptionsDto): Promise<boolean> {
-		return this.chatService.updateUserAdminStatusFromConversationTrue(userOptionsDto);
+	promoteadminUserFromConversation(@Req() req, @Body() userOptionsDto: UserOptionsDto): Promise<boolean> {
+		const { user } = req;
+		console.log("CONTROLLER", user);
+		return this.chatService.updateUserAdminStatusFromConversationTrue(userOptionsDto, user.id);
 	}
 
 	@UseGuards(AuthGuard)
 	@HttpCode(HttpStatus.OK)
 	@Post('demoteAdminUser')
-	demoteadminUserFromConversation(@Body() userOptionsDto: UserOptionsDto): Promise<boolean> {
-		return this.chatService.updateUserAdminStatusFromConversationFalse(userOptionsDto);
+	demoteadminUserFromConversation(@Req() req, @Body() userOptionsDto: UserOptionsDto): Promise<boolean> {
+		const { user } = req;
+		return this.chatService.updateUserAdminStatusFromConversationFalse(userOptionsDto, user.id);
 	}
 
 	/******		CHANNEL OPTIONS		******/
