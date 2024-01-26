@@ -15,6 +15,9 @@ dotenv.config();
 const redirectUri = process.env.SERVER_REDIRECT_URI;
 const clientId = process.env.SERVER_TOKEN_CLIENT_ID;
 const clientSecret = process.env.SERVER_TOKEN_CLIENT_SECRET;
+const baseURL = process.env.PROJECT_URL;
+
+console.log("BASE URL: ", baseURL);
 
 @Injectable()
 export class AuthService {
@@ -109,10 +112,10 @@ export class AuthService {
 				}
 			}
 			else {
-				throw ("Fatal error: 42 API request failed");
+				throw (`Fatal error: 42 API request failed, ${response.status}, ${response.statusText}`);
 			}
 		} catch (error) {
-			console.error("-- Request to API FAILED --");
+			console.error("-- Request to API FAILED --", error);
 			throw error;
 		}
 	}

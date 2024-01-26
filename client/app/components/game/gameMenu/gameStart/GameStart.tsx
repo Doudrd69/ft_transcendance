@@ -26,6 +26,7 @@ const MatchMaking = () => {
             console.log("Event leave-game");
             globalState.gameSocket?.disconnect();
             dispatchGame({ type: 'TOGGLE', payload: 'showGameMenu'});
+            state.showGameMenu = true;
         });
             
         globalState.gameSocket?.on('setgame', () => {
@@ -35,6 +36,12 @@ const MatchMaking = () => {
                 payload: 'showGame',
             });
             state.showGame = true;
+        });
+
+        globalState.gameSocket?.on('returnGameInProgress', () => {
+            globalState.gameSocket?.disconnect();
+            dispatchGame({ type: 'TOGGLE', payload: 'showGameMenu'});
+            state.showGameMenu = true;
         });
 
         return () => {

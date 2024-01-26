@@ -258,7 +258,8 @@ const GeneralComponent = () => {
 
 		globalState.gameSocket?.on('connect', () => {
 			console.log('GameSocket new connection : ', globalState.gameSocket?.id);
-			globalState.gameSocket?.emit('linkSocketWithUser', sessionStorage.getItem("currentUserLogin"));
+			console.log(`userLogin: ${sessionStorage.getItem("currentUserLogin")}`)
+			globalState.gameSocket?.emit('linkSocketWithUser', {playerLogin: sessionStorage.getItem("currentUserLogin")});
 		})
 		
 		globalState.gameSocket?.on('disconnect', () => {

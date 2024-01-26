@@ -22,6 +22,7 @@ import { DeleteConversationDto } from './dto/deleteConversationDto.dto';
 import { MuteUserDto } from './dto/muteUserDto.dto';
 import { DMcreationDto } from './dto/DMcreationDto.dto';
 import { UsersService } from 'src/users/users.service';
+import { kickUserDto } from './dto/kickuserDto.dto';
 
 @Injectable()
 export class ChatService {
@@ -176,7 +177,7 @@ export class ChatService {
 								if (group.conversation.is_channel)
 									userListForThisGroup.push({
 										id: user_.id,
-										login: user_.login,
+										login: user_.username,
 										avatarURL: user_.avatarURL,
 										isOwner: group.isOwner,
 										isAdmin: group.isAdmin,
@@ -228,12 +229,21 @@ export class ChatService {
 		return array;
 	}
 
-	private async getAllMessages(conversationID: number): Promise<Message[]> {
+	private async getAllMessages(conversationID: number, userID: number): Promise<Message[]> {
 
-		const conversation = await this.conversationRepository.find({ where: {id: conversationID} });
+		const conversation = await this.conversationRepository.findOne({ where: {id: conversationID} });
 		if (!conversation) {
 			console.error("Conversation  not found");
 			return [];
+		}
+
+		const user = await this.usersRepository.findOne({
+			where: { id: userID },
+			relations: ['groups', 'groups.conversation'],
+		});
+		const group = await this.getRelatedGroup(user, conversation)
+		if (!group) {
+			console.error("Unauthorized");
 		}
 
 		const messages = await this.messageRepository.find({ where: {conversation: conversation}});
@@ -849,6 +859,37 @@ export class ChatService {
 
 		throw new Error("Fatal error");
 	}
+
+	async kickUserFromConversation(kickUserDto: kickUserDto) {
+
+		const userToKick : User = await this.usersRepository.findOne({
+			where: { id: kickUserDto.userToKickID },
+			relations: ["groups", "groups.conversation"],
+		});
+
+		const userInitiator : User = await this.usersRepository.findOne({
+			where: { id: kickUserDto.initiatorID },
+			relations: ["groups", "groups.conversation"],
+		}); 
+
+		const conversation : Conversation = await this.conversationRepository.findOne({
+			where: { id: kickUserDto.conversationID },
+		});
+
+		const kickGroup = await this.getRelatedGroup(userToKick, conversation);
+		const initiatorGroup = await this.getRelatedGroup(userInitiator, conversation);
+		if (initiatorGroup.isAdmin) {
+			if (kickGroup && !kickGroup.isOwner) {
+				const dto : QuitConversationDto = {
+					conversationID: conversation.id,
+					userID: userToKick.id,
+				}
+				return await this.quitConversation(dto);
+			}
+			throw new Error(`${userToKick.username} is the owner`);
+		}
+		throw new Error("You are not admin");
+	}
 	
 	async addUserToConversation(addUserToConversationDto: AddUserToConversationDto): Promise<Conversation> {
 		
@@ -1137,9 +1178,9 @@ export class ChatService {
 		return conversations;
 	}
 
-	async getMessages(conversationID: number): Promise<Message[]> {
+	async getMessages(conversationID: number, userID: number): Promise<Message[]> {
 
-		const allMessages = await this.getAllMessages(conversationID);
+		const allMessages = await this.getAllMessages(conversationID, userID);
 		if (!allMessages) {
 			console.error("Fatal error: messsages not found");
 			return [];
