@@ -176,7 +176,7 @@ export class ChatService {
 								if (group.conversation.is_channel)
 									userListForThisGroup.push({
 										id: user_.id,
-										login: user_.login,
+										login: user_.username,
 										avatarURL: user_.avatarURL,
 										isOwner: group.isOwner,
 										isAdmin: group.isAdmin,
@@ -227,12 +227,21 @@ export class ChatService {
 		return array;
 	}
 
-	private async getAllMessages(conversationID: number): Promise<Message[]> {
+	private async getAllMessages(conversationID: number, userID: number): Promise<Message[]> {
 
-		const conversation = await this.conversationRepository.find({ where: {id: conversationID} });
+		const conversation = await this.conversationRepository.findOne({ where: {id: conversationID} });
 		if (!conversation) {
 			console.error("Conversation  not found");
 			return [];
+		}
+
+		const user = await this.usersRepository.findOne({
+			where: { id: userID },
+			relations: ['groups', 'groups.conversation'],
+		});
+		const group = await this.getRelatedGroup(user, conversation)
+		if (!group) {
+			console.error("Unauthorized");
 		}
 
 		const messages = await this.messageRepository.find({ where: {conversation: conversation}});
@@ -1141,9 +1150,9 @@ export class ChatService {
 		return conversations;
 	}
 
-	async getMessages(conversationID: number): Promise<Message[]> {
+	async getMessages(conversationID: number, userID: number): Promise<Message[]> {
 
-		const allMessages = await this.getAllMessages(conversationID);
+		const allMessages = await this.getAllMessages(conversationID, userID);
 		if (!allMessages) {
 			console.error("Fatal error: messsages not found");
 			return [];

@@ -367,15 +367,15 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 	}
 	
 	const handleDms = async() => {
-		console.log("ahahahahahahah");
 
 		try {
-		console.log("user ljourand: ", user);
 
 			const createDMConversationDto = {
 				user1: Number(user.id),
 				user2: Number(sessionStorage.getItem("currentUserID")),
 			}
+
+			console.log(createDMConversationDto);
 
 			const response = await fetch(`http://localhost:3001/chat/newDMConversation`, {
 				method: 'POST',
@@ -398,6 +398,7 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 				// Current user joins the room
 				globalState.userSocket?.emit('joinRoom', { roomName: conversation.name, roomID: conversation.id } );
 				// Emit to the targeted user so he joins the room
+				// user.login == mauvais username
 				globalState.userSocket?.emit('addUserToRoom', {
 					convID: conversation.id,
 					convName: conversation.name,
