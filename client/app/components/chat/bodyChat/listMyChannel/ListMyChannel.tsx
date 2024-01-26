@@ -40,7 +40,6 @@ const ListMyChannelComponent: React.FC<ListMyChannelComponentProps> = ({ user, i
 	};
 
 	const loadDiscussions = async () => {
-
 		try {
 			const response = await fetch(`http://localhost:3001/chat/getConversationsWithStatus/${userID}`, {
 				method: 'GET',
@@ -62,6 +61,7 @@ const ListMyChannelComponent: React.FC<ListMyChannelComponentProps> = ({ user, i
 
 	const loadDiscussionsPublic = async () => {
 		try {
+
 			const response = await fetch(`http://localhost:3001/chat/getConversationsPublic/${userID}`, {
 				method: 'GET',
 				headers: {
