@@ -166,6 +166,22 @@ export class GameGateway {
         }
     }
 
+    @SubscribeMessage('checkGameInvite')
+    handleCheckgameInvite(@ConnectedSocket() client: Socket, @MessageBody() data: {playerOneLogin: string, playerTwoLogin: string}) {
+        // du coup en amont il faut creer des sockets pour les deux users. si pas bon supprimer les deux sockets
+        
+        // check si deja ingame or in matchmaking pour les deux
+        // check si encore co
+        // add sockets et set debut de game (room etc)
+        //emit pour joinGameInvite
+    }    
+
+    @SubscribeMessage('joinGameInvite')
+    handleJoinGameInvite(@ConnectedSocket() client: Socket, @MessageBody() data: {playerOneLogin: string, playerTwoLogin:string}) {
+        // creer la game
+        // emit joingame et gameStart pour playerJoined et apres tout ok !
+    }
+
     @SubscribeMessage('linkSocketWithUser')
     @UseGuards(GatewayGuard)
     async handleLinkSocketWithUser(@ConnectedSocket() client: Socket, @MessageBody() data: { playerLogin: string }) {

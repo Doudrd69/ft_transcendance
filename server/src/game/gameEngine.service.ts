@@ -30,7 +30,7 @@ export class GameEngineService {
 				speed: { x: (signe / 100) * 0.177 * 1.5, y: (Math.random() - 0.5) * Math.random() / 60 },
 				r: 0.02,
 				alive: true,
-				elasticity: 1.15,
+				elasticity: 1.35,
 			},
 			player1_score: 0,
 			player2_score: 0,
