@@ -57,6 +57,7 @@ const ChannelListComponent: React.FC = () => {
 				if (isAdmin)
 					setIsAdmin([...isAdmin]);
 				if (usersList ) {
+					console.log('userlist =====>', usersList);
 					setUserList([...usersList]);
 				}	
 			}

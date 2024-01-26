@@ -174,6 +174,7 @@ export class UsersController {
 	@HttpCode(HttpStatus.OK)
 	@Post('blockUser')
 	blockUser(@Body() blockUserDto: BlockUserDto): Promise<boolean> {
+		console.log('blockUserDrto', blockUserDto);
 		return this.usersService.blockUser(blockUserDto);
 	}
 

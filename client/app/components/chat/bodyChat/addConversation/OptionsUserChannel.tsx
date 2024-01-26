@@ -39,6 +39,7 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 	let isBlocked = false;
 
 	if (me && me.blockList) {
+		console.log("blockLIST", me.blockList);
 		isBlocked = !!me.blockList.find((userblock) => userblock === user.login);
 	}
 	
@@ -60,7 +61,8 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 		});
 
 		if (response.ok) {
-			setBlock(true);
+			console.log('ahaahahahahahahahahah')
+			isBlocked = true;
 			if (globalState.userSocket && chatState.currentConversation && chatState.currentConversationID) {
 				globalState.userSocket?.emit('joinRoom', { roomName: `whoblocked${user.login}`, roomID: '' } );
 				globalState.userSocket?.emit('refreshChannel', {
@@ -92,8 +94,8 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 		});
 
 		if (response.ok) {
-			setBlock(false);
-
+			console.log('babababababababababababab')
+			isBlocked = false;
 			console.log("unblock");
 			if (globalState.userSocket && chatState.currentConversation && chatState.currentConversationID) {
 				globalState.userSocket?.emit('leaveRoom', { roomName: `whoblocked${user.login}`, roomID: '' } );
@@ -471,7 +473,7 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 			document.removeEventListener('keydown', handleEscape);
 		};
 	}, []);
-
+	console.log("user =====>", user);
 	return (
 		<>
 		<div className="blur-background"></div>
@@ -497,8 +499,8 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 									{ban ? (
 										<img className="option-image" src="interdit.png" onClick={unbanUser}/>
 										) : (
-											<img className="option-image-opacity" src="interdit.png" onClick={banUser}/>
-											)}
+										<img className="option-image-opacity" src="interdit.png" onClick={banUser}/>
+										)}
 									</>
 								)
 							}
@@ -509,7 +511,11 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 								)}
 						</div>
 					)}
-					<img className="option-image" src="logoutred.png" onClick={handleLeaveChannel}/>
+					{me.id && user.login !== sessionStorage.getItem("currentUserID")  && 
+						<img className="option-image" src="logoutred.png" onClick={handleLeaveChannel}/>}
+					{!user.isOwner && 
+						<img className="option-image" src="logoutred.png" onClick={handleLeaveChannel}/>
+					}
 				</div>
 			</div>
 		</>
