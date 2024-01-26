@@ -180,7 +180,7 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 						}} />
 					</div>
 					{chatState.showOptionsUserChannelOwner && ownerUser &&
-					  currentUser && <OptionsUserChannel user={ownerUser} me={currentUser} />}
+						currentUser && <OptionsUserChannel user={ownerUser} me={currentUser} />}
 					</div>
 					</div>
 					<div className='list-users-channel'>
