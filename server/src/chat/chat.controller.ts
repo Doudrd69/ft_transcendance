@@ -17,6 +17,7 @@ import { UpdateProtectFalseDto } from './dto/updateProtectFalseDto.dto';
 import { DeleteConversationDto } from './dto/deleteConversationDto.dto';
 import { MuteUserDto } from './dto/muteUserDto.dto';
 import { DMcreationDto } from './dto/DMcreationDto.dto';
+import { kickUserDto } from './dto/kickuserDto.dto';
 
 @Controller('chat')
 export class ChatController {
@@ -79,6 +80,13 @@ export class ChatController {
 	}
 
 	/******		USER OPTIONS ON CHANNEL		******/
+
+	@UseGuards(AuthGuard)
+	@HttpCode(HttpStatus.OK)
+	@Post('kickUser')
+	kickUserFromConversation(@Body() kickUserDto: kickUserDto): Promise<boolean>{
+		return this.chatService.kickUserFromConversation(kickUserDto);
+	}
 
 	@UseGuards(AuthGuard)
 	@HttpCode(HttpStatus.OK)

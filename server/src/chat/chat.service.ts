@@ -22,6 +22,7 @@ import { DeleteConversationDto } from './dto/deleteConversationDto.dto';
 import { MuteUserDto } from './dto/muteUserDto.dto';
 import { DMcreationDto } from './dto/DMcreationDto.dto';
 import { UsersService } from 'src/users/users.service';
+import { kickUserDto } from './dto/kickuserDto.dto';
 
 @Injectable()
 export class ChatService {
@@ -857,6 +858,37 @@ export class ChatService {
 		}
 
 		throw new Error("Fatal error");
+	}
+
+	async kickUserFromConversation(kickUserDto: kickUserDto) {
+
+		const userToKick : User = await this.usersRepository.findOne({
+			where: { id: kickUserDto.userToKickID },
+			relations: ["groups", "groups.conversation"],
+		});
+
+		const userInitiator : User = await this.usersRepository.findOne({
+			where: { id: kickUserDto.initiatorID },
+			relations: ["groups", "groups.conversation"],
+		}); 
+
+		const conversation : Conversation = await this.conversationRepository.findOne({
+			where: { id: kickUserDto.conversationID },
+		});
+
+		const kickGroup = await this.getRelatedGroup(userToKick, conversation);
+		const initiatorGroup = await this.getRelatedGroup(userInitiator, conversation);
+		if (initiatorGroup.isAdmin) {
+			if (kickGroup && !kickGroup.isOwner) {
+				const dto : QuitConversationDto = {
+					conversationID: conversation.id,
+					userID: userToKick.id,
+				}
+				return await this.quitConversation(dto);
+			}
+			throw new Error(`${userToKick.username} is the owner`);
+		}
+		throw new Error("You are not admin");
 	}
 	
 	async addUserToConversation(addUserToConversationDto: AddUserToConversationDto): Promise<Conversation> {
