@@ -86,7 +86,7 @@ export class ChatController {
 	@Post('kickUser')
 	kickUserFromConversation(@Req() req, @Body() kickUserDto: kickUserDto): Promise<boolean>{
 		const { user } = req;
-		return this.chatService.kickUserFromConversation(kickUserDto, user.id);
+		return this.chatService.kickUserFromConversation(kickUserDto, user.sub);
 	}
 
 	@UseGuards(AuthGuard)
@@ -94,7 +94,7 @@ export class ChatController {
 	@Post('banUser')
 	banUserFromConversation(@Req() req, @Body() userOptionsDto: UserOptionsDto): Promise<boolean> {
 		const { user } = req;
-		return this.chatService.updateUserBanStatusFromConversation(userOptionsDto, user.id);
+		return this.chatService.updateUserBanStatusFromConversation(userOptionsDto, user.sub);
 	}
 
 	@UseGuards(AuthGuard)
@@ -102,7 +102,7 @@ export class ChatController {
 	@Post('unbanUser')
 	unbanUserFromConversation(@Req() req, @Body() userOptionsDto: UserOptionsDto): Promise<boolean>{
 		const { user } = req;
-		return this.chatService.updateUserUnbanStatusFromConversation(userOptionsDto, user.id);
+		return this.chatService.updateUserUnbanStatusFromConversation(userOptionsDto, user.sub);
 	}
 
 	@UseGuards(AuthGuard)
@@ -110,7 +110,7 @@ export class ChatController {
 	@Post('muteUser')
 	muteUserFromConversation(@Req() req, @Body() muteUserDto: MuteUserDto): Promise<boolean> {
 		const { user } = req;
-		return this.chatService.updateUserMuteStatusFromConversation(muteUserDto, user.id);
+		return this.chatService.updateUserMuteStatusFromConversation(muteUserDto, user.sub);
 	}
 
 	@UseGuards(AuthGuard)
@@ -118,7 +118,7 @@ export class ChatController {
 	@Post('unmuteUser')
 	unmuteUserFromConversation(@Req() req, @Body() userOptionsDto: UserOptionsDto): Promise<boolean> {
 		const { user } = req;
-		return this.chatService.updateUserUnmuteStatusFromConversation(userOptionsDto, user.id);
+		return this.chatService.updateUserUnmuteStatusFromConversation(userOptionsDto, user.sub);
 	}
 
 	@UseGuards(AuthGuard)
@@ -127,7 +127,7 @@ export class ChatController {
 	promoteadminUserFromConversation(@Req() req, @Body() userOptionsDto: UserOptionsDto): Promise<boolean> {
 		const { user } = req;
 		console.log("CONTROLLER", user);
-		return this.chatService.updateUserAdminStatusFromConversationTrue(userOptionsDto, user.id);
+		return this.chatService.updateUserAdminStatusFromConversationTrue(userOptionsDto, user.sub);
 	}
 
 	@UseGuards(AuthGuard)
@@ -135,7 +135,7 @@ export class ChatController {
 	@Post('demoteAdminUser')
 	demoteadminUserFromConversation(@Req() req, @Body() userOptionsDto: UserOptionsDto): Promise<boolean> {
 		const { user } = req;
-		return this.chatService.updateUserAdminStatusFromConversationFalse(userOptionsDto, user.id);
+		return this.chatService.updateUserAdminStatusFromConversationFalse(userOptionsDto, user.sub);
 	}
 
 	/******		CHANNEL OPTIONS		******/

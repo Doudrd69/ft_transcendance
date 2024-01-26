@@ -56,7 +56,7 @@ export class ChatService {
 		user.groups.forEach((userGroup: GroupMember) => {
 			groupList.forEach((group: GroupMember) => {
 				if (userGroup.id == group.id) {
-					// console.log("Related group: ", group.id);
+					console.log("Related group: ", group.id);
 					groupFound = group;
 				}
 			});
@@ -862,6 +862,7 @@ export class ChatService {
 
 	async kickUserFromConversation(kickUserDto: kickUserDto, userID: number) {
 
+
 		const userToKick : User = await this.usersRepository.findOne({
 			where: { id: kickUserDto.userToKickID },
 			relations: ["groups", "groups.conversation"],
@@ -933,8 +934,6 @@ export class ChatService {
 		
 		// We first check if there is not already a conversation between the two users
 		const conversationCheck = await this.userService.findDMConversation(initiator, friend);
-
-		console.log("CONV check ==> ", conversationCheck);
 		// If not, we can create the DM conversation
 		if (!conversationCheck) {
 			const room = new Conversation();
@@ -986,7 +985,6 @@ export class ChatService {
 
 		if (user1 && user2) {
 			const dm = await this.createDMConversation(user1, user2);
-			console.log("Created DM: ", dm);
 			if (dm) {
 				return dm;
 			}
@@ -1096,7 +1094,6 @@ export class ChatService {
 	}
 
 	async saveNotification(dto: any) {
-		console.log("DTO ==> ", dto);
 		const conversation : Conversation = await this.conversationRepository.findOne({ where: {id: dto.channelID} });
 		
 		if (conversation) {
