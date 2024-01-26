@@ -176,7 +176,7 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	async handleMessage( @MessageBody() data: { dto: MessageDto, conversationName: string } ) {
 
 		const { dto, conversationName } = data;
-		console.log("Message sent to: ", conversationName + dto.conversationID);
+		// console.log("Message sent to: ", conversationName + dto.conversationID);
 
 		// The room's name is not the conversation's name in DB
 		this.server.to(conversationName + dto.conversationID).except(`whoblocked${dto.from}`).emit('onMessage', {
@@ -278,5 +278,20 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		const { channel } = data;
 		console.log("refreshing channel");
 		this.server.to(channel).emit('refresh_channel');
+	}
+
+	@SubscribeMessage('emitNotification')
+	@UseGuards(GatewayGuard)
+	async handleNotif(@MessageBody() data: { channel: string, content: string, channelID: string} ) {
+		console.log("aakajajajaajajaj");
+		const { channel, content, channelID } = data;
+		const dto = {
+			from: 'Bot',
+			content: content,
+			post_datetime: new Date(),
+			conversationID: channelID,
+		};
+		await this.chatService.saveNotification(dto);
+		this.server.to(channel).emit('recv_notif', dto);
 	}
 }
