@@ -54,6 +54,29 @@ const Menu = () => {
         
     };
 
+    const handleSpeedClick = () => {
+
+        try {
+
+            const gameSocket = io('http://localhost:3001/game', {
+                autoConnect: false,
+                auth: {
+                    token: sessionStorage.getItem("jwt"),
+                }
+            });
+            gameSocket.connect();
+
+            dispatch({ type: 'SET_GAME_SOCKET', payload: gameSocket });
+            dispatchGame({ type: 'TOGGLE', payload: 'showGameMatchmaking' });
+    
+            // console.log("After Dispatch: ", globalState?.gameSocket);
+
+        } catch (error) {
+            console.error(error);
+        }
+        
+    };
+
     return (
         <div className="background-game">
             <div className="background-game">
@@ -62,7 +85,10 @@ const Menu = () => {
             <div className="background-game">
                 <button className={`buttonclass ${state.showGameMatchmaking ? 'clicked' : ''}`} onClick={() => { 
                     handleStartClick(); 
-                    }}>START GAME</button>
+                    }}>START GAME: NORMAL MODE</button>
+                    <button className={`buttonclass ${state.showGameMatchmaking ? 'clicked' : ''}`} onClick={() => { 
+                    handleStartClick(); 
+                    }}>START GAME: SPEED MODE</button>
                 {/* <button className="buttonclass" >PROFILE</button> */}
                 {/* <button className={`buttonclass ${state.showGameSettings ? 'clicked' : ''}`} onClick={() => dispatch({ type: 'TOGGLE', payload: 'showGameSettings' })}>SETTINGS</button> */}
             </div>

@@ -13,50 +13,50 @@ export class MatchmakingService {
         
     ) { }
 
-    public playersQueue: string[] = [];
+    public playersNormalQueue: string[] = [];
+    public playersSpeedQueue: string[] = [];
 	
-    async getPlayersPairs()  {
+    async getPlayersPairsNormalQueue()  {
 		// Créer des paires
 		const pairs: Array<[string, string]> = [];
-        for (let i = 0; i < this.playersQueue.length - 1; i += 2) {
-            pairs.push([this.playersQueue[i], this.playersQueue[i + 1]]);
+        for (let i = 0; i < this.playersNormalQueue.length - 1; i += 2) {
+            pairs.push([this.playersNormalQueue[i], this.playersNormalQueue[i + 1]]);
 			console.log("Found a socket pair");
         }
 		return pairs;
 	}
 
-    async join(playerID: string, playerLogin: string) {
-        console.log("Push queue before: ", this.playersQueue);
-		this.playersQueue.push(playerID);
-        console.log("Push queue after: ", this.playersQueue);
+    async joinNormalQueue(playerID: string, playerLogin: string) {
+        console.log("Push queue before: ", this.playersNormalQueue);
+		this.playersNormalQueue.push(playerID);
+        console.log("Push queue after: ", this.playersNormalQueue);
         const newUser: User = await this.usersRepository.findOne({ where: { login: playerLogin } })
-        console.log(`userIDuniqe: ${newUser.id}`)
         if (!newUser)
             console.log(`No User for this gameSocketId: ${playerID}`);
         newUser.inMatchmaking = true;
         await this.usersRepository.save(newUser);
-		console.log(`${newUser.login} joins the queue`);
     }
 
-	async leave(playerID: string) {
-        // const index = this.playersQueue.findIndex(id => id === playerID);
+	async leaveNormalQueue(playerID: string) {
+        // const index = this.playersNormalQueue.findIndex(id => id === playerID);
         // console.log("coucou from leave 1");
         // if (index !== -1) {
         //     console.log("coucou from leave 1-2");
-        //     this.playersQueue.splice(index, 1);
+        //     this.playersNormalQueue.splice(index, 1);
         //     console.log("player leave the queue");
         // }
-        console.log("Queue before: ", this.playersQueue);
-        const newQueue = this.playersQueue.filter((id: string) => id === playerID);
-        this.playersQueue = newQueue;
-        console.log("Queue After: ", this.playersQueue);
+        console.log("Queue before: ", this.playersNormalQueue);
+        this.playersNormalQueue.splice(this.playersNormalQueue.indexOf(playerID), 1);
+        // const newQueue = this.playersNormalQueue.filter((id: string) => id === playerID);
+        // this.playersNormalQueue = newQueue;
+        console.log("Queue After: ", this.playersNormalQueue);
 
 
         return ;
     }
 
     async IsThereEnoughPairs() {
-        return (this.playersQueue.length >= 2);
+        return (this.playersNormalQueue.length >= 2);
     }
 }
 

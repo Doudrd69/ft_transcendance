@@ -88,7 +88,7 @@ export class GameGateway {
     private connectedUsers: { [userId: string]: Socket } = {};
 
 
-    handleConnection(@ConnectedSocket() client: Socket) {
+    async handleConnection(@ConnectedSocket() client: Socket) {
         console.log(`GameGtw client connected : ${client.id}`);
         this.connectedUsers[client.id] = client;
     }
@@ -98,29 +98,57 @@ export class GameGateway {
         if (this.userLogin) {
             const user: User = await this.GameService.getUserWithUserLogin(this.userLogin);
             if (this.GameService.userInGameOrInMacthmaking(user)) {
-                this.game = await this.GameService.getGameWithUserLogin(this.userLogin);
-                const gameInstance: game_instance = this.GameService.getGameInstance(this.game_instance, this.game.gameId);
-                console.log(`gameInstance de ses morts: ${gameInstance.gameID}`);
                 if (user.inMatchmaking === true) {
-                    await this.MatchmakingService.leave(client.id);
+                    await this.MatchmakingService.leaveNormalQueue(client.id);
                     await this.GameService.deconnectUserMatchmaking(user, this.userLogin);
                 }
-                else if (gameInstance.game_has_ended !== true) {
-                    gameInstance.stop = true;
-                    const otherUser: User = await this.GameService.getOtherUser(this.game, user);
-                    await this.GameService.updateStateGameForUsers(user, otherUser);
-                    this.server.to(otherUser.gameSocketId).emit('GameStop');
-                    this.GameService.deleteGameSocketsIdForPlayers(user, otherUser);
-                    await this.GameService.deleteGame(this.game);
-                }
                 else {
-                    this.GameService.deleteGameSocketsIdForPlayer(user);
-                    await this.GameService.updateStateGameForUser(user);
+                    this.game = await this.GameService.getGameWithUserLogin(this.userLogin);
+                    const gameInstance: game_instance = this.GameService.getGameInstance(this.game_instance, this.game.gameId);
+                    console.log(`gameInstance de ses morts: ${gameInstance.gameID}`);
+                    if (gameInstance.game_has_ended !== true) {
+                        console.log(`Disco Game Stop`);
+                        gameInstance.stop = true;
+                        const otherUser: User = await this.GameService.getOtherUser(this.game, user);
+                        console.log(`otherUsersocket : ${otherUser.gameSocketId}`)
+                        if (user.login === gameInstance.playersLogin[0])
+                        this.server.to(gameInstance.players[1]).emit('GameStop');
+                    else {
+                        this.server.to(gameInstance.players[0]).emit('GameStop');
+                    }
+                    console.log(`otherUsersocket : ${otherUser.gameSocketId}`)
+                        await this.GameService.updateStateGameForUsers(user, otherUser);
+                        this.GameService.deleteGameSocketsIdForPlayers(user, otherUser);
+                        setTimeout(async () => {
+                            await this.GameService.deleteGame(this.game);
+                        }, 1000); // peut etre faire un boolean avec un boucle qui deletelagame quand lautre user est suppr?
+                    }
+                    else {
+                        console.log(`Disco Game Ended`);
+                        this.GameService.deleteGameSocketsIdForPlayer(user);
+                        await this.GameService.updateStateGameForUser(user);
+                    }
                 }
             }
         }
         console.log(`GameGtw client disconnected : ${client.id}`);
         delete this.connectedUsers[client.id];
+    }
+
+    @SubscribeMessage('checkGameInvite')
+    handleCheckgameInvite(@ConnectedSocket() client: Socket, @MessageBody() data: {playerOneLogin: string, playerTwoLogin: string}) {
+        // du coup en amont il faut creer des sockets pour les deux users. si pas bon supprimer les deux sockets
+        
+        // check si deja ingame or in matchmaking pour les deux
+        // check si encore co
+        // add sockets et set debut de game (room etc)
+        //emit pour joinGameInvite
+    }    
+
+    @SubscribeMessage('joinGameInvite')
+    handleJoinGameInvite(@ConnectedSocket() client: Socket, @MessageBody() data: {playerOneLogin: string, playerTwoLogin:string}) {
+        // creer la game
+        // emit joingame et gameStart pour playerJoined et apres tout ok !
     }
 
     @SubscribeMessage('linkSocketWithUser')
@@ -151,12 +179,12 @@ export class GameGateway {
     async handleJoinMatchmaking(@ConnectedSocket() client: Socket, @MessageBody() data: { playerLogin: string }) {
         console.log(`== ${data.playerLogin} JOINS MATCHMAKING ==`);
         console.log(`idplayer ==== ${client.id}`);
-        await this.MatchmakingService.join(client.id, data.playerLogin);
+        await this.MatchmakingService.joinNormalQueue(client.id, data.playerLogin);
         const enoughPlayers = await this.MatchmakingService.IsThereEnoughPairs();
 
         console.log("Ready to start: ", enoughPlayers);
         if (enoughPlayers) {
-            const pairs: [string, string][] = await this.MatchmakingService.getPlayersPairs();
+            const pairs: [string, string][] = await this.MatchmakingService.getPlayersPairsNormalQueue();
             for (const pair of pairs) {
                 const socketIDs: [string, string] = [pair[0], pair[1]];
                 this.game = await this.GameService.createGame(pair[0], pair[1]);
@@ -164,8 +192,8 @@ export class GameGateway {
                     throw new Error("Fatal error");
                 const gameInstance: game_instance = this.GameEngineceService.createGameInstance(this.game);
                 this.game_instance.push(gameInstance);
-                this.MatchmakingService.leave(pair[0]);
-                this.MatchmakingService.leave(pair[1]);
+                this.MatchmakingService.leaveNormalQueue(pair[0]);
+                this.MatchmakingService.leaveNormalQueue(pair[1]);
                 console.log("SOCKET IDs: ", socketIDs);
                 this.server.to(socketIDs).emit('setgame');
                 this.server.to(socketIDs).emit('joinGame', {
@@ -200,6 +228,7 @@ export class GameGateway {
             this.GameService.playerJoined(client.id, gameInstance)
             if (this.GameService.everyPlayersJoined(gameInstance)) {
                 setTimeout(() => {
+                    this.server.to([gameInstance.players[0], gameInstance.players[1]]).emit('startGameLoop');
                     const gameLoop = setInterval(() => {
                         this.executeGameTick(gameLoop, gameInstance, client.id)
                     }, 16)
@@ -236,7 +265,7 @@ export class GameGateway {
     @SubscribeMessage('leave-matchmaking')
     @UseGuards(GatewayGuard)
     async handleLeaveMatchmaking(@ConnectedSocket() client: Socket, @MessageBody() data: { playerLogin: string }) {
-        console.log("emit leave-game");
+        console.log("emit leave-matchmaking");
         //demander a edouard pour directement fare l'appel leave-game au lieu de leavematch puis leave game car ca marchais pas et j'ai fais un truc bien clean
         this.server.to(client.id).emit('leave-game');
     }
@@ -264,24 +293,30 @@ export class GameGateway {
 }
 
 /** Liste des choses a faire :
- * remettre les reset de game CHECK
- * mettre en place le singleSocketPlayer
- * {
- *      ca consiste a check au moment du matchmaking si le user.id a deja une socket si oui
- *      deja en matchmaking ou ingame, la supprimer a la fin de la game pour que la deuxieme page puisse retry
- * }
- * mettre en place les inGame et les inMatchmaking
- * {
- *      a verifier
- * }
- * gerer les disconnects et les fins de game
- * {
- *      a verifier
- * }
- * essayer d'ameliorer les collisions/ speed (avec gael) atester
+ * essayer d'ameliorer les collisions (avec gael)
  * creer un game mode
+ * {
+ *      recuperer le fait que le joueur ai lance en speed ou normal mode
+ *      check normal du matchmaking
+ *      si tout ok, emit joinmatchmaking mais avec un boolean normal === true ou normal === false si speed mode
+ *      rentrer dans la bonne queue, (litteralement copier coller la queue)
+ *      set la game et gameinstance avec le boolean (juste rajouter 0.2 a l'elasticity de la balle)
+ *      puis tout ok
+ * }
  * faire les game invites
+ * {
+ *      creer un socket aux deux users, check des 2 users, puis celui qui a invite cree la game et emit pour les 2
+ * }
  * faire le front du jeu
- * regarder ce que je peux enlever du front pour le mettre dans le back
+ * {
+ *      voir ce que je peux faire comme :
+ *          -message a la fin de la game
+ *          -message au depart d'un player
+ *          -message si Game in progress ou Matchmaking in progress
+ *          -debut de game moins chaotique
+ * }
  * casser le jeu pour debug
+ * 
+ * DEBUG :
+ * probleme quand 2eUser essaie de spam startgame en meme temps que endgame a 1seconde pres
  */

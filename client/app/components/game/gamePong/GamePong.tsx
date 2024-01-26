@@ -114,15 +114,15 @@ const PongComponent = () => {
                 setCountdown((prevCountdown) => prevCountdown - 1);
             }, 1000);
 
-            setTimeout(() => {
                 clearInterval(countdownInterval);
+                globalState.gameSocket?.on('startGameLoop', () => {
                 setCountdown(0);
                 setBlurGame(false);
                 setGame((prevState) => ({
                     ...prevState,
                     pause: false,
                 }));
-            }, 3000);
+            });
         };
 
         setBlurGame(true);
@@ -206,14 +206,19 @@ const PongComponent = () => {
                 payload: 'showGameMenu',
             });
             state.showGameMenu = true;
-            globalState.gameSocket?.disconnect();
+            // globalState.gameSocket?.disconnect();
         });
 
         globalState.gameSocket?.on('GameStop', () => {
+            console.log(`where i am bro?`);
             dispatchGame({
                 type: 'TOGGLE',
                 payload: 'showGameMenu',
             });
+            setGame((prevState) => ({
+                ...prevState,
+                pause: true,
+            }));
             state.showGameMenu = true;
             globalState.gameSocket?.disconnect();
         });
@@ -240,6 +245,8 @@ const PongComponent = () => {
             globalState.gameSocket?.off('GameBallUpdate');
             globalState.gameSocket?.off('GamePaddleUpdate');
             globalState.gameSocket?.off('Game_Start');
+            globalState.gameSocket?.off('GameStop');
+            globalState.gameSocket?.off('GameEnd');
             clearInterval(countdownInterval);
             window.removeEventListener('keydown', handleKeyDown);
             window.removeEventListener('keyup', handleKeyUp);

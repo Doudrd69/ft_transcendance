@@ -211,8 +211,6 @@ export class GameService {
 		const gameTwo = await this.gameRepository.findOne({ where: { playerTwoID: this.userGameSockets[userLogin] } })
 		if (gameTwo)
 			return gameTwo;
-		else
-			throw new Error("Fatal error");
 	}
 
 	async getOtherUser(game: Game, user: User): Promise<User> {
@@ -220,7 +218,7 @@ export class GameService {
 		if (user.login === game.playerOneLogin) {
 			otherUser = await this.usersRepository.findOne({ where: { login: user.login } })
 		}
-		else if (user.login === game.playerOneLogin) {
+		else if (user.login === game.playerTwoLogin) {
 			otherUser = await this.usersRepository.findOne({ where: { login: user.login } })
 		}
 		return otherUser
