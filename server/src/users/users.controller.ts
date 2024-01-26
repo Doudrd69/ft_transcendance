@@ -74,17 +74,17 @@ export class UsersController {
 	// @UseGuards(AuthGuard)
 	@Get('getAvatar/:userId/:timestamp')
 	async getUserAvatar(@Param('userId') userId: number, @Param('timestamp') timestamp: string, @Res() res: ExpressResponse) {
-		// try {
-		// 	const avatarURL = await this.usersService.getAvatar(userId);
-		// 	if (!avatarURL) {
-		// 		throw new Error("Avatar not found");
-		// 	}
-		// 	res.setHeader('Content-Type', 'image/*'); 
-		// 	res.redirect(301, avatarURL);
-		// 	return avatarURL
-		// } catch (error) {
-		// 	throw error;
-		// }
+		try {
+			const avatarURL = await this.usersService.getAvatar(userId);
+			if (!avatarURL) {
+				throw new Error("Avatar not found");
+			}
+			res.setHeader('Content-Type', 'image/*'); 
+			res.redirect(301, avatarURL);
+			return avatarURL
+		} catch (error) {
+			throw error;
+		}
 	}
 
 	// @UseGuards(AuthGuard)
