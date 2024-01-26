@@ -18,10 +18,4 @@ export class kickUserDto {
 	@IsInt()
 	@Max(1000)
 	userToKickID: number;
-
-    @IsNotEmpty()
-	@IsPositive()
-	@IsInt()
-	@Max(1000)
-	initiatorID: number;
 }
