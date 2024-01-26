@@ -14,22 +14,6 @@ const ProfilsSettingsComponent: React.FC = () => {
 	const [username, setUsername] = useState('');
 	const { globalState, dispatch } = useGlobal();
 
-	const notify = (flag: number) => {
-
-		switch (flag) {
-
-			case 0:
-				return;
-
-			case 1:
-				toast.success('Username has been updated');
-				return;
-
-			case 2:
-				toast.success('Authenticator code is verified');
-		}
-	};
-
 	const handleUsernameSubmit = async (event: React.FormEvent) => {
 		
 		event.preventDefault();
@@ -59,8 +43,10 @@ const ProfilsSettingsComponent: React.FC = () => {
 				}
 				else {
 					sessionStorage.setItem("currentUserLogin", newUsername);
-					globalState.userSocket?.emit('joinRoom',  { roomName: sessionStorage.getItem("currentUserLogin"), roomID: sessionStorage.getItem("currentUserID") });
-					notify(1);
+					// Probleme: quand je recharge mes channels, le user ebrodeur (login) est return
+					// globalState.userSocket?.emit('joinRoom',  { roomName: sessionStorage.getItem("currentUserLogin"), roomID: '' });
+					globalState.userSocket?.emit('refreshUserChannelList', { userToRefresh: newUsername });
+					toast.success('Username has been updated');
 				}
 			} else {
 				const error = await response.json();

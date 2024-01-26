@@ -58,6 +58,7 @@ const ChannelListComponent: React.FC = () => {
 					setIsAdmin([...isAdmin]);
 				if (usersList ) {
 					setUserList([...usersList]);
+					console.log(usersList);
 				}	
 			}
 		}
@@ -84,8 +85,9 @@ const ChannelListComponent: React.FC = () => {
 		globalState.userSocket?.on('userIsUnban', () => {
 			loadDiscussions();
 		});
-		// seul event rfreshChannelList est ici donc besoin de rien
+
 		globalState.userSocket?.on('refreshChannelList', () => {
+			console.log("REFRESHING USERLIST");
 			loadDiscussions();
 		});
 
