@@ -17,6 +17,7 @@ import SetComponent from './components/Avatar/SetAvatar';
 import { totalmem } from 'os';
 import GameHeader from './components/game/GameHeader';
 import { useGlobal } from './GlobalContext';
+import { ChatProvider } from './components/chat/ChatContext';
 // import { useChat } from './components/chat/ChatContext';
 
 interface Game {
@@ -100,9 +101,6 @@ const GeneralComponent = () => {
 				sessionStorage.setItem("currentUserLogin", payload.login);
 			else
 				sessionStorage.setItem("currentUserLogin", payload.username);
-			if (payload.tfa_enabled) {
-				setShow2FAForm(true);
-			}
 		}
 	}
 
@@ -151,8 +149,10 @@ const GeneralComponent = () => {
 				});
 				userSocket.connect();
 				dispatch({ type: 'SET_SOCKET', payload: userSocket });
+				// d abord la 2fa puis si valide alors setAuthvalidatedTrue
+				if (sessionStorage.getItem("2fa") === "true")
+					setShow2FAForm(true);
 				setAuthValidated(true);
-				// Attention a la 2fa
 				return true;
 			}
 			else
@@ -319,11 +319,10 @@ const GeneralComponent = () => {
 					) : show2FAForm ? (
 					<TFAComponent on2FADone={handle2FADone} />
 					) : (
-						<>
-						{/* <SetComponent/> */}
-						<Header/>
-						<BodyComponent/>
-					</>
+						<ChatProvider>
+							<Header/>
+							<BodyComponent/>
+						</ChatProvider>
 					)}	
 			</>
 			);

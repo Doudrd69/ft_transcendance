@@ -16,7 +16,7 @@ const AddConversationComponent: React.FC<AddConversationComponentProps> = ({ loa
 
 	const [formValue, setFormValue] = useState('');
 	const [passwordValue, setPasswordValue] = useState('');
-	const { state, dispatch } = useChat();
+	const { chatState, chatDispatch } = useChat();
 	const [isPassword, setIsPassowrd] = useState(false);
 	const [isPublic, setIsPublic] = useState(true);
 
@@ -52,9 +52,9 @@ const AddConversationComponent: React.FC<AddConversationComponentProps> = ({ loa
 				}
 		
 				console.log("Conversation successfully created");
-				dispatch({ type: 'DISABLE', payload: 'showCreateChannel' });
-				dispatch({ type: 'DISABLE', payload: 'showAddCreateChannel' });
-				dispatch({ type: 'TOGGLEX', payload: 'refreshChannel'});
+				chatDispatch({ type: 'DISABLE', payload: 'showCreateChannel' });
+				chatDispatch({ type: 'DISABLE', payload: 'showAddCreateChannel' });
+				chatDispatch({ type: 'TOGGLEX', payload: 'refreshChannel'});
 				
 			}
 		}
@@ -64,13 +64,13 @@ const AddConversationComponent: React.FC<AddConversationComponentProps> = ({ loa
 	};
 
 	const handleCancel = () => {
-		dispatch({ type: 'DISABLE', payload: 'showAddChannel' });
-		dispatch({ type: 'DISABLE', payload: 'showAddUser' });
-		dispatch({ type: 'DISABLE', payload: 'showAddFriend' });
-		dispatch({ type: 'DISABLE', payload: 'showListChannelAdd' });
-		dispatch({ type: 'DISABLE', payload: 'showAddChannel' });
-		dispatch({ type: 'DISABLE', payload: 'showCreateChannel' });
-		dispatch({ type: 'DISABLE', payload: 'showAddCreateChannel' });
+		chatDispatch({ type: 'DISABLE', payload: 'showAddChannel' });
+		chatDispatch({ type: 'DISABLE', payload: 'showAddUser' });
+		chatDispatch({ type: 'DISABLE', payload: 'showAddFriend' });
+		chatDispatch({ type: 'DISABLE', payload: 'showListChannelAdd' });
+		chatDispatch({ type: 'DISABLE', payload: 'showAddChannel' });
+		chatDispatch({ type: 'DISABLE', payload: 'showCreateChannel' });
+		chatDispatch({ type: 'DISABLE', payload: 'showAddCreateChannel' });
 		setFormValue('');
 		setIsPublic(true);
 		setPasswordValue('');
@@ -79,12 +79,14 @@ const AddConversationComponent: React.FC<AddConversationComponentProps> = ({ loa
 	useEffect(() => {
 		const handleEscape = (event: KeyboardEvent) => {
 			if (event.key === 'Escape') {
-			handleCancel();
+				handleCancel();
 			}
 		};
+	
 		document.addEventListener('keydown', handleEscape);
+	
 		return () => {
-		document.removeEventListener('keydown', handleEscape);
+			document.removeEventListener('keydown', handleEscape);
 		};
 	}, []);
 

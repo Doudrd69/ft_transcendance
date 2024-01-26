@@ -6,7 +6,7 @@ import { useGlobal } from '@/app/GlobalContext';
 
 const SendBoxChannelComponent: React.FC = () => {
 
-	const { state } = useChat();
+	const { chatState } = useChat();
 	const { globalState } = useGlobal();
 	const [messageValue, setMessageValue] = useState('');
 
@@ -24,7 +24,7 @@ const SendBoxChannelComponent: React.FC = () => {
 				from: sessionStorage.getItem("currentUserLogin"),
 				content: messageValue,
 				post_datetime: new Date(),
-				conversationID: state.currentConversationID,
+				conversationID: chatState.currentConversationID,
 			}
 			
 			const response = await fetch('http://localhost:3001/chat/newMessage', {
@@ -38,7 +38,7 @@ const SendBoxChannelComponent: React.FC = () => {
 	
 			if (response.ok) {
 				if (globalState.userSocket?.connected) {
-					globalState.userSocket?.emit('message', { dto: messageDto, conversationName: state.currentConversation });
+					globalState.userSocket?.emit('message', { dto: messageDto, conversationName: chatState.currentConversation });
 				}
 				else {
 					console.log("Client is not connected");

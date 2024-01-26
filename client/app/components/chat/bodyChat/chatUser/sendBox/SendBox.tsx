@@ -6,7 +6,7 @@ import { useGlobal } from '@/app/GlobalContext';
 
 const SendBoxComponent: React.FC = () => {
 
-	const { state } = useChat();
+	const { chatState } = useChat();
 	const { globalState } = useGlobal();
 	const [messageValue, setMessageValue] = useState('');
 	
@@ -19,9 +19,9 @@ const SendBoxComponent: React.FC = () => {
 			from: sessionStorage.getItem("currentUserLogin"),
 			content: messageValue,
 			post_datetime: new Date(),
-			conversationID: state.currentConversationID,
+			conversationID: chatState.currentConversationID,
 		}
-		console.log("messageDto", messageDto);
+		// console.log("messageDto", messageDto);
 		try {
 			e.preventDefault();
 	
@@ -37,9 +37,9 @@ const SendBoxComponent: React.FC = () => {
 			if (response.ok) {
 				console.log('globalState.userSocket?.connected', globalState.userSocket?.connected);
 				console.log('messageDto', messageDto);
-				console.log('state.currentRoom', state.currentRoom);
+				console.log('chatState.currentRoom', chatState.currentRoom);
 				if (globalState.userSocket?.connected) {
-					globalState.userSocket?.emit('message', { dto: messageDto, conversationName: state.currentRoom });
+					globalState.userSocket?.emit('message', { dto: messageDto, conversationName: chatState.currentRoom });
 				}
 				setMessageValue('');
 			}

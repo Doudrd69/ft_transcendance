@@ -176,7 +176,7 @@ export class ChatService {
 								if (group.conversation.is_channel)
 									userListForThisGroup.push({
 										id: user_.id,
-										login: user_.login,
+										login: user_.username,
 										avatarURL: user_.avatarURL,
 										isOwner: group.isOwner,
 										isAdmin: group.isAdmin,
@@ -218,6 +218,7 @@ export class ChatService {
 							isOwner: group.isOwner,
 							isBan: group.isBan,
 							id: user_.id,
+							blockList: user_.blockedUsers,
 						});
 					}
 				}
@@ -227,12 +228,21 @@ export class ChatService {
 		return array;
 	}
 
-	private async getAllMessages(conversationID: number): Promise<Message[]> {
+	private async getAllMessages(conversationID: number, userID: number): Promise<Message[]> {
 
-		const conversation = await this.conversationRepository.find({ where: {id: conversationID} });
+		const conversation = await this.conversationRepository.findOne({ where: {id: conversationID} });
 		if (!conversation) {
 			console.error("Conversation  not found");
 			return [];
+		}
+
+		const user = await this.usersRepository.findOne({
+			where: { id: userID },
+			relations: ['groups', 'groups.conversation'],
+		});
+		const group = await this.getRelatedGroup(user, conversation)
+		if (!group) {
+			console.error("Unauthorized");
 		}
 
 		const messages = await this.messageRepository.find({ where: {conversation: conversation}});
@@ -297,6 +307,7 @@ export class ChatService {
 								username: user.username,
 								avatarURL: user.avatarURL,
 								name: userGroup.conversation.name,
+								onlineStatus: user.isActive,
 							});
 						}
 					})
@@ -306,6 +317,7 @@ export class ChatService {
 
 		return DMList;
 	}
+
 	private async getDMsConversations(userID: number): Promise<Conversation[]> {
 		
 		
@@ -529,27 +541,18 @@ export class ChatService {
 			throw new Error(`${user.username} is ban from this channel`);
 		}
 
-		
 		if (userToMute && conversation && userGroup) {
 			const groupToUpdate = await this.getRelatedGroup(userToMute, conversation);
 			if (groupToUpdate.isBan) {
 				throw new Error(`${userToMute.username} is ban from this channel`);
 			}
 
-			if (userGroup.isOwner || userGroup.isAdmin) {
-				if (groupToUpdate && !groupToUpdate.isOwner || !groupToUpdate.isAdmin) {
-					groupToUpdate.isMute = true;
-					const currentDate = new Date();
-					const mutedUntil = new Date(currentDate.getTime() + muteUserDto.mutedUntil * 60000);
-					groupToUpdate.mutedUntil = mutedUntil;
-					await this.groupMemberRepository.save(groupToUpdate);
-					return true;	
-				}
-	
-				throw new Error(`${userToMute.username} has higher privilege`);
-			}
-
-			throw new Error(`${user.username} is not owner or admin`);
+			groupToUpdate.isMute = true;
+			const currentDate = new Date();
+			const mutedUntil = new Date(currentDate.getTime() + muteUserDto.mutedUntil * 60000);
+			groupToUpdate.mutedUntil = mutedUntil;
+			await this.groupMemberRepository.save(groupToUpdate);
+			return true;
 		}
 
 		throw new Error("Fatal error");
@@ -573,21 +576,11 @@ export class ChatService {
 			if (groupToUpdate.isBan) {
 				throw new Error(`${userToMute.username} is ban from this channel`);
 			}
-
-			if (userGroup.isOwner || userGroup.isAdmin) {
-				if (groupToUpdate && !groupToUpdate.isOwner || !groupToUpdate.isAdmin) {
-					groupToUpdate.isMute = false;
-					groupToUpdate.mutedUntil = null;
-					await this.groupMemberRepository.save(groupToUpdate);
-					return true;	
-				}
-
-				throw new Error(`${userToMute.username} has higher privilege`);
-			}
-
-			throw new Error(`${user.username} is not owner or admin`);
+			groupToUpdate.isMute = false;
+			groupToUpdate.mutedUntil = null;
+			await this.groupMemberRepository.save(groupToUpdate);
+			return true;	
 		}
-
 		throw new Error("Fatal error");
 	}
 
@@ -1070,7 +1063,21 @@ export class ChatService {
 		throw new Error("Fatal error");
 	}
 
+	async saveNotification(dto: any) {
+		console.log("DTO ==> ", dto);
+		const conversation : Conversation = await this.conversationRepository.findOne({ where: {id: dto.channelID} });
+		
+		if (conversation) {
+			const newMessage = new Message();
+			newMessage.from = 'Bot';
+			newMessage.content = dto.content;
+			newMessage.post_datetime = dto.post_datetime;
+			newMessage.conversation = conversation;
+			return await this.messageRepository.save(newMessage);
+		}
 
+		throw new Error("Fatal error");
+	}
 
 	/**************************************************************/
 	/***						GETTERS							***/
@@ -1139,9 +1146,9 @@ export class ChatService {
 		return conversations;
 	}
 
-	async getMessages(conversationID: number): Promise<Message[]> {
+	async getMessages(conversationID: number, userID: number): Promise<Message[]> {
 
-		const allMessages = await this.getAllMessages(conversationID);
+		const allMessages = await this.getAllMessages(conversationID, userID);
 		if (!allMessages) {
 			console.error("Fatal error: messsages not found");
 			return [];
@@ -1201,6 +1208,7 @@ export class ChatService {
 					conversationList: conversationList,
 					isAdmin: isAdminArray,
 					usersList: usersList,
+					blockList: user.blockedUsers,
 				}
 	
 				return conversationArray;

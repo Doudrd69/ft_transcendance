@@ -27,7 +27,7 @@ interface User {
 
 const ChannelListComponent: React.FC = () => {
 
-	const { state, dispatch } = useChat();
+	const { chatState, chatDispatch } = useChat();
 	const { globalState } = useGlobal();
 
 	const userID = Number(sessionStorage.getItem("currentUserID"));
@@ -58,6 +58,7 @@ const ChannelListComponent: React.FC = () => {
 					setIsAdmin([...isAdmin]);
 				if (usersList ) {
 					setUserList([...usersList]);
+					console.log(usersList);
 				}	
 			}
 		}
@@ -68,27 +69,25 @@ const ChannelListComponent: React.FC = () => {
 
 	useEffect(() => {
 
-		if (globalState?.userSocket) {
-			console.log("OUAIS ON ETS LA");
-			globalState.userSocket?.on('userIsBan', () => {
-				dispatch({ type: 'DISABLE', payload: 'showChannel' });
-				dispatch({ type: 'ACTIVATE', payload: 'showChannelList' });
-				loadDiscussions();
-			});
-		}
+		globalState.userSocket?.on('userIsBan', () => {
+			chatDispatch({ type: 'DISABLE', payload: 'showChannel' });
+			chatDispatch({ type: 'ACTIVATE', payload: 'showChannelList' });
+			loadDiscussions();
+		});
 
 		globalState.userSocket?.on('channelDeleted', ( data: {roomName: string, roomID: string} ) => {
 			const { roomName, roomID } = data;
 			loadDiscussions();
 			globalState.userSocket?.emit('leaveRoom', { roomName: roomName, roomID: roomID });
-			dispatch({ type: 'ACTIVATE', payload: 'showChannelList' });
+			chatDispatch({ type: 'ACTIVATE', payload: 'showChannelList' });
 		});
 
 		globalState.userSocket?.on('userIsUnban', () => {
 			loadDiscussions();
 		});
-		// seul event rfreshChannelList est ici donc besoin de rien
+
 		globalState.userSocket?.on('refreshChannelList', () => {
+			console.log("REFRESHING USERLIST");
 			loadDiscussions();
 		});
 
@@ -102,13 +101,12 @@ const ChannelListComponent: React.FC = () => {
 	}, [globalState?.userSocket]);
 
 	useEffect(() => {
-		console.log("Loading conversations...");
 		loadDiscussions();
 
-	}, [state.refreshChannel]);
+	}, [chatState.refreshChannel]);
 
 	const handleCloseAddCreate = () => {
-		dispatch({ type: 'DISABLE', payload: 'showAddCreateChannel' });
+		chatDispatch({ type: 'DISABLE', payload: 'showAddCreateChannel' });
 	};
 
 	useEffect(() => {
@@ -118,65 +116,62 @@ const ChannelListComponent: React.FC = () => {
 			}
 		};
 		
-			document.addEventListener('keydown', handleEscape);
-			return () => {
-			  document.removeEventListener('keydown', handleEscape);
+		document.addEventListener('keydown', handleEscape);
+		return () => {
+			document.removeEventListener('keydown', handleEscape);
 			};
 	}, []);
 
 	const handleConv = (conversation: Conversation, user: User[], index: number) => {
-		dispatch({ type: 'SET_CURRENT_CONVERSATION', payload: conversation.name });
-		dispatch(setCurrentComponent('showChannelList'));
-		dispatch({ type: 'SET_CURRENT_CONVERSATION_ID', payload: conversation.id });
-		dispatch({ type: 'SET_CURRENT_CONVERSATION_IS_PRIVATE', payload: conversation.isPublic });
-		dispatch({ type: 'SET_CURRENT_CONVERSATION_IS_PROTECTED', payload: conversation.isProtected });
-		dispatch({ type: 'ACTIVATE', payload: 'currentChannelBool' });
-		dispatch({ type: 'ACTIVATE', payload: 'dontcancel' });
-		console.log("user", user);
+		chatDispatch({ type: 'SET_CURRENT_CONVERSATION', payload: conversation.name });
+		chatDispatch(setCurrentComponent('showChannelList'));
+		chatDispatch({ type: 'SET_CURRENT_CONVERSATION_ID', payload: conversation.id });
+		chatDispatch({ type: 'SET_CURRENT_CONVERSATION_IS_PRIVATE', payload: conversation.isPublic });
+		chatDispatch({ type: 'SET_CURRENT_CONVERSATION_IS_PROTECTED', payload: conversation.isProtected });
+		chatDispatch({ type: 'ACTIVATE', payload: 'currentChannelBool' });
+		chatDispatch({ type: 'ACTIVATE', payload: 'dontcancel' });
 		if(isAdmin[index])
 		{
-			dispatch({ type: 'ACTIVATE', payload: 'showAdmin' });
-			dispatch({ type: 'ACTIVATE', payload: 'isAdmin' });
+			chatDispatch({ type: 'ACTIVATE', payload: 'showAdmin' });
+			chatDispatch({ type: 'ACTIVATE', payload: 'isAdmin' });
 		}
 		const me = user.filter((user: User) => user.login === sessionStorage.getItem("currentUserLogin"));
-		console.log("me", me);
-		console.log("m2", me[0].isOwner);
 
 		if(me[0].isOwner)
-			dispatch({ type: 'ACTIVATE', payload: 'isOwner' });
+			chatDispatch({ type: 'ACTIVATE', payload: 'isOwner' });
 		
-		dispatch({ type: 'DISABLE', payload: 'showChannelList' });
-		dispatch({ type: 'ACTIVATE', payload: 'showChannel' });
+		chatDispatch({ type: 'DISABLE', payload: 'showChannelList' });
+		chatDispatch({ type: 'ACTIVATE', payload: 'showChannel' });
 	
 	}
 
 	return (
 		<div className="bloc-channel-list">
 			<button
-				className={`button-channel-list-add ${state.showAddCreateChannel ? 'green-border' : ''}`}
+				className={`button-channel-list-add ${chatState.showAddCreateChannel ? 'green-border' : ''}`}
 				onClick={() => {
-				dispatch({ type: 'ACTIVATE', payload: 'showAddCreateChannel' });
+				chatDispatch({ type: 'ACTIVATE', payload: 'showAddCreateChannel' });
 				}}
 			>
 				+
 			</button>
 			<div className='create-add'>
-				{ state.showAddCreateChannel ?
+				{ chatState.showAddCreateChannel ?
 					<div className='blur'>
 						<img className="add_button_cancel" src='./close.png'  onClick={handleCloseAddCreate}/>
 						<div className='bloc-add-create'>
-							<button className='button-add' onClick= {() => {dispatch({type:'ACTIVATE', payload: 'showCreateChannel'})}}>
+							<button className='button-add' onClick= {() => {chatDispatch({type:'ACTIVATE', payload: 'showCreateChannel'})}}>
 								CREATE
 							</button>
-							<button className='button-add' onClick= {() => {dispatch({type:'ACTIVATE', payload: 'showAddChannel'})}}>
+							<button className='button-add' onClick= {() => {chatDispatch({type:'ACTIVATE', payload: 'showAddChannel'})}}>
 								JOIN 
 							</button>
 						</div>
 					</div>
 					: null}
-				{state.showPassword ? <PasswordComponent /> : null}
-				{state.showAddChannel ? <ListMyChannelComponent user={userName || 'no-user'} isAdd={true} title="JOIN CHANNEL"/> : null}
-				{state.showCreateChannel ? <AddConversationComponent loadDiscussions={loadDiscussions} title="CREATE CHANNEL" isChannel={true} /> : null}
+				{chatState.showPassword ? <PasswordComponent /> : null}
+				{chatState.showAddChannel ? <ListMyChannelComponent user={userName || 'no-user'} isAdd={true} title="JOIN CHANNEL"/> : null}
+				{chatState.showCreateChannel ? <AddConversationComponent loadDiscussions={loadDiscussions} title="CREATE CHANNEL" isChannel={true} /> : null}
 			</div>
 			{conversations.map((conversation, index) => (
 					conversation.is_channel && (
@@ -184,10 +179,9 @@ const ChannelListComponent: React.FC = () => {
 					key={index}
 					className="button-channel-list"
 					onClick={() => {
-							console.log("userList", userList);
 							handleConv(conversation, userList[index], index);
 							if(isAdmin[index])
-								state.currentIsAdmin = true;
+								chatState.currentIsAdmin = true;
 						}}>
 					{isAdmin[index] && <img className="icon-admin-channel" src='./crown.png' alt="private" />}
 					{conversation.isProtected &&  <img className="icon-password-channel" src='./password.png' alt="private" />}

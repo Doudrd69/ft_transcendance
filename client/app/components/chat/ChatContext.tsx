@@ -179,16 +179,16 @@ const chatReducer = (state: ChatState, action: Action): ChatState => {
   
 // Contexte
 const ChatContext = createContext<{
-  state: ChatState;
-  dispatch: React.Dispatch<Action>;
+	chatState: ChatState;
+	chatDispatch: React.Dispatch<Action>;
 } | undefined>(undefined);
 
 // Fournisseur de contexte
 export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({children}) => {
-	const [state, dispatch] = useReducer(chatReducer, initialState);
+	const [chatState, chatDispatch] = useReducer(chatReducer, initialState);
 	
 	return (
-		<ChatContext.Provider value={{ state, dispatch }}>
+		<ChatContext.Provider value={{ chatState, chatDispatch }}>
 			{children}
 		</ChatContext.Provider>
 	);

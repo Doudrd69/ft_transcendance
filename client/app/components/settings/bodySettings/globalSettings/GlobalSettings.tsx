@@ -74,15 +74,15 @@ const GlobalSettingsComponent: React.FC = () => {
 			e.preventDefault();
 	
 			const dto = {
-			userID: Number(sessionStorage.getItem("currentUserID")),
-			code: authenticatorCodeInput,
+				userID: Number(sessionStorage.getItem("currentUserID")),
+				code: authenticatorCodeInput,
 			}
 	
 			const response = await fetch('http://localhost:3001/auth/checkAuthenticatorCode', {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
-				'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
+				// 'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
 			},
 			body: JSON.stringify(dto),
 			});

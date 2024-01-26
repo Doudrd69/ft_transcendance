@@ -29,7 +29,7 @@ interface Conversation {
 
 const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) => {
 
-	const { state, dispatch } = useChat();
+	const { chatState, chatDispatch } = useChat();
 	const { globalState } = useGlobal();
 	const [formValue, setFormValue] = useState('');
 	const [admin, setAdmin] = useState<boolean>(user.isAdmin);
@@ -42,9 +42,6 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 		isBlocked = !!me.blockList.find((userblock) => userblock === user.login);
 	}
 	
-	if (isBlocked) {
-		setBlock(isBlocked);
-	}
 
 	const blockUser = async() => {
 
@@ -52,8 +49,6 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 			initiatorLogin: sessionStorage.getItem("currentUserLogin"),
 			recipientLogin: user.login,
 		}
-
-		console.log("dto++> ", BlockUserDto);
 
 		const response = await fetch(`http://localhost:3001/users/blockUser`, {
 			method: 'POST',
@@ -66,6 +61,12 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 
 		if (response.ok) {
 			setBlock(true);
+			if (globalState.userSocket && chatState.currentConversation && chatState.currentConversationID) {
+				globalState.userSocket?.emit('joinRoom', { roomName: `whoblocked${user.login}`, roomID: '' } );
+				globalState.userSocket?.emit('refreshChannel', {
+					channel: chatState.currentConversation + chatState.currentConversationID,
+				});
+			}
 
 			console.log("block");
 		}
@@ -94,6 +95,12 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 			setBlock(false);
 
 			console.log("unblock");
+			if (globalState.userSocket && chatState.currentConversation && chatState.currentConversationID) {
+				globalState.userSocket?.emit('leaveRoom', { roomName: `whoblocked${user.login}`, roomID: '' } );
+				globalState.userSocket?.emit('refreshChannel', {
+					channel: chatState.currentConversation + chatState.currentConversationID,
+				});
+			}
 		}
 		else {
 			console.error("Fatal error");
@@ -103,7 +110,7 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 
 		try {
 			const userOptionDto = {
-				conversationID: Number(state.currentConversationID),
+				conversationID: Number(chatState.currentConversationID),
 				username: user.login,
 				state: false,
 				from: Number(sessionStorage.getItem("currentUserID"))
@@ -121,6 +128,13 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 			if (response.ok) {
 				user.isMute = !user.isMute;
 				setMute(false);
+				if (chatState.currentConversation) {
+					globalState.userSocket?.emit('emitNotification', {
+						channel: chatState.currentConversation + chatState.currentConversationID,
+						content: `${user.login} has been unmuted`,
+						channelID: chatState.currentConversationID,
+					});
+				}
 			}
 		}
 		catch (error) {
@@ -129,9 +143,8 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 	}
 	
 	const muteUser = async() => {
-		dispatch({ type: 'ACTIVATE', payload: 'showTimer' });
-		dispatch({ type: 'DISABLE', payload: 'showOptionsUserChannel' });
-
+		chatDispatch({ type: 'ACTIVATE', payload: 'showTimer' });
+		chatDispatch({ type: 'DISABLE', payload: 'showOptionsUserChannel' });
 	}
 
 	const banUser = async() => {
@@ -140,7 +153,7 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 
 
 			const userOptionDto = {
-				conversationID: Number(state.currentConversationID),
+				conversationID: Number(chatState.currentConversationID),
 				username: user.login,
 				state : true,
 				from: Number(sessionStorage.getItem("currentUserID"))
@@ -160,11 +173,19 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 				user.isBan = !user.isBan;
 				setBan(true);
 
-				globalState.userSocket?.emit('banUser', {
-					userToBan: user.login,
-					roomName: state.currentConversation,
-					roomID: state.currentConversationID
-				});
+				if (chatState.currentConversation) {
+					globalState.userSocket?.emit('banUser', {
+						userToBan: user.login,
+						roomName: chatState.currentConversation,
+						roomID: chatState.currentConversationID
+					});
+					globalState.userSocket?.emit('emitNotification', {
+						channel: chatState.currentConversation + chatState.currentConversationID,
+						content: `${user.login} has been ban`,
+						channelID: chatState.currentConversationID,
+					});
+				}
+
 
 			}
 		}
@@ -178,7 +199,7 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 		try {
 
 			const userOptionDto = {
-				conversationID: Number(state.currentConversationID),
+				conversationID: Number(chatState.currentConversationID),
 				username: user.login,
 				state : false,
 				from: Number(sessionStorage.getItem("currentUserID"))
@@ -198,11 +219,19 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 				user.isBan = !user.isBan;
 				setBan(false);
 
-				globalState.userSocket?.emit('unbanUser', {
-					userToUnban: user.login,
-					roomName: state.currentConversation,
-					roomID: state.currentConversationID
-				});
+				if (chatState.currentConversation) {
+					globalState.userSocket?.emit('unbanUser', {
+						userToUnban: user.login,
+						roomName: chatState.currentConversation,
+						roomID: chatState.currentConversationID
+					});
+					globalState.userSocket?.emit('emitNotification', {
+						channel: chatState.currentConversation + chatState.currentConversationID,
+						content: `${user.login} has been unban`,
+						channelID: chatState.currentConversationID,
+					});
+				}
+
 
 			}
 		}
@@ -215,7 +244,7 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 		
 		try {
 			const userOptionDto = {
-				conversationID: Number(state.currentConversationID),
+				conversationID: Number(chatState.currentConversationID),
 				username: user.login,
 				state : true,
 				from: Number(sessionStorage.getItem("currentUserID"))
@@ -233,9 +262,15 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 			if (response.ok) {
 				user.isAdmin = !user.isAdmin;
 
-				if (state.currentConversation) {
+				if (chatState.currentConversation) {
 					globalState.userSocket?.emit('refreshChannel', {
-						channel: state.currentConversation + state.currentConversationID,
+						channel: chatState.currentConversation + chatState.currentConversationID,
+					});
+
+					globalState.userSocket?.emit('emitNotification', {
+						channel: chatState.currentConversation + chatState.currentConversationID,
+						content: `${user.login} has been promoted to admin`,
+						channelID: chatState.currentConversationID,
 					});
 	
 					// refresh channel list for userToRefresh (who has been promoted)
@@ -257,7 +292,7 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 		try{
 			console.log(user);
 			const userOptionDto = {
-				conversationID: Number(state.currentConversationID),
+				conversationID: Number(chatState.currentConversationID),
 				username: user.login,
 				state : false,
 				from: Number(sessionStorage.getItem("currentUserID"))
@@ -274,15 +309,21 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 			if (response.ok) {
 				user.isAdmin = !user.isAdmin;
 
-				if (state.currentConversation) {
+				if (chatState.currentConversation) {
 					globalState.userSocket?.emit('refreshChannel', {
-						channel: state.currentConversation + state.currentConversationID,
+						channel: chatState.currentConversation + chatState.currentConversationID,
 					});
 	
 					// refresh channel list for userToRefresh (who has been promoted)
 					globalState.userSocket?.emit('refreshUserChannelList', {
 						userToRefresh: user.login,
 					});
+					globalState.userSocket?.emit('emitNotification', {
+						channel: chatState.currentConversation + chatState.currentConversationID,
+						content: `${user.login} has been demoted to admin`,
+						channelID: chatState.currentConversationID,
+					});
+	
 				}
 
 				setAdmin(false);
@@ -296,7 +337,7 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 	const handleLeaveChannel = async() => {
 		try {
 			const quitlConversationDto = {
-					conversationID: Number(state.currentConversationID),
+					conversationID: Number(chatState.currentConversationID),
 					userID: user.id,
 			}
 	
@@ -313,35 +354,35 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 				if (user.login == me.login)
 				{
 					// je quitte le channel donc faut refresh le composant pour les autres
-					dispatch({ type: 'ACTIVATE', payload: 'showChannelList' });
-					dispatch({ type: 'DISABLE', payload: 'showChannel' });
-					dispatch({ type: 'DISABLE', payload: 'showOptionsUserChannel' });
+					chatDispatch({ type: 'ACTIVATE', payload: 'showChannelList' });
+					chatDispatch({ type: 'DISABLE', payload: 'showChannel' });
+					chatDispatch({ type: 'DISABLE', payload: 'showOptionsUserChannel' });
 
-					if (state.currentConversation) {
+					if (chatState.currentConversation) {
 						globalState.userSocket?.emit('refreshChannel', {
-							channel: state.currentConversation + state.currentConversationID,
+							channel: chatState.currentConversation + chatState.currentConversationID,
 						});
 						globalState.userSocket?.emit('leaveRoom', {
-							roomName: state.currentConversation,
-							roomID: state.currentConversationID,
+							roomName: chatState.currentConversation,
+							roomID: chatState.currentConversationID,
 						});
 					}
 				}
 				else {
 					// je kick un user donc faut refresh le composant pour les autres
-					dispatch({ type: 'ACTIVATE', payload: 'showBackComponent' });
-					dispatch({ type: 'DISABLE', payload: 'showOptionsUserChannel' });
+					chatDispatch({ type: 'ACTIVATE', payload: 'showBackComponent' });
+					chatDispatch({ type: 'DISABLE', payload: 'showOptionsUserChannel' });
 
 					// refresh channel for all users inside
-					if (state.currentConversation) {
+					if (chatState.currentConversation) {
 						globalState.userSocket?.emit('refreshChannel', {
-							channel: state.currentConversation + state.currentConversationID,
+							channel: chatState.currentConversation + chatState.currentConversationID,
 						});
 						// permet au user kick de leave la room
 						globalState.userSocket?.emit('kickUserFromChannel', {
 							userToKick: user.login,
-							roomName: state.currentConversation,
-							roomID: state.currentConversationID,
+							roomName: chatState.currentConversation,
+							roomID: chatState.currentConversationID,
 						});
 	
 						globalState.userSocket?.emit('refreshUserChannelList', {
@@ -357,15 +398,15 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 	}
 	
 	const handleDms = async() => {
-		console.log("ahahahahahahah");
 
 		try {
-		console.log("user ljourand: ", user);
 
 			const createDMConversationDto = {
 				user1: Number(user.id),
 				user2: Number(sessionStorage.getItem("currentUserID")),
 			}
+
+			console.log(createDMConversationDto);
 
 			const response = await fetch(`http://localhost:3001/chat/newDMConversation`, {
 				method: 'POST',
@@ -381,19 +422,17 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 				let tmp = conversation.name;
 				let conversationName = tmp.replace(me.login, "");
 				console.log("conversationName: ", conversationName);
-				dispatch({ type: 'SET_CURRENT_CONVERSATION', payload: conversationName });
-				dispatch({ type: 'SET_CURRENT_ROOM', payload: conversation.name });
-				dispatch({ type: 'SET_CURRENT_CONVERSATION_ID', payload: conversation.id });
-				
-				// Current user joins the room
+				chatDispatch({ type: 'SET_CURRENT_CONVERSATION', payload: conversationName });
+				chatDispatch({ type: 'SET_CURRENT_ROOM', payload: conversation.name });
+				chatDispatch({ type: 'SET_CURRENT_CONVERSATION_ID', payload: conversation.id });
 				globalState.userSocket?.emit('joinRoom', { roomName: conversation.name, roomID: conversation.id } );
 				// Emit to the targeted user so he joins the room
+				// user.login == mauvais username
 				globalState.userSocket?.emit('addUserToRoom', {
 					convID: conversation.id,
 					convName: conversation.name,
 					friend: user.login,
 				});
-				// Emit to refresh DM list
 				globalState.userSocket?.emit('refreshUser', {
 					userToRefresh: user.login,
 					target: 'refreshDmList',
@@ -407,18 +446,18 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 		catch (error) {
 			console.log(error);
 		}
-		dispatch({ type: 'ACTIVATE', payload: 'showChat' });
-		dispatch({ type: 'ACTIVATE', payload: 'showBackComponent' });
-		dispatch({ type: 'DISABLE', payload: 'showOptionsUserChannel' });
-		dispatch({ type: 'DISABLE', payload: 'currentChannelBool' });
-		dispatch({ type: 'DISABLE', payload: 'showChannel' });
-		dispatch({ type: 'DISABLE', payload: 'showOptionsUserChannelOwner' });
+		chatDispatch({ type: 'ACTIVATE', payload: 'showChat' });
+		chatDispatch({ type: 'ACTIVATE', payload: 'showBackComponent' });
+		chatDispatch({ type: 'DISABLE', payload: 'showOptionsUserChannel' });
+		chatDispatch({ type: 'DISABLE', payload: 'currentChannelBool' });
+		chatDispatch({ type: 'DISABLE', payload: 'showChannel' });
+		chatDispatch({ type: 'DISABLE', payload: 'showOptionsUserChannelOwner' });
 	}
 
 	const handleCancel = () => {
-		dispatch({ type: 'DISABLE', payload: 'showOptionsUserChannel' });
-		dispatch({ type: 'DISABLE', payload: 'showOptionsUserChannelOwner' });
-		dispatch({ type: 'ACTIVATE', payload: 'showBackComponent' });		
+		chatDispatch({ type: 'DISABLE', payload: 'showOptionsUserChannel' });
+		chatDispatch({ type: 'DISABLE', payload: 'showOptionsUserChannelOwner' });
+		chatDispatch({ type: 'ACTIVATE', payload: 'showBackComponent' });		
 		setFormValue('');
 	};
 		
@@ -465,7 +504,7 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 									</>
 								)
 							}
-							{block ? (
+							{isBlocked ? (
 								<img className="option-image" src="block.png" onClick={unblockUser}/>
 								) : (
 									<img className="option-image-opacity" src="block.png" onClick={blockUser}/>

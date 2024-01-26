@@ -14,7 +14,6 @@ export class AuthenticatorCodeDto {
 	userID: number;
 
 	@IsNotEmpty()
-	@IsDecimal()
 	@Length(6)
 	code: string;
 }

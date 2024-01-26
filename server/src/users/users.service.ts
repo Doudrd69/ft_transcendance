@@ -64,10 +64,6 @@ export class UsersService {
 
 	async upate2FAState(user: User, state: boolean) {
 		user.TFA_isEnabled = state;
-		if (!state) {
-			user.TFA_secret = null;
-			user.TFA_temp_secret = null;
-		}
 		return await this.usersRepository.save(user);
 	}
 
@@ -444,8 +440,11 @@ export class UsersService {
 		const userToBlock: User = await this.usersRepository.findOne({ where: { username: blockUserDto.recipientLogin } });
 
 		if (user && userToBlock) {
-			user.blockedUsers.push(userToBlock.login);
-			await this.usersRepository.save(user);
+			const checkUserDouble = user.blockedUsers.filter((username: string) => username === userToBlock.username);
+			if (!checkUserDouble) {
+				user.blockedUsers.push(userToBlock.login);
+				await this.usersRepository.save(user);
+			}
 			return true;
 		}
 
@@ -522,6 +521,7 @@ export class UsersService {
 				id: element.friend ? element.friend.id : element.initiator ? element.initiator.id : -1,
 				username: element.friend ? element.friend.username : element.initiator ? element.initiator.username : 'unknown user',
 				isBlocked: blockStatus,
+				onlineStatus:  element.friend ? element.friend.isActive : element.initiator ? element.initiator.isActive : false,
 			});
 		});
 

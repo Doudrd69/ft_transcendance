@@ -7,12 +7,10 @@ import BodyChatComponent from './bodyChat/BodyChat';
 
 const ChatComponent: React.FC = () => {
 	return (
-		<ChatProvider>
 			<div className="left-half">
 					<HeaderChatComponent/>
 					<BodyChatComponent />
 			</div>
-		</ChatProvider>
 	)
 };
 

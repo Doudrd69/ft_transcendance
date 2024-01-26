@@ -11,6 +11,7 @@ interface FriendShip {
 	id: number;
 	username: string;
 	isBlocked: boolean;
+	onlineStatus: boolean;
 }
 
 interface Conversation {
@@ -21,13 +22,12 @@ interface Conversation {
 
 const FriendsListComponent: React.FC = () => {
 	
-	const {state, dispatch} = useChat();
+	const { chatState, chatDispatch } = useChat();
 	const { globalState } = useGlobal();
 	const [showTabFriendsList, setTabFriendsList] = useState(false);
 	const [activeIndex, setActiveIndex] = useState<number | null>(null);
 	const [friendList, setFriendList] = useState<FriendShip[]>([]);
 	const username = sessionStorage.getItem("currentUserLogin");
-	console.log("refreshFriendsList0", state.refreshFriendsList);
 
 	const disableTabFriendsList = () => setTabFriendsList(false);
 
@@ -59,9 +59,8 @@ const FriendsListComponent: React.FC = () => {
 
 	useEffect(() => {
 		console.log("Loading friend list...");
-		console.log("refreshFriendsList3", state.refreshFriendsList);
 		loadFriendList();
-	}, [state.refreshFriendsList]);
+	}, [chatState.refreshFriendsList]);
 
 	useEffect(() => {
 
@@ -73,9 +72,21 @@ const FriendsListComponent: React.FC = () => {
 			loadFriendList();
 		});
 
+		globalState.userSocket?.on('newConnection', (notif: string) => {
+			console.log("refreshing friendlist status ONLINE");
+			loadFriendList();
+		})
+
+		globalState.userSocket?.on('newDeconnection', (notif: string) => {
+			console.log("refreshing friendlist status OFFLINE");
+			loadFriendList();
+		})
+
 		return () => {
 			globalState.userSocket?.off('friendRequestAcceptedNotif');
 			globalState.userSocket?.off('refreshFriends');
+			globalState.userSocket?.off('newConnection');
+			globalState.userSocket?.off('newDeconnection');
 		}
 
 	}, [globalState?.userSocket]);
@@ -87,12 +98,12 @@ const FriendsListComponent: React.FC = () => {
 			<button
 				className="button-friends-list-add"
 				onClick={() => {
-				dispatch({ type: 'ACTIVATE', payload: 'showAddFriend' });
+				chatDispatch({ type: 'ACTIVATE', payload: 'showAddFriend' });
 			}}
 			>
 			+
 			</button>
-			{state.showAddFriend && <AddFriendComponent updateFriends={loadFriendList} title="ADD NEW FRIEND"/>}
+			{chatState.showAddFriend && <AddFriendComponent updateFriends={loadFriendList} title="ADD NEW FRIEND"/>}
 			{friendList.map((friend: FriendShip, id: number) => (
 			<div className="tab-and-userclicked" key={id}>
 				<div className="bloc-button-friendslist">
@@ -101,7 +112,12 @@ const FriendsListComponent: React.FC = () => {
 							className={`profil-friendslist`}
 							alt="User Avatar"
 						/>
-						<div className={`amies ${activeIndex === id ? 'active' : ''}`} onClick={() => activateTabFriendsList(id)}>
+						<div className="amies" onClick={() => activateTabFriendsList(id)}>
+							{friend.onlineStatus ? 
+								<div className="online" />
+								:
+								<div className="offline" />
+							}
 							{friend.username}
 						</div>
 				</div>

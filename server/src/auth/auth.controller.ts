@@ -37,7 +37,7 @@ export class AuthController {
 		return this.authService.desactivate2FA(requestTfaDto);
 	}
 
-	@UseGuards(AuthGuard)
+	// @UseGuards(AuthGuard)
 	@Post('checkAuthenticatorCode')
 	verifyCode(@Body() authenticatorCodeDto: AuthenticatorCodeDto) {
 		return this.authService.verifyCode(authenticatorCodeDto);
@@ -45,7 +45,7 @@ export class AuthController {
 
 	// class-validator
 	@Post('access')
-	getAccessToken(@Body() requestBody: {code: string}) {
+	getAccessToken(@Body() requestBody: { code: string } ) {
 		const { code } = requestBody;
 		return this.authService.getAccessToken(code);
 	}

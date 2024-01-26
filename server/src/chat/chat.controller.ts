@@ -164,8 +164,9 @@ export class ChatController {
 
 	@UseGuards(AuthGuard)
 	@Get('getMessages/:conversationID')
-	getMessagesFromConversation(@Param('conversationID') conversationID: number): Promise<Message[]> {
-		return this.chatService.getMessages(conversationID);
+	getMessagesFromConversation(@Req() req, @Param('conversationID') conversationID: number): Promise<Message[]> {
+		const { user } = req;
+		return this.chatService.getMessages(conversationID, user.id);
 	}
 
 	@UseGuards(AuthGuard)

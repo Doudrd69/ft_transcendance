@@ -19,9 +19,9 @@ const TFAComponent: React.FC<TFAComponentProps>  = ({ on2FADone　}) => {
 	
 			const dto = {
 				userID: Number(sessionStorage.getItem("currentUserID")),
-				code: authenticatorCodeInput,
+				code: String(authenticatorCodeInput),
 			}
-	
+
 			const response = await fetch('http://localhost:3001/auth/checkAuthenticatorCode', {
 				method: 'POST',
 				headers: {
