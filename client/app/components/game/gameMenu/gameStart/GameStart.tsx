@@ -38,6 +38,12 @@ const MatchMaking = () => {
             state.showGame = true;
         });
 
+        globalState.gameSocket?.on('returnGameInProgress', () => {
+            globalState.gameSocket?.disconnect();
+            dispatchGame({ type: 'TOGGLE', payload: 'showGameMenu'});
+            state.showGameMenu = true;
+        });
+
         return () => {
             globalState.gameSocket?.off('leave-game');
             globalState.gameSocket?.off('setgame');

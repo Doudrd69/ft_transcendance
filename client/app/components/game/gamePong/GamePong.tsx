@@ -212,6 +212,7 @@ const PongComponent = () => {
                 payload: 'showGameMenu',
             });
             state.showGameMenu = true;
+            globalState.gameSocket?.disconnect();
         });
 
         const handleKeyUp = (e: KeyboardEvent) => {

@@ -17,7 +17,7 @@ export class  GatewayGuard implements CanActivate {
 		}
 
 		try {
-			const payload = await this.jwtService.verifyAsync(token, { secret: jwtConstants.secret } );
+			await this.jwtService.verifyAsync(token, { secret: jwtConstants.secret } );
 			return true;
 		} catch (error) {
 			throw new UnauthorizedException();
