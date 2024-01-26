@@ -43,4 +43,4 @@ COPY ./avatar.png ./dist/users/avatars/avatar.png
 
 # ENTRYPOINT [ "./script.sh" ]
 
-CMD ["npm", "run", "start:prod"]
+CMD ["npm", "run", "start:dev"]
