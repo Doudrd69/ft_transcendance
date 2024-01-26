@@ -181,47 +181,49 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 					</div>
 					{chatState.showOptionsUserChannelOwner && ownerUser &&
 					  currentUser && <OptionsUserChannel user={ownerUser} me={currentUser} />}
-				  </div>
-				</div>
-				<div className='list-users-channel'>
-				  {userList && userList?.map((user: User, index: number) => (
-					<div key={index} className='user-list-item'>
-					  <div className='avatar-container'>
-						{user.isAdmin && !user.isOwner &&
-						  <>
-							<img className='admin-user' src='./crown.png' alt='user' />
-							<img
-							  className='img-list-users-channel-admin'
-							  src={`http://localhost:3001${user.avatarURL}`}
-							  onClick={() => {
+					</div>
+					</div>
+					<div className='list-users-channel'>
+					{userList && userList?.map((user: User, index: number) => (
+						<div key={index} className='user-list-item'>
+						<div className='avatar-container'>
+							{user.isAdmin && !user.isOwner &&
+							<>
+								<img className='admin-user' src='./crown.png' alt='user' />
+								<img
+								className='img-list-users-channel-admin'
+								src={`http://localhost:3001${user.avatarURL}`}
+								onClick={() => {
+									chatDispatch({ type: 'ACTIVATE', payload: 'dontcandcel' });
+									chatDispatch({ type: 'ACTIVATE', payload: 'dontcandcel' });
+									chatDispatch({ type: 'ACTIVATE', payload: 'showOptionsUserChannel' });
+									chatDispatch({ type: 'SET_CURRENT_OPTION_CHANNEL_NAME', payload: user.login });
+									chatDispatch({ type: 'DISABLE', payload: 'showBackComponent' });
+								}} />
+							</>
+						}
+						{!user.isAdmin && !user.isOwner &&
+						  <img
+						  className='img-list-users-channel'
+						  src={`http://localhost:3001${user.avatarURL}`}
+						  onClick={() => {
+								chatDispatch({ type: 'SET_CURRENT_TARGET', payload: user});
 								chatDispatch({ type: 'ACTIVATE', payload: 'dontcandcel' });
 								chatDispatch({ type: 'ACTIVATE', payload: 'showOptionsUserChannel' });
 								chatDispatch({ type: 'SET_CURRENT_OPTION_CHANNEL_NAME', payload: user.login });
 								chatDispatch({ type: 'DISABLE', payload: 'showBackComponent' });
-							  }} />
-						  </>
-						}
-						{!user.isAdmin && !user.isOwner &&
-						  <img
-							className='img-list-users-channel'
-							src={`http://localhost:3001${user.avatarURL}`}
-							onClick={() => {
-							  chatDispatch({ type: 'ACTIVATE', payload: 'dontcandcel' });
-							  chatDispatch({ type: 'ACTIVATE', payload: 'showOptionsUserChannel' });
-							  chatDispatch({ type: 'SET_CURRENT_OPTION_CHANNEL_NAME', payload: user.login });
-							  chatDispatch({ type: 'DISABLE', payload: 'showBackComponent' });
 							}} />}
 					  </div>
 					  {chatState.showOptionsUserChannel && !user.isOwner && currentUser &&
-						(<OptionsUserChannel user={user} me={currentUser} />)
-					  }
+						(<OptionsUserChannel user={user} me={currentUser}/>)
+					}
 					</div>
 				  ))}
 				</div>
 				</div>
 				<div ref={messagesContainerRef} className="bloc-channel-chat">
 				{messages.map((message: Message, id: number) => (
-				  <div key={id} className="bloc-contain">
+					<div key={id} className="bloc-contain">
 					<div className="bloc-avatar-username">
 						{message.from === 'Bot' ?
 							<>
@@ -229,7 +231,7 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 									src="./robot.png"
 									className='avatar-channel'
 									alt="bot"
-								/>
+									/>
 									<div className="user-name">Bot</div>
 							</>
 							:
@@ -250,9 +252,9 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 					</div>		
 				))}
 				</div>
-				{/* {chatState.showTimer && currentUser && <TimerComponent user={currentUser}/>} */}
+				{chatState.showTimer && <TimerComponent user={chatState.currentTarget}/>}
 			</>
 		);
-};
+	};
 
 export default ReceiveBoxChannelComponent;

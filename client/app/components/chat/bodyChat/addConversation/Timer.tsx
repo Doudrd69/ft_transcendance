@@ -21,21 +21,25 @@ interface TimerComponentProps {
 
 const TimerComponent: React.FC<TimerComponentProps> = ({user}) => {
 	
+
 	const [timer, setTimer] = useState('');
 	const { chatState, chatDispatch } = useChat();
 	const { globalState } = useGlobal();
-	
+	console.log("state.currentTarget", chatState.currentTarget);
+	console.log("hihihihihihihihhihihihihi");
 	const handleChange = async(e: React.ChangeEvent<HTMLInputElement>) => {
 			setTimer(e.target.value);
 	}
 
 	const handleTimerSubmit = async(e: React.FormEvent<HTMLFormElement>) => {
 
+		e.preventDefault();
 		try{
-			e.preventDefault();
+			console.log(timer);
+			console.log("user.login ======>", user.login);
 			const muteUserDto = {
 				conversationID: Number(chatState.currentConversationID),
-				username: user.login,
+				username: chatState.currentTarget.login,
 				state: true,
 				from: Number(sessionStorage.getItem("currentUserID")),
 				mutedUntil: Number(timer),
@@ -59,6 +63,9 @@ const TimerComponent: React.FC<TimerComponentProps> = ({user}) => {
 						channelID: chatState.currentConversationID,
 					});
 				}
+				globalState.userSocket?.emit('refreshUserChannelList', {
+					userToRefresh: user.login,
+				});
 				chatDispatch({ type: 'DISABLE' , payload: 'showTimer'});
 			}
 		}
@@ -68,6 +75,7 @@ const TimerComponent: React.FC<TimerComponentProps> = ({user}) => {
 	}
 
 	const handleCancel = () => {
+		chatDispatch({ type: 'ACTIVATE' , payload: 'showOptionUserChannel'});
 		chatDispatch({ type: 'DISABLE' , payload: 'showTimer'});
 		chatDispatch({ type: 'ACTIVATE' , payload: 'showBackComponent'});
 		setTimer('');
