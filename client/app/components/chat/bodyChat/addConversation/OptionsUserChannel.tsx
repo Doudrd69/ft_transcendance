@@ -108,14 +108,14 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 			console.error("Fatal error");
 		}
 	}
+
 	const unmuteUser = async() => {
 
 		try {
 			const userOptionDto = {
 				conversationID: Number(chatState.currentConversationID),
-				username: user.login,
+				target: user.id,
 				state: false,
-				from: Number(sessionStorage.getItem("currentUserID"))
 			}
 	
 			const response = await fetch(`http://localhost:3001/chat/unmuteUser`, {
@@ -156,9 +156,8 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 
 			const userOptionDto = {
 				conversationID: Number(chatState.currentConversationID),
-				username: user.login,
+				target: user.id,
 				state : true,
-				from: Number(sessionStorage.getItem("currentUserID"))
 			}
 	
 			const response = await fetch(`http://localhost:3001/chat/banUser`, {
@@ -202,9 +201,8 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 
 			const userOptionDto = {
 				conversationID: Number(chatState.currentConversationID),
-				username: user.login,
+				target: user.id,
 				state : false,
-				from: Number(sessionStorage.getItem("currentUserID"))
 			}
 	
 			const response = await fetch(`http://localhost:3001/chat/unbanUser`, {
@@ -247,9 +245,8 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 		try {
 			const userOptionDto = {
 				conversationID: Number(chatState.currentConversationID),
-				username: user.login,
+				target: user.id,
 				state : true,
-				from: Number(sessionStorage.getItem("currentUserID"))
 			}
 	
 			const response = await fetch(`http://localhost:3001/chat/promoteAdminUser`, {
@@ -295,9 +292,8 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 			console.log(user);
 			const userOptionDto = {
 				conversationID: Number(chatState.currentConversationID),
-				username: user.login,
+				target: user.id,
 				state : false,
-				from: Number(sessionStorage.getItem("currentUserID"))
 			}
 	
 			const response = await fetch(`http://localhost:3001/chat/demoteAdminUser`, {

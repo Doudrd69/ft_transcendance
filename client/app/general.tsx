@@ -149,10 +149,11 @@ const GeneralComponent = () => {
 				});
 				userSocket.connect();
 				dispatch({ type: 'SET_SOCKET', payload: userSocket });
-				// d abord la 2fa puis si valide alors setAuthvalidatedTrue
+				// dispatch le component 2FA?
 				if (sessionStorage.getItem("2fa") === "true")
 					setShow2FAForm(true);
-				setAuthValidated(true);
+				else
+					setAuthValidated(true);
 				return true;
 			}
 			else

@@ -11,7 +11,7 @@ const cors = require('cors');
 // Configure CORS to allow requests from http://localhost:3000
 const corsOptions = {
   origin: 'http://localhost:3000',
-  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  methods: 'GET,POST',
   allowedHeaders: 'Content-Type,Authorization',
   credentials: true,  // Enable CORS with credentials (e.g., cookies)
 };

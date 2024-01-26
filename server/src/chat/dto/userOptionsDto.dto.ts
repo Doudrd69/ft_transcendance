@@ -20,20 +20,13 @@ export class UserOptionsDto {
 	conversationID: number;
 
 	@IsNotEmpty()
-	@Length(6, 20)
-	@IsAscii()
-	@IsAlpha()
-	@IsString()
-	@Matches(/^[^"';%()|<>\\]*$/)
-	username: string;
+	@IsPositive()
+	@IsInt()
+	@Max(1000)
+	target: number;
+
 
 	@IsNotEmpty()
 	@IsBoolean()
 	state: boolean;
-
-	@IsNotEmpty()
-	@IsPositive()
-	@IsInt()
-	@Max(1000)
-	from: number;
 }
