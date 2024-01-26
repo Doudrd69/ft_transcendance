@@ -64,6 +64,10 @@ export class UsersService {
 
 	async upate2FAState(user: User, state: boolean) {
 		user.TFA_isEnabled = state;
+		if (!state) {
+			user.TFA_secret = "";
+			user.TFA_temp_secret = "";
+		}
 		return await this.usersRepository.save(user);
 	}
 
