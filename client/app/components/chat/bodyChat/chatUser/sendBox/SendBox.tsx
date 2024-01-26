@@ -21,7 +21,7 @@ const SendBoxComponent: React.FC = () => {
 			post_datetime: new Date(),
 			conversationID: chatState.currentConversationID,
 		}
-		console.log("messageDto", messageDto);
+		// console.log("messageDto", messageDto);
 		try {
 			e.preventDefault();
 	

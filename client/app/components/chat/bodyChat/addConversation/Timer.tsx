@@ -23,6 +23,7 @@ const TimerComponent: React.FC<TimerComponentProps> = ({user}) => {
 	
 	const [timer, setTimer] = useState('');
 	const { chatState, chatDispatch } = useChat();
+	const { globalState } = useGlobal();
 	
 	const handleChange = async(e: React.ChangeEvent<HTMLInputElement>) => {
 			setTimer(e.target.value);
@@ -51,8 +52,14 @@ const TimerComponent: React.FC<TimerComponentProps> = ({user}) => {
 		
 			if (response.ok) {
 				user.isMute = !user.isMute;
+				if (chatState.currentConversation) {
+					globalState.userSocket?.emit('emitNotification', {
+						channel: chatState.currentConversation + chatState.currentConversationID,
+						content: `${user.login} has been muted for ${timer} minutes`,
+						channelID: chatState.currentConversationID,
+					});
+				}
 				chatDispatch({ type: 'DISABLE' , payload: 'showTimer'});
-
 			}
 		}
 		catch (error) {

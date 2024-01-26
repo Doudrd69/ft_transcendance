@@ -91,11 +91,10 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 			});
 	
 			if (response.ok) {
-				const userList = await response.json();
-				setUserList([...userList]);
-				// console.log("userlist", userList);
-				setOwnerUser(userList.find((user:User) => user.isOwner));
-				setCurrentUser(userList.find((user:User) => user.login === sessionStorage.getItem("currentUserLogin")));
+				const data = await response.json();
+				setUserList([...data]);
+				setOwnerUser(data.find((user:User) => user.isOwner));
+				setCurrentUser(data.find((user:User) => user.login === sessionStorage.getItem("currentUserLogin")));
 			}
 		} catch (error) {
 			console.log(error);
@@ -131,6 +130,11 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 			console.log("Refresh channel...");
 			loadUserList();
 		});
+
+		globalState.userSocket?.on('recv_notif', (notif: Message) => {
+			console.log('notifffffffff', notif);
+			setMessages((prevMessages: Message[]) => [...prevMessages, notif]);
+		});
 		
 		return () => {
 			globalState.userSocket?.off('userJoinedRoom');
@@ -138,6 +142,7 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 			globalState.userSocket?.off('refresh_channel');
 			globalState.userSocket?.off('kickUser');
 			globalState.userSocket?.off('channelDeleted');
+			globalState.userSocket?.off('recv_notif');
 		};
 		
 	}, [globalState?.userSocket]);
@@ -213,26 +218,39 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 					</div>
 				  ))}
 				</div>
-			  </div>
-			  <div ref={messagesContainerRef} className="bloc-channel-chat">
+				</div>
+				<div ref={messagesContainerRef} className="bloc-channel-chat">
 				{messages.map((message: Message, id: number) => (
 				  <div key={id} className="bloc-contain">
 					<div className="bloc-avatar-username">
-						<img
-						src={`http://localhost:3001/users/getAvatarByLogin/${message.from}/${timestamp}`}
-						className='avatar-channel'
-						alt="User Avatar"
-						/>
-						<div className="user-name">{message.from}</div>
+						{message.from === 'Bot' ?
+							<>
+								<img
+									src="./robot.png"
+									className='avatar-channel'
+									alt="bot"
+								/>
+									<div className="user-name">Bot</div>
+							</>
+							:
+							<>
+								<img
+								src={`http://localhost:3001/users/getAvatarByLogin/${message.from}/${timestamp}`}
+								className='avatar-channel'
+								alt="User Avatar"
+								/>
+								<div className="user-name">{message.from}</div>
+							</>
+						}
 					</div>
 					<div className={`message-container ${isMyMessage(message) ? 'my-message-channel' : 'other-message-channel'}`}>
 						<p className="channel-chat-content">{message.content}</p>
 						<p className="channel-chat-date">{formatDateTime(message.post_datetime)}</p>
 					</div>
-				  </div>
+					</div>		
 				))}
-			  </div>
-			  {chatState.showTimer && currentUser && <TimerComponent user={currentUser}/>}
+				</div>
+				{/* {chatState.showTimer && currentUser && <TimerComponent user={currentUser}/>} */}
 			</>
 		);
 };

@@ -25,6 +25,7 @@
 .amies{
 	display: flex;
 	justify-content: center;
+	position:relative;
 	height: 100%;
 	align-items: center;
 	color: aliceblue;
@@ -39,6 +40,23 @@
 	background-color: var(--fifth);
 }
 
+.online {
+	width: 15px;
+	height: 15px;
+	background-color: #35b93a; /* Couleur verte, tu peux changer cela selon tes préférences */
+	border-radius: 50%; /* Pour obtenir une forme de cercle */
+	position: absolute;
+    left: 10px;
+	
+}
+.offline {
+	width: 15px;
+	height: 15px;
+	background-color: #9c0d0d; /* Couleur verte, tu peux changer cela selon tes préférences */
+	border-radius: 50%; /* Pour obtenir une forme de cercle */
+	position: absolute;
+    left: 10px;
+  }
 /*avatar du profil*/
 .on-off {
 	width: 20px;
