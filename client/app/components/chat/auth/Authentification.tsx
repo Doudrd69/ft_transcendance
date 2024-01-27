@@ -1,39 +1,44 @@
 import './Authentification.css'
-import React, { useState } from 'react'
+import React, { use, useState , useEffect} from 'react'
+import { useGlobal } from '../../../GlobalContext';
 
 
 const Authentificationcomponent = () => {
 
 	const [username, setUsername] = useState('');
+	const { globalState, dispatch } = useGlobal();
+	console.log("auth");
+	// const handleUsername = (e: React.ChangeEvent<HTMLInputElement>) => {
+	// 	setUsername(e.target.value);
+	// };
 
-	const handleUsername = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setUsername(e.target.value);
-	};
+	// const userRegister = async (e: React.FormEvent) => {
 
-	const userRegister = async (e: React.FormEvent) => {
-
-		try{
-			e.preventDefault();
+	// 	try{
+	// 		e.preventDefault();
 	
-			const response = await fetch('http://localhost:3001/users/signup', {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-				body: JSON.stringify({username}),
-			});
+	// 		const response = await fetch('http://localhost:3001/users/signup', {
+	// 			method: 'POST',
+	// 			headers: {
+	// 				'Content-Type': 'application/json',
+	// 			},
+	// 			body: JSON.stringify({username}),
+	// 		});
 	
-			if (response.ok) {
-				console.log("User successfully created");
-				sessionStorage.setItem("currentUserLogin", username);
-			}
-		}
-		catch(error){
-			console.log(error);
-		}
-	}
+	// 		if (response.ok) {
+	// 			console.log("User successfully created");
+	// 			sessionStorage.setItem("currentUserLogin", username);
+	// 		}
+	// 	}
+	// 	catch(error){
+	// 		console.log(error);
+	// 	}
+	// }
+	//AccessNouspermet de nous diriger vers la bonne fenetre de connexion
+	//ici on regarde si la 2fa est activé ou non
 
 	return (
+		
 			<div className="block-auth">
 				<a href="https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-8a7a2b2fd0e4c017d37f372040ba814c255a58303468e243ff07831a8d026b50&redirect_uri=http%3A%2F%2Flocalhost%3A3000&response_type=code">
 					<button className= "button-auth">SIGN IN WITH 42</button>

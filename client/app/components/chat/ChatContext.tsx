@@ -129,7 +129,6 @@ const initialState: ChatState = {
 	currentChannelBool: false,
 	showTimer: false,
 	currentTarget: null,
-
 };
 
 // Réducteur
