@@ -58,7 +58,6 @@ const FriendsListComponent: React.FC = () => {
 	}
 
 	useEffect(() => {
-		console.log("Loading friend list...");
 		loadFriendList();
 	}, [chatState.refreshFriendsList]);
 
@@ -73,12 +72,10 @@ const FriendsListComponent: React.FC = () => {
 		});
 
 		globalState.userSocket?.on('newConnection', (notif: string) => {
-			console.log("refreshing friendlist status ONLINE");
 			loadFriendList();
 		})
 
 		globalState.userSocket?.on('newDeconnection', (notif: string) => {
-			console.log("refreshing friendlist status OFFLINE");
 			loadFriendList();
 		})
 
@@ -108,7 +105,7 @@ const FriendsListComponent: React.FC = () => {
 			<div className="tab-and-userclicked" key={id}>
 				<div className="bloc-button-friendslist">
 						<img
-							src={`http://localhost:3001/users/getAvatarByLogin/${friend.username}/${timestamp}`}
+							src={`http://localhost:3001/users/getAvatar/${friend.id}/${timestamp}`}
 							className={`profil-friendslist`}
 							alt="User Avatar"
 						/>

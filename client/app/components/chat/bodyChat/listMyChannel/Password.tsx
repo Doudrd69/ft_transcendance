@@ -34,11 +34,8 @@ const PasswordComponent: React.FC = () => {
 			});
 		
 			if (response.ok) {
-				const passwordValidated = await response.json();
-				if (globalState.userSocket?.connected) {
-					globalState.userSocket?.emit('refreshUserChannelList', { userToRefresh: sessionStorage.getItem("currentUserLogin") });
-					globalState.userSocket?.emit('joinRoom', { roomName: chatState.currentConversation, roomID: chatState.currentConversationID });
-				}
+				console.log("isProtectedTrue");
+
 				chatDispatch({ type: 'DISABLE', payload: 'showPassword' });
 			}
 		}

@@ -116,8 +116,9 @@ export class UsersService {
 	}
 
 	async getAvatar(userId: number): Promise<string | null> {
+		console.log("getAvatar");
 		const user = await this.getUserByID(userId);
-
+		console.log("user: ", user.avatarURL);
 		if (!user || !user.avatarURL) {
 			console.log("Avatar not found");
 			return null;
@@ -501,22 +502,23 @@ export class UsersService {
 
 		const user: User = await this.usersRepository.findOne({ where: { username: username } });
 
-		const initiatedfriends = await this.friendshipRepository
-			.createQueryBuilder('friendship')
-			.leftJoinAndSelect('friendship.initiator', 'initiator')
-			.where('initiator.username != :username', { username })
-			.andWhere('friendship.isAccepted = true')
-			.getMany();
+		const initiatedFriends = await this.friendshipRepository
+		.createQueryBuilder('friendship')
+		.innerJoinAndSelect('friendship.friend', 'friend')
+		.where('friendship.initiator = :userId', { userId: user.id })
+		.andWhere('friendship.isAccepted = true')
+		.getMany();
+	  
 
-		const acceptedfriends = await this.friendshipRepository
-			.createQueryBuilder('friendship')
-			.leftJoinAndSelect('friendship.friend', 'friend')
-			.where('friend.username != :username', { username })
-			.andWhere('friendship.isAccepted = true')
-			.getMany();
+		const acceptedFriends = await this.friendshipRepository
+		.createQueryBuilder('friendship')
+		.innerJoinAndSelect('friendship.initiator', 'initiator')
+		.where('friendship.friend = :userId', { userId: user.id })
+		.andWhere('friendship.isAccepted = true')
+		.getMany();
 
 		let array = [];
-		const friendships = [...initiatedfriends, ...acceptedfriends];
+		const friendships = [...initiatedFriends, ...acceptedFriends];
 		friendships.forEach((element: Friendship) => {
 			let blockStatus = false;
 			user.blockedUsers.forEach((blockedFriend: string) => {

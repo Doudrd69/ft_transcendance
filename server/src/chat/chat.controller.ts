@@ -197,15 +197,17 @@ export class ChatController {
 		return this.chatService.getUserListFromDms(userID);
 	}
 
-	@UseGuards(AuthGuard)
-	@Get('getConversationsPublic')
-	getConversationsPublic(): Promise<Conversation[]> {
-		return this.chatService.getAllPublicConversations();
-	}
+	// @UseGuards(AuthGuard)
+	// @Get('getConversationsPublic')
+	// getConversationsPublic(): Promise<Conversation[]> {
+	// 	return this.chatService.getAllPublicConversations();
+	// }
 
 	@UseGuards(AuthGuard)
 	@Get('getConversationsPublic/:userID')
 	getConversationsPublicOption(@Param('userID') userID: number)  {
+		console.log("getConversationsPublic");
+
 		return this.chatService.getAllPublicConversationsOption(userID);
 	}
 
@@ -216,6 +218,13 @@ export class ChatController {
 		return this.chatService.getConversationsWithStatus(userID);
 	}
 
+	@UseGuards(AuthGuard)
+	@Get('getConversationsToAdd/:userID')
+	getConversationsToAdd(@Req() req, @Param('userID') userID: number) {
+		const { user } = req;
+		console.log("getConversationsToAdd");
+		return this.chatService.getConversationsToAdd(userID, user.sub);
+	}
 	@UseGuards(AuthGuard)
 	@Get('getUserList/:conversationID')
 	getUserList(@Param('conversationID') conversation: number) {

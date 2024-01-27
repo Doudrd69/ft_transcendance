@@ -75,4 +75,4 @@ Nest is [MIT licensed](LICENSE).
 
 ##TODO
 
-jimp pour verirfier l'extention
+Public afficher quand on join

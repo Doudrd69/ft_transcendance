@@ -104,7 +104,6 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 	useEffect(() => {
 
 		globalState.userSocket?.on('userJoinedRoom', (notification: Message) => {
-			console.log("Channel log: ", notification);
 			loadUserList();
 			// setMessages((prevMessages: Message[]) => [...prevMessages, notification])
 		});
@@ -127,12 +126,10 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 		});
 
 		globalState.userSocket?.on('refresh_channel', () => {
-			console.log("Refresh channel...");
 			loadUserList();
 		});
 
 		globalState.userSocket?.on('recv_notif', (notif: Message) => {
-			console.log('notifffffffff', notif);
 			setMessages((prevMessages: Message[]) => [...prevMessages, notif]);
 		});
 		
@@ -148,7 +145,6 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 	}, [globalState?.userSocket]);
 	
 	useEffect(() => {
-		console.log("Loading conversation...");
 		getMessages();
 	}, []);
 
@@ -159,7 +155,7 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 	useEffect(() => {
 		scrollToBottom();
 	}, [messages]);
-	// console.log("ownerUser", ownerUser)
+
 	const timestamp = new Date().getTime();
 		return (
 			<>
@@ -172,7 +168,6 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 						className='img-list-users-channel-admin'
 						src={`http://localhost:3001${ownerUser?.avatarURL}`}
 						onClick={() => {
-							{console.log("ownerUser", ownerUser?.avatarURL)}
 						  chatDispatch({ type: 'ACTIVATE', payload: 'dontcandcel' });
 						  chatDispatch({ type: 'ACTIVATE', payload: 'showOptionsUserChannelOwner' });
 						  chatDispatch({ type: 'SET_CURRENT_OPTION_CHANNEL_NAME', payload: ownerUser?.login });

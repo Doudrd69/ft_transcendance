@@ -181,8 +181,6 @@ const GeneralComponent = () => {
 			})
 
 			globalState.userSocket?.on('userJoinedRoom', (notification: string) => {
-				console.log("User socket in main: ", globalState.userSocket?.id);
-				console.log("Notif from server: ", notification);
 			});
 
 			globalState.userSocket?.on('userIsBan', ( data: { roomName: string, roomID: string } ) => {
@@ -228,13 +226,11 @@ const GeneralComponent = () => {
 		
 			// Works on both connection and reconnection
 			globalState.userSocket?.on('connect', () => {
-				console.log("UserSocket new connection : ", globalState.userSocket?.id);
 				const personnalRoom = sessionStorage.getItem("currentUserLogin");
 				globalState.userSocket?.emit('joinPersonnalRoom', personnalRoom, sessionStorage.getItem("currentUserID"));
 			})
 			
 			globalState.userSocket?.on('disconnect', () => {
-				console.log('UserSocket disconnected from the server : ', globalState.userSocket?.id);
 			})
 
 			globalState.userSocket?.on('newConnection', (notif: string) => {
@@ -258,8 +254,7 @@ const GeneralComponent = () => {
 	useEffect(() => {
 
 		globalState.gameSocket?.on('connect', () => {
-			console.log('GameSocket new connection : ', globalState.gameSocket?.id);
-			console.log(`userLogin: ${sessionStorage.getItem("currentUserLogin")}`)
+
 			globalState.gameSocket?.emit('linkSocketWithUser', {playerLogin: sessionStorage.getItem("currentUserLogin")});
 		})
 		

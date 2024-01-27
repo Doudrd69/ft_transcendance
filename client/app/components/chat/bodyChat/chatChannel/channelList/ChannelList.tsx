@@ -57,9 +57,7 @@ const ChannelListComponent: React.FC = () => {
 				if (isAdmin)
 					setIsAdmin([...isAdmin]);
 				if (usersList ) {
-					console.log('userlist =====>', usersList);
 					setUserList([...usersList]);
-					console.log(usersList);
 				}	
 			}
 		}
@@ -88,8 +86,14 @@ const ChannelListComponent: React.FC = () => {
 		});
 
 		globalState.userSocket?.on('refreshChannelList', () => {
-			console.log("REFRESHING USERLIST");
 			loadDiscussions();
+		});
+
+		globalState.userSocket?.on('refreshChannelListBis', () => {
+			loadDiscussions();
+		});
+		globalState.userSocket?.on('refreshAdmin', () => {
+			chatDispatch({type: 'TOGGLEX', payload: 'isAdmin' });
 		});
 
 		return () => {
@@ -97,6 +101,8 @@ const ChannelListComponent: React.FC = () => {
 			globalState.userSocket?.off('refreshChannelList');
 			globalState.userSocket?.off('refreshChannel');
 			globalState.userSocket?.off('channelDeleted');
+			globalState.userSocket?.off('refreshAdmin');
+			globalState.userSocket?.off('refreshChannelListBis');
 		}
 
 	}, [globalState?.userSocket]);
