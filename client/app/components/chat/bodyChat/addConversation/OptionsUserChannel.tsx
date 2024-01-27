@@ -37,11 +37,8 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 	const [ban, setBan] = useState<boolean>(user.isBan);
 	const [block, setBlock] = useState<boolean>(false);
 	
-	console.log("user", user);
-	console.log("me", me);
 	let isBlocked = false;
 	if (me && me.blockList) {
-		console.log("blockLIST", me.blockList);
 		isBlocked = !!me.blockList.find((userblock) => userblock === user.login);
 	}
 	
@@ -63,7 +60,6 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 		});
 
 		if (response.ok) {
-			console.log('ahaahahahahahahahahah')
 			isBlocked = true;
 			if (globalState.userSocket && chatState.currentConversation && chatState.currentConversationID) {
 				globalState.userSocket?.emit('joinRoom', { roomName: `whoblocked${user.login}`, roomID: '' } );
@@ -71,8 +67,6 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 					channel: chatState.currentConversation + chatState.currentConversationID,
 				});
 			}
-
-			console.log("block");
 		}
 		else {
 			console.error("Fatal error");
@@ -96,9 +90,7 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 		});
 
 		if (response.ok) {
-			console.log('babababababababababababab')
 			isBlocked = false;
-			console.log("unblock");
 			if (globalState.userSocket && chatState.currentConversation && chatState.currentConversationID) {
 				globalState.userSocket?.emit('leaveRoom', { roomName: `whoblocked${user.login}`, roomID: '' } );
 				globalState.userSocket?.emit('refreshChannel', {
@@ -274,6 +266,11 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 						channelID: chatState.currentConversationID,
 					});
 	
+					globalState.userSocket?.emit('refreshUser', {
+						userToRefresh: user.login,
+						target: 'refreshAdmin',
+						status: true,
+					});
 					// refresh channel list for userToRefresh (who has been promoted)
 					globalState.userSocket?.emit('refreshUserChannelList', {
 						userToRefresh: user.login,
@@ -313,7 +310,12 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 					globalState.userSocket?.emit('refreshChannel', {
 						channel: chatState.currentConversation + chatState.currentConversationID,
 					});
-	
+					
+					globalState.userSocket?.emit('refreshUser', {
+						userToRefresh: user.login,
+						target: 'refreshAdmin',
+						status: true,
+					});
 					// refresh channel list for userToRefresh (who has been promoted)
 					globalState.userSocket?.emit('refreshUserChannelList', {
 						userToRefresh: user.login,
@@ -374,7 +376,6 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 	
 	const handleKickChannel = async() => {
 		try {
-			console.log("userrrrrrrr", user);
 			const KickConversationDto = {
 					conversationID: Number(chatState.currentConversationID),
 					userToKickID: user.id,
@@ -420,9 +421,6 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 				user1: Number(user.id),
 				user2: Number(sessionStorage.getItem("currentUserID")),
 			}
-
-			console.log(createDMConversationDto);
-
 			const response = await fetch(`http://localhost:3001/chat/newDMConversation`, {
 				method: 'POST',
 				headers: {
@@ -453,9 +451,6 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 					target: 'refreshDmList',
 					status: true
 				});
-				
-				
-				console.log("Conversation created");
 			}
 		}
 		catch (error) {
@@ -488,7 +483,6 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 			document.removeEventListener('keydown', handleEscape);
 		};
 	}, []);
-	console.log("user =====>", user);
 	return (
 		<>
 		<div className="blur-background"></div>

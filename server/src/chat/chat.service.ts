@@ -911,7 +911,6 @@ export class ChatService {
 		if (await this.getGroupIsBanStatus(userToAdd, conversationToAdd)) {
 			throw new Error("User is banned from this discussion");
 		}
-		
 		if (conversationToAdd && userToAdd) {
 			
 			const group = new GroupMember();
@@ -1114,6 +1113,7 @@ export class ChatService {
 
 	async getAllPublicConversations(): Promise<Conversation[]> {
 
+		console.log("Getting all public conversations");
 		const publicConversations = await this.conversationRepository.find({
 			where: {isPublic: true},
 		});
@@ -1232,7 +1232,6 @@ export class ChatService {
 			const conversationList = await this.getAllChannels(userID);
 			const usersList = await this.getUserListFromConversations(user, conversationList);
 			if (conversationList && usersList) {
-
 				const conversationArray = {
 					conversationList: conversationList,
 					isAdmin: isAdminArray,
@@ -1248,22 +1247,63 @@ export class ChatService {
 		return [];
 	}
 
-	async getAllPublicConversationsOption(userID : number) {
+	async getConversationsToAdd(friendID: number, userID: number) {
 
 		const user = await this.usersRepository.findOne({
 			where: { id: userID },
 			relations: ["groups", "groups.conversation"],
 		});
 
-		let conversations : Conversation[] = await this.conversationRepository.find();
-		// faire des test avec la liste quand le user a qu'un channel et qu'il est ban
-		user.groups.forEach((group: GroupMember) => {
-				conversations = conversations.filter((conversation: Conversation) => 
-					conversation.id != group.conversation.id 
-					&& conversation.isPublic == true 
-					&& conversation.is_channel == true);
+		const friend = await this.usersRepository.findOne({
+			where: { id: friendID },
+			relations: ["groups", "groups.conversation"],
 		});
 
-		return conversations;
+		let conversations : Conversation[] = await this.conversationRepository.find({
+			where: {is_channel: true},
+		});
+
+		let friendChannels = [];
+		friend.groups.forEach((group: GroupMember) => {
+			conversations.forEach((conversation: Conversation) => {
+				if (group.conversation.id == conversation.id && conversation.is_channel)
+				friendChannels.push(conversation);
+			});
+		});
+	
+		let arrayDelete = [];
+		user.groups.forEach((group: GroupMember) => {
+			conversations.forEach((conversation: Conversation) => {
+				if (group.isAdmin && group.conversation.id == conversation.id && conversation.is_channel)
+					arrayDelete.push(conversation);
+			});
+		});
+	
+		const array1 = conversations.filter((conversation: Conversation) => arrayDelete.includes(conversation));
+		const array2 = array1.filter((conversation: Conversation) => !friendChannels.includes(conversation));
+		return array2;
+	}
+
+	async getAllPublicConversationsOption(userID : number) {
+
+		const user = await this.usersRepository.findOne({
+			where: { id: userID },
+			relations: ["groups", "groups.conversation"],
+		});
+		console.log("user: ", user.login);
+
+		let conversations : Conversation[] = await this.conversationRepository.find({
+			where: {isPublic: true, is_channel: true},
+		});
+		
+		let arrayDelete = [];
+		user.groups.forEach((group: GroupMember) => {
+			conversations.forEach((conversation: Conversation) => {
+				if (group.conversation.id == conversation.id && conversation.is_channel && conversation.isPublic)
+					arrayDelete.push(conversation);
+			});
+		});
+		const array = conversations.filter((conversation: Conversation) => !arrayDelete.includes(conversation));
+		return array;
 	}
 }
