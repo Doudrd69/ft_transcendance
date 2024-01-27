@@ -80,7 +80,7 @@ const ChatListComponent: React.FC = () => {
 			{dm.map((dm: Conversation, id: number) => (
 				<div key={dm.id} className="bloc-button-discussion-list">
 				<img
-						src={`http://localhost:3001/users/getAvatarByLogin/${dm.username}/${timestamp}`}
+						src={`http://localhost:3001/users/getAvatar/${dm.id}/${timestamp}`}
 					className={`profil-discussion-list`}
 					alt="User Avatar"
 					/>

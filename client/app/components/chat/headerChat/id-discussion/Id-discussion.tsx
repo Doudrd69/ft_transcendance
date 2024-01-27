@@ -4,8 +4,7 @@ import { useChat } from '../../ChatContext';
 import OptionsChannel from '../../bodyChat/addConversation/OptionsChannel';
 import { Socket } from 'socket.io-client';
 import PasswordChangeComponent from './PasswordChange';
-
-
+import { useGlobal } from '@/app/GlobalContext';
 
 interface User {
 	id: number;
@@ -18,9 +17,23 @@ interface User {
 }
 
 const IdDiscussionComponent: React.FC = () => {
+
 	const { chatState, chatDispatch } = useChat();
+	const { globalState } = useGlobal();
 	const [me, setMe] = useState<User>();
 	var id;
+
+	useEffect(() => {
+		console.log("coucou");
+		globalState.userSocket?.on('refreshAdmin', () => {
+			chatDispatch({type: 'TOGGLEX', payload: 'isAdmin' });
+		});
+		return () => {
+			globalState.userSocket?.off('refreshAdmin');
+		};
+		
+	}, [globalState?.userSocket]);
+
 	if (chatState.currentChannelBool)
 	{
 		console.log("coucou");

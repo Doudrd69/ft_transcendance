@@ -44,7 +44,7 @@ const ProfilsSettingsComponent: React.FC = () => {
 				else {
 					sessionStorage.setItem("currentUserLogin", newUsername);
 					// Probleme: quand je recharge mes channels, le user ebrodeur (login) est return
-					// globalState.userSocket?.emit('joinRoom',  { roomName: sessionStorage.getItem("currentUserLogin"), roomID: '' });
+					globalState.userSocket?.emit('joinRoom',  { roomName: sessionStorage.getItem("currentUserLogin"), roomID: '' });
 					globalState.userSocket?.emit('refreshUserChannelList', { userToRefresh: newUsername });
 					toast.success('Username has been updated');
 				}

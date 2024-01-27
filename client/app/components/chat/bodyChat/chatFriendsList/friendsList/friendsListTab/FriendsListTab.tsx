@@ -148,7 +148,7 @@ const FriendsListTabComponent:  React.FC<FriendsListTabComponentProps> = ({user}
 				<ConfirmationComponent phrase={confirmationText} functionToExecute={funtionToExecute}/>
 			)}
 			{chatState.showListChannelAdd && (
-				<ListMyChannelComponent user={user.username}  title={`INVITE ${user.username} TO MY CHANNEL`}/>
+				<ListMyChannelComponent user={user.username} friendID={user.id} isAdd={false} title={`INVITE ${user.username} TO MY CHANNEL`}/>
 			)}
 		</>
 	);

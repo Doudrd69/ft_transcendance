@@ -6,6 +6,7 @@ import { useGlobal } from '@/app/GlobalContext';
 
 interface ListMyChannelComponentProps {
 	user: string;
+	friendID?: number;
 	isAdd?: boolean;
 	title?: string;
 }
@@ -17,7 +18,7 @@ interface Conversation {
 	isProtected: boolean;
 }
 
-const ListMyChannelComponent: React.FC<ListMyChannelComponentProps> = ({ user, isAdd, title }) => {
+const ListMyChannelComponent: React.FC<ListMyChannelComponentProps> = ({ user, friendID, isAdd, title }) => {
 
 	const { chatState, chatDispatch } = useChat();
 	const { globalState } = useGlobal();
@@ -28,6 +29,7 @@ const ListMyChannelComponent: React.FC<ListMyChannelComponentProps> = ({ user, i
 	const [showPassword, setShowPassword] = useState<boolean>(false);
 	const [password, setPassword] = useState('');
 
+	console.log('isAdd',isAdd);
 	const handlePasswordSubmit = (password: string) => {
 		setPassword(password);
 	};
@@ -40,9 +42,10 @@ const ListMyChannelComponent: React.FC<ListMyChannelComponentProps> = ({ user, i
 	};
 
 	const loadDiscussions = async () => {
-
 		try {
-			const response = await fetch(`http://localhost:3001/chat/getConversationsWithStatus/${userID}`, {
+			console.log('loadDiscussions');
+			console.log('userID', user);
+			const response = await fetch(`http://localhost:3001/chat/getConversationsToAdd/${friendID}`, {
 				method: 'GET',
 				headers: {
 					'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
@@ -50,18 +53,18 @@ const ListMyChannelComponent: React.FC<ListMyChannelComponentProps> = ({ user, i
 			});
 			if (response.ok) {
 				const responseData = await response.json();
-				const { conversationList, isAdmin } = responseData;
-				if (conversationList)
-					setConversations((prevConversations: Conversation[]) => [...prevConversations, ...conversationList]);
+				if (responseData)
+					setConversations((prevConversations: Conversation[]) => [...prevConversations, ...responseData]);
+
 			}
 		}
 		catch (error) {
 			console.error(error);
 		}
 	};
-
 	const loadDiscussionsPublic = async () => {
 		try {
+			console.log('loadDiscussionsPublic');
 			const response = await fetch(`http://localhost:3001/chat/getConversationsPublic/${userID}`, {
 				method: 'GET',
 				headers: {
@@ -70,6 +73,7 @@ const ListMyChannelComponent: React.FC<ListMyChannelComponentProps> = ({ user, i
 			});
 			if (response.ok) {
 				const conversationPublic = await response.json();
+				console.log('conversationPublic', conversationPublic);
 				if (conversationPublic)
 					setConversations((prevConversations: Conversation[]) => [...prevConversations, ...conversationPublic]);
 			}
@@ -80,8 +84,8 @@ const ListMyChannelComponent: React.FC<ListMyChannelComponentProps> = ({ user, i
 	};
 
 	const addUserToConversation = async (convID: number, friend: string) => {
-
 		try {
+			console.log("uueueuwerweurweiruwoeiruweoiruweoriuweoriuweroiweurw")
 
 			const addUserToConversationDto = {
 				userToAdd: friend,
@@ -97,17 +101,16 @@ const ListMyChannelComponent: React.FC<ListMyChannelComponentProps> = ({ user, i
 			});
 
 			if (response.ok) {
+				console.log("uueueuwerweurweiruwoeiruweoiruweoriuweoriuweroiweurw")
 				const conversation = await response.json();
 
 				if (globalState.userSocket?.connected) {
-
 					// on utilise la meme pour inviter et rejoindre --> probleme
 					globalState.userSocket?.emit('addUserToRoom', {
 						convID: conversation.id,
 						convName: conversation.name,
 						friend: user,
 					});
-
 					// refresh channel list
 					globalState.userSocket?.emit('refreshUserChannelList', {
 						userToRefresh: friend, 
@@ -120,6 +123,7 @@ const ListMyChannelComponent: React.FC<ListMyChannelComponentProps> = ({ user, i
 
 					chatDispatch({ type: 'TOGGLEX', payload: 'showAddCreateChannel' });
 					chatDispatch({ type: 'TOGGLEX', payload: 'showAddChannel' });
+					chatDispatch({ type: 'DISABLE', payload: 'showListChannelAdd' });
 				}
 			}
 		}
