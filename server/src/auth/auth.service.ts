@@ -184,6 +184,16 @@ export class AuthService {
 		}
 	}
 
+	async get2fa(userID: number) {
+		const user = await this.usersService.getUserByID(userID);
+		console.log("get2fa", user.TFA_isEnabled);
+		if (user) {
+			return user.TFA_isEnabled;
+		}
+
+		throw new Error("User does not exist");
+	}
+
 	async verifyCode(authenticatorCodeDto: AuthenticatorCodeDto) {
 
 		// We find the user whose need a check to retrieve its temporary secret

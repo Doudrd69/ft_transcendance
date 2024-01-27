@@ -1,18 +1,18 @@
-import React, { useState } from 'react';
-
-interface TFAComponentProps {
-	on2FADone: () => void; // Define the on2FADone prop as a function
-  }
-
-const TFAComponent: React.FC<TFAComponentProps>  = ({ on2FADone　}) => {
+import React, { use, useEffect, useState } from 'react';
+import { useGlobal } from '../../GlobalContext';
 
 
+
+const TFAComponent: React.FC  = () => {
+
+	const { globalState, dispatch } = useGlobal();
 	const [authenticatorCodeInput, setAuthenticatorCodeInput] = useState('');
 
 	const handleAuthenticatorCodeInput = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setAuthenticatorCodeInput(e.target.value);
 	};
 
+	
 	const checkAuthenticatorCode = async (e: React.FormEvent) => {
 		try {
 			e.preventDefault();
@@ -31,7 +31,7 @@ const TFAComponent: React.FC<TFAComponentProps>  = ({ on2FADone　}) => {
 			});
 	
 			if (response.ok) {
-				on2FADone();
+				dispatch({ type: 'ACTIVATE', payload: 'isConnected' });
 			}
 		}
 		catch (error) {
