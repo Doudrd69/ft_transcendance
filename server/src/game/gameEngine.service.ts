@@ -37,7 +37,7 @@ export class GameEngineService {
 			players: [game.playerOneID, game.playerTwoID],
 			playersLogin: [game.playerOneLogin, game.playerTwoLogin],
 			super_game_mode: false,
-			victory_condition: 5,
+			victory_condition: 1,
 			paddles: [
 				{ number: 1, speed: 1 / 80, ArrowUp: false, ArrowDown: false, end: { x: 0.025, y: 0.585 }, start: { x: 0.025, y: 0.415 }, is_a_paddle: true, length: 0.17 },
 				{ number: 2, speed: 1 / 80, ArrowUp: false, ArrowDown: false, end: { x: 1 - 0.025, y: 0.585 }, start: { x: 1 - 0.025, y: 0.415 }, is_a_paddle: true, length: 0.17 },
@@ -98,13 +98,12 @@ export class GameEngineService {
 	}
 
 	resetGamePause(gameInstance: game_instance, server: any) {
-		console.log(gameInstance.ball.speed.x);
 		gameInstance.ball.player1Scored = false;
 		gameInstance.ball.player2Scored = false;
 		gameInstance.pause = true;
 		if (gameInstance.player1_score === gameInstance.victory_condition || gameInstance.player2_score === gameInstance.victory_condition) {
+			console.log("QUIT")
 			gameInstance.game_has_ended = true;
-			server.to([gameInstance.players[0], gameInstance.players[1]]).emit('GameEnd')
 			return;
 		}
 		let signe = (Math.random() - 0.5) > 0 ? 1 : -1;

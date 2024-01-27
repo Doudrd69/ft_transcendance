@@ -12,6 +12,7 @@ import { GatewayGuard } from 'src/gateway/Gatewayguard.guard';
 import { UseGuards } from '@nestjs/common'
 import { ExecutionContext } from '@nestjs/common';
 import { User } from 'src/users/entities/users.entity';
+import { on } from 'events';
 
 export interface vector_instance {
     x: number;
@@ -74,7 +75,6 @@ export class GameGateway {
     game: Game;
     paddle: Paddle;
     game_instance: game_instance[];
-    userLogin: string;
 
     constructor(
         private readonly GameService: GameService,
@@ -94,47 +94,60 @@ export class GameGateway {
     }
 
     async handleDisconnect(@ConnectedSocket() client: Socket) {
-        this.userLogin = this.GameService.getUserLoginWithSocketId(client.id);
-        if (this.userLogin) {
-            const user: User = await this.GameService.getUserWithUserLogin(this.userLogin);
-            if (this.GameService.userInGameOrInMacthmaking(user)) {
-                if (user.inMatchmaking === true) {
-                    await this.MatchmakingService.leaveNormalQueue(client.id);
-                    await this.GameService.deconnectUserMatchmaking(user, this.userLogin);
-                }
-                else {
-                    this.game = await this.GameService.getGameWithUserLogin(this.userLogin);
-                    const gameInstance: game_instance = this.GameService.getGameInstance(this.game_instance, this.game.gameId);
-                    console.log(`gameInstance de ses morts: ${gameInstance.gameID}`);
-                    if (gameInstance.game_has_ended !== true) {
-                        console.log(`Disco Game Stop`);
-                        gameInstance.stop = true;
-                        const otherUser: User = await this.GameService.getOtherUser(this.game, user);
-                        console.log(`otherUsersocket : ${otherUser.gameSocketId}`)
-                        if (user.login === gameInstance.playersLogin[0])
-                        this.server.to(gameInstance.players[1]).emit('GameStop');
-                    else {
-                        this.server.to(gameInstance.players[0]).emit('GameStop');
-                    }
-                    console.log(`otherUsersocket : ${otherUser.gameSocketId}`)
-                        await this.GameService.updateStateGameForUsers(user, otherUser);
-                        this.GameService.deleteGameSocketsIdForPlayers(user, otherUser);
-                        setTimeout(async () => {
-                            await this.GameService.deleteGame(this.game);
-                        }, 1000); // peut etre faire un boolean avec un boucle qui deletelagame quand lautre user est suppr?
+        try {
+            // this.game_instance.deconnections.push(current_deconnection)
+            const userLogin = this.GameService.getUserLoginWithSocketId(client.id);
+            console.log(`[${client.id}] userLogin de ses morts 1: ${userLogin}`);
+            if (userLogin) {
+                const user: User = await this.GameService.getUserWithUserLogin(userLogin);
+                if (this.GameService.userInGameOrInMacthmaking(user)) {
+                    if (user.inMatchmaking === true) {
+                        await this.MatchmakingService.leaveNormalQueue(client.id);
+                        await this.GameService.deconnectUserMatchmaking(user, userLogin);
                     }
                     else {
-                        console.log(`Disco Game Ended`);
-                        this.GameService.deleteGameSocketsIdForPlayer(user);
-                        await this.GameService.updateStateGameForUser(user);
+                        console.log(`[${client.id}] userLogin de ses morts 2: ${userLogin}`);
+                        this.game = await this.GameService.getGameWithUserLogin(userLogin);
+                        const gameInstance: game_instance = this.GameService.getGameInstance(this.game_instance, this.game.gameId);
+                        console.log(`[${client.id}] gameInstance de ses morts: ${gameInstance.gameID}`);
+                        if (gameInstance.game_has_ended !== true) {
+                            console.log(`[${client.id}] Game has ended false`);
+                            gameInstance.stop = true;
+                            const otherUser: User = await this.GameService.getOtherUser(this.game, user);
+                            console.log(`[${client.id}] otherUsersocket : ${otherUser.gameSocketId}`)
+                            if (user.login === gameInstance.playersLogin[0]) {
+                                this.server.to(gameInstance.players[1]).emit('GameStop');
+                            }
+                            else {
+                                this.server.to(gameInstance.players[0]).emit('GameStop');
+                            }
+                            console.log(`[${client.id}] otherUsersocket : ${otherUser.gameSocketId}`)
+                            await this.GameService.updateStateGameForUsers(user, otherUser);
+                            this.GameService.deleteGameSocketsIdForPlayers(user, otherUser);
+                            setTimeout(async () => {
+                                await this.GameService.deleteGame(this.game);
+                            }, 1000); // peut etre faire un boolean avec un boucle qui deletelagame quand lautre user est suppr?
+                        }
+                        else {
+                            console.log(`[${client.id}] Game has ended true`);
+                            this.GameService.deleteGameSocketsIdForPlayer(user);
+                            await this.GameService.updateStateGameForUser(user);
+                        }
                     }
                 }
             }
+            delete this.connectedUsers[client.id];
+            console.log(`[${client.id}] GameGtw client disconnected : ${client.id}`);
         }
-        console.log(`GameGtw client disconnected : ${client.id}`);
-        delete this.connectedUsers[client.id];
+        catch (err) {
+            console.log(client.id)
+            throw (err)
+        }
+
     }
 
+
+    
     @SubscribeMessage('checkGameInvite')
     handleCheckgameInvite(@ConnectedSocket() client: Socket, @MessageBody() data: {playerOneLogin: string, playerTwoLogin: string}) {
         // du coup en amont il faut creer des sockets pour les deux users. si pas bon supprimer les deux sockets
@@ -238,18 +251,22 @@ export class GameGateway {
     }
 
     async executeGameTick(gameLoop: NodeJS.Timeout, gameInstance: game_instance, client: string) {
+        // if decconeciron {
+        //     if this.game.
+        // }
+        //refaire la deconnection ici
         if (gameInstance.stop === true) {
             clearInterval(gameLoop);
             // enlever la gameInstance 
         }
         if (gameInstance.game_has_ended === true) {
+			this.server.to([gameInstance.players[0], gameInstance.players[1]]).emit('GameEnd')
             clearInterval(gameLoop);
             if (this.game.gameEnd !== true && client == gameInstance.players[0]) {
                 await this.GameService.endOfGame(this.game, gameInstance);
                 // enlever la gameInstance
                 console.log("Game Save");
             }
-
         }
         this.GameEngineceService.processInput(gameInstance);
         this.GameEngineceService.updateGameInstance(gameInstance, this.server);

@@ -206,7 +206,7 @@ const PongComponent = () => {
                 payload: 'showGameMenu',
             });
             state.showGameMenu = true;
-            // globalState.gameSocket?.disconnect();
+            globalState.gameSocket?.disconnect();
         });
 
         globalState.gameSocket?.on('GameStop', () => {

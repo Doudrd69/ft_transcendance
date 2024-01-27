@@ -153,8 +153,8 @@ export class GameService {
 		console.log("After U1: ", UserOne.victory, UserOne.defeat);
 		console.log("After U2: ", UserTwo.victory, UserTwo.defeat);
 
-		game.playerOneID = String(UserOne.id);
-		game.playerTwoID = String(UserTwo.id);
+		// game.playerOneID = String(UserOne.id);
+		// game.playerTwoID = String(UserTwo.id);
 		game.gameEnd = true;
 		game.scoreOne = gameInstance.player1_score;
 		game.scoreTwo = gameInstance.player2_score;
@@ -182,7 +182,7 @@ export class GameService {
 			console.log(`null`)
 			return false;
 		}
-		console.log(`pipi`);
+		console.log(`user ${userLogin} has already game socket`);
 		return true;
 	}
 
@@ -204,6 +204,7 @@ export class GameService {
 	}
 
 	async getGameWithUserLogin(userLogin: string): Promise<Game> {
+        console.log(`[${this.userGameSockets[userLogin]}] userLogin de ses morts gameWithUserLogin: ${userLogin}`);
 		const gameOne = await this.gameRepository.findOne({ where: { playerOneID: this.userGameSockets[userLogin] } })
 		if (gameOne) {
 			return gameOne;
