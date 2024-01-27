@@ -55,6 +55,11 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 			});
 
 			if (response.ok) {
+				console.log("isPublicTrue");
+				globalState.userSocket?.emit('refreshChannelList', {
+					roomName : chatState.currentConversation,
+					roomID: chatState.currentConversationID,
+				});
 				chatDispatch({ type: 'ACTIVATE', payload: 'currentConversationIsPrivate' });
 			}
 		}
@@ -80,6 +85,11 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 			});
 
 			if (response.ok) {
+				console.log("isPublicFalse");
+				globalState.userSocket?.emit('refreshChannelList', {
+					roomName : chatState.currentConversation,
+					roomID: chatState.currentConversationID,
+				});
 				chatDispatch({ type: 'DISABLE', payload: 'currentConversationIsPrivate' });
 			}
 		}
@@ -143,14 +153,11 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 			});
 	
 			if (response.ok) {
-				const status = await response.json();
-				if (status) {
+					globalState.userSocket?.emit('refreshChannelList', {
+						roomName : chatState.currentConversation,
+						roomID: chatState.currentConversationID,
+					});
 					chatDispatch({ type: 'DISABLE', payload: 'currentConversationIsProtected' });
-				}
-				else {
-					console.log("User is not admin on this channel");
-				}
-
 			}
 		}
 		catch (error) {

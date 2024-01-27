@@ -25,8 +25,6 @@ const TimerComponent: React.FC<TimerComponentProps> = ({user}) => {
 	const [timer, setTimer] = useState('');
 	const { chatState, chatDispatch } = useChat();
 	const { globalState } = useGlobal();
-	console.log("state.currentTarget", chatState.currentTarget);
-	console.log("hihihihihihihihhihihihihi");
 	const handleChange = async(e: React.ChangeEvent<HTMLInputElement>) => {
 			setTimer(e.target.value);
 	}
@@ -35,8 +33,6 @@ const TimerComponent: React.FC<TimerComponentProps> = ({user}) => {
 
 		e.preventDefault();
 		try{
-			console.log(timer);
-			console.log("user.login ======>", user.login);
 			const muteUserDto = {
 				conversationID: Number(chatState.currentConversationID),
 				username: chatState.currentTarget.login,

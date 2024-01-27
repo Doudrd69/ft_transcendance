@@ -265,6 +265,13 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		this.server.to(userToRefresh).emit('refreshChannelList');
 	}
 
+	@SubscribeMessage('refreshChannelList')
+	@UseGuards(GatewayGuard)
+	handleRefreshChannel(@MessageBody() data: {roomName: string, roomID: string  } ) {
+		console.log("refreshing channel list");
+		const { roomName, roomID} = data;
+		this.server.to(roomName + roomID).emit('refreshChannelListBis');
+	}
 	@SubscribeMessage('refreshUser')
 	@UseGuards(GatewayGuard)
 	handleUserRefresh(@MessageBody() data: { userToRefresh: string, target: string, status: boolean } ) {

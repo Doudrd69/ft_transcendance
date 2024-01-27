@@ -2,11 +2,13 @@ import './PasswordChange.css';
 import React, { useState, useEffect } from 'react';
 import { Socket } from 'socket.io-client';
 import { useChat } from '../../ChatContext';
+import { useGlobal } from '@/app/GlobalContext';
 
 const PasswordChangeComponent: React.FC = () => {
 
 	const [password, setPassword] = useState('');
 	const { chatState, chatDispatch } = useChat();
+	const { globalState } = useGlobal();
 
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const newPassword = e.target.value;
@@ -34,6 +36,11 @@ const PasswordChangeComponent: React.FC = () => {
 			});
 	
 			if (response.ok) {
+				console.log("isProtectedTrue");
+				globalState.userSocket?.emit('refreshChannelList', {
+					roomName : chatState.currentConversation,
+					roomID: chatState.currentConversationID,
+				});
 				chatDispatch({ type: 'ACTIVATE', payload: 'currentConversationIsProtected' });
 				chatDispatch({ type: 'ACTIVATE', payload: 'showOptionUseChannel' });
 				chatDispatch({ type: 'ACTIVATE', payload: 'showBackComponent' });
