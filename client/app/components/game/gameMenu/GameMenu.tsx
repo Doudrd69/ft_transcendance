@@ -87,29 +87,6 @@ const Menu = () => {
         
     };
 
-    const handleSpeedClick = () => {
-
-        try {
-
-            const gameSocket = io('http://localhost:3001/game', {
-                autoConnect: false,
-                auth: {
-                    token: sessionStorage.getItem("jwt"),
-                }
-            });
-            gameSocket.connect();
-
-            dispatch({ type: 'SET_GAME_SOCKET', payload: gameSocket });
-            dispatchGame({ type: 'TOGGLE', payload: 'showGameMatchmaking' });
-    
-            // console.log("After Dispatch: ", globalState?.gameSocket);
-
-        } catch (error) {
-            console.error(error);
-        }
-        
-    };
-
     return (
         <div className="background-game">
             <div className="background-game">

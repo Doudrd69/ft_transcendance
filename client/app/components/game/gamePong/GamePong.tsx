@@ -209,12 +209,7 @@ const PongComponent = () => {
             // globalState.gameSocket?.disconnect();
         });
 
-<<<<<<< HEAD
         globalState.gameSocket?.on('userDisconnected', () => {
-=======
-        globalState.gameSocket?.on('GameStop', () => {
->>>>>>> 7d37a825 (start 2e mod, delete timeout in front, start back for gameInvite, add security socket)
-            console.log(`where i am bro?`);
             dispatchGame({
                 type: 'TOGGLE',
                 payload: 'showGameMenu',
@@ -249,11 +244,7 @@ const PongComponent = () => {
             globalState.gameSocket?.off('GameBallUpdate');
             globalState.gameSocket?.off('GamePaddleUpdate');
             globalState.gameSocket?.off('Game_Start');
-<<<<<<< HEAD
             globalState.gameSocket?.off('userDisconnected');
-=======
-            globalState.gameSocket?.off('GameStop');
->>>>>>> 7d37a825 (start 2e mod, delete timeout in front, start back for gameInvite, add security socket)
             globalState.gameSocket?.off('GameEnd');
             clearInterval(countdownInterval);
             window.removeEventListener('keydown', handleKeyDown);

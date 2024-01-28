@@ -120,6 +120,7 @@ export class GameGateway {
     }
 
 
+<<<<<<< HEAD
 
     @SubscribeMessage('inviteAccepted')
     async handleCheckgameInvite(@ConnectedSocket() client: Socket, @MessageBody() data: { playerOneLogin: string, playerTwoLogin: string, playerTwoId: string }) {
@@ -175,11 +176,52 @@ export class GameGateway {
         // add sockets et set debut de game (room etc)
         //emit pour joinGameInvite
     }    
+=======
+>>>>>>> ea306c91 (add back gameInvite, add mode speed, list of deconnections, clean fonctions and handledisconnect, add securiy etc)
 
-    @SubscribeMessage('joinGameInvite')
-    handleJoinGameInvite(@ConnectedSocket() client: Socket, @MessageBody() data: {playerOneLogin: string, playerTwoLogin:string}) {
-        // creer la game
-        // emit joingame et gameStart pour playerJoined et apres tout ok !
+    @SubscribeMessage('inviteAccepted')
+    async handleCheckgameInvite(@ConnectedSocket() client: Socket, @MessageBody() data: { playerOneLogin: string, playerTwoLogin: string, playerTwoId: string }) {
+        //     // du coup en amont il faut creer des sockets pour les deux users. si pas bon supprimer les deux sockets
+        if (!this.GameService.userHasAlreadyGameSockets(data.playerOneLogin)) {
+            if (!this.GameService.userHasAlreadyGameSockets(data.playerTwoLogin)) {
+                this.GameService.addGameInviteSocket(client.id, data.playerOneLogin, data.playerTwoId, data.playerTwoLogin);
+                await this.GameService.linkSocketIDWithUser(client.id, data.playerOneLogin);
+                await this.GameService.linkSocketIDWithUser(data.playerTwoId, data.playerTwoLogin);
+                //             // creating a personnal room so we can emit to the user
+                client.join(data.playerOneLogin);
+                client.join(data.playerTwoLogin);
+                this.game = await this.GameService.createGame(client.id, data.playerTwoId, "NORMAL");
+                const gameInstance: game_instance = this.GameEngineceService.createGameInstance(this.game);
+                this.game_instance.push(gameInstance);
+                this.server.to([client.id, data.playerTwoId]).emit('setgame');
+                this.server.to([client.id, data.playerTwoId]).emit('joinGame', {
+                    gameId: this.game.gameId,
+                    playerOneID: this.game.playerOneID,
+                    playerTwoID: this.game.playerTwoID,
+                    playerOneLogin: this.game.playerOneLogin,
+                    playerTwoLogin: this.game.playerTwoLogin,
+                    scoreOne: this.game.scoreOne,
+                    scoreTwo: this.game.scoreTwo,
+                });
+                setTimeout(() => {
+                    this.server.to([client.id, data.playerTwoId]).emit('gameStart', {
+                        gameId: this.game.gameId,
+                        playerOneID: this.game.playerOneID,
+                        playerTwoID: this.game.playerTwoID,
+                        playerOneLogin: this.game.playerOneLogin,
+                        playerTwoLogin: this.game.playerTwoLogin,
+                        scoreOne: this.game.scoreOne,
+                        scoreTwo: this.game.scoreTwo,
+                    });
+                }, 1000);
+            }
+            else {
+                this.server.to([client.id, data.playerTwoId]).emit('gameInProgress');
+            }
+        }
+        else {
+            this.server.to([client.id, data.playerTwoId]).emit('gameInProgress');
+        }
     }
 
     @SubscribeMessage('linkSocketWithUser')
