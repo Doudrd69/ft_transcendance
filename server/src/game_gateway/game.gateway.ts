@@ -356,6 +356,4 @@ export class GameGateway {
  * casser le jeu pour debug
  * essayer d'ameliorer les collisions (avec gael)
  * 
- * DEBUG :
- * probleme quand 2eUser essaie de spam startgame en meme temps que endgame a 1seconde pres
  */
