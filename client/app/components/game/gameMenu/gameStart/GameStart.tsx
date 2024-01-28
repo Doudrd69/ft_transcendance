@@ -37,8 +37,8 @@ const MatchMaking = () => {
             });
             state.showGame = true;
         });
-
-        globalState.gameSocket?.on('returnGameInProgress', () => {
+        globalState.gameSocket?.on('gameInProgress', () => {
+            console.log(`DISPATCH_IP`);
             globalState.gameSocket?.disconnect();
             dispatchGame({ type: 'TOGGLE', payload: 'showGameMenu'});
             state.showGameMenu = true;
@@ -47,6 +47,7 @@ const MatchMaking = () => {
         return () => {
             globalState.gameSocket?.off('leave-game');
             globalState.gameSocket?.off('setgame');
+            globalState.gameSocket?.off('returnGameInProgress');
          }
 
     }, [globalState?.gameSocket]);

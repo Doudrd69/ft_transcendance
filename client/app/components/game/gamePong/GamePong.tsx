@@ -209,7 +209,7 @@ const PongComponent = () => {
             globalState.gameSocket?.disconnect();
         });
 
-        globalState.gameSocket?.on('GameStop', () => {
+        globalState.gameSocket?.on('userDisconnected', () => {
             console.log(`where i am bro?`);
             dispatchGame({
                 type: 'TOGGLE',
@@ -245,7 +245,7 @@ const PongComponent = () => {
             globalState.gameSocket?.off('GameBallUpdate');
             globalState.gameSocket?.off('GamePaddleUpdate');
             globalState.gameSocket?.off('Game_Start');
-            globalState.gameSocket?.off('GameStop');
+            globalState.gameSocket?.off('userDisconnected');
             globalState.gameSocket?.off('GameEnd');
             clearInterval(countdownInterval);
             window.removeEventListener('keydown', handleKeyDown);

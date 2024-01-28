@@ -25,15 +25,32 @@ export class GameService {
 		@InjectRepository(User)
 		private usersRepository: Repository<User>,
 
-
 	) {
 
-		this.userGameSockets = {};
+	this.userGameSockets = {};
+	this.disconnections = {};
 	}
 
 	userGameSockets: { [userLogin: string]: string };
+	disconnections: {[gameID: number]: string[]} ;
 
-	async createGame(player1ID: string, player2ID: string): Promise<Game> {
+	async disconnectSocket(socketId: string, gameID: number) {
+		this.disconnections[gameID].push(socketId)
+	}
+
+	setUpDisconnection(gameId: number) {
+		this.disconnections[gameId] = []
+	}
+
+	getDiconnections(gameId: number): string[] {
+		return this.disconnections[gameId]
+	}
+
+	async clearDisconnections(gameId: number) {
+		this.disconnections[gameId] = []
+	}
+	
+	async createGame(player1ID: string, player2ID: string, gameMode: string): Promise<Game> {
 
 		console.log("Creating new GAME...");
 		const playersLogin: [string, string] = await this.getLoginByIDpairStartGame(player1ID, player2ID);
@@ -46,6 +63,8 @@ export class GameService {
 			game.scoreOne = 0;
 			game.scoreTwo = 0;
 			game.gameEnd = false;
+			if (gameMode === "SPEED")
+				game.gameMode = "SPEED";
 			await this.gameRepository.save(game);
 			return (game);
 		}
@@ -188,6 +207,11 @@ export class GameService {
 
 	addGameSocket(gameSocketId: string, userLogin: string) {
 		this.userGameSockets[userLogin] = gameSocketId;
+	}
+
+	addGameInviteSocket(gameSocketIdOne: string, userOneLogin: string, gameSocketIdTwo: string, userTwoLogin: string) {
+		this.userGameSockets[userOneLogin] = gameSocketIdOne;
+		this.userGameSockets[userTwoLogin] = gameSocketIdTwo;
 	}
 
 	getMyGameSockets(userLogin: string) {

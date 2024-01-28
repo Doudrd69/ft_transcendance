@@ -265,11 +265,6 @@ const GeneralComponent = () => {
 		globalState.gameSocket?.on('disconnect', () => {
 			console.log('GameSocket? disconnected from the server : ', globalState.gameSocket?.id);
 		})
-		
-		globalState.gameSocket?.on('connectionDone', () => {
-			console.log("Emitting join-matchmaking");
-			globalState.gameSocket?.emit('join-matchmaking',{ playerLogin: sessionStorage.getItem("currentUserLogin") });
-		});
 
 		globalState.gameSocket?.on('joinGame', (game: Game) => {
             console.log("JOIN GAME");

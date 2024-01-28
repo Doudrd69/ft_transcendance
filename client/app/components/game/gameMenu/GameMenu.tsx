@@ -10,6 +10,7 @@ const Menu = () => {
 
     const { state, dispatchGame } = useGame();
     const { globalState, dispatch } = useGlobal();
+    const [gameMode, setGameMode] =  useState<string | null>(null);
 
     interface Game {
         gameId: number;
@@ -30,11 +31,19 @@ const Menu = () => {
         scoreOne: 0,
         scoreTwo: 0,
     };
-        
+    
+    useEffect(() => {
+        globalState.gameSocket?.on('gameNotInProgress', () => {
+            console.log(`DISPATCH`);
+            dispatchGame({ type: 'TOGGLE', payload: 'showGameMatchmaking'});
+            globalState.gameSocket?.emit('join-matchmaking',{ playerLogin: sessionStorage.getItem("currentUserLogin"),  gameMode: gameMode});
+        });
+    })
+
     const handleStartClick = () => {
 
         try {
-
+            setGameMode("NORMAL");
             const gameSocket = io('http://localhost:3001/game', {
                 autoConnect: false,
                 auth: {
@@ -44,20 +53,21 @@ const Menu = () => {
             gameSocket.connect();
 
             dispatch({ type: 'SET_GAME_SOCKET', payload: gameSocket });
-            dispatchGame({ type: 'TOGGLE', payload: 'showGameMatchmaking' });
+            // dispatchGame({ type: 'TOGGLE', payload: 'showGameMatchmaking' });
     
             // console.log("After Dispatch: ", globalState?.gameSocket);
 
         } catch (error) {
             console.error(error);
         }
+
         
     };
 
     const handleSpeedClick = () => {
 
         try {
-
+            setGameMode("SPEED");
             const gameSocket = io('http://localhost:3001/game', {
                 autoConnect: false,
                 auth: {
@@ -67,7 +77,7 @@ const Menu = () => {
             gameSocket.connect();
 
             dispatch({ type: 'SET_GAME_SOCKET', payload: gameSocket });
-            dispatchGame({ type: 'TOGGLE', payload: 'showGameMatchmaking' });
+            // dispatchGame({ type: 'TOGGLE', payload: 'showGameMatchmaking' });
     
             // console.log("After Dispatch: ", globalState?.gameSocket);
 
@@ -87,7 +97,7 @@ const Menu = () => {
                     handleStartClick(); 
                     }}>START GAME: NORMAL MODE</button>
                     <button className={`buttonclass ${state.showGameMatchmaking ? 'clicked' : ''}`} onClick={() => { 
-                    handleStartClick(); 
+                    handleSpeedClick (); 
                     }}>START GAME: SPEED MODE</button>
                 {/* <button className="buttonclass" >PROFILE</button> */}
                 {/* <button className={`buttonclass ${state.showGameSettings ? 'clicked' : ''}`} onClick={() => dispatch({ type: 'TOGGLE', payload: 'showGameSettings' })}>SETTINGS</button> */}
