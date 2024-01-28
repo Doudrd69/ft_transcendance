@@ -25,4 +25,7 @@ export class Game {
 
 	@Column({ default: false})
 	gameEnd: boolean;
+
+	@Column({default: "NORMAL"})
+	gameMode: string;
 }

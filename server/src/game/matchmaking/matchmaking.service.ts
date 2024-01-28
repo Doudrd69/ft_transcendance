@@ -10,55 +10,63 @@ export class MatchmakingService {
         @InjectRepository(User)
         private usersRepository: Repository<User>,
 
-        
+
     ) { }
 
-    public playersQueue: string[] = [];
-	
-    async getPlayersPairs()  {
-		// Créer des paires
-		const pairs: Array<[string, string]> = [];
-        for (let i = 0; i < this.playersQueue.length - 1; i += 2) {
-            pairs.push([this.playersQueue[i], this.playersQueue[i + 1]]);
-			console.log("Found a socket pair");
-        }
-		return pairs;
-	}
+    public playersNormalQueue: string[] = [];
+    public playersSpeedQueue: string[] = [];
 
-    async join(playerID: string, playerLogin: string) {
-        console.log("Push queue before: ", this.playersQueue);
-		this.playersQueue.push(playerID);
-        console.log("Push queue after: ", this.playersQueue);
+    async getPlayersPairsQueue(gameMode: string) {
+        // Créer des paires
+        const pairs: Array<[string, string]> = [];
+        if (gameMode === "NORMAL") {
+            for (let i = 0; i < this.playersNormalQueue.length - 1; i += 2) {
+                pairs.push([this.playersNormalQueue[i], this.playersNormalQueue[i + 1]]);
+                console.log("Found a socket pair");
+            }
+        }
+        else if (gameMode === "SPEED") {
+            for (let i = 0; i < this.playersSpeedQueue.length - 1; i += 2) {
+                pairs.push([this.playersSpeedQueue[i], this.playersSpeedQueue[i + 1]]);
+                console.log("Found a socket pair");
+            }
+        }
+        return pairs;
+    }
+
+    async joinQueue(playerID: string, playerLogin: string, gameMode: string) {
+        if (gameMode === "NORMAL")
+            this.playersNormalQueue.push(playerID);
+        else if (gameMode === "SPEED") {
+            this.playersSpeedQueue.push(playerID);
+        }
         const newUser: User = await this.usersRepository.findOne({ where: { login: playerLogin } })
-        console.log(`userIDuniqe: ${newUser.id}`)
         if (!newUser)
             console.log(`No User for this gameSocketId: ${playerID}`);
         newUser.inMatchmaking = true;
         await this.usersRepository.save(newUser);
-		console.log(`${newUser.login} joins the queue`);
     }
 
-	async leave(playerID: string) {
-        // const index = this.playersQueue.findIndex(id => id === playerID);
-        // console.log("coucou from leave 1");
-        // if (index !== -1) {
-        //     console.log("coucou from leave 1-2");
-        //     this.playersQueue.splice(index, 1);
-        //     console.log("player leave the queue");
-        // }
-        console.log("Queue before: ", this.playersQueue);
-        const newQueue = this.playersQueue.filter((id: string) => id === playerID);
-        this.playersQueue = newQueue;
-        console.log("Queue After: ", this.playersQueue);
+    async leaveQueue(playerID: string, gameMode: string) {
+        if (gameMode === "NORMAL") {
+            this.playersNormalQueue.splice(this.playersNormalQueue.indexOf(playerID), 1);
+        }
+        else if (gameMode === "SPEED") {
+            this.playersSpeedQueue.splice(this.playersSpeedQueue.indexOf(playerID), 1);
+        }
+        // const newQueue = this.playersNormalQueue.filter((id: string) => id === playerID);
+        // this.playersNormalQueue = newQueue;
 
 
-        return ;
+        return;
     }
 
-    async IsThereEnoughPairs() {
-        return (this.playersQueue.length >= 2);
+    async IsThereEnoughPairs(gameMode: string) {
+        if (gameMode === "NORMAL" && (this.playersNormalQueue.length >= 2))
+            return true;
+        else if (gameMode === "SPEED" && (this.playersSpeedQueue.length >= 2)) {
+            return true;
+        }
+        return false;
     }
 }
-
-
-// trouver comment envoyer a seulement deux users pour lancer une partie
