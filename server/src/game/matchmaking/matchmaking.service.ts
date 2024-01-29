@@ -34,13 +34,13 @@ export class MatchmakingService {
         return pairs;
     }
 
-    async joinQueue(playerID: string, playerLogin: string, gameMode: string) {
+    async joinQueue(playerID: string, userId: number, gameMode: string) {
         if (gameMode === "NORMAL")
             this.playersNormalQueue.push(playerID);
         else if (gameMode === "SPEED") {
             this.playersSpeedQueue.push(playerID);
         }
-        const newUser: User = await this.usersRepository.findOne({ where: { login: playerLogin } })
+        const newUser: User = await this.usersRepository.findOne({ where: { id: userId } })
         if (!newUser)
             console.log(`No User for this gameSocketId: ${playerID}`);
         newUser.inMatchmaking = true;

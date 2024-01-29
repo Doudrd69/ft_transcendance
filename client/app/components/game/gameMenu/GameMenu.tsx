@@ -5,6 +5,7 @@ import { useGame } from '../GameContext'
 import React, { useState, useEffect } from 'react';
 import { io, Socket } from 'socket.io-client'
 import { useGlobal } from '@/app/GlobalContext';
+import { stringify } from 'querystring';
 
 const Menu = () => {
 
@@ -36,7 +37,7 @@ const Menu = () => {
         globalState.gameSocket?.on('gameNotInProgress', () => {
             console.log(`DISPATCH`);
             dispatchGame({ type: 'TOGGLE', payload: 'showGameMatchmaking'});
-            globalState.gameSocket?.emit('join-matchmaking',{ playerLogin: sessionStorage.getItem("currentUserLogin"),  gameMode: gameMode});
+            globalState.gameSocket?.emit('join-matchmaking',{ playerLogin: sessionStorage.getItem("currentUserLogin"),  gameMode: gameMode, userId: Number(sessionStorage.getItem("currentUserID"))});
         });
 
         globalState.gameSocket?.on('setgame', () => {
