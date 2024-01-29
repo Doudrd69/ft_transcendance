@@ -121,8 +121,12 @@ export class GameGateway {
     @SubscribeMessage('inviteAccepted')
     async handleCheckgameInvite(@ConnectedSocket() client: Socket, @MessageBody() data: { playerOneLogin: string, playerTwoLogin: string, playerTwoId: string }) {
         //     // du coup en amont il faut creer des sockets pour les deux users. si pas bon supprimer les deux sockets
+        // envoyer un emit accept a lautre user
+        this.server.to([data.playerTwoId]).emit('acceptInvitation');
         if (!this.GameService.userHasAlreadyGameSockets(data.playerOneLogin)) {
             if (!this.GameService.userHasAlreadyGameSockets(data.playerTwoLogin)) {
+                console.log("set gameInvite ", data.playerTwoLogin, " , ", data.playerOneLogin);
+                console.log("set gameInvite ", data.playerTwoId, " , ", client.id);
                 this.GameService.addGameInviteSocket(client.id, data.playerOneLogin, data.playerTwoId, data.playerTwoLogin);
                 await this.GameService.linkSocketIDWithUser(client.id, data.playerOneLogin);
                 await this.GameService.linkSocketIDWithUser(data.playerTwoId, data.playerTwoLogin);

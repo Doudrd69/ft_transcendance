@@ -44,6 +44,8 @@ export class MatchmakingService {
         if (!newUser)
             console.log(`No User for this gameSocketId: ${playerID}`);
         newUser.inMatchmaking = true;
+        console.log(`joinSpeedQueue: ${this.playersSpeedQueue}`)
+        console.log(`joinNormalQueue: ${this.playersNormalQueue}`)
         await this.usersRepository.save(newUser);
     }
 
@@ -54,10 +56,8 @@ export class MatchmakingService {
         else if (gameMode === "SPEED") {
             this.playersSpeedQueue.splice(this.playersSpeedQueue.indexOf(playerID), 1);
         }
-        // const newQueue = this.playersNormalQueue.filter((id: string) => id === playerID);
-        // this.playersNormalQueue = newQueue;
-
-
+        console.log(`quitSpeedQueue: ${this.playersSpeedQueue}`)
+        console.log(`quitNormalQueue: ${this.playersNormalQueue}`)
         return;
     }
 
