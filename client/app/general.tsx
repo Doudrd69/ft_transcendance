@@ -38,7 +38,8 @@ interface FriendRequestDto {
 }
 
 const GeneralComponent = () => {
-
+	
+	console.log("ENV: ", process.env.REACT_APP_PROJECT_URL);
     const { globalState, dispatch } = useGlobal();
 	const [showLogin, setShowLogin] = useState(true);
 	const [show2FAForm, setShow2FAForm] = useState(false);
@@ -125,9 +126,9 @@ const GeneralComponent = () => {
 
 	const handleAccessToken = async (code: any): Promise<boolean> => {
 
-		// if (userReconnects())
-		// 	return true;
-		console.log('handleAccessToken');
+		if (userReconnects())
+			return true;
+
 		const response = await fetch('http://localhost:3001/auth/access', {
 			method: 'POST',
 			headers: {
@@ -135,9 +136,9 @@ const GeneralComponent = () => {
 			},
 			body: JSON.stringify({code}),
 		});
-		console.log("Access token request sent");
+
 		if (response.ok) {
-			console.log("Access token received");
+
 			const token = await response.json();
 			sessionStorage.setItem("jwt", token.access_token);
 			if (token.access_token) {

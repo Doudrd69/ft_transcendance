@@ -14,7 +14,8 @@ RUN npm install && \
 	npm install @types/socket.io-client && \
 	npm install class-validator class-transformer && \
 	npm install zustand && \
-	npm install sudo
+	npm install sudo \
+	dotenv
 
 COPY . .
 

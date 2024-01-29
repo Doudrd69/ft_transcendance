@@ -30,7 +30,6 @@ services:
       - SERVER_REDIRECT_URI=${SERVER_REDIRECT_URI}
       - SERVER_TOKEN_CLIENT_ID=${SERVER_TOKEN_CLIENT_ID}
       - SERVER_TOKEN_CLIENT_SECRET=${SERVER_TOKEN_CLIENT_SECRET}
-      - PROJECT_URL=${PROJECT_URL}
     ports:
       - '3001:3001'
     depends_on:
@@ -43,8 +42,8 @@ services:
   client:
     build: ./client
     container_name: client
-    #  environment:
-    #   - PROJECT_URL=${PROJECT_URL}
+    environment:
+      - REACT_APP_PROJECT_URL=${REACT_APP_PROJECT_URL}
     depends_on:
       - server
     ports:

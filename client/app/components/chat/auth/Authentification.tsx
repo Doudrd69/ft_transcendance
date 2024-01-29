@@ -7,7 +7,7 @@ const Authentificationcomponent = () => {
 
 	const [username, setUsername] = useState('');
 	const { globalState, dispatch } = useGlobal();
-	console.log("auth");
+
 	// const handleUsername = (e: React.ChangeEvent<HTMLInputElement>) => {
 	// 	setUsername(e.target.value);
 	// };
