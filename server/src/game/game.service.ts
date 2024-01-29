@@ -98,10 +98,10 @@ export class GameService {
 		const Player: User = await this.usersRepository.findOne({ where: { login: playerLogin } })
 		Player.gameSocketId = playerID;
 		
-		// console.log(`playerID link : ${playerID}, ${Player.gameSocketId}`)
+		console.log(`playerID link : ${playerID}, ${Player.gameSocketId}`)
 		await this.usersRepository.save(Player);
 		const otherPlayer: User = await this.usersRepository.findOne({ where: { gameSocketId: playerID } })
-		// console.log(`otherplayerID link : ${playerID}, ${otherPlayer.gameSocketId}`)
+		console.log(`otherplayerID link : ${playerID}, ${otherPlayer.gameSocketId}`)
 		return;
 	}
 
