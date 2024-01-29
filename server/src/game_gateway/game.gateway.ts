@@ -67,7 +67,6 @@ let gameInstance: game_instance | null = null;
     middlewares: [GatewayGuard],
 })
 
-
 export class GameGateway {
 
     @WebSocketServer()
