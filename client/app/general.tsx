@@ -68,21 +68,21 @@ const GeneralComponent = () => {
 		gameSocket.emit('inviteAccepted', {
 			playerOneLogin: sessionStorage.getItem("currentUserLogin"),
 			playerTwoLogin: gameInviteDto.senderUsername,
-			playerTwoId: gameInviteDto.senderID,
+			playerTwoId: gameInviteDto.senderID, 
 		});
 	}
 
 	const GameInviteNotification = ({ closeToast, toastProps, gameInviteDto }: any) => (
 		<div>
 			You received a game invite from  {gameInviteDto.senderID}
-			<button style={{ padding: '5px ' }} onClick={() => {
+			<button style={{ padding: '5px '}} onClick={() => {
 				closeToast();
 				gameInviteValidation(gameInviteDto);
 			}}>
-				Accept
+			Accept
 			</button>
-			<button style={{ padding: '5px ' }} onClick={() =>
-				closeToast()}>Deny</button>
+				<button style={{ padding: '5px '}} onClick={() => 
+					closeToast()}>Deny</button>
 		</div>
 	)
 
