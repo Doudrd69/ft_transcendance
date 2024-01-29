@@ -28,4 +28,11 @@ export class Game {
 
 	@Column({default: "NORMAL"})
 	gameMode: string;
+
+	@Column({ default: null})
+	userOneId: number;
+
+	@Column({ default: null})
+	userTwoId: number;
+
 }

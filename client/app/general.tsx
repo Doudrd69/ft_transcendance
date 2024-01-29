@@ -16,10 +16,11 @@ import BodyComponent from './components/body/Body';
 import SetComponent from './components/Avatar/SetAvatar';
 import { totalmem } from 'os';
 import GameHeader from './components/game/GameHeader';
-import { useGlobal } from './GlobalContext';
-import { ChatProvider } from './components/chat/ChatContext';
+import { setGameSocket, useGlobal } from './GlobalContext';
+import { ChatProvider, useChat } from './components/chat/ChatContext';
 import AccessComponent from './access';
-// import { useChat } from './components/chat/ChatContext';
+import { send } from 'process';
+import { useGlobal } from './GlobalContext';
 
 interface Game {
 	gameId: number;
@@ -37,6 +38,12 @@ interface FriendRequestDto {
 	initiatorLogin: string;
 }
 
+interface GameInviteDto {
+	senderID: string,
+	senderUsername: string;
+	initiatorLogin: string;
+}
+
 const GeneralComponent = () => {
 
     const { globalState, dispatch } = useGlobal();
@@ -48,6 +55,41 @@ const GeneralComponent = () => {
 	const searchParams = useSearchParams();
 	const code = searchParams.get('code');
 
+	// GAME INVITE
+	const gameInviteValidation = (gameInviteDto: GameInviteDto) => {
+
+		const gameSocket = io('http://localhost:3001/game', {
+			autoConnect: false,
+			auth: {
+				token: sessionStorage.getItem("jwt"),
+			}
+		});
+		gameSocket.connect();
+		dispatch({ type: 'SET_GAME_SOCKET', payload: gameSocket });
+		gameSocket.emit('inviteAccepted', {
+			playerOneLogin: sessionStorage.getItem("currentUserLogin"),
+			playerTwoLogin: gameInviteDto.senderUsername,
+			playerTwoId: gameInviteDto.senderID, 
+		});
+	}
+
+	const GameInviteNotification = ({ closeToast, toastProps, gameInviteDto }: any) => (
+		<div>
+			You received a game invite from  {gameInviteDto.senderID}
+			<button style={{ padding: '5px '}} onClick={() => {
+				closeToast();
+				gameInviteValidation(gameInviteDto);
+			}}>
+			Accept
+			</button>
+				<button style={{ padding: '5px '}} onClick={() => 
+					closeToast()}>Deny</button>
+		</div>
+	)
+
+	// if accept envoye un emit depuis le front pour l'autre user et si rien recu disco 
+
+	// FRIEND REQUEST
 	const friendRequestValidation = async (friendRequestDto: FriendRequestDto) => {
 
 		const response = await fetch('http://localhost:3001/users/acceptFriendRequest', {
@@ -125,8 +167,8 @@ const GeneralComponent = () => {
 
 	const handleAccessToken = async (code: any): Promise<boolean> => {
 
-		// if (userReconnects())
-		// 	return true;
+		if (userReconnects())
+			return true;
 		console.log('handleAccessToken');
 		const response = await fetch('http://localhost:3001/auth/access', {
 			method: 'POST',
@@ -200,6 +242,11 @@ const GeneralComponent = () => {
 				globalState.userSocket?.emit('joinRoom', {roomName: convName, roomID: convID});
 			});
 
+			globalState.userSocket?.on('gameInvite', (gameInviteDto: GameInviteDto) => {
+				console.log("senderID :", gameInviteDto.senderID);
+				toast(<GameInviteNotification gameInviteDto={gameInviteDto} />);
+			});
+
 			return () => {
 				globalState.userSocket?.off('friendRequest');
 				globalState.userSocket?.off('friendRequestAcceptedNotif');
@@ -208,6 +255,7 @@ const GeneralComponent = () => {
 				globalState.userSocket?.off('userIsBan');
 				globalState.userSocket?.off('kickUser');
 				globalState.userSocket?.off('userAddedToRoom');
+				globalState.userSocket?.off('gameInvite');
 		}
 
 	}, [globalState?.userSocket]);
@@ -255,6 +303,7 @@ const GeneralComponent = () => {
 
 		globalState.gameSocket?.on('joinGame', (game: Game) => {
             console.log("JOIN GAME");
+			// chatDispatch({ type: 'DISABLE', payload: 'showConfirmation' })
             setGame((prevState: Game | undefined) => ({
                 ...prevState,
                 gameId: game.gameId,
@@ -267,7 +316,6 @@ const GeneralComponent = () => {
             }));
             globalState.gameSocket?.emit('playerJoined', {gameId: game.gameId})
         })
-
 
 		return () => {
 			globalState.gameSocket?.off('connect');

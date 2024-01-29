@@ -171,6 +171,18 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		});
 	}
 
+	@SubscribeMessage('inviteToGame')
+	@UseGuards(GatewayGuard)
+	inviteUserToGame( @MessageBody() data: { usernameToInvite: string, senderID: string, senderUsername: string } ) {
+		const { usernameToInvite, senderID, senderUsername } = data;
+		console.log("Inviting ", usernameToInvite," to game");
+		console.log("-----> ",  usernameToInvite, senderID, senderUsername);
+		this.server.to(usernameToInvite).emit('gameInvite', {
+			senderID: senderID,
+			senderUsername: senderUsername,
+		});
+	}
+
 	@SubscribeMessage('message')
 	@UseGuards(GatewayGuard)
 	async handleMessage( @MessageBody() data: { dto: MessageDto, conversationName: string } ) {
