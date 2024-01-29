@@ -20,7 +20,6 @@ import { setGameSocket, useGlobal } from './GlobalContext';
 import { ChatProvider, useChat } from './components/chat/ChatContext';
 import AccessComponent from './access';
 import { send } from 'process';
-import { useGlobal } from './GlobalContext';
 
 interface Game {
 	gameId: number;
