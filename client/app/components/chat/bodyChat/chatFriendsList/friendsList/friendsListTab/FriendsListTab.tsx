@@ -6,6 +6,7 @@ import ListMyChannelComponent from '../../../listMyChannel/ListMyChannel';
 import { io, Socket } from 'socket.io-client';
 import { handleWebpackExternalForEdgeRuntime } from 'next/dist/build/webpack/plugins/middleware-plugin';
 import { setGameSocket, useGlobal } from '@/app/GlobalContext';
+import { ToastContainer, toast } from 'react-toastify';
 
 interface User {
 	id: number;
@@ -105,6 +106,15 @@ const FriendsListTabComponent: React.FC<FriendsListTabComponentProps> = ({ user 
 		gameSocket.on('connect', () => {
 			dispatch({ type: 'SET_GAME_SOCKET', payload: gameSocket });
 			console.log("socketID :", gameSocket.id);
+			// const functionThatReturnPromise = () => new Promise(resolve => setTimeout(resolve, 3000));
+			// toast.promise(
+			// 	functionThatReturnPromise,
+			// 	{
+			// 		pending: 'Game Invitation is pending',
+			// 		success: 'Game Invitation is pending',
+			// 		error: 'Game Invite rejected 🤯'
+			// 	}
+			// )
 			globalState.userSocket?.emit('inviteToGame', {
 				usernameToInvite: user.username,
 				senderID: gameSocket.id,

@@ -1,6 +1,6 @@
 import { useSearchParams } from 'next/navigation'
 import Image from 'next/image'
-import React, { useState , useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import RootLayout from './layout'
 import Chat from './components/chat/Chat'
 import Game from './components/game/Game'
@@ -20,7 +20,6 @@ import { setGameSocket, useGlobal } from './GlobalContext';
 import { ChatProvider, useChat } from './components/chat/ChatContext';
 import AccessComponent from './access';
 import { send } from 'process';
-import { useGlobal } from './GlobalContext';
 
 interface Game {
 	gameId: number;
@@ -46,7 +45,7 @@ interface GameInviteDto {
 
 const GeneralComponent = () => {
 
-    const { globalState, dispatch } = useGlobal();
+	const { globalState, dispatch } = useGlobal();
 	const [showLogin, setShowLogin] = useState(true);
 	const [show2FAForm, setShow2FAForm] = useState(false);
 	const [authValidated, setAuthValidated] = useState(false);
@@ -104,8 +103,8 @@ const GeneralComponent = () => {
 		if (response.ok) {
 			const conversationData = await response.json();
 			if (globalState.userSocket?.connected) {
-				globalState.userSocket?.emit('friendRequestAccepted', {roomName: conversationData.name, roomID: conversationData.id, initiator: friendRequestDto.initiatorLogin, recipient: friendRequestDto.recipientLogin});
-				globalState.userSocket?.emit('joinRoom', {roomName: conversationData.name, roomID: conversationData.id} );
+				globalState.userSocket?.emit('friendRequestAccepted', { roomName: conversationData.name, roomID: conversationData.id, initiator: friendRequestDto.initiatorLogin, recipient: friendRequestDto.recipientLogin });
+				globalState.userSocket?.emit('joinRoom', { roomName: conversationData.name, roomID: conversationData.id });
 			}
 		}
 		else {
@@ -116,13 +115,13 @@ const GeneralComponent = () => {
 	const FriendRequestReceived = ({ closeToast, toastProps, friendRequestDto }: any) => (
 		<div>
 			You received a friend request from  {friendRequestDto.initiatorLogin}
-			<button style={{ padding: '5px '}} onClick={() => {
+			<button style={{ padding: '5px ' }} onClick={() => {
 				friendRequestValidation(friendRequestDto);
 				closeToast;
 			}}>
-			Accept
+				Accept
 			</button>
-				<button style={{ padding: '5px '}} onClick={closeToast}>Deny</button>
+			<button style={{ padding: '5px ' }} onClick={closeToast}>Deny</button>
 		</div>
 	)
 
@@ -175,7 +174,7 @@ const GeneralComponent = () => {
 			headers: {
 				'Content-Type': 'application/json',
 			},
-			body: JSON.stringify({code}),
+			body: JSON.stringify({ code }),
 		});
 		console.log("Access token request sent");
 		if (response.ok) {
@@ -202,89 +201,101 @@ const GeneralComponent = () => {
 
 	// Multi-purpose useEffect for socket handling
 	useEffect(() => {
-		
-			globalState.userSocket?.on('friendRequest', (friendRequestDto: FriendRequestDto) => {
-				toast(<FriendRequestReceived friendRequestDto={friendRequestDto}/>);
-			});
 
-			globalState.userSocket?.on('friendRequestAcceptedNotif', (data: { roomName: string, roomID: string, initiator: string, recipient: string }) => {
-				const { roomName, roomID, initiator, recipient } = data;
-				toast(<FriendRequestAccepted friend={recipient}/>);
-				globalState.userSocket?.emit('joinRoom', {roomName: roomName, roomID: roomID});
-			})
+		globalState.userSocket?.on('friendRequest', (friendRequestDto: FriendRequestDto) => {
+			toast(<FriendRequestReceived friendRequestDto={friendRequestDto} />);
+		});
 
-			globalState.userSocket?.on('userJoinedRoom', (notification: string) => {
-			});
+		globalState.userSocket?.on('friendRequestAcceptedNotif', (data: { roomName: string, roomID: string, initiator: string, recipient: string }) => {
+			const { roomName, roomID, initiator, recipient } = data;
+			toast(<FriendRequestAccepted friend={recipient} />);
+			globalState.userSocket?.emit('joinRoom', { roomName: roomName, roomID: roomID });
+		})
 
-			globalState.userSocket?.on('userIsBan', ( data: { roomName: string, roomID: string } ) => {
-				const { roomName, roomID } = data; 
-				if (roomName && roomID) {
-					globalState.userSocket?.emit('leaveRoom', { roomName: roomName, roomID: roomID });
-					toast.warn(`You are ban from ${roomName}`);
-				}
-			});
+		globalState.userSocket?.on('userJoinedRoom', (notification: string) => {
+		});
 
-			globalState.userSocket?.on('userIsUnban', ( data: { roomName: string, roomID: string } ) => {
-				const { roomName, roomID } = data; 
-				if (roomName && roomID) {
-					globalState.userSocket?.emit('joinRoom', { roomName: roomName, roomID: roomID });
-					toast.warn(`You are unban from ${roomName}`);
-				}
-			});
-
-			globalState.userSocket?.on('kickUser', ( data: {roomName: string, roomID: string} ) => {
-				const { roomName, roomID } = data;
+		globalState.userSocket?.on('userIsBan', (data: { roomName: string, roomID: string }) => {
+			const { roomName, roomID } = data;
+			if (roomName && roomID) {
 				globalState.userSocket?.emit('leaveRoom', { roomName: roomName, roomID: roomID });
-			});
+				toast.warn(`You are ban from ${roomName}`);
+			}
+		});
 
-			globalState.userSocket?.on('userAddedToRoom', (data: {convID: number, convName: string}) => {
-				const { convID, convName } = data;
-				globalState.userSocket?.emit('joinRoom', {roomName: convName, roomID: convID});
-			});
+		globalState.userSocket?.on('userIsUnban', (data: { roomName: string, roomID: string }) => {
+			const { roomName, roomID } = data;
+			if (roomName && roomID) {
+				globalState.userSocket?.emit('joinRoom', { roomName: roomName, roomID: roomID });
+				toast.warn(`You are unban from ${roomName}`);
+			}
+		});
 
-			globalState.userSocket?.on('gameInvite', (gameInviteDto: GameInviteDto) => {
-				console.log("senderID :", gameInviteDto.senderID);
-				toast(<GameInviteNotification gameInviteDto={gameInviteDto} />);
-			});
+		globalState.userSocket?.on('kickUser', (data: { roomName: string, roomID: string }) => {
+			const { roomName, roomID } = data;
+			globalState.userSocket?.emit('leaveRoom', { roomName: roomName, roomID: roomID });
+		});
 
-			return () => {
-				globalState.userSocket?.off('friendRequest');
-				globalState.userSocket?.off('friendRequestAcceptedNotif');
-				globalState.userSocket?.off('userJoinedRoom');
-				globalState.userSocket?.off('userIsUnban');
-				globalState.userSocket?.off('userIsBan');
-				globalState.userSocket?.off('kickUser');
-				globalState.userSocket?.off('userAddedToRoom');
-				globalState.userSocket?.off('gameInvite');
+		globalState.userSocket?.on('userAddedToRoom', (data: { convID: number, convName: string }) => {
+			const { convID, convName } = data;
+			globalState.userSocket?.emit('joinRoom', { roomName: convName, roomID: convID });
+		});
+
+		globalState.userSocket?.on('gameInvite', (gameInviteDto: GameInviteDto) => {
+			console.log("senderID :", gameInviteDto.senderID);
+			toast(<GameInviteNotification gameInviteDto={gameInviteDto} />,
+				{
+					pauseOnFocusLoss: false,
+				});
+			// const functionThatReturnPromise = () => new Promise(resolve => setTimeout(resolve, 3000));
+			// toast.promise(
+			// 	functionThatReturnPromise,
+			// 	{
+			// 		pending: 'Game Invitation is pending',
+			// 		success: 'Game Invite accepted👌',
+			// 		error: 'Game Invite rejected 🤯'
+			// 	}
+			// )
+		});
+
+		return () => {
+			globalState.userSocket?.off('friendRequest');
+			globalState.userSocket?.off('friendRequestAcceptedNotif');
+			globalState.userSocket?.off('userJoinedRoom');
+			globalState.userSocket?.off('userIsUnban');
+			globalState.userSocket?.off('userIsBan');
+			globalState.userSocket?.off('kickUser');
+			globalState.userSocket?.off('userAddedToRoom');
+			globalState.userSocket?.off('gameInvite');
 		}
 
 	}, [globalState?.userSocket]);
 
 	// Connection - Deconnection useEffect
 	useEffect(() => {
-		
-			// Works on both connection and reconnection
-			globalState.userSocket?.on('connect', () => {
-				const personnalRoom = sessionStorage.getItem("currentUserLogin");
-				globalState.userSocket?.emit('joinPersonnalRoom', personnalRoom, sessionStorage.getItem("currentUserID"));
-			})
-			
-			globalState.userSocket?.on('disconnect', () => {
-			})
 
-			globalState.userSocket?.on('newConnection', (notif: string) => {
-				toast(notif);
-			})
+		// Works on both connection and reconnection
+		globalState.userSocket?.on('connect', () => {
+			const personnalRoom = sessionStorage.getItem("currentUserLogin");
+			globalState.userSocket?.emit('joinPersonnalRoom', personnalRoom, sessionStorage.getItem("currentUserID"));
+		})
 
-			globalState.userSocket?.on('newDeconnection', (notif: string) => {
-				toast(notif);
-			})
+		globalState.userSocket?.on('disconnect', () => {
+		})
 
-			return () => {
-				globalState.userSocket?.off('connect');
-				globalState.userSocket?.off('disconnect');
-				globalState.userSocket?.off('newConnection');
-				globalState.userSocket?.off('newDeconnection');
+		globalState.userSocket?.on('newConnection', (notif: string) => {
+			toast(notif);
+		})
+
+		globalState.userSocket?.on('newDeconnection', (notif: string) => {
+			toast(notif);
+		})
+
+		return () => {
+			globalState.userSocket?.off('connect');
+			globalState.userSocket?.off('disconnect');
+			globalState.userSocket?.off('newConnection');
+			globalState.userSocket?.off('newDeconnection');
 		}
 
 	}, [globalState?.userSocket])
@@ -294,28 +305,27 @@ const GeneralComponent = () => {
 
 		globalState.gameSocket?.on('connect', () => {
 
-			globalState.gameSocket?.emit('linkSocketWithUser', {playerLogin: sessionStorage.getItem("currentUserLogin")});
+			globalState.gameSocket?.emit('linkSocketWithUser', { playerLogin: sessionStorage.getItem("currentUserLogin") });
 		})
-		
+
 		globalState.gameSocket?.on('disconnect', () => {
 			console.log('GameSocket? disconnected from the server : ', globalState.gameSocket?.id);
 		})
 
 		globalState.gameSocket?.on('joinGame', (game: Game) => {
-            console.log("JOIN GAME");
-			// chatDispatch({ type: 'DISABLE', payload: 'showConfirmation' })
-            setGame((prevState: Game | undefined) => ({
-                ...prevState,
-                gameId: game.gameId,
-                playerOneID: game.playerOneID,
-                playerTwoID: game.playerTwoID,
-                playerOneLogin: game.playerOneLogin,
-                playerTwoLogin: game.playerTwoLogin,
-                scoreOne: game.scoreOne,
-                scoreTwo: game.scoreTwo,
-            }));
-            globalState.gameSocket?.emit('playerJoined', {gameId: game.gameId})
-        })
+			console.log("JOIN GAME");
+			setGame((prevState: Game | undefined) => ({
+				...prevState,
+				gameId: game.gameId,
+				playerOneID: game.playerOneID,
+				playerTwoID: game.playerTwoID,
+				playerOneLogin: game.playerOneLogin,
+				playerTwoLogin: game.playerTwoLogin,
+				scoreOne: game.scoreOne,
+				scoreTwo: game.scoreTwo,
+			}));
+			globalState.gameSocket?.emit('playerJoined', { gameId: game.gameId })
+		})
 
 		return () => {
 			globalState.gameSocket?.off('connect');
@@ -334,7 +344,7 @@ const GeneralComponent = () => {
 				headers: {
 					'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
 				},
-			}); 
+			});
 			if (response.ok) {
 				const data = await response.json();
 				if (data)
@@ -363,18 +373,18 @@ const GeneralComponent = () => {
 	// 		setShowLogin(false);
 	// });
 
-		return (
-			<>
-				<ToastContainer />
-					{!globalState.isConnected ?
-					(<AccessComponent/>) 
-					: (	
-						<ChatProvider>
-							<Header/>
-							<BodyComponent/>
-						</ChatProvider>
-					)}	
-			</>
-			);
+	return (
+		<>
+			<ToastContainer stacked />
+			{!globalState.isConnected ?
+				(<AccessComponent />)
+				: (
+					<ChatProvider>
+						<Header />
+						<BodyComponent />
+					</ChatProvider>
+				)}
+		</>
+	);
 }
 export default GeneralComponent;
