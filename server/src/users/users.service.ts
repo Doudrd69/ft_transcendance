@@ -279,7 +279,7 @@ export class UsersService {
 
 			const userGames = await this.gameRepository
 				.createQueryBuilder('game')
-				.where('(game.playerOneID = :id) OR (game.playerTwoID = :id)', { id: user.id })
+				.where('(game.userOneId = :id) OR (game.userTwoId = :id)', { id: user.id })
 				.getMany()
 
 			console.log(`User ${user.username} games history: `);

@@ -3,12 +3,15 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useGame } from '../GameContext'
 import { Socket } from 'socket.io-client'
 import { useGlobal } from '@/app/GlobalContext';
+import ConfirmationComponent from '../../chat/bodyChat/chatFriendsList/confirmation/Confirmation';
+import { useChat } from '../../chat/ChatContext';
 // import { clearInterval } from 'timers';
 
 const PongComponent = () => {
 
     const { state, dispatchGame } = useGame();
     const { globalState } = useGlobal();
+    const { chatState, chatDispatch } = useChat();
 
     const [countdown, setCountdown] = useState<number>(3);
     const [blurGame, setBlurGame] = useState<boolean>(true);
@@ -132,6 +135,8 @@ const PongComponent = () => {
     useEffect(() => {
 
         globalState.gameSocket?.on('gameStart', (Game: Game) => {
+            console.log("DISBALE THIS BLUR");
+            chatDispatch({ type: 'DISABLE', payload: 'showConfirmation' })
             setGameID(Game.gameId);
             setGame((prevState) => ({
                 ...prevState,
@@ -146,6 +151,7 @@ const PongComponent = () => {
         });
 
         globalState.gameSocket?.on('GameUpdate', (gameState: gameState) => {
+            // console.log("DISBALE THIS BLUR");
             const newGameState: gameState = {
                 BallPosition: { x: gameState.BallPosition!.x * containerWidth || 0.5 * containerWidth, y: gameState.BallPosition!.y * containerHeight || 0.5 * containerHeight  },
                 scoreOne: gameState.scoreOne,
@@ -176,6 +182,7 @@ const PongComponent = () => {
         };
 
         globalState.gameSocket?.on('GameGoal', (gameState: gameState) => {
+            // console.log("DISBALE THIS BLUR");
             const newGameState: gameState = {
                 BallPosition: { x: gameState.BallPosition!.x * containerWidth || 0.5 * containerWidth, y: gameState.BallPosition!.y * containerHeight || 0.5 * containerHeight },
                 scoreOne: gameState.scoreOne,

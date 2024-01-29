@@ -38,6 +38,16 @@ const Menu = () => {
             dispatchGame({ type: 'TOGGLE', payload: 'showGameMatchmaking'});
             globalState.gameSocket?.emit('join-matchmaking',{ playerLogin: sessionStorage.getItem("currentUserLogin"),  gameMode: gameMode});
         });
+
+        globalState.gameSocket?.on('setgame', () => {
+            console.log("SET GAME");
+            dispatchGame({
+                type: 'TOGGLE',
+                payload: 'showGame',
+            });
+            state.showGame = true;
+        });
+
     })
 
     const handleStartClick = () => {

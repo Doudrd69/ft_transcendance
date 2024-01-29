@@ -98,20 +98,20 @@ export class GameService {
 		const Player: User = await this.usersRepository.findOne({ where: { login: playerLogin } })
 		Player.gameSocketId = playerID;
 		
-		console.log(`playerID link : ${playerID}, ${Player.gameSocketId}`)
+		// console.log(`playerID link : ${playerID}, ${Player.gameSocketId}`)
 		await this.usersRepository.save(Player);
 		const otherPlayer: User = await this.usersRepository.findOne({ where: { gameSocketId: playerID } })
-		console.log(`otherplayerID link : ${playerID}, ${otherPlayer.gameSocketId}`)
+		// console.log(`otherplayerID link : ${playerID}, ${otherPlayer.gameSocketId}`)
 		return;
 	}
 
 	async getLoginByIDpairStartGame(player1ID: string, player2ID: string) {
-		console.log(`playerTwo id: ${player2ID}`);
+		// console.log(`playerTwo id: ${player2ID}`);
 		const UserOne: User = await this.usersRepository.findOne({ where: { gameSocketId: player1ID } })
 		const UserTwo: User = await this.usersRepository.findOne({ where: { gameSocketId: player2ID } })
 
-		console.log("USER ONE: ", UserOne);
-		console.log("USER TWO: ", UserTwo);
+		// console.log("USER ONE: ", UserOne);
+		// console.log("USER TWO: ", UserTwo);
 		UserOne.inMatchmaking = false;
 		UserOne.inGame = true;
 		UserTwo.inMatchmaking = false;
@@ -120,7 +120,7 @@ export class GameService {
 		await this.usersRepository.save(UserTwo);
 		if (UserOne && UserTwo) {
 			const playersLogin: [string, string] = [UserOne.login, UserTwo.login]
-			console.log("Players login : ", playersLogin);
+			// console.log("Players login : ", playersLogin);
 			return (playersLogin);
 		}
 	}
@@ -155,7 +155,6 @@ export class GameService {
 		const UserTwo: User = await this.usersRepository.findOne({ where: { gameSocketId: gameInstance.players[1] } })
 		UserOne.inGame = false;
 		UserTwo.inGame = false;
-		// delete les sockets et le userLoginsocketsomposr
 
 		console.log("Before U1: ", UserOne.victory, UserOne.defeat);
 		console.log("Before U2: ", UserTwo.victory, UserTwo.defeat);
@@ -174,8 +173,8 @@ export class GameService {
 		console.log("After U1: ", UserOne.victory, UserOne.defeat);
 		console.log("After U2: ", UserTwo.victory, UserTwo.defeat);
 
-		// game.playerOneID = String(UserOne.id);
-		// game.playerTwoID = String(UserTwo.id);
+		game.userOneId = UserOne.id;
+		game.userTwoId = UserTwo.id;
 		game.gameEnd = true;
 		game.scoreOne = gameInstance.player1_score;
 		game.scoreTwo = gameInstance.player2_score;
