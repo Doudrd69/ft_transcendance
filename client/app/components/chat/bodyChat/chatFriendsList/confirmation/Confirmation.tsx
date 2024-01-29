@@ -16,7 +16,7 @@ const ConfirmationComponent: React.FC<ConfirmationComponentProps> = ({ phrase, f
 
 	useEffect(() => {
 		const handleEscape = (event: KeyboardEvent) => {
-			if (event.key === 'Escape') {
+			if (event.key === 'Escape') { 
 				handleCancel();
 			}
 		};
