@@ -64,17 +64,18 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 
 	const getMessages = async () => {
 		try {
-		const response = await fetch(`http://localhost:3001/chat/getMessages/${chatState.currentConversationID}`, {
-			method: 'GET',
-			headers: {
-			'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
-			},
-		});
 
-		if (response.ok) {
-			const messageList = await response.json();
-			setMessages((prevMessages: Message[]) => [...prevMessages, ...messageList]);
-		}
+			const response = await fetch(`http://localhost:3001/chat/getMessages/${chatState.currentConversationID}`, {
+				method: 'GET',
+				headers: {
+				'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
+				},
+			});
+
+			if (response.ok) {
+				const messageList = await response.json();
+				setMessages((prevMessages: Message[]) => [...prevMessages, ...messageList]);
+			}
 		} catch (error) {
 			console.log(error);
 		}

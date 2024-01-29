@@ -237,17 +237,19 @@ export class ChatService {
 			return [];
 		}
 
-		const user = await this.usersRepository.findOne({
+		const user : User = await this.usersRepository.findOne({
 			where: { id: userID },
 			relations: ['groups', 'groups.conversation'],
 		});
+
 		const group = await this.getRelatedGroup(user, conversation)
 		if (!group) {
 			console.error("Unauthorized");
 		}
 
 		const messages = await this.messageRepository.find({ where: {conversation: conversation}});
-		return messages;
+		const filteredMessages = messages.filter((message: Message) => !user.blockedUsers.includes(message.from));
+		return filteredMessages;
 	}
 
 	private async getAllChannels(userID: number): Promise<Conversation[]> {
