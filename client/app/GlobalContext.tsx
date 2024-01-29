@@ -34,6 +34,11 @@ interface GlobalState {
 	avatar:string;
 	userSocket: Socket | undefined;
 	gameSocket: Socket | undefined;
+	show2FA: boolean;
+	isConnected: boolean;
+	showAuth: boolean;
+	activate2FA: boolean;
+
 	[key: string]: boolean | string | Socket | undefined | null;
 }
 
@@ -53,6 +58,10 @@ const initialState: GlobalState = {
 	avatar:"",
 	userSocket: undefined,
 	gameSocket: undefined,
+	show2FA: false,
+	activate2FA: false,
+	isConnected: false,
+	showAuth: false,
 };
 
 // Réducteur

@@ -18,6 +18,7 @@ import { totalmem } from 'os';
 import GameHeader from './components/game/GameHeader';
 import { useGlobal } from './GlobalContext';
 import { ChatProvider } from './components/chat/ChatContext';
+import AccessComponent from './access';
 // import { useChat } from './components/chat/ChatContext';
 
 interface Game {
@@ -124,9 +125,9 @@ const GeneralComponent = () => {
 
 	const handleAccessToken = async (code: any): Promise<boolean> => {
 
-		if (userReconnects())
-			return true;
-
+		// if (userReconnects())
+		// 	return true;
+		console.log('handleAccessToken');
 		const response = await fetch('http://localhost:3001/auth/access', {
 			method: 'POST',
 			headers: {
@@ -134,9 +135,9 @@ const GeneralComponent = () => {
 			},
 			body: JSON.stringify({code}),
 		});
-
+		console.log("Access token request sent");
 		if (response.ok) {
-
+			console.log("Access token received");
 			const token = await response.json();
 			sessionStorage.setItem("jwt", token.access_token);
 			if (token.access_token) {
@@ -149,22 +150,12 @@ const GeneralComponent = () => {
 				});
 				userSocket.connect();
 				dispatch({ type: 'SET_SOCKET', payload: userSocket });
-				// dispatch le component 2FA?
-				if (sessionStorage.getItem("2fa") === "true")
-					setShow2FAForm(true);
-				else
-					setAuthValidated(true);
-				return true;
+				if (globalState.activate2FA)
+					dispatch({ type: 'ACTIVATE', payload: 'show2FA' });
 			}
-			else
-				return false;
 		}
 
 		return false;
-	}
-
-	const handle2FADone = () => {
-		setShow2FAForm(false);
 	}
 
 	// Multi-purpose useEffect for socket handling
@@ -287,14 +278,36 @@ const GeneralComponent = () => {
 
 	}, [globalState?.gameSocket])
 
+	const check2faActivate = async () => {
+		console.log("check2faActivate")
+		try {
+			const response = await fetch('http://localhost:3001/auth/get2fa', {
+				method: 'GET',
+				headers: {
+					'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
+				},
+			}); 
+			if (response.ok) {
+				const data = await response.json();
+				if (data)
+					dispatch({ type: 'ACTIVATE', payload: 'show2FA' });
+				else
+					dispatch({ type: 'ACTIVATE', payload: 'isConnected' });
+			}
+		}
+		catch (error) {
+			console.error(error);
+		}
+	}
 	// Login form useEffect
 	useEffect(() => {
-		if (code && showLogin) {
+		if (code) {
+			console.log('code : ', code)
 			handleAccessToken(code).then(result => {
-				setShowLogin(false);
+				check2faActivate();
 			})
 		}
-	}, [showLogin]);
+	}, []);
 
 	// For testing purpose : no 42 form on connection
 	// useEffect(() => {
@@ -305,11 +318,9 @@ const GeneralComponent = () => {
 		return (
 			<>
 				<ToastContainer />
-					{showLogin ? (
-					<Authentificationcomponent />
-					) : show2FAForm ? (
-					<TFAComponent on2FADone={handle2FADone} />
-					) : (
+					{!globalState.isConnected ?
+					(<AccessComponent/>) 
+					: (	
 						<ChatProvider>
 							<Header/>
 							<BodyComponent/>

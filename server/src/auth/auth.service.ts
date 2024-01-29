@@ -151,8 +151,7 @@ export class AuthService {
 		throw new Error("Fatal error");
 	}
 
-	// on genere le secret si on en a pas
-	// et au premier coup, si tout est bon on enregistre le temp_secret comme secret onn
+	// On genere le qrcode a la demande d'activation de la 2fa
 	async activate2FA(requestTfaDto: RequestTfaDto) {
 
 		try {
@@ -183,6 +182,16 @@ export class AuthService {
 		catch (error) {
 			throw new Error("Fatal errorr: " + error);
 		}
+	}
+
+	async get2fa(userID: number) {
+		const user = await this.usersService.getUserByID(userID);
+		console.log("get2fa", user.TFA_isEnabled);
+		if (user) {
+			return user.TFA_isEnabled;
+		}
+
+		throw new Error("User does not exist");
 	}
 
 	async verifyCode(authenticatorCodeDto: AuthenticatorCodeDto) {

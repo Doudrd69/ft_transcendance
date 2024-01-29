@@ -12,6 +12,7 @@ import { AuthGuard } from './auth.guard';
 import { AuthService } from './auth.service';
 import { RequestTfaDto } from './dto/RequestTfaDto.dto';
 import { AuthenticatorCodeDto } from './dto/AuthenticatorCodeDto.dto';
+import { Req } from '@nestjs/common';
 	
 @Controller('auth')
 export class AuthController {
@@ -37,6 +38,12 @@ export class AuthController {
 		return this.authService.desactivate2FA(requestTfaDto);
 	}
 
+	@UseGuards(AuthGuard)
+	@Get('get2fa')
+	getMessagesFromConversation(@Req() req) {
+		const { user } = req;
+		return this.authService.get2fa(user.sub);
+	}
 	// @UseGuards(AuthGuard)
 	@Post('checkAuthenticatorCode')
 	verifyCode(@Body() authenticatorCodeDto: AuthenticatorCodeDto) {
