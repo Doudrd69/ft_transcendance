@@ -20,7 +20,16 @@ import SetComponent from './components/Avatar/SetAvatar';
 import { totalmem } from 'os';
 import GameHeader from './components/game/GameHeader';
 import GeneralComponent from './general';
+import dotenv from 'dotenv';
 // import { useChat } from './components/chat/ChatContext';
+
+dotenv.config();
+
+const test = process.env.REACT_APP_SERVER_REDIRECT_URI;
+
+console.log(`JPPPPPP 1: ${test}`);
+console.log(`JPPPPPP 2: ${process.env.REACT_APP_SERVER_REDIRECT_URI}`);
+console.log(`======> ${process.env.REACT_APP_PROJECT_URL}`);
 
 export default function Home() {
 
@@ -30,5 +39,5 @@ export default function Home() {
 					<GeneralComponent/>
 				</GlobalProvider>
 			</RootLayout>
-		  );
+		);
 }

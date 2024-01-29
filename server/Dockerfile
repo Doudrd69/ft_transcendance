@@ -8,7 +8,6 @@ COPY package*.json ./
 
 COPY script.sh ./
 
-
 RUN npm install	&& \
 	npm install @nestjs/jwt \
 	@types/node \
@@ -35,12 +34,12 @@ RUN npm install	&& \
 
 COPY . .
 
-RUN [ "npm", "run", "build" ]
+# RUN [ "npm", "run", "build" ]
 
-# RUN mkdir -pv dist/users/avatars
+# # RUN mkdir -pv dist/users/avatars
 
-COPY ./avatar.png ./dist/users/avatars/avatar.png
+# COPY ./avatar.png ./dist/users/avatars/avatar.png
 
-# ENTRYPOINT [ "./script.sh" ]
+# # ENTRYPOINT [ "./script.sh" ]
 
-CMD ["npm", "run", "start:prod"]
+CMD ["npm", "run", "start"]

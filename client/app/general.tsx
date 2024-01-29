@@ -19,6 +19,7 @@ import GameHeader from './components/game/GameHeader';
 import { useGlobal } from './GlobalContext';
 import { ChatProvider } from './components/chat/ChatContext';
 import AccessComponent from './access';
+import dotenv from 'dotenv';
 // import { useChat } from './components/chat/ChatContext';
 
 interface Game {
@@ -37,10 +38,14 @@ interface FriendRequestDto {
 	initiatorLogin: string;
 }
 
+dotenv.config();
+// console.log("URL ==========================> ", PROJECT_URL);
+console.log(`====> 2 ${process.env.REACT_APP_PROJECT_URL}`);
+
 const GeneralComponent = () => {
 	
-	console.log("ENV: ", process.env.REACT_APP_PROJECT_URL);
-    const { globalState, dispatch } = useGlobal();
+
+	const { globalState, dispatch } = useGlobal();
 	const [showLogin, setShowLogin] = useState(true);
 	const [show2FAForm, setShow2FAForm] = useState(false);
 	const [authValidated, setAuthValidated] = useState(false);
