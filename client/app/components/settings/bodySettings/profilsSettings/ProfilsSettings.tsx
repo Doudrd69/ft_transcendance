@@ -25,7 +25,7 @@ const ProfilsSettingsComponent: React.FC = () => {
 				newUsername: username,
 			};
 
-			const response = await fetch('http://localhost:3001/users/updateUsername', {
+			const response = await fetch(`${process.env.API_URL}/users/updateUsername`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
@@ -65,7 +65,7 @@ const ProfilsSettingsComponent: React.FC = () => {
 				formData.append('avatar', newImage, newImage.name);
 			}
 
-			const response = await fetch(`http://localhost:3001/users/upload-Avatar/${sessionStorage.getItem('currentUserID')}`, {
+			const response = await fetch(`${process.env.API_URL}/users/upload-Avatar/${sessionStorage.getItem('currentUserID')}`, {
 				method: 'POST',
 				body: formData,
 			});

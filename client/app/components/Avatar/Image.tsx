@@ -13,11 +13,11 @@ const ImageComponent: React.FC<ImageProps> = ({ className }) => {
 		const fetchAvatar = async () => {
 			try {
 
-				const response = await fetch(`http://localhost:3001/users/getAvatar/${sessionStorage.getItem('currentUserID')}`,{
+				const response = await fetch(`${process.env.API_URL}/users/getAvatar/${sessionStorage.getItem('currentUserID')}`,{
 					method: 'GET',
 				});	
 				if (response.ok) {
-					setAvatarURL(`http://localhost:3001/users/getAvatar/${sessionStorage.getItem('currentUserID')}`)
+					setAvatarURL(`${process.env.API_URL}/users/getAvatar/${sessionStorage.getItem('currentUserID')}`)
 					setAvatarURL('rien');
 				} else {
 					setAvatarURL('test')

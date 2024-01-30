@@ -24,7 +24,7 @@ const AddFriendComponent: React.FC<AddFriendComponentProps> = ({ updateFriends, 
 				recipientLogin: formValue,
 			};
 
-			const response = await fetch('http://localhost:3001/users/addfriend', {
+			const response = await fetch(`${process.env.API_URL}/users/addfriend`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',

@@ -50,7 +50,7 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 			recipientLogin: user.login,
 		}
 
-		const response = await fetch(`http://localhost:3001/users/blockUser`, {
+		const response = await fetch(`${process.env.API_URL}/users/blockUser`, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
@@ -80,7 +80,7 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 			recipientLogin: user.login,
 		}
 
-		const response = await fetch(`http://localhost:3001/users/unblockUser`, {
+		const response = await fetch(`${process.env.API_URL}/users/unblockUser`, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
@@ -112,7 +112,7 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 				state: false,
 			}
 	
-			const response = await fetch(`http://localhost:3001/chat/unmuteUser`, {
+			const response = await fetch(`${process.env.API_URL}/chat/unmuteUser`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
@@ -154,7 +154,7 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 				state : true,
 			}
 	
-			const response = await fetch(`http://localhost:3001/chat/banUser`, {
+			const response = await fetch(`${process.env.API_URL}/chat/banUser`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
@@ -199,7 +199,7 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 				state : false,
 			}
 	
-			const response = await fetch(`http://localhost:3001/chat/unbanUser`, {
+			const response = await fetch(`${process.env.API_URL}/chat/unbanUser`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
@@ -243,7 +243,7 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 				state : true,
 			}
 	
-			const response = await fetch(`http://localhost:3001/chat/promoteAdminUser`, {
+			const response = await fetch(`${process.env.API_URL}/chat/promoteAdminUser`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
@@ -295,7 +295,7 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 				state : false,
 			}
 	
-			const response = await fetch(`http://localhost:3001/chat/demoteAdminUser`, {
+			const response = await fetch(`${process.env.API_URL}/chat/demoteAdminUser`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
@@ -343,7 +343,7 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 					userID: user.id,
 			}
 	
-			const response = await fetch(`http://localhost:3001/chat/quitConversation`, {
+			const response = await fetch(`${process.env.API_URL}/chat/quitConversation`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
@@ -381,7 +381,7 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 					userToKickID: user.id,
 			}
 	
-			const response = await fetch(`http://localhost:3001/chat/kickUser`, {
+			const response = await fetch(`${process.env.API_URL}/chat/kickUser`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
@@ -421,7 +421,7 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 				user1: Number(user.id),
 				user2: Number(sessionStorage.getItem("currentUserID")),
 			}
-			const response = await fetch(`http://localhost:3001/chat/newDMConversation`, {
+			const response = await fetch(`${process.env.API_URL}/chat/newDMConversation`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',

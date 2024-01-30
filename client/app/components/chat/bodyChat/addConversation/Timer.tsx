@@ -41,7 +41,7 @@ const TimerComponent: React.FC<TimerComponentProps> = ({user}) => {
 				mutedUntil: Number(timer),
 			}
 			console.log(muteUserDto);
-			const response = await fetch(`http://localhost:3001/chat/muteUser`, {
+			const response = await fetch(`${process.env.API_URL}/chat/muteUser`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',

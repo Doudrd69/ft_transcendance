@@ -11,7 +11,7 @@ import { UseGuards } from '@nestjs/common'
 @WebSocketGateway({
 	namespace: 'user',
 	cors: {
-		origin: ['http://localhost:3000']
+		origin: ['http://localhost:3000', 'http://10.12.11.2:3000']
 	},
 	middlewares: [GatewayGuard],
 })

@@ -25,7 +25,7 @@ const SendBoxComponent: React.FC = () => {
 		try {
 			e.preventDefault();
 	
-			const response = await fetch('http://localhost:3001/chat/newMessage', {
+			const response = await fetch(`${process.env.API_URL}/chat/newMessage`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',

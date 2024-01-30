@@ -62,7 +62,7 @@ let gameInstance: game_instance | null = null;
 @WebSocketGateway({
     namespace: 'game',
     cors: {
-        origin: ['http://localhost:3000']
+        origin: ['http://localhost:3000', 'http://10.12.11.2:3000']
     },
     middlewares: [GatewayGuard],
 })

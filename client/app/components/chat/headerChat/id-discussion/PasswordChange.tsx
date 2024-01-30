@@ -26,7 +26,7 @@ const PasswordChangeComponent: React.FC = () => {
 				password: password,
 			}
 
-			const response = await fetch(`http://localhost:3001/chat/updateIsProtectedTrue`, {
+			const response = await fetch(`${process.env.API_URL}/chat/updateIsProtectedTrue`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',

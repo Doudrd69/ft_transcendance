@@ -28,7 +28,7 @@ const ChatListComponent: React.FC = () => {
   
 	const loadDMs = async () => {
 		try {
-			const requestDms = await fetch(`http://localhost:3001/chat/getDMsConversations/${sessionStorage.getItem("currentUserID")}`, {
+			const requestDms = await fetch(`${process.env.API_URL}/chat/getDMsConversations/${sessionStorage.getItem("currentUserID")}`, {
 				method: 'GET',
 				headers: {
 					'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
@@ -80,7 +80,7 @@ const ChatListComponent: React.FC = () => {
 			{dm.map((dm: Conversation, id: number) => (
 				<div key={dm.id} className="bloc-button-discussion-list">
 				<img
-						src={`http://localhost:3001/users/getAvatar/${dm.id}/${timestamp}`}
+						src={`${process.env.API_URL}/users/getAvatar/${dm.id}/${timestamp}`}
 					className={`profil-discussion-list`}
 					alt="User Avatar"
 					/>

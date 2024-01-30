@@ -10,7 +10,7 @@ interface AvatarImageProps {
 const AvatarImageComponent: React.FC<AvatarImageProps> = ({ className, refresh, name}) => {
 
 	const { globalState, dispatch } = useGlobal();
-	const defaultAvatar = 'http://localhost:3001/avatars/avatar.png';
+	const defaultAvatar = `${process.env.API_URL}/avatars/avatar.png`;
 
 	const [isDefault, setDefault] = useState(true);
 	const userLogin = name;
@@ -19,10 +19,10 @@ const AvatarImageComponent: React.FC<AvatarImageProps> = ({ className, refresh, 
 	var url : string;
 	if (name){
 		
-		url = `http://localhost:3001/users/getAvatarByLogin/${userLogin}/${timestamp}`;
+		url = `${process.env.API_URL}/users/getAvatarByLogin/${userLogin}/${timestamp}`;
 	}
 	else {
-		url = `http://localhost:3001/users/getAvatar/${userId}/${timestamp}`;
+		url = `${process.env.API_URL}/users/getAvatar/${userId}/${timestamp}`;
 	}
 
 

@@ -41,7 +41,7 @@ const FriendsListComponent: React.FC = () => {
 	
 	const loadFriendList = async () => {
 		try {
-			const response = await fetch(`http://localhost:3001/users/getFriends/${username}`, {
+			const response = await fetch(`${process.env.API_URL}/users/getFriends/${username}`, {
 				method: 'GET',
 				headers: {
 					'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
@@ -105,7 +105,7 @@ const FriendsListComponent: React.FC = () => {
 			<div className="tab-and-userclicked" key={id}>
 				<div className="bloc-button-friendslist">
 						<img
-							src={`http://localhost:3001/users/getAvatar/${friend.id}/${timestamp}`}
+							src={`${process.env.API_URL}/users/getAvatar/${friend.id}/${timestamp}`}
 							className={`profil-friendslist`}
 							alt="User Avatar"
 						/>

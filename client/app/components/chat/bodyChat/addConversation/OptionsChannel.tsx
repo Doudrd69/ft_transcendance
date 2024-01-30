@@ -45,7 +45,7 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 				userID: Number(sessionStorage.getItem("currentUserID")),
 			}
 
-			const response = await fetch(`http://localhost:3001/chat/updateIsPublicTrue`, {
+			const response = await fetch(`${process.env.API_URL}/chat/updateIsPublicTrue`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
@@ -75,7 +75,7 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 				userID: Number(sessionStorage.getItem("currentUserID")),
 			}
 
-			const response = await fetch(`http://localhost:3001/chat/updateIsPublicFalse`, {
+			const response = await fetch(`${process.env.API_URL}/chat/updateIsPublicFalse`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
@@ -106,7 +106,7 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 				userID: Number(sessionStorage.getItem("currentUserID")),
 			}
 	
-			const response = await fetch(`http://localhost:3001/chat/deleteConversation`, {
+			const response = await fetch(`${process.env.API_URL}/chat/deleteConversation`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
@@ -143,7 +143,7 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 				state: chatState.currentConversationIsProtected,
 			}
 
-			const response = await fetch(`http://localhost:3001/chat/updateIsProtectedFalse`, {
+			const response = await fetch(`${process.env.API_URL}/chat/updateIsProtectedFalse`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',

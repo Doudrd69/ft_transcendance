@@ -48,7 +48,7 @@ const ReceiveBoxComponent: React.FC = () => {
 	const getMessage = async () => {
 
 		try {
-			const response = await fetch(`http://localhost:3001/chat/getMessages/${chatState.currentConversationID}`, {
+			const response = await fetch(`${process.env.API_URL}/chat/getMessages/${chatState.currentConversationID}`, {
 				method: 'GET',
 				headers: {
 					'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,

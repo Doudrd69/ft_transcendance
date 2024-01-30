@@ -42,10 +42,10 @@ services:
 
   client:
     container_name: client
-    build: ./client
-    environment:
-      - REACT_APP_PROJECT_URL=${PROJECT_URL}
-      - REACT_APP_SERVER_REDIRECT_URI=${SERVER_REDIRECT_URI}
+    build:
+      context: ./client
+      args:
+        API_URL: ${API_URL}
     depends_on:
       - server
     ports:

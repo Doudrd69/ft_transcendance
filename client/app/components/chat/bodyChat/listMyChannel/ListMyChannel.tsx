@@ -45,7 +45,7 @@ const ListMyChannelComponent: React.FC<ListMyChannelComponentProps> = ({ user, f
 		try {
 			console.log('loadDiscussions');
 			console.log('userID', user);
-			const response = await fetch(`http://localhost:3001/chat/getConversationsToAdd/${friendID}`, {
+			const response = await fetch(`${process.env.API_URL}/chat/getConversationsToAdd/${friendID}`, {
 				method: 'GET',
 				headers: {
 					'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
@@ -65,7 +65,7 @@ const ListMyChannelComponent: React.FC<ListMyChannelComponentProps> = ({ user, f
 	const loadDiscussionsPublic = async () => {
 		try {
 			console.log('loadDiscussionsPublic');
-			const response = await fetch(`http://localhost:3001/chat/getConversationsPublic/${userID}`, {
+			const response = await fetch(`${process.env.API_URL}/chat/getConversationsPublic/${userID}`, {
 				method: 'GET',
 				headers: {
 					'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
@@ -91,7 +91,7 @@ const ListMyChannelComponent: React.FC<ListMyChannelComponentProps> = ({ user, f
 				userToAdd: friend,
 				conversationID: convID,
 			}
-			const response = await fetch('http://localhost:3001/chat/addUserToConversation', {
+			const response = await fetch(`${process.env.API_URL}/chat/addUserToConversation`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',

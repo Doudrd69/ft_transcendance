@@ -65,7 +65,7 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 	const getMessages = async () => {
 		try {
 
-			const response = await fetch(`http://localhost:3001/chat/getMessages/${chatState.currentConversationID}`, {
+			const response = await fetch(`${process.env.API_URL}/chat/getMessages/${chatState.currentConversationID}`, {
 				method: 'GET',
 				headers: {
 				'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
@@ -84,7 +84,7 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 	const loadUserList = async () => {
 
 		try {
-			const response = await fetch(`http://localhost:3001/chat/getUserlist/${chatState.currentConversationID}`, {
+			const response = await fetch(`${process.env.API_URL}/chat/getUserlist/${chatState.currentConversationID}`, {
 				method: 'GET',
 				headers: {
 				'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
@@ -167,7 +167,7 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 						<img className='admin-user' src='./crown.png' alt='user' />
 						<img
 						className='img-list-users-channel-admin'
-						src={`http://localhost:3001${ownerUser?.avatarURL}`}
+						src={`${process.env.API_URL}${ownerUser?.avatarURL}`}
 						onClick={() => {
 						  chatDispatch({ type: 'ACTIVATE', payload: 'dontcandcel' });
 						  chatDispatch({ type: 'ACTIVATE', payload: 'showOptionsUserChannelOwner' });
@@ -188,7 +188,7 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 								<img className='admin-user' src='./crown.png' alt='user' />
 								<img
 								className='img-list-users-channel-admin'
-								src={`http://localhost:3001${user.avatarURL}`}
+								src={`${process.env.API_URL}${user.avatarURL}`}
 								onClick={() => {
 									chatDispatch({ type: 'ACTIVATE', payload: 'dontcandcel' });
 									chatDispatch({ type: 'ACTIVATE', payload: 'dontcandcel' });
@@ -201,7 +201,7 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 						{!user.isAdmin && !user.isOwner &&
 						  <img
 						  className='img-list-users-channel'
-						  src={`http://localhost:3001${user.avatarURL}`}
+						  src={`${process.env.API_URL}${user.avatarURL}`}
 						  onClick={() => {
 								chatDispatch({ type: 'SET_CURRENT_TARGET', payload: user});
 								chatDispatch({ type: 'ACTIVATE', payload: 'dontcandcel' });
@@ -233,7 +233,7 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 							:
 							<>
 								<img
-								src={`http://localhost:3001/users/getAvatarByLogin/${message.from}/${timestamp}`}
+								src={`${process.env.API_URL}/users/getAvatarByLogin/${message.from}/${timestamp}`}
 								className='avatar-channel'
 								alt="User Avatar"
 								/>

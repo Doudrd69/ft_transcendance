@@ -37,7 +37,7 @@ const FriendsListTabComponent: React.FC<FriendsListTabComponentProps> = ({ user 
 				recipientLogin: user.username,
 			}
 
-			const response = await fetch(`http://localhost:3001/users/blockUser`, {
+			const response = await fetch(`${process.env.API_URL}/users/blockUser`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
@@ -64,7 +64,7 @@ const FriendsListTabComponent: React.FC<FriendsListTabComponentProps> = ({ user 
 				initiatorLogin: sessionStorage.getItem("currentUserLogin"),
 				recipientLogin: user.username,
 			}
-			const response = await fetch(`http://localhost:3001/users/unblockUser`, {
+			const response = await fetch(`${process.env.API_URL}/users/unblockUser`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
@@ -96,7 +96,7 @@ const FriendsListTabComponent: React.FC<FriendsListTabComponentProps> = ({ user 
 		// si l'autre accept envoyer emit de userOneId playerOneid userTwoId 
 		console.log("Inviting user to play");
 
-		const gameSocket = io('http://localhost:3001/game', {
+		const gameSocket = io(`${process.env.API_URL}/game`, {
 			autoConnect: false,
 			auth: {
 				token: sessionStorage.getItem("jwt"),
@@ -139,7 +139,7 @@ const FriendsListTabComponent: React.FC<FriendsListTabComponentProps> = ({ user 
 				recipientLogin: user.username,
 			}
 
-			const response = await fetch('http://localhost:3001/users/removeFriend', {
+			const response = await fetch(`${process.env.API_URL}/users/removeFriend`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',

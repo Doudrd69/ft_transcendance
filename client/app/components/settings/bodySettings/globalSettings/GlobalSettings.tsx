@@ -19,7 +19,7 @@ const GlobalSettingsComponent: React.FC = () => {
 				userID: Number(sessionStorage.getItem("currentUserID")),
 			}
 		
-			const response = await fetch('http://localhost:3001/auth/desactivate2fa', {
+			const response = await fetch(`${process.env.API_URL}/auth/desactivate2fa`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
@@ -48,7 +48,7 @@ const GlobalSettingsComponent: React.FC = () => {
 				userID: Number(sessionStorage.getItem("currentUserID")),
 			}
 	
-			const response = await fetch('http://localhost:3001/auth/request2fa', {
+			const response = await fetch(`${process.env.API_URL}/auth/request2fa`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
@@ -79,7 +79,7 @@ const GlobalSettingsComponent: React.FC = () => {
 				code: authenticatorCodeInput,
 			}
 	
-			const response = await fetch('http://localhost:3001/auth/checkAuthenticatorCode', {
+			const response = await fetch(`${process.env.API_URL}/auth/checkAuthenticatorCode`, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',

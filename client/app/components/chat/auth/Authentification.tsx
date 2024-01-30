@@ -17,7 +17,7 @@ const Authentificationcomponent = () => {
 	// 	try{
 	// 		e.preventDefault();
 	
-	// 		const response = await fetch('http://localhost:3001/users/signup', {
+	// 		const response = await fetch(`${process.env.API_URL}/users/signup`, {
 	// 			method: 'POST',
 	// 			headers: {
 	// 				'Content-Type': 'application/json',
@@ -40,7 +40,8 @@ const Authentificationcomponent = () => {
 	return (
 		
 			<div className="block-auth">
-				<a href="https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-8a7a2b2fd0e4c017d37f372040ba814c255a58303468e243ff07831a8d026b50&redirect_uri=http%3A%2F%2Flocalhost%3A3000&response_type=code">
+				{/* <a href="https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-8a7a2b2fd0e4c017d37f372040ba814c255a58303468e243ff07831a8d026b50&redirect_uri=http%3A%2F%2Flocalhost%3A3000&response_type=code"> */}
+				<a href="https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-8a7a2b2fd0e4c017d37f372040ba814c255a58303468e243ff07831a8d026b50&redirect_uri=http%3A%2F%2F10.12.11.2%3A3000&response_type=code">
 					<button className= "button-auth">SIGN IN WITH 42</button>
 				</a>
 

@@ -8,9 +8,9 @@ import { ValidationPipe } from '@nestjs/common'
 const express = require('express');
 const cors = require('cors');
 
-// Configure CORS to allow requests from http://localhost:3000
+// Configure CORS to allow requests from http://localhost:3000 and 10.12.11.2:3000
 const corsOptions = {
-  origin: 'http://localhost:3000',
+  origin: ['http://10.12.11.2:3000', 'http://localhost:3000'],
   methods: 'GET,POST',
   allowedHeaders: 'Content-Type,Authorization',
   credentials: true,  // Enable CORS with credentials (e.g., cookies)

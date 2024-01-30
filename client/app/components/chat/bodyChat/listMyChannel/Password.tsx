@@ -24,7 +24,7 @@ const PasswordComponent: React.FC = () => {
 				username: sessionStorage.getItem("currentUserLogin"),
 			}
 		
-			const response = await fetch('http://localhost:3001/chat/checkPassword', {
+			const response = await fetch(`${process.env.API_URL}/chat/checkPassword`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',

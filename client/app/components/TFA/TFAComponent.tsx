@@ -22,7 +22,7 @@ const TFAComponent: React.FC  = () => {
 				code: String(authenticatorCodeInput),
 			}
 
-			const response = await fetch('http://localhost:3001/auth/checkAuthenticatorCode', {
+			const response = await fetch(`${process.env.API_URL}/auth/checkAuthenticatorCode`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',

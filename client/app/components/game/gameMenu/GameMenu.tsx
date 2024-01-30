@@ -54,7 +54,7 @@ const Menu = () => {
 
         try {
             setGameMode("NORMAL");
-            const gameSocket = io('http://localhost:3001/game', {
+            const gameSocket = io(`${process.env.API_URL}/game`, {
                 autoConnect: false,
                 auth: {
                     token: sessionStorage.getItem("jwt"),
@@ -78,7 +78,7 @@ const Menu = () => {
 
         try {
             setGameMode("SPEED");
-            const gameSocket = io('http://localhost:3001/game', {
+            const gameSocket = io(`${process.env.API_URL}/game`, {
                 autoConnect: false,
                 auth: {
                     token: sessionStorage.getItem("jwt"),

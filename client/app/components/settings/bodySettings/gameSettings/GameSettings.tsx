@@ -8,7 +8,7 @@ const GameSettingsComponent: React.FC = () => {
 
 		try {
 
-			const response = await fetch(`http://localhost:3001/users/getGameHistory/${sessionStorage.getItem("currentUserID")}`, {
+			const response = await fetch(`${process.env.API_URL}/users/getGameHistory/${sessionStorage.getItem("currentUserID")}`, {
 				method: 'GET',
 				headers: {
 					'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`

@@ -19,12 +19,9 @@ import GameHeader from './components/game/GameHeader';
 import { setGameSocket, useGlobal } from './GlobalContext';
 import { ChatProvider, useChat } from './components/chat/ChatContext';
 import AccessComponent from './access';
-<<<<<<< HEAD
-import dotenv from 'dotenv';
-// import { useChat } from './components/chat/ChatContext';
-=======
-import { send } from 'process';
->>>>>>> abda9fd5a50656d4ac7f1b32b1be0990b95fa34b
+// import dotenv from 'dotenv';
+
+// dotenv.config();
 
 interface Game {
 	gameId: number;
@@ -42,20 +39,15 @@ interface FriendRequestDto {
 	initiatorLogin: string;
 }
 
-<<<<<<< HEAD
-dotenv.config();
-// console.log("URL ==========================> ", PROJECT_URL);
-console.log(`====> 2 ${process.env.REACT_APP_PROJECT_URL}`);
-=======
 interface GameInviteDto {
 	senderID: string,
 	senderUsername: string;
 	initiatorLogin: string;
 }
->>>>>>> abda9fd5a50656d4ac7f1b32b1be0990b95fa34b
 
 const GeneralComponent = () => {
 	
+	// console.log(`ENV ====> ${process.env.REACT_APP_PROJECT_URL}`);
 
 	const { globalState, dispatch } = useGlobal();
 	const [showLogin, setShowLogin] = useState(true);
@@ -69,7 +61,7 @@ const GeneralComponent = () => {
 	// GAME INVITE
 	const gameInviteValidation = (gameInviteDto: GameInviteDto) => {
 
-		const gameSocket = io('http://localhost:3001/game', {
+		const gameSocket = io(`${process.env.API_URL}/game`, {
 			autoConnect: false,
 			auth: {
 				token: sessionStorage.getItem("jwt"),
@@ -103,7 +95,7 @@ const GeneralComponent = () => {
 	// FRIEND REQUEST
 	const friendRequestValidation = async (friendRequestDto: FriendRequestDto) => {
 
-		const response = await fetch('http://localhost:3001/users/acceptFriendRequest', {
+		const response = await fetch(`${process.env.API_URL}/users/acceptFriendRequest`, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
@@ -161,7 +153,7 @@ const GeneralComponent = () => {
 	const userReconnects = () => {
 
 		if (sessionStorage.getItem("jwt")) {
-			const userSocket = io('http://localhost:3001/user', {
+			const userSocket = io(`${process.env.API_URL}/user`, {
 				autoConnect: false,
 				auth: {
 					token: sessionStorage.getItem("jwt"),
@@ -180,12 +172,9 @@ const GeneralComponent = () => {
 
 		if (userReconnects())
 			return true;
-<<<<<<< HEAD
 
-=======
-		console.log('handleAccessToken');
->>>>>>> abda9fd5a50656d4ac7f1b32b1be0990b95fa34b
-		const response = await fetch('http://localhost:3001/auth/access', {
+		console.log(process.env.API_URL);
+		const response = await fetch(`${process.env.API_URL}/auth/access`, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
@@ -199,7 +188,7 @@ const GeneralComponent = () => {
 			sessionStorage.setItem("jwt", token.access_token);
 			if (token.access_token) {
 				await setUserSession(token.access_token);
-				const userSocket = io('http://localhost:3001/user', {
+				const userSocket = io(`${process.env.API_URL}/user`, {
 					autoConnect: false,
 					auth: {
 						token: token.access_token,
@@ -355,7 +344,7 @@ const GeneralComponent = () => {
 	const check2faActivate = async () => {
 		console.log("check2faActivate")
 		try {
-			const response = await fetch('http://localhost:3001/auth/get2fa', {
+			const response = await fetch(`${process.env.API_URL}/auth/get2fa`, {
 				method: 'GET',
 				headers: {
 					'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
