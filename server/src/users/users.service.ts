@@ -289,6 +289,8 @@ export class UsersService {
 					id: game.gameId,
 					playerOne: game.playerOneLogin,
 					playerTwo: game.playerTwoLogin,
+					playerOneId: game.userOneId,
+					playerTwoId: game.userTwoId,
 					scoreP1: game.scoreOne,
 					scoreP2: game.scoreTwo,
 				});
@@ -302,6 +304,14 @@ export class UsersService {
 
 		throw new Error('Fatal error');
 	}
+	
+	// getStateGame(userId: number) {
+	// 	const user = this.usersRepository.findOne({ where: { id: userId } });
+
+		
+
+		
+	// }
 
 	/**************************************************************/
 	/***				FRIENDSHIP MANAGEMENT					***/

@@ -1,0 +1,70 @@
+
+.bloc-history {
+	margin: 10px;
+	padding: 20px;
+	border-radius: 10px;
+	min-height: 100%;
+	border : 3px solid #6a6a6a;
+
+	overflow-y: auto; /* Enable vertical scrolling */
+}
+.title-game{
+	margin: 10px 10px 0px 10px;
+	font-size: 20px;
+	font-weight: bold;
+	font-family: 'Gill Sans' , sans-serif;
+	}
+.game-history {
+	display: flex;
+	justify-content: space-between;
+	border: 1px solid #ccc;
+	margin : 10px;
+	padding: 10px;
+	}
+
+.green-text {
+	color: rgb(22, 103, 22);
+	}
+
+.red-text {
+	color: rgb(182, 37, 37);
+	}
+
+.img-history {
+	width: 40px;
+	height: auto;
+	}
+.game-history-player {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	margin: 10px;
+	}
+
+.game-history-player-name {
+	font-weight: bold;
+	margin-bottom: 5px;
+	}
+
+.game-history-player-score {
+	color: #555;
+	}
+
+.color-palette {
+	display: flex;
+	justify-content: space-around;
+	margin-top: 20px;
+	}
+	
+	.color-option {
+	width: 30px;
+	height: 30px;
+	border-radius: 50%;
+	cursor: pointer;
+	transition: transform 0.2s;
+	}
+	
+	.color-option:hover {
+	transform: scale(1.1);
+	}
