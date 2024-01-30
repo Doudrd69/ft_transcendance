@@ -35,19 +35,10 @@ const GameSettingsComponent: React.FC = () => {
 	}
 	
 		return (
-			<>
 				<div className="bloc-game-settings">
-					Game
-					<form onSubmit={handleGameHistory}>
-						<label>
-							
-						</label>
-						<button type="submit">Game History</button>
-					</form>
+					{/* <HistoryComponent/> */}
 				</div>
-			</>
 			);
-
 	};
 	
 	export default GameSettingsComponent;
