@@ -42,7 +42,7 @@ export class GameService {
 		this.disconnections[gameId] = []
 	}
 
-	getDiconnections(gameId: number): string[] {
+	getDisconnections(gameId: number): string[] {
 		return this.disconnections[gameId]
 	}
 
@@ -96,12 +96,9 @@ export class GameService {
 	}
 
 	getUserIdWithSocketId(socketId: string): number {
-		let userId: number;
-		for (const [socketIdValue] of Object.entries(this.userGameSockets)) {
+		for (const [userIdValue, socketIdValue] of Object.entries(this.userGameSockets)) {
 			if (socketIdValue === socketId) {
-				userId = Number(socketIdValue);
-				console.log(`getUserIdWithSocketId: ${userId}`);
-				return userId;
+				return Number(userIdValue);
 			}
 		}
 		return (0);

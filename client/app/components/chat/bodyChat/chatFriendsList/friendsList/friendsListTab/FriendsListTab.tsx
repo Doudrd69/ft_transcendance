@@ -20,8 +20,9 @@ interface FriendsListTabComponentProps {
 
 const FriendsListTabComponent: React.FC<FriendsListTabComponentProps> = ({ user }) => {
 
-	let gameInviteValidation: boolean = false;
+	// let gameInviteValidation: boolean = false;
 	let gameSocketConnected: boolean = false;
+	const [gameInviteValidation, setgameInviteValidation] = useState<boolean>(false);
 	const { chatState, chatDispatch } = useChat();
 	const { globalState, dispatch } = useGlobal();
 	const [confirmationText, setConfirmationText] = useState('');
@@ -93,50 +94,46 @@ const FriendsListTabComponent: React.FC<FriendsListTabComponentProps> = ({ user 
 	};
 
 	const gameInvite = () => {
-		// envoyer toast a lautre user et attendre la reponse
-		// si l'autre accept envoyer emit de userOneId playerOneid userTwoId 
-		console.log("Inviting user to play");
 		if (gameSocketConnected === false) {
-			const gameSocket = io('http://localhost:3001/game', {
-				autoConnect: false,
-				auth: {
-					token: sessionStorage.getItem("jwt"),
-				}
+		  const gameSocket = io('http://localhost:3001/game', {
+			autoConnect: false,
+			auth: {
+			  token: sessionStorage.getItem("jwt"),
+			}
+		  });
+		  gameSocket.connect();
+		  gameSocketConnected = true;
+		  gameSocket.on('connect', () => {
+			dispatch({ type: 'SET_GAME_SOCKET', payload: gameSocket });
+			console.log("socketID :", gameSocket.id);
+			globalState.userSocket?.emit('inviteToGame', {
+			  usernameToInvite: user.username,
+			  senderID: gameSocket.id,
+			  senderUsername: sessionStorage.getItem("currentUserLogin"),
+			  senderUserID: sessionStorage.getItem("currentUserID"),
 			});
-			gameSocket.connect();
-			gameSocketConnected = true;
-			gameSocket.on('connect', () => {
-				dispatch({ type: 'SET_GAME_SOCKET', payload: gameSocket });
-				console.log("socketID :", gameSocket.id);
-
-				// const functionThatReturnPromise = () => new Promise(resolve => setTimeout(resolve, 3000));
-				// toast.promise(
-				// 	functionThatReturnPromise,
-				// 	{
-				// 		pending: 'Game Invitation is pending',
-				// 		success: 'Game Invitation is pending',
-				// 		error: 'Game Invite rejected 🤯'
-				// 	}
-				// )
-				globalState.userSocket?.emit('inviteToGame', {
-					usernameToInvite: user.username,
-					senderID: gameSocket.id,
-					senderUsername: sessionStorage.getItem("currentUserLogin"),
-				});
-				setTimeout(() => {
-					gameSocketConnected = false;
-					if (gameInviteValidation === false)
-						gameSocket.disconnect();
-				}, 8000)
-			});
+			setTimeout(() => {
+			  gameSocketConnected = false;
+			  if (gameInviteValidation === false) {
+				console.log("validationoooooooo :", gameInviteValidation);
+				globalState.gameSocket?.disconnect();
+			  }
+			}, 8000)
+		  });
 		}
-	}
-
-	useEffect(() => {
-		globalState.gameSocket?.on('acceptInvitation', () => {
-			gameInviteValidation = true;
+	  };
+	  
+	  useEffect(() => {
+		const subscription = globalState.gameSocket?.on('acceptInvitation', () => {
+		  console.log("validation :", gameInviteValidation);
+		  setgameInviteValidation(true);
+		  // gameInviteValidation = true;
 		});
-	})
+	  
+		return () => {
+		  subscription?.off('acceptInviation');
+		};
+	  }, [globalState?.gameSocket, gameInviteValidation]);
 
 	const removeFriends = async () => {
 

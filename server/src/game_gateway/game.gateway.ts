@@ -93,6 +93,7 @@ export class GameGateway {
             const userId: number = this.GameService.getUserIdWithSocketId(client.id);
             // console.log(`[${client.id}] userLogin de ses morts 1: ${userLogin}`);
             if (userId) {
+                console.log("disconect USER NOW")
                 console.log(`userId = ${userId}`)
                 const user: User = await this.GameService.getUserWithUserId(userId);
                 if (user && this.GameService.userInGameOrInMacthmaking(user)) {
@@ -111,18 +112,19 @@ export class GameGateway {
                     }
                 }
             }
-            console.log(`[${client.id}] GameGtw client disconnected : ${client.id}`);
         }
         catch (err) {
             console.log(client.id)
             throw (err)
         }
+        console.log(`[${client.id}] GameGtw client disconnected : ${client.id}`);
     }
 
     @SubscribeMessage('inviteAccepted')
     async handleCheckgameInvite(@ConnectedSocket() client: Socket, @MessageBody() data: { userOneId: number, userTwoId: number, playerTwoId: string, playerOneLogin: string, playerTwoLogin: string}) {
         //     // du coup en amont il faut creer des sockets pour les deux users. si pas bon supprimer les deux sockets
         // envoyer un emit accept a lautre user
+        console.log(`check : id : ${client.id}, ${data.playerTwoId} ${data.userOneId} ${data.userTwoId} playerOneLogin: string, playerTwoLogin: string`)
         this.server.to([data.playerTwoId]).emit('acceptInvitation');
         if (!this.GameService.userHasAlreadyGameSockets(data.userOneId)) {
             if (!this.GameService.userHasAlreadyGameSockets(data.userTwoId)) {
@@ -263,9 +265,9 @@ export class GameGateway {
     async executeGameTick(gameLoop: NodeJS.Timeout, gameInstance: game_instance, client: string) {
         if (gameInstance.stop === true)
             return
-        const disconnectedSockets = this.GameService.getDiconnections(gameInstance.gameID)
+        const disconnectedSockets = this.GameService.getDisconnections(gameInstance.gameID)
         if (disconnectedSockets.length > 0) {
-            console.log(`diconnectedFound: ${disconnectedSockets} `)
+            console.log(`disconnectedFound: ${disconnectedSockets} `)
             gameInstance.stop = true
             clearInterval(gameLoop);
             for (const userSocket of disconnectedSockets) {
