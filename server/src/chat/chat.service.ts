@@ -1101,6 +1101,7 @@ export class ChatService {
 		if (conversation) {
 			const newMessage = new Message();
 			newMessage.from = 'Bot';
+			newMessage.senderId = 0;
 			newMessage.content = dto.content;
 			newMessage.post_datetime = dto.post_datetime;
 			newMessage.conversation = conversation;

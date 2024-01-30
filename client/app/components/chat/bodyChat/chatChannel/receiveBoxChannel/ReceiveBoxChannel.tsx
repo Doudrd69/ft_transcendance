@@ -124,6 +124,11 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 			// setMessages((prevMessages: Message[]) => [...prevMessages, notification])
 		});
 
+		globalState.userSocket?.on('userIsBan', () => {
+			chatDispatch({ type: 'DISABLE', payload: 'showChannel' });
+			chatDispatch({ type: 'ACTIVATE', payload: 'showChannelList' });
+		});
+
 		globalState.userSocket?.on('onMessage', (message: Message) => {
 			if (message && (message.conversationID == chatState.currentConversationID))
 				setMessages((prevMessages: Message[]) => [...prevMessages, message]);
@@ -156,6 +161,7 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 			globalState.userSocket?.off('kickUser');
 			globalState.userSocket?.off('channelDeleted');
 			globalState.userSocket?.off('recv_notif');
+			globalState.userSocket?.off('userIsBan');
 		};
 		
 	}, [globalState?.userSocket]);
