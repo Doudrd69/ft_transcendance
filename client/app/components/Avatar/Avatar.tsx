@@ -10,7 +10,6 @@ interface AvatarImageProps {
 const AvatarImageComponent: React.FC<AvatarImageProps> = ({ className, refresh, name}) => {
 
 	const { globalState, dispatch } = useGlobal();
-	const defaultAvatar = `${process.env.API_URL}/avatars/avatar.png`;
 
 	const [isDefault, setDefault] = useState(true);
 	const userLogin = name;

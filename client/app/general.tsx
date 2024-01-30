@@ -1,24 +1,14 @@
-import { useSearchParams } from 'next/navigation'
-import Image from 'next/image'
-import React, { useState, useEffect } from 'react';
-import RootLayout from './layout'
-import Chat from './components/chat/Chat'
-import Game from './components/game/Game'
-import TFAComponent from './components/TFA/TFAComponent'
-import Header from './components/header/Header'
-import Authentificationcomponent from './components/chat/auth/Authentification';
-import { GameProvider } from './components/game/GameContext';
-import { io, Socket } from 'socket.io-client'
+import { useSearchParams } from 'next/navigation';
+import React, { useEffect, useState } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import SettingsComponent from './components/settings/Settings';
-import BodyComponent from './components/body/Body';
-import SetComponent from './components/Avatar/SetAvatar';
-import { totalmem } from 'os';
-import GameHeader from './components/game/GameHeader';
-import { setGameSocket, useGlobal } from './GlobalContext';
-import { ChatProvider, useChat } from './components/chat/ChatContext';
+import { io } from 'socket.io-client';
+import { useGlobal } from './GlobalContext';
 import AccessComponent from './access';
+import BodyComponent from './components/body/Body';
+import { ChatProvider } from './components/chat/ChatContext';
+import Game from './components/game/Game';
+import Header from './components/header/Header';
 // import dotenv from 'dotenv';
 
 // dotenv.config();

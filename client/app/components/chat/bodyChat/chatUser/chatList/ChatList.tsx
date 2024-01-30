@@ -3,8 +3,6 @@ import React, { useState, useEffect } from 'react';
 import {useChat} from '../../../ChatContext';
 import AddConversationComponent from '../../addConversation/AddConversation';
 import { Socket } from 'socket.io-client';
-import AvatarImageComponent from '@/app/components/Avatar/Avatar';
-import AvatarImageBisComponent from '@/app/components/Avatar/AvatarBis';
 import { setCurrentComponent } from '../../../ChatContext';
 import { useGlobal } from '@/app/GlobalContext';
 

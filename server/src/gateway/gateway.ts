@@ -187,16 +187,15 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 
 	@SubscribeMessage('message')
 	@UseGuards(GatewayGuard)
-	async handleMessage(@ConnectedSocket() client, @MessageBody() data: { dto: MessageDto, conversationName: string } ) {
+	async handleMessage(@ConnectedSocket() client: Socket, @MessageBody() data: { dto: MessageDto, conversationName: string } ) {
 
 		const { dto, conversationName } = data;
-		console.log("=========================================> ", client.user);
-		// console.log("Message sent to: ", conversationName + dto.conversationID);
+		const user = client.handshake.auth.user;
 
 		// The room's name is not the conversation's name in DB
 		this.server.to(conversationName + dto.conversationID).except(`whoblocked${dto.from}`).emit('onMessage', {
 			from: dto.from,
-			// senderId: test.sub,
+			senderId: user.sub,
 			content: dto.content,
 			post_datetime: dto.post_datetime,
 			conversationID: dto.conversationID,
