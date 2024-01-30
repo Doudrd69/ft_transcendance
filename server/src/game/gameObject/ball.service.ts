@@ -45,34 +45,8 @@ export class BallService {
 	// refaire un check de collision? em mode
 	collisionWithPaddle(ball: ball_instance, paddle: paddle_instance) {
 		let distanceBetweenBallAndPaddle = this.VectorService.norm(this.VectorService.sub(this.closestPointWithPaddle(ball, paddle), ball.position));
-
-		// setTimeout(() => {
-		// 	if (paddle.number === 1 && ball.position.x) {
-		// 		// console.log(`paddle{${paddle.number}}, distance: ${distanceBetweenBallAndPaddle}, x: ${paddle.start.x}, y: ${paddle.start.y}`);
-		// 	}
-		// }, 100);
 		return (distanceBetweenBallAndPaddle <= ball.r)
 	}
-
-	// checkCollisionPaddle(ball: ball_instance, paddle: paddle_instance) {
-	// 	if (ball.position.x <= 0.2)
-	// 		return (this.checkPaddleOne(ball, paddle));
-	// 	else if (ball.position.x >= 0.8)
-	// 		return (this.checkPaddleTwo(ball, paddle));
-	// 	return false;
-	// }
-
-	// checkPaddleOne(ball: ball_instance, paddle: paddle_instance) {
-	// 	if (ball.position.x - ball.r <= 0.025 && ball.position.y >= paddle.y && ball.position.y <= paddle.y + paddle.length)
-	// 		return true;
-	// 	return false;
-	// }
-
-	// checkPaddleTwo(ball: ball_instance, paddle: paddle_instance) {
-	// 	if (ball.position.x + ball.r >= 0.975 && ball.position.y >= paddle.y && ball.position.y <= paddle.y + paddle.length)
-	// 		return true;
-	// 	return false;
-	// }
 
 	closestPointWithPaddle(ball: ball_instance, paddle: paddle_instance) {
 		let ball_to_wall_start = this.VectorService.sub(paddle.start, ball.position);

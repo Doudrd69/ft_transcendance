@@ -173,11 +173,12 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 
 	@SubscribeMessage('inviteToGame')
 	@UseGuards(GatewayGuard)
-	inviteUserToGame( @MessageBody() data: { usernameToInvite: string, senderID: string, senderUsername: string } ) {
-		const { usernameToInvite, senderID, senderUsername } = data;
+	inviteUserToGame( @MessageBody() data: { usernameToInvite: string, senderID: string, senderUsername: string, senderUserID: number } ) {
+		const { usernameToInvite, senderID, senderUsername, senderUserID } = data;
 		console.log("Inviting ", usernameToInvite," to game");
-		console.log("-----> ",  usernameToInvite, senderID, senderUsername);
+		console.log("-----> ",  usernameToInvite, senderID, senderUsername, "ho :", senderUserID);
 		this.server.to(usernameToInvite).emit('gameInvite', {
+			senderUserID: senderUserID,
 			senderID: senderID,
 			senderUsername: senderUsername,
 		});

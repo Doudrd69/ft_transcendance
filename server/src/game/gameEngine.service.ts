@@ -16,6 +16,7 @@ export class GameEngineService {
 	createGameInstance(game: Game) {
 		let signe = (Math.random() - 0.5) > 0 ? 1 : -1;
 		const newGame: game_instance = {
+			usersId: [game.userOneId, game.userTwoId],
 			stop: false,
 			pause: false,
 			player1Joined: false,

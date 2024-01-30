@@ -40,6 +40,7 @@ interface FriendRequestDto {
 }
 
 interface GameInviteDto {
+	senderUserID: number;
 	senderID: string,
 	senderUsername: string;
 	initiatorLogin: string;
@@ -70,6 +71,8 @@ const GeneralComponent = () => {
 		gameSocket.connect();
 		dispatch({ type: 'SET_GAME_SOCKET', payload: gameSocket });
 		gameSocket.emit('inviteAccepted', {
+			userOneId: sessionStorage.getItem("currentUserID"),
+			userTwoId: gameInviteDto.senderUserID,
 			playerOneLogin: sessionStorage.getItem("currentUserLogin"),
 			playerTwoLogin: gameInviteDto.senderUsername,
 			playerTwoId: gameInviteDto.senderID, 
@@ -78,7 +81,7 @@ const GeneralComponent = () => {
 
 	const GameInviteNotification = ({ closeToast, toastProps, gameInviteDto }: any) => (
 		<div>
-			You received a game invite from  {gameInviteDto.senderID}
+			You received a game invite from  {gameInviteDto.senderUserID}
 			<button style={{ padding: '5px '}} onClick={() => {
 				closeToast();
 				gameInviteValidation(gameInviteDto);
@@ -121,7 +124,7 @@ const GeneralComponent = () => {
 			You received a friend request from  {friendRequestDto.initiatorLogin}
 			<button style={{ padding: '5px ' }} onClick={() => {
 				friendRequestValidation(friendRequestDto);
-				closeToast;
+				closeToast();
 			}}>
 				Accept
 			</button>
@@ -208,12 +211,16 @@ const GeneralComponent = () => {
 	useEffect(() => {
 
 		globalState.userSocket?.on('friendRequest', (friendRequestDto: FriendRequestDto) => {
-			toast(<FriendRequestReceived friendRequestDto={friendRequestDto} />);
+			toast(<FriendRequestReceived friendRequestDto={friendRequestDto} />, {
+				pauseOnFocusLoss: false,
+			});
 		});
 
 		globalState.userSocket?.on('friendRequestAcceptedNotif', (data: { roomName: string, roomID: string, initiator: string, recipient: string }) => {
 			const { roomName, roomID, initiator, recipient } = data;
-			toast(<FriendRequestAccepted friend={recipient} />);
+			toast(<FriendRequestAccepted friend={recipient} />, {
+				pauseOnFocusLoss: false,
+			});
 			globalState.userSocket?.emit('joinRoom', { roomName: roomName, roomID: roomID });
 		})
 
@@ -247,20 +254,12 @@ const GeneralComponent = () => {
 		});
 
 		globalState.userSocket?.on('gameInvite', (gameInviteDto: GameInviteDto) => {
-			console.log("senderID :", gameInviteDto.senderID);
+			console.log("senderID :", gameInviteDto.senderUserID);
 			toast(<GameInviteNotification gameInviteDto={gameInviteDto} />,
 				{
 					pauseOnFocusLoss: false,
+					autoClose: 5000,
 				});
-			// const functionThatReturnPromise = () => new Promise(resolve => setTimeout(resolve, 3000));
-			// toast.promise(
-			// 	functionThatReturnPromise,
-			// 	{
-			// 		pending: 'Game Invitation is pending',
-			// 		success: 'Game Invite accepted👌',
-			// 		error: 'Game Invite rejected 🤯'
-			// 	}
-			// )
 		});
 
 		return () => {
@@ -310,7 +309,7 @@ const GeneralComponent = () => {
 
 		globalState.gameSocket?.on('connect', () => {
 
-			globalState.gameSocket?.emit('linkSocketWithUser', { playerLogin: sessionStorage.getItem("currentUserLogin") });
+			globalState.gameSocket?.emit('linkSocketWithUser', { playerLogin: sessionStorage.getItem("currentUserLogin"), userId: sessionStorage.getItem("currentUserID") });
 		})
 
 		globalState.gameSocket?.on('disconnect', () => {
@@ -380,7 +379,9 @@ const GeneralComponent = () => {
 
 	return (
 		<>
-			<ToastContainer stacked />
+			<ToastContainer
+			pauseOnHover={false}
+			/>
 			{!globalState.isConnected ?
 				(<AccessComponent />)
 				: (

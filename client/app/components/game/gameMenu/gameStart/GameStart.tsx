@@ -13,7 +13,7 @@ const MatchMaking = () => {
 
 		if (globalState.gameSocket?.connected) {
 			console.log("Player leaves matchmaking")
-			globalState.gameSocket?.emit('leave-matchmaking', { playerLogin: sessionStorage.getItem("currentUserLogin") });
+			globalState.gameSocket?.emit('leave-matchmaking', { playerLogin: sessionStorage.getItem("currentUserLogin"), userId: sessionStorage.getItem("currentUserID") });
 		}
 		else {
 			console.log("ERROR: GameSocket pas connecté (leave matchmaking)");
