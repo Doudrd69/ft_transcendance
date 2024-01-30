@@ -13,6 +13,7 @@ interface Message {
 	content: string;
 	post_datetime: string;
 	conversationID: number;
+	senderId: number;
 }
 
 interface User {
@@ -233,7 +234,7 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 							:
 							<>
 								<img
-								src={`${process.env.API_URL}/users/getAvatarByLogin/${message.from}}/${timestamp}`}
+								src={`${process.env.API_URL}/users/getAvatar/${message.senderId}/${timestamp}`}
 								className='avatar-channel'
 								alt="User Avatar"
 								/>

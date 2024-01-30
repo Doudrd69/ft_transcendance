@@ -10,6 +10,9 @@ export class Message {
   from: string;
 
   @Column()
+  senderId: number;
+
+  @Column()
   content: string;
 
   @Column() // Recommended

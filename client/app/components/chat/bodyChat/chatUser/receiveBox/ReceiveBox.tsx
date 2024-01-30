@@ -10,6 +10,7 @@ interface Message {
 	post_datetime: string;
 	conversationName: string;
 	conversationID?: number;
+	senderId: number;
 }
 
 const ReceiveBoxComponent: React.FC = () => {
@@ -87,6 +88,7 @@ const ReceiveBoxComponent: React.FC = () => {
 	useEffect(() => {
 		scrollToBottom();
 	}, [messages]);
+
 	return (
 		<div ref={messagesContainerRef} className="bloc-discussion-chat">
 			{messages.map((message: Message, index: number) => (

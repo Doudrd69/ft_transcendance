@@ -9,7 +9,7 @@ interface ImageProps {
 const ImageComponent: React.FC<ImageProps> = ({ className }) => {
 
 	const { globalState } = useGlobal();
-	const [avatarURL, setAvatarURL] = useState('http://localhost:3000/avatars/avatar.png');
+	const [avatarURL, setAvatarURL] = useState(`${process.env.API_URL}/avatars/avatar.png`);
 		const fetchAvatar = async () => {
 			try {
 

@@ -7,6 +7,7 @@ import { Conversation } from 'src/chat/entities/conversation.entity';
 import { MessageDto } from 'src/chat/dto/message.dto';
 import { GatewayGuard } from './Gatewayguard.guard';
 import { UseGuards } from '@nestjs/common'
+import { Req } from '@nestjs/common'
 
 @WebSocketGateway({
 	namespace: 'user',
@@ -186,14 +187,16 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 
 	@SubscribeMessage('message')
 	@UseGuards(GatewayGuard)
-	async handleMessage( @MessageBody() data: { dto: MessageDto, conversationName: string } ) {
+	async handleMessage(@ConnectedSocket() client, @MessageBody() data: { dto: MessageDto, conversationName: string } ) {
 
 		const { dto, conversationName } = data;
+		console.log("=========================================> ", client.user);
 		// console.log("Message sent to: ", conversationName + dto.conversationID);
 
 		// The room's name is not the conversation's name in DB
 		this.server.to(conversationName + dto.conversationID).except(`whoblocked${dto.from}`).emit('onMessage', {
 			from: dto.from,
+			// senderId: test.sub,
 			content: dto.content,
 			post_datetime: dto.post_datetime,
 			conversationID: dto.conversationID,
@@ -303,7 +306,6 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	@SubscribeMessage('emitNotification')
 	@UseGuards(GatewayGuard)
 	async handleNotif(@MessageBody() data: { channel: string, content: string, channelID: string} ) {
-		console.log("aakajajajaajajaj");
 		const { channel, content, channelID } = data;
 		const dto = {
 			from: 'Bot',

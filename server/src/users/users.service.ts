@@ -120,9 +120,8 @@ export class UsersService {
 	}
 
 	async getAvatar(userId: number): Promise<string | null> {
-		console.log("getAvatar");
-		const user = await this.getUserByID(userId);
-		console.log("user: ", user.avatarURL);
+		console.log("== Get avatar of user: ", userId);
+		const user = await this.usersRepository.findOne({ where: { id: userId }});
 		if (!user || !user.avatarURL) {
 			console.log("Avatar not found");
 			return null;
@@ -483,7 +482,7 @@ export class UsersService {
 	/**************************************************************/
 
 	async getUserByID(userID: number): Promise<User> {
-		console.log(userID);
+		console.log("Get userID: ", userID);
 		return await this.usersRepository.findOne({ where: { id: userID } });
 	}
 
