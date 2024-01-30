@@ -17,14 +17,13 @@ const AvatarImageBisComponent: React.FC<AvatarImageProps> = ({ className, refres
 	const userId = sessionStorage.getItem('currentUserID');
 	const timestamp = new Date().getTime();
 	var urlWithTimestamp = `${process.env.API_URL}/users/getAvatar/${userId}/${timestamp}`;
-	var urlLoginWithTimestamp = `${process.env.API_URL}/users/getAvatarByLogin/${userLogin}`;
 
 
 	const fetchAvatar = async () => {
 			try {
 				let response;
 				if (userLogin) {
-					response = await fetch(urlLoginWithTimestamp, {
+					response = await fetch(urlWithTimestamp, {
 						method: 'GET',
 					});
 				} else {

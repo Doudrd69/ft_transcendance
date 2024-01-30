@@ -233,7 +233,7 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 							:
 							<>
 								<img
-								src={`${process.env.API_URL}/users/getAvatarByLogin/${message.from}/${timestamp}`}
+								src={`${process.env.API_URL}/users/getAvatarByLogin/${message.from}}/${timestamp}`}
 								className='avatar-channel'
 								alt="User Avatar"
 								/>

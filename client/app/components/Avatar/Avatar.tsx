@@ -16,14 +16,7 @@ const AvatarImageComponent: React.FC<AvatarImageProps> = ({ className, refresh, 
 	const userLogin = name;
 	const userId = sessionStorage.getItem('currentUserID');
 	const timestamp = new Date().getTime();
-	var url : string;
-	if (name){
-		
-		url = `${process.env.API_URL}/users/getAvatarByLogin/${userLogin}/${timestamp}`;
-	}
-	else {
-		url = `${process.env.API_URL}/users/getAvatar/${userId}/${timestamp}`;
-	}
+	const url = `${process.env.API_URL}/users/getAvatar/${userId}/${timestamp}`;
 
 
 	const fetchAvatar = async () => {
