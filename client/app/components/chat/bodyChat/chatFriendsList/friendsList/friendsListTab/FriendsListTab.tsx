@@ -53,6 +53,13 @@ const FriendsListTabComponent: React.FC<FriendsListTabComponentProps> = ({ user 
 				chatDispatch({ type: 'DISABLE', payload: 'showConfirmation' })
 				globalState.userSocket?.emit('joinRoom', { roomName: `whoblocked${user.username}`, roomID: '' });
 			}
+			else {
+				const error = await response.json();
+				if (Array.isArray(error.message))
+					toast.warn(error.message[0]);
+				else
+					toast.warn(error.message);
+			}
 		}
 		catch (error) {
 			console.error(error);
@@ -80,6 +87,13 @@ const FriendsListTabComponent: React.FC<FriendsListTabComponentProps> = ({ user 
 
 				globalState.userSocket?.emit('leaveRoom', { roomName: `whoblocked${user.username}`, roomID: '' });
 				chatDispatch({ type: 'DISABLE', payload: 'showConfirmation' })
+			}
+			else {
+				const error = await response.json();
+				if (Array.isArray(error.message))
+					toast.warn(error.message[0]);
+				else
+					toast.warn(error.message);
 			}
 		}
 		catch (error) {
@@ -169,6 +183,13 @@ const FriendsListTabComponent: React.FC<FriendsListTabComponentProps> = ({ user 
 					target: 'refreshFriends',
 					status: true
 				});
+			}
+			else {
+				const error = await response.json();
+				if (Array.isArray(error.message))
+					toast.warn(error.message[0]);
+				else
+					toast.warn(error.message);
 			}
 		}
 		catch (error) {

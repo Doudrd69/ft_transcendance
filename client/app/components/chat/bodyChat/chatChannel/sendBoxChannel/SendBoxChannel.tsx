@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { Socket } from 'socket.io-client'
 import { useChat } from '../../../ChatContext'
 import { useGlobal } from '@/app/GlobalContext';
+import { toast } from 'react-toastify';
 
 const SendBoxChannelComponent: React.FC = () => {
 
@@ -44,6 +45,13 @@ const SendBoxChannelComponent: React.FC = () => {
 					console.log("Client is not connected");
 				}
 				setMessageValue('');
+			}
+			else {
+				const error = await response.json();
+				if (Array.isArray(error.message))
+					toast.warn(error.message[0]);
+				else
+					toast.warn(error.message);
 			}
 		}
 		catch (error) {

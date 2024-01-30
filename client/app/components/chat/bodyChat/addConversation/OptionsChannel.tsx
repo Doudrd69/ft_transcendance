@@ -3,8 +3,7 @@ import { Socket } from 'socket.io-client';
 import { useChat } from '../../ChatContext';
 import './AddConversation.css';
 import { useGlobal } from '@/app/GlobalContext';
-
-
+import { toast } from 'react-toastify';
 
 interface OptionsChannelProps {
 	title: string;
@@ -62,6 +61,13 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 				});
 				chatDispatch({ type: 'ACTIVATE', payload: 'currentConversationIsPrivate' });
 			}
+			else {
+				const error = await response.json();
+				if (Array.isArray(error.message))
+					toast.warn(error.message[0]);
+				else
+					toast.warn(error.message);
+			}
 		}
 		catch (error) {
 			console.error(error);
@@ -91,6 +97,13 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 					roomID: chatState.currentConversationID,
 				});
 				chatDispatch({ type: 'DISABLE', payload: 'currentConversationIsPrivate' });
+			}
+			else {
+				const error = await response.json();
+				if (Array.isArray(error.message))
+					toast.warn(error.message[0]);
+				else
+					toast.warn(error.message);
 			}
 		}
 		catch (error) {
@@ -128,6 +141,13 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 				chatDispatch({ type: 'ACTIVATE', payload: 'showBackComponent' });
 				chatDispatch({ type: 'ACTIVATE', payload: 'showChannelList' });
 			}
+			else {
+				const error = await response.json();
+				if (Array.isArray(error.message))
+					toast.warn(error.message[0]);
+				else
+					toast.warn(error.message);
+			}
 		}
 		catch (error) {
 			console.error(error);
@@ -158,6 +178,13 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 						roomID: chatState.currentConversationID,
 					});
 					chatDispatch({ type: 'DISABLE', payload: 'currentConversationIsProtected' });
+			}
+			else {
+				const error = await response.json();
+				if (Array.isArray(error.message))
+					toast.warn(error.message[0]);
+				else
+					toast.warn(error.message);
 			}
 		}
 		catch (error) {

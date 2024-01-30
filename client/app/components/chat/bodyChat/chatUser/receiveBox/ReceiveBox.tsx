@@ -3,6 +3,7 @@ import React, { useState , useEffect, useRef } from 'react';
 import { Socket } from 'socket.io-client'
 import { useChat } from '../../../ChatContext';
 import { useGlobal } from '@/app/GlobalContext';
+import { toast } from 'react-toastify';
 
 interface Message {
 	from: string;
@@ -59,6 +60,13 @@ const ReceiveBoxComponent: React.FC = () => {
 			if (response.ok) {
 				const messageList = await response.json();
 				setMessages((prevMessages: Message[]) => [...prevMessages, ...messageList]);
+			}
+			else {
+				const error = await response.json();
+				if (Array.isArray(error.message))
+					toast.warn(error.message[0]);
+				else
+					toast.warn(error.message);
 			}
 		} catch (error) {
 			console.log(error);

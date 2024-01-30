@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Socket } from 'socket.io-client'
 import { useChat } from '../../../ChatContext';
 import { useGlobal } from '@/app/GlobalContext';
+import { toast } from 'react-toastify';
 
 const SendBoxComponent: React.FC = () => {
 
@@ -42,6 +43,13 @@ const SendBoxComponent: React.FC = () => {
 					globalState.userSocket?.emit('message', { dto: messageDto, conversationName: chatState.currentRoom });
 				}
 				setMessageValue('');
+			}
+			else {
+				const error = await response.json();
+				if (Array.isArray(error.message))
+					toast.warn(error.message[0]);
+				else
+					toast.warn(error.message);
 			}
 		}
 		catch (error) {

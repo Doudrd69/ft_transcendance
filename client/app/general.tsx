@@ -105,7 +105,11 @@ const GeneralComponent = () => {
 			}
 		}
 		else {
-			console.error("Fatal error: friend request failed");
+			const error = await response.json();
+			if (Array.isArray(error.message))
+				toast.warn(error.message[0]);
+			else
+				toast.warn(error.message);
 		}
 	};
 
@@ -192,6 +196,12 @@ const GeneralComponent = () => {
 				if (globalState.activate2FA)
 					dispatch({ type: 'ACTIVATE', payload: 'show2FA' });
 			}
+		} else {
+			const error = await response.json();
+			if (Array.isArray(error.message))
+				toast.warn(error.message[0]);
+			else
+				toast.warn(error.message);
 		}
 
 		return false;
@@ -345,6 +355,13 @@ const GeneralComponent = () => {
 					dispatch({ type: 'ACTIVATE', payload: 'show2FA' });
 				else
 					dispatch({ type: 'ACTIVATE', payload: 'isConnected' });
+			}
+			else {
+				const error = await response.json();
+				if (Array.isArray(error.message))
+					toast.warn(error.message[0]);
+				else
+					toast.warn(error.message);
 			}
 		}
 		catch (error) {

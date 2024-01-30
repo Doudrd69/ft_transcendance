@@ -77,6 +77,13 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 				const messageList = await response.json();
 				setMessages((prevMessages: Message[]) => [...prevMessages, ...messageList]);
 			}
+			else {
+				const error = await response.json();
+				if (Array.isArray(error.message))
+					toast.warn(error.message[0]);
+				else
+					toast.warn(error.message);
+			}
 		} catch (error) {
 			console.log(error);
 		}
@@ -97,6 +104,13 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 				setUserList([...data]);
 				setOwnerUser(data.find((user:User) => user.isOwner));
 				setCurrentUser(data.find((user:User) => user.login === sessionStorage.getItem("currentUserLogin")));
+			}
+			else {
+				const error = await response.json();
+				if (Array.isArray(error.message))
+					toast.warn(error.message[0]);
+				else
+					toast.warn(error.message);
 			}
 		} catch (error) {
 			console.log(error);

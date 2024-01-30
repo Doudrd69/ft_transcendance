@@ -3,6 +3,7 @@ import { Socket } from 'socket.io-client';
 import { useChat } from '../../ChatContext';
 import './AddConversation.css';
 import { useGlobal } from '@/app/GlobalContext';
+import { toast } from 'react-toastify';
 
 interface AddFriendComponentProps {
 	updateFriends: () => void;
@@ -50,6 +51,12 @@ const AddFriendComponent: React.FC<AddFriendComponentProps> = ({ updateFriends, 
 					globalState.userSocket?.emit('joinRoom', { roomName: data.name, roomID: data.id });
 					globalState.userSocket?.emit('addFriend', friendRequestDto);
 				}
+			} else {
+				const error = await response.json();
+				if (Array.isArray(error.message))
+					toast.warn(error.message[0]);
+				else
+					toast.warn(error.message);
 			}
 		} catch (error) {
 			console.log(error);

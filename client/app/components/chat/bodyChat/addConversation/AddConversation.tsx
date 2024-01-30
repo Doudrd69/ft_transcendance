@@ -3,6 +3,7 @@ import { Socket } from 'socket.io-client';
 import { useChat } from '../../ChatContext';
 import './AddConversation.css';
 import { useGlobal } from '@/app/GlobalContext';
+import { toast } from 'react-toastify';
 
 interface AddConversationComponentProps {
 	loadDiscussions: () => void;
@@ -56,6 +57,13 @@ const AddConversationComponent: React.FC<AddConversationComponentProps> = ({ loa
 				chatDispatch({ type: 'DISABLE', payload: 'showAddCreateChannel' });
 				chatDispatch({ type: 'TOGGLEX', payload: 'refreshChannel'});
 				
+			}
+			else {
+				const error = await response.json();
+				if (Array.isArray(error.message))
+					toast.warn(error.message[0]);
+				else
+					toast.warn(error.message);
 			}
 		}
 		catch(error) {

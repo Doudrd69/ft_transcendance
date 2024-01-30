@@ -33,7 +33,14 @@ const GlobalSettingsComponent: React.FC = () => {
 				sessionStorage.setItem("2fa", `${status}`);
 				setActiveUrlImg(false);
 				toast.warn("2fa is now disabled");
-		}
+			}
+			else {
+				const error = await response.json();
+				if (Array.isArray(error.message))
+					toast.warn(error.message[0]);
+				else
+					toast.warn(error.message);
+			}
 		}
 		catch (error) {
 			console.error(error);
@@ -62,6 +69,13 @@ const GlobalSettingsComponent: React.FC = () => {
 				setUrlQrCode(qrcode.qrcodeURL);
 				setActiveUrlImg(true);
 				toast.warn('Enter the code on your Google Athenticator app to enable 2FA');
+			}
+			else {
+				const error = await response.json();
+				if (Array.isArray(error.message))
+					toast.warn(error.message[0]);
+				else
+					toast.warn(error.message);
 			}
 		}
 		catch (error) {
@@ -92,11 +106,11 @@ const GlobalSettingsComponent: React.FC = () => {
 				toast.success('2FA is now enabled');
 				sessionStorage.setItem("2fa", "true");
 			} else {
-			const error = await response.json();
-			if (Array.isArray(error.message))
-				toast.warn(error.message[0]);
-			else
-				toast.warn(error.message);
+				const error = await response.json();
+				if (Array.isArray(error.message))
+					toast.warn(error.message[0]);
+				else
+					toast.warn(error.message);
 			}
 		}
 		catch (error) {

@@ -7,6 +7,7 @@ import ListMyChannelComponent from '../../listMyChannel/ListMyChannel';
 import PasswordComponent from '../../listMyChannel/Password';
 import { setCurrentComponent } from '../../../ChatContext';
 import { useGlobal } from '@/app/GlobalContext';
+import { toast } from 'react-toastify';
 
 interface Conversation {
 	id: string;
@@ -59,6 +60,13 @@ const ChannelListComponent: React.FC = () => {
 				if (usersList ) {
 					setUserList([...usersList]);
 				}	
+			}
+			else {
+				const error = await response.json();
+				if (Array.isArray(error.message))
+					toast.warn(error.message[0]);
+				else
+					toast.warn(error.message);
 			}
 		}
 		catch (error) {

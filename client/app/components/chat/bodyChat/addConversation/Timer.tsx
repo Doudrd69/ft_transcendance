@@ -3,6 +3,7 @@ import { Socket } from 'socket.io-client';
 import { useChat } from '../../ChatContext';
 import './AddConversation.css';
 import { useGlobal } from '@/app/GlobalContext';
+import { toast } from 'react-toastify';
 
 
 interface User {
@@ -63,6 +64,13 @@ const TimerComponent: React.FC<TimerComponentProps> = ({user}) => {
 					userToRefresh: user.login,
 				});
 				chatDispatch({ type: 'DISABLE' , payload: 'showTimer'});
+			}
+			else {
+				const error = await response.json();
+				if (Array.isArray(error.message))
+					toast.warn(error.message[0]);
+				else
+					toast.warn(error.message);
 			}
 		}
 		catch (error) {

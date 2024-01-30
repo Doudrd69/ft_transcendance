@@ -6,6 +6,7 @@ import AddFriendComponent from '../../addConversation/AddFriends';
 import { Socket } from 'socket.io-client';
 import AvatarImageComponent from '@/app/components/Avatar/Avatar';
 import { useGlobal } from '@/app/GlobalContext';
+import { toast } from 'react-toastify';
 
 interface FriendShip {
 	id: number;
@@ -50,6 +51,13 @@ const FriendsListComponent: React.FC = () => {
 			if (response.ok) {
 				const friends = await response.json();
 				setFriendList([...friends]);
+			}
+			else {
+				const error = await response.json();
+				if (Array.isArray(error.message))
+					toast.warn(error.message[0]);
+				else
+					toast.warn(error.message);
 			}
 		}
 		catch (error) {

@@ -37,21 +37,16 @@ const ProfilsSettingsComponent: React.FC = () => {
 			if (response.ok) {
 				const userName = await response.json();
 				const { newUsername } = userName;
-				if (!userName) {
-					toast.warn("Error: username is already used");
-					return ;
-				}
-				else {
-					sessionStorage.setItem("currentUserLogin", newUsername);
-					// Probleme: quand je recharge mes channels, le user ebrodeur (login) est return
-					globalState.userSocket?.emit('joinRoom',  { roomName: sessionStorage.getItem("currentUserLogin"), roomID: '' });
-					globalState.userSocket?.emit('refreshUserChannelList', { userToRefresh: newUsername });
-					toast.success('Username has been updated');
-				}
+				sessionStorage.setItem("currentUserLogin", newUsername);
+				globalState.userSocket?.emit('joinRoom',  { roomName: sessionStorage.getItem("currentUserLogin"), roomID: '' });
+				globalState.userSocket?.emit('refreshUserChannelList', { userToRefresh: newUsername });
+				toast.success('Username has been updated');
 			} else {
 				const error = await response.json();
-				toast.warn(error.message[0]);
-				console.error('Fatal error: request failed');
+				if (Array.isArray(error.message))
+					toast.warn(error.message[0]);
+				else
+					toast.warn(error.message);
 			}
 		} catch (error) {
 			console.error('Fatal error:', error);
@@ -74,6 +69,13 @@ const ProfilsSettingsComponent: React.FC = () => {
 				dispatch({ type: 'ACTIVATE', payload: 'showAvatar' });
 				dispatch({ type: 'DISABLE', payload: 'showUploadAvatar' });
 				dispatch({ type: 'TOGGLEX', payload: 'showRefresh'});
+			}
+			else {
+				const error = await response.json();
+				if (Array.isArray(error.message))
+					toast.warn(error.message[0]);
+				else
+					toast.warn(error.message);
 			}
 		}
 		catch (error) {

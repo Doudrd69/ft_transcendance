@@ -5,6 +5,7 @@ import './AddConversation.css';
 import { RSC } from 'next/dist/client/components/app-router-headers';
 import { useGlobal } from '@/app/GlobalContext';
 import TimerComponent from './Timer';
+import { toast } from 'react-toastify';
 
 interface User {
 	id: number;
@@ -69,7 +70,11 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 			}
 		}
 		else {
-			console.error("Fatal error");
+			const error = await response.json();
+			if (Array.isArray(error.message))
+				toast.warn(error.message[0]);
+			else
+				toast.warn(error.message);
 		}
 	}
 
@@ -99,7 +104,11 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 			}
 		}
 		else {
-			console.error("Fatal error");
+			const error = await response.json();
+			if (Array.isArray(error.message))
+				toast.warn(error.message[0]);
+			else
+				toast.warn(error.message);
 		}
 	}
 
@@ -131,6 +140,13 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 						channelID: chatState.currentConversationID,
 					});
 				}
+			}
+			else {
+				const error = await response.json();
+				if (Array.isArray(error.message))
+					toast.warn(error.message[0]);
+				else
+					toast.warn(error.message);
 			}
 		}
 		catch (error) {
@@ -180,8 +196,13 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 						channelID: chatState.currentConversationID,
 					});
 				}
-
-
+				else {
+					const error = await response.json();
+					if (Array.isArray(error.message))
+						toast.warn(error.message[0]);
+					else
+						toast.warn(error.message);
+				}
 			}
 		}
 		catch (error) {
@@ -225,8 +246,13 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 						channelID: chatState.currentConversationID,
 					});
 				}
-
-
+				else {
+					const error = await response.json();
+					if (Array.isArray(error.message))
+						toast.warn(error.message[0]);
+					else
+						toast.warn(error.message);
+				}
 			}
 		}
 		catch (error) {
@@ -279,6 +305,13 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 
 				setAdmin(true);
 			}
+			else {
+				const error = await response.json();
+				if (Array.isArray(error.message))
+					toast.warn(error.message[0]);
+				else
+					toast.warn(error.message);
+			}
 		}
 		catch (error) {
 			console.error(error);
@@ -330,6 +363,13 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 
 				setAdmin(false);
 			}
+			else {
+				const error = await response.json();
+				if (Array.isArray(error.message))
+					toast.warn(error.message[0]);
+				else
+					toast.warn(error.message);
+			}
 		}
 		catch (error) {
 			console.error(error);
@@ -367,6 +407,13 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 							roomID: chatState.currentConversationID,
 						});
 					}
+			}
+			else {
+				const error = await response.json();
+				if (Array.isArray(error.message))
+					toast.warn(error.message[0]);
+				else
+					toast.warn(error.message);
 			}
 		}
 		catch (error) {
@@ -407,6 +454,13 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 							userToRefresh: user.login,
 						});
 					}
+				}
+				else {
+					const error = await response.json();
+					if (Array.isArray(error.message))
+						toast.warn(error.message[0]);
+					else
+						toast.warn(error.message);
 				}
 		}
 		catch (error) {
@@ -451,6 +505,13 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 					target: 'refreshDmList',
 					status: true
 				});
+			}
+			else {
+				const error = await response.json();
+				if (Array.isArray(error.message))
+					toast.warn(error.message[0]);
+				else
+					toast.warn(error.message);
 			}
 		}
 		catch (error) {

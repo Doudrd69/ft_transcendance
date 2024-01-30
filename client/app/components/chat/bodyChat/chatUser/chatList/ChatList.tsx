@@ -5,6 +5,7 @@ import AddConversationComponent from '../../addConversation/AddConversation';
 import { Socket } from 'socket.io-client';
 import { setCurrentComponent } from '../../../ChatContext';
 import { useGlobal } from '@/app/GlobalContext';
+import { toast } from 'react-toastify';
 
 
 
@@ -36,6 +37,13 @@ const ChatListComponent: React.FC = () => {
 			if (requestDms.ok) {
 				const dmResult = await requestDms.json();
 				setDm([...dmResult]);
+			}
+			else {
+				const error = await requestDms.json();
+				if (Array.isArray(error.message))
+					toast.warn(error.message[0]);
+				else
+					toast.warn(error.message);
 			}
 	}
 		catch (error) {

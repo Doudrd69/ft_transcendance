@@ -116,7 +116,7 @@ export class AuthService {
 			}
 		} catch (error) {
 			console.error("-- Request to API FAILED --", error);
-			throw error;
+			throw new HttpException(error, HttpStatus.BAD_REQUEST);
 		}
 	}
 
@@ -148,7 +148,7 @@ export class AuthService {
 			return false;
 		}
 
-		throw new Error("Fatal error");
+		throw new HttpException('Fatal error', HttpStatus.BAD_REQUEST);
 	}
 
 	// On genere le qrcode a la demande d'activation de la 2fa
@@ -180,7 +180,7 @@ export class AuthService {
 			}
 		}
 		catch (error) {
-			throw new Error("Fatal errorr: " + error);
+			throw new HttpException('Fatal error', HttpStatus.BAD_REQUEST);
 		}
 	}
 
@@ -191,7 +191,7 @@ export class AuthService {
 			return user.TFA_isEnabled;
 		}
 
-		throw new Error("User does not exist");
+		throw new HttpException('User does not exist', HttpStatus.BAD_REQUEST);
 	}
 
 	async verifyCode(authenticatorCodeDto: AuthenticatorCodeDto) {
@@ -227,14 +227,14 @@ export class AuthService {
 				else {
 					console.error("-- INVALID CODE --");
 					this.usersService.upate2FAState(user, false);
-					throw Error("Invalide code");
+					throw new HttpException('Invalid code', HttpStatus.BAD_REQUEST);
 				}
 			}
 
 		}
 		catch (error) {
 			console.error("!! Token verification failed !!");
-			throw new Error(error);
+			throw new HttpException(error, HttpStatus.BAD_REQUEST);
 		}
 	}
 }

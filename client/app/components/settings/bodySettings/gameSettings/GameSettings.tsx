@@ -1,5 +1,6 @@
 import './GameSettings.css'
 import React, { useState } from 'react';
+import { toast } from 'react-toastify';
 // import Image from './setting.png'
 
 const GameSettingsComponent: React.FC = () => {
@@ -21,7 +22,11 @@ const GameSettingsComponent: React.FC = () => {
 				console.log(gameHistoryData);
 			}
 			else {
-				console.log("Error");
+				const error = await response.json();
+				if (Array.isArray(error.message))
+					toast.warn(error.message[0]);
+				else
+					toast.warn(error.message);
 			}
 
 		} catch (error) {

@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useChat } from '../../ChatContext';
 import { Socket } from 'socket.io-client';
 import { useGlobal } from '@/app/GlobalContext';
+import { toast } from 'react-toastify';
 
 interface ListMyChannelComponentProps {
 	user: string;
@@ -57,6 +58,13 @@ const ListMyChannelComponent: React.FC<ListMyChannelComponentProps> = ({ user, f
 					setConversations((prevConversations: Conversation[]) => [...prevConversations, ...responseData]);
 
 			}
+			else {
+				const error = await response.json();
+				if (Array.isArray(error.message))
+					toast.warn(error.message[0]);
+				else
+					toast.warn(error.message);
+			}
 		}
 		catch (error) {
 			console.error(error);
@@ -76,6 +84,13 @@ const ListMyChannelComponent: React.FC<ListMyChannelComponentProps> = ({ user, f
 				console.log('conversationPublic', conversationPublic);
 				if (conversationPublic)
 					setConversations((prevConversations: Conversation[]) => [...prevConversations, ...conversationPublic]);
+			}
+			else {
+				const error = await response.json();
+				if (Array.isArray(error.message))
+					toast.warn(error.message[0]);
+				else
+					toast.warn(error.message);
 			}
 		}
 		catch (error) {
@@ -125,6 +140,13 @@ const ListMyChannelComponent: React.FC<ListMyChannelComponentProps> = ({ user, f
 					chatDispatch({ type: 'TOGGLEX', payload: 'showAddChannel' });
 					chatDispatch({ type: 'DISABLE', payload: 'showListChannelAdd' });
 				}
+			}
+			else {
+				const error = await response.json();
+				if (Array.isArray(error.message))
+					toast.warn(error.message[0]);
+				else
+					toast.warn(error.message);
 			}
 		}
 		catch (error) {
