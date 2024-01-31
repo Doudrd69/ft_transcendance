@@ -33,6 +33,8 @@ const ProfilsSettingsComponent: React.FC = () => {
 				},
 				body: JSON.stringify(usernameDto),
 			});
+			console.log(JSON.stringify(usernameDto));
+			console.log(sessionStorage.getItem("jwt"));
 
 			if (response.ok) {
 				const userName = await response.json();

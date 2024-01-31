@@ -1,19 +1,26 @@
 
+
+.bloc-history-title {
+	display: flex;
+	flex-direction: column;
+	height: 60vh;
+	overflow: hidden;
+}
 .bloc-history {
 	margin: 10px;
 	padding: 20px;
 	border-radius: 10px;
-	min-height: 100%;
-	border : 3px solid #6a6a6a;
+	height: 100%;
+	border: 3px solid #6e6e6e;
 
 	overflow-y: auto; /* Enable vertical scrolling */
 }
 .title-game{
-	margin: 10px 10px 0px 10px;
+	margin: 10px 10px 10px 10px;
 	font-size: 20px;
 	font-weight: bold;
 	font-family: 'Gill Sans' , sans-serif;
-	}
+}
 .game-history {
 	display: flex;
 	justify-content: space-between;

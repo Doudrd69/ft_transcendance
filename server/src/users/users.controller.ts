@@ -202,4 +202,10 @@ export class UsersController {
 	getUserGamehistory(@Param('userID') userID: number) {
 		return this.usersService.getUserGames(userID);
 	}
+
+	@UseGuards(AuthGuard)
+	@Get('getUserStats/:userID')
+	getUsersStats(@Param('userID') userID: number) {
+		return this.usersService.getUsersStats(userID);
+	}
 }

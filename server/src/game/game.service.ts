@@ -188,7 +188,6 @@ export class GameService {
 			UserOne.defeat += 1;
 			UserTwo.victory += 1;
 		}
-
 		await this.usersRepository.save(UserOne);
 		await this.usersRepository.save(UserTwo);
 
