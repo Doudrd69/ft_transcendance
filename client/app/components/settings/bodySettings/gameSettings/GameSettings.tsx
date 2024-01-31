@@ -1,7 +1,8 @@
 import './GameSettings.css'
-import React, { useState } from 'react';
-import { toast } from 'react-toastify';
-// import Image from './setting.png'
+import React, { useEffect, useState } from 'react';
+import HistoryComponent from './history/History';
+import StatsComponent from './stats/Stats';
+import { Stats } from 'fs';
 
 const GameSettingsComponent: React.FC = () => {
 
@@ -34,7 +35,8 @@ const GameSettingsComponent: React.FC = () => {
 	
 		return (
 				<div className="bloc-game-settings">
-					{/* <HistoryComponent/> */}
+					<HistoryComponent/>
+					<StatsComponent/>
 				</div>
 			);
 	};

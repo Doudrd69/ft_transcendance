@@ -1,5 +1,6 @@
 .bloc-game-settings {
 	display: flex;
-	flex-direction: column;
-	justify-content: space-between;
+	flex-direction: row;
+	/* justify-content: space-between; */
+
 }

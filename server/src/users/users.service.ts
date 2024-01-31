@@ -301,13 +301,21 @@ export class UsersService {
 		throw new HttpException('Fatal error', HttpStatus.BAD_REQUEST);
 	}
 	
-	// getStateGame(userId: number) {
-	// 	const user = this.usersRepository.findOne({ where: { id: userId } });
+	async getUsersStats(userId: number) {
+		const user : User = await this.usersRepository.findOne({ where: { id: userId } });
 
-		
+		if (user) {
+			let object = {
+				victory: user.victory,
+				defeat: user.defeat,
+				ratio: user.defeat ? (user.victory / (user.defeat + user.victory) * 100): -1,
+			};
 
-		
-	// }
+			return object;
+		}
+
+		throw new Error('Fatal error');
+	}
 
 	/**************************************************************/
 	/***				FRIENDSHIP MANAGEMENT					***/
