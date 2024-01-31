@@ -89,6 +89,7 @@ export class GameGateway {
     }
 
     async handleDisconnect(@ConnectedSocket() client: Socket) {
+        console.log("ONE DISCONNECT");
         try {
             const userId: number = this.GameService.getUserIdWithSocketId(client.id);
             // console.log(`[${client.id}] userLogin de ses morts 1: ${userLogin}`);
@@ -125,6 +126,7 @@ export class GameGateway {
         //     // du coup en amont il faut creer des sockets pour les deux users. si pas bon supprimer les deux sockets
         // envoyer un emit accept a lautre user
         console.log(`check : id : ${client.id}, ${data.playerTwoId} ${data.userOneId} ${data.userTwoId} playerOneLogin: string, playerTwoLogin: string`)
+        console.log(`playerTwoID :=====> ${data.playerTwoId}`);
         this.server.to([data.playerTwoId]).emit('acceptInvitation');
         if (!this.GameService.userHasAlreadyGameSockets(data.userOneId)) {
             if (!this.GameService.userHasAlreadyGameSockets(data.userTwoId)) {

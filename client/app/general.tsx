@@ -71,21 +71,32 @@ const GeneralComponent = () => {
 			userTwoId: gameInviteDto.senderUserID,
 			playerOneLogin: sessionStorage.getItem("currentUserLogin"),
 			playerTwoLogin: gameInviteDto.senderUsername,
-			playerTwoId: gameInviteDto.senderID, 
+			playerTwoId: gameInviteDto.senderID,
 		});
+	}
+
+	const gameInviteClosed = (gameInviteDto: GameInviteDto) => {
+		globalState.gameSocket?.emit('')
+		// envoyer emit toast close
+	}
+
+	const gameInviteDeny = (gameInviteDto: GameInviteDto) => {
+		// envoyer emit toast deny
 	}
 
 	const GameInviteNotification = ({ closeToast, toastProps, gameInviteDto }: any) => (
 		<div>
-			You received a game invite from  {gameInviteDto.senderUserID}
+			You received a game invite from  {gameInviteDto.senderUsername}
 			<button style={{ padding: '5px '}} onClick={() => {
 				closeToast();
 				gameInviteValidation(gameInviteDto);
 			}}>
 			Accept
 			</button>
-				<button style={{ padding: '5px '}} onClick={() => 
-					closeToast()}>Deny</button>
+				<button style={{ padding: '5px '}} onClick={() =>  {
+					closeToast();
+					gameInviteClosed(gameInviteDto);
+					}}>Deny</button>
 		</div>
 	)
 
@@ -254,6 +265,7 @@ const GeneralComponent = () => {
 				{
 					pauseOnFocusLoss: false,
 					autoClose: 5000,
+					onClose: (gameInviteDto: GameInviteDto) => gameInviteClosed(gameInviteDto),
 				});
 		});
 

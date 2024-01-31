@@ -60,7 +60,7 @@ const PongComponent = () => {
 					paddleTwo: { x: gameState.paddleTwo!.x * containerWidth, y: gameState.paddleTwo!.y * containerHeight, width: containerWidth * 0.025, height: containerHeight * 0.17 },
 				};
 				setGameState(newGameState);
-				console.log(`pongcontainer size, x:${pongContainer.clientWidth}, y: ${pongContainer.clientHeight}`);
+				// console.log(`pongcontainer size, x:${pongContainer.clientWidth}, y: ${pongContainer.clientHeight}`);
 			};
 			
 			window.addEventListener('resize', handleResize);
@@ -130,6 +130,9 @@ const PongComponent = () => {
 
         setBlurGame(true);
         startCountdown();
+        return () => {
+            globalState.gameSocket?.off('startGameLoop');
+        }
     }, []);
 
     useEffect(() => {
@@ -248,9 +251,9 @@ const PongComponent = () => {
         window.addEventListener('keyup', handleKeyUp);
 
         return () => {
-            globalState.gameSocket?.off('GameBallUpdate');
-            globalState.gameSocket?.off('GamePaddleUpdate');
-            globalState.gameSocket?.off('Game_Start');
+            globalState.gameSocket?.off('GameUpdate');
+            globalState.gameSocket?.off('GameGoal');
+            globalState.gameSocket?.off('gameStart');
             globalState.gameSocket?.off('userDisconnected');
             globalState.gameSocket?.off('GameEnd');
             clearInterval(countdownInterval);

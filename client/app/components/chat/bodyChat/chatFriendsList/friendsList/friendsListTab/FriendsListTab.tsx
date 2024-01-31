@@ -21,7 +21,7 @@ interface FriendsListTabComponentProps {
 const FriendsListTabComponent: React.FC<FriendsListTabComponentProps> = ({ user }) => {
 
 	// let gameInviteValidation: boolean = false;
-	let gameSocketConnected: boolean = false;
+	const [gameSocketConnected, setgameSocketConnected] = useState<boolean>(false);
 	const [gameInviteValidation, setgameInviteValidation] = useState<boolean>(false);
 	const { chatState, chatDispatch } = useChat();
 	const { globalState, dispatch } = useGlobal();
@@ -95,45 +95,59 @@ const FriendsListTabComponent: React.FC<FriendsListTabComponentProps> = ({ user 
 
 	const gameInvite = () => {
 		if (gameSocketConnected === false) {
-		  const gameSocket = io('http://localhost:3001/game', {
-			autoConnect: false,
-			auth: {
-			  token: sessionStorage.getItem("jwt"),
-			}
-		  });
-		  gameSocket.connect();
-		  gameSocketConnected = true;
-		  gameSocket.on('connect', () => {
-			dispatch({ type: 'SET_GAME_SOCKET', payload: gameSocket });
-			console.log("socketID :", gameSocket.id);
-			globalState.userSocket?.emit('inviteToGame', {
-			  usernameToInvite: user.username,
-			  senderID: gameSocket.id,
-			  senderUsername: sessionStorage.getItem("currentUserLogin"),
-			  senderUserID: sessionStorage.getItem("currentUserID"),
+			const gameSocket = io('http://localhost:3001/game', {
+				autoConnect: false,
+				auth: {
+					token: sessionStorage.getItem("jwt"),
+				}
 			});
-			setTimeout(() => {
-			  gameSocketConnected = false;
-			  if (gameInviteValidation === false) {
-				console.log("validationoooooooo :", gameInviteValidation);
-				globalState.gameSocket?.disconnect();
-			  }
-			}, 8000)
-		  });
+			gameSocket.connect();
+			setgameSocketConnected(true);
+			gameSocket.on('connect', () => {
+				dispatch({ type: 'SET_GAME_SOCKET', payload: gameSocket });
+				console.log("socketID PLAYERTWO :", gameSocket.id);
+				globalState.userSocket?.emit('inviteToGame', {
+					usernameToInvite: user.username,
+					senderID: gameSocket.id,
+					senderUsername: sessionStorage.getItem("currentUserLogin"),
+					senderUserID: sessionStorage.getItem("currentUserID"),
+				});
+			gameSocket.on()
+			});
 		}
-	  };
-	  
-	  useEffect(() => {
-		const subscription = globalState.gameSocket?.on('acceptInvitation', () => {
-		  console.log("validation :", gameInviteValidation);
-		  setgameInviteValidation(true);
-		  // gameInviteValidation = true;
-		});
-	  
+	};
+
+	useEffect(() => {
+		console.log("useEfeccts trigged")
+		if (typeof globalState.gameSocket !== "undefined") {
+			globalState.gameSocket.on('acceptInvitation', () => {
+				console.log("validation :");
+				setgameInviteValidation(true);
+				setgameSocketConnected(false);
+			});
+			globalState.gameSocket.on('toastClose', () => {
+				if (gameInviteValidation == false)
+				{
+					globalState.gameSocket?.disconnect();
+					setgameSocketConnected(false);
+				}
+
+			});
+			globalState.gameSocket.on('toastDeny', () => {
+				globalState.gameSocket?.disconnect();
+				setgameSocketConnected(false);
+			});
+		}
+		else {
+			console.log("gameSocket undefined");
+		}
+		
 		return () => {
-		  subscription?.off('acceptInviation');
+			globalState.gameSocket?.off('acceptInvitation');
+			globalState.gameSocket?.off('toastClose');
+			globalState.gameSocket?.off('toastDeny');
 		};
-	  }, [globalState?.gameSocket, gameInviteValidation]);
+	}, [globalState?.gameSocket]);
 
 	const removeFriends = async () => {
 
