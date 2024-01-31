@@ -120,9 +120,9 @@ export class UsersService {
 	}
 
 	async getAvatar(userId: number): Promise<string | null> {
-		console.log("getAvatar");
+		// console.log("getAvatar");
 		const user = await this.getUserByID(userId);
-		console.log("user: ", user.avatarURL);
+		// console.log("user: ", user.avatarURL);
 		if (!user || !user.avatarURL) {
 			console.log("Avatar not found");
 			return null;

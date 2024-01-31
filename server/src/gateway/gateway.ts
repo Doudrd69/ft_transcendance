@@ -184,6 +184,20 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		});
 	}
 
+	@SubscribeMessage('inviteClosed')
+	@UseGuards(GatewayGuard)
+    handleInviteClosed(@ConnectedSocket() client: Socket, @MessageBody() data: {senderUsername: string}) {
+        console.log("CLOSED")
+        this.server.to([data.senderUsername]).emit('closedInvitation');
+    }
+
+    @SubscribeMessage('inviteDenied')
+	@UseGuards(GatewayGuard)
+    handleInviteDenied(@ConnectedSocket() client: Socket, @MessageBody() data: {senderUsername: string}) {
+        console.log("CLOSED DENY")
+        this.server.to([data.senderUsername]).emit('deniedInvitation');
+    }
+
 	@SubscribeMessage('message')
 	@UseGuards(GatewayGuard)
 	async handleMessage( @MessageBody() data: { dto: MessageDto, conversationName: string } ) {

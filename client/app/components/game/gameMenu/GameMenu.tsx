@@ -49,6 +49,11 @@ const Menu = () => {
             state.showGame = true;
         });
 
+        return () => {
+            globalState.gameSocket?.off('gameNotInProgress');
+            globalState.gameSocket?.off('setgame');
+        }
+
     })
 
     const handleStartClick = () => {

@@ -47,7 +47,7 @@ const MatchMaking = () => {
         return () => {
             globalState.gameSocket?.off('leave-game');
             globalState.gameSocket?.off('setgame');
-            globalState.gameSocket?.off('returnGameInProgress');
+            globalState.gameSocket?.off('gameInProgress');
          }
 
     }, [globalState?.gameSocket]);
