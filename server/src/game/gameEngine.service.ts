@@ -79,17 +79,17 @@ export class GameEngineService {
 	}
 
 	updateGameInstance(gameInstance: game_instance, server: any) {
+		gameInstance.paddles.forEach((paddle) => {
+			if (this.BallService.collisionWithPaddle(gameInstance.ball, paddle)) {
+				// this.BallService.penetration_resolution_bw(gameInstance.ball, paddle); // then do the repositionning
+				this.BallService.collision_resolution_bw(gameInstance.ball, paddle); // and the change in speed
+			}
+			//this.BallService.ballIntersectWithPaddle(gameInstance.ball, paddle)) 
+		});
 		if (gameInstance.ball.alive === false) {
 			this.playerScoredIncr(gameInstance);
 			this.resetGamePause(gameInstance, server);
 		}
-		gameInstance.paddles.forEach((paddle) => {
-			if (this.BallService.collisionWithPaddle(gameInstance.ball, paddle)) {
-				console.log("BALL COLLIDE WITH PADDLE")
-				this.BallService.penetration_resolution_bw(gameInstance.ball, paddle); // then do the repositionning
-				this.BallService.collision_resolution_bw(gameInstance.ball, paddle); // and the change in speed
-			}
-		});
 		gameInstance.ball = this.updateBall(gameInstance.ball);
 	}
 

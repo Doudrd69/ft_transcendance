@@ -25,8 +25,7 @@ RUN npm install	&& \
 	@types/image-type \
 	jimp@latest	\
 	@nestjs/platform-express \
-	class-validator class-transformer \
-	sudo
+	class-validator class-transformer
 
 COPY . .
 

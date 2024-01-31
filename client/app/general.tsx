@@ -63,21 +63,37 @@ const GeneralComponent = () => {
 			userTwoId: gameInviteDto.senderUserID,
 			playerOneLogin: sessionStorage.getItem("currentUserLogin"),
 			playerTwoLogin: gameInviteDto.senderUsername,
-			playerTwoId: gameInviteDto.senderID, 
+			playerTwoId: gameInviteDto.senderID,
 		});
+	}
+
+	const gameInviteClosed = (gameInviteDto: GameInviteDto) => {
+		globalState.userSocket?.emit('inviteClosed', {
+			senderUsername: gameInviteDto.senderUsername,
+		})
+		// envoyer emit toast close
+	}
+
+	const gameInviteDeny = (gameInviteDto: GameInviteDto) => {
+		globalState.userSocket?.emit('inviteDenied', {
+			senderUsername: gameInviteDto.senderUsername,
+		})
+		// envoyer emit toast deny
 	}
 
 	const GameInviteNotification = ({ closeToast, toastProps, gameInviteDto }: any) => (
 		<div>
-			You received a game invite from  {gameInviteDto.senderUserID}
+			You received a game invite from  {gameInviteDto.senderUsername}
 			<button style={{ padding: '5px '}} onClick={() => {
-				closeToast();
 				gameInviteValidation(gameInviteDto);
+				closeToast();
 			}}>
 			Accept
 			</button>
-				<button style={{ padding: '5px '}} onClick={() => 
-					closeToast()}>Deny</button>
+				<button style={{ padding: '5px '}} onClick={() =>  {
+					gameInviteDeny(gameInviteDto);
+					closeToast();
+					}}>Deny</button>
 		</div>
 	)
 
@@ -255,6 +271,7 @@ const GeneralComponent = () => {
 				{
 					pauseOnFocusLoss: false,
 					autoClose: 5000,
+					onClose: props => gameInviteClosed(gameInviteDto),
 				});
 		});
 
