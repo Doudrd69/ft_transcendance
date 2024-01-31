@@ -35,25 +35,26 @@ export class MatchmakingService {
     }
 
     async joinQueue(playerID: string, userId: number, gameMode: string) {
+        const newUser: User = await this.usersRepository.findOne({ where: { id: userId } })
         if (gameMode === "NORMAL")
             this.playersNormalQueue.push(playerID);
         else if (gameMode === "SPEED") {
+            newUser.inSpeedQueue = true;
             this.playersSpeedQueue.push(playerID);
         }
-        const newUser: User = await this.usersRepository.findOne({ where: { id: userId } })
-        if (!newUser)
-            console.log(`No User for this gameSocketId: ${playerID}`);
         newUser.inMatchmaking = true;
         console.log(`joinSpeedQueue: ${this.playersSpeedQueue}`)
         console.log(`joinNormalQueue: ${this.playersNormalQueue}`)
         await this.usersRepository.save(newUser);
     }
 
-    async leaveQueue(playerID: string, gameMode: string) {
+    async leaveQueue(playerID: string, gameMode: string, userId: number) {
+        const newUser: User = await this.usersRepository.findOne({ where: { id: userId } })
         if (gameMode === "NORMAL") {
             this.playersNormalQueue.splice(this.playersNormalQueue.indexOf(playerID), 1);
         }
         else if (gameMode === "SPEED") {
+            newUser.inSpeedQueue = false;
             this.playersSpeedQueue.splice(this.playersSpeedQueue.indexOf(playerID), 1);
         }
         console.log(`quitSpeedQueue: ${this.playersSpeedQueue}`)
