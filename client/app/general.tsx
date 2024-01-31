@@ -76,11 +76,16 @@ const GeneralComponent = () => {
 	}
 
 	const gameInviteClosed = (gameInviteDto: GameInviteDto) => {
-		globalState.gameSocket?.emit('')
+		globalState.userSocket?.emit('inviteClosed', {
+			senderUsername: gameInviteDto.senderUsername,
+		})
 		// envoyer emit toast close
 	}
 
 	const gameInviteDeny = (gameInviteDto: GameInviteDto) => {
+		globalState.userSocket?.emit('inviteDenied', {
+			senderUsername: gameInviteDto.senderUsername,
+		})
 		// envoyer emit toast deny
 	}
 
@@ -88,14 +93,14 @@ const GeneralComponent = () => {
 		<div>
 			You received a game invite from  {gameInviteDto.senderUsername}
 			<button style={{ padding: '5px '}} onClick={() => {
-				closeToast();
 				gameInviteValidation(gameInviteDto);
+				closeToast();
 			}}>
 			Accept
 			</button>
 				<button style={{ padding: '5px '}} onClick={() =>  {
+					gameInviteDeny(gameInviteDto);
 					closeToast();
-					gameInviteClosed(gameInviteDto);
 					}}>Deny</button>
 		</div>
 	)
@@ -265,7 +270,7 @@ const GeneralComponent = () => {
 				{
 					pauseOnFocusLoss: false,
 					autoClose: 5000,
-					onClose: (gameInviteDto: GameInviteDto) => gameInviteClosed(gameInviteDto),
+					onClose: props => gameInviteClosed(gameInviteDto),
 				});
 		});
 

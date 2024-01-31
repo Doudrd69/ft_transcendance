@@ -22,6 +22,7 @@ const FriendsListTabComponent: React.FC<FriendsListTabComponentProps> = ({ user 
 
 	// let gameInviteValidation: boolean = false;
 	const [gameSocketConnected, setgameSocketConnected] = useState<boolean>(false);
+	const [gameInviteCalled, setGameInviteCalled] = useState(false);
 	const [gameInviteValidation, setgameInviteValidation] = useState<boolean>(false);
 	const { chatState, chatDispatch } = useChat();
 	const { globalState, dispatch } = useGlobal();
@@ -94,17 +95,22 @@ const FriendsListTabComponent: React.FC<FriendsListTabComponentProps> = ({ user 
 	};
 
 	const gameInvite = () => {
-		if (gameSocketConnected === false) {
-			const gameSocket = io('http://localhost:3001/game', {
+		console.log("gameSocketConnected :", globalState?.gameSocket);
+		// !gameInviteCalled && gameSocketConnected === false
+		if (!globalState.gameSocket) {
+			// setGameInviteCalled(true); // Marquer gameInvite comme appelée
+
+			// setgameSocketConnected(true);
+			const gameSocket: Socket = io('http://localhost:3001/game', {
 				autoConnect: false,
 				auth: {
 					token: sessionStorage.getItem("jwt"),
 				}
 			});
 			gameSocket.connect();
-			setgameSocketConnected(true);
+			dispatch({ type: 'SET_GAME_SOCKET', payload: gameSocket });
 			gameSocket.on('connect', () => {
-				dispatch({ type: 'SET_GAME_SOCKET', payload: gameSocket });
+				console.log("INgameInvite gameSocketConnected :", globalState?.gameSocket);
 				console.log("socketID PLAYERTWO :", gameSocket.id);
 				globalState.userSocket?.emit('inviteToGame', {
 					usernameToInvite: user.username,
@@ -112,42 +118,67 @@ const FriendsListTabComponent: React.FC<FriendsListTabComponentProps> = ({ user 
 					senderUsername: sessionStorage.getItem("currentUserLogin"),
 					senderUserID: sessionStorage.getItem("currentUserID"),
 				});
-			gameSocket.on()
 			});
 		}
 	};
+
+
+	// si je lui cree pas de socket, peut etre que ca marche
+	// je lui cree une socket seulement si l'autre accept, si l'autre deny ya rien, si l'autre accepte, cree.
+
+	useEffect(() => {
+		console.log("UseEffect gameSocketConnected :", gameSocketConnected)
+	}, [gameSocketConnected]);
+
 
 	useEffect(() => {
 		console.log("useEfeccts trigged")
 		if (typeof globalState.gameSocket !== "undefined") {
 			globalState.gameSocket.on('acceptInvitation', () => {
 				console.log("validation :");
+				// const gameSocket: Socket = io('http://localhost:3001/game', {
+				// 	autoConnect: false,
+				// 	auth: {
+				// 		token: sessionStorage.getItem("jwt"),
+				// 	}
+				// });
+				// gameSocket.connect();
+				// dispatch({ type: 'SET_GAME_SOCKET', payload: gameSocket });
+				// gameSocket.on('connect', () => {
+				// 	console.log("INgameInvite gameSocketConnected :", globalState?.gameSocket);
+				// 	console.log("socketID PLAYERTWO :", gameSocket.id);
+				// 	globalState.userSocket?.emit('inviteToGame', {
+				// 		usernameToInvite: user.username,
+				// 		senderID: gameSocket.id,
+				// 		senderUsername: sessionStorage.getItem("currentUserLogin"),
+				// 		senderUserID: sessionStorage.getItem("currentUserID"),
+				// 	});
+				// });
 				setgameInviteValidation(true);
-				setgameSocketConnected(false);
 			});
-			globalState.gameSocket.on('toastClose', () => {
-				if (gameInviteValidation == false)
-				{
-					globalState.gameSocket?.disconnect();
-					setgameSocketConnected(false);
-				}
-
-			});
-			globalState.gameSocket.on('toastDeny', () => {
+			globalState.userSocket?.on('deniedInvitation', () => {
 				globalState.gameSocket?.disconnect();
-				setgameSocketConnected(false);
+				console.log("DENIED")
+			});
+			globalState.userSocket?.on('closedInvitation', () => {
+				console.log("CLOSED")
+				if (gameInviteValidation == false) {
+					console.log("CLOSED DENY")
+					globalState.gameSocket?.disconnect();
+				}
 			});
 		}
 		else {
 			console.log("gameSocket undefined");
 		}
-		
+
 		return () => {
 			globalState.gameSocket?.off('acceptInvitation');
-			globalState.gameSocket?.off('toastClose');
-			globalState.gameSocket?.off('toastDeny');
+			globalState.userSocket?.off('closedInvitation');
+			globalState.userSocket?.off('deniedInvitation');
+			globalState.gameSocket?.off('disconnect');
 		};
-	}, [globalState?.gameSocket]);
+	}, [globalState?.gameSocket, gameInviteValidation, globalState?.userSocket]);
 
 	const removeFriends = async () => {
 

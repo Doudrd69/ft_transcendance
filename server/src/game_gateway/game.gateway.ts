@@ -19,6 +19,7 @@ export interface vector_instance {
     y: number;
 }
 
+
 export interface ball_instance {
     position: vector_instance;
     speed: vector_instance;
@@ -122,6 +123,7 @@ export class GameGateway {
     }
 
     @SubscribeMessage('inviteAccepted')
+    @UseGuards(GatewayGuard)
     async handleCheckgameInvite(@ConnectedSocket() client: Socket, @MessageBody() data: { userOneId: number, userTwoId: number, playerTwoId: string, playerOneLogin: string, playerTwoLogin: string}) {
         //     // du coup en amont il faut creer des sockets pour les deux users. si pas bon supprimer les deux sockets
         // envoyer un emit accept a lautre user
