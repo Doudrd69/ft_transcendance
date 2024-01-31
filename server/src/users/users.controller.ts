@@ -138,7 +138,7 @@ export class UsersController {
 	@UseGuards(AuthGuard)
 	@HttpCode(HttpStatus.OK)
 	@Post('updateUsername')
-	updateUsername(@Body() updateUsernameDto: UpdateUsernameDto, @Res() res) {
+	updateUsername(@Body() updateUsernameDto: UpdateUsernameDto) {
 		return this.usersService.updateUsername(updateUsernameDto);
 	}
 

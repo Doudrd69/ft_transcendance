@@ -34,10 +34,8 @@ const ProfilsSettingsComponent: React.FC = () => {
 				body: JSON.stringify(usernameDto),
 			});
 
-			console.log("UsernameUpdate response: ", response);
 			if (response.ok) {
-				console.log("UPDATING USERNAME");
-				console.log(response.ok);
+
 				const userName = await response.json();
 				const { newUsername } = userName;
 				sessionStorage.setItem("currentUserLogin", newUsername);
