@@ -103,7 +103,7 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 				const data = await response.json();
 				setUserList([...data]);
 				setOwnerUser(data.find((user:User) => user.isOwner));
-				setCurrentUser(data.find((user:User) => user.login === sessionStorage.getItem("currentUserLogin")));
+				setCurrentUser(data.find((user:User) => user.id === Number(sessionStorage.getItem("currentUserID"))));
 			}
 			else {
 				const error = await response.json();
@@ -203,46 +203,48 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 					<div className='list-users-channel'>
 					{userList && userList?.map((user: User, index: number) => (
 						<div key={index} className='user-list-item'>
-						<div className='avatar-container'>
-							{user.isAdmin && !user.isOwner &&
-							<>
-								<img className='admin-user' src='./crown.png' alt='user' />
+							<div className='avatar-container'>
+								{user.isAdmin && !user.isOwner &&
+								<>
+									<img className='admin-user' src='./crown.png' alt='user' />
+									<img
+									className='img-list-users-channel-admin'
+									src={`${process.env.API_URL}${user.avatarURL}`}
+									onClick={() => {
+										chatDispatch({ type: 'ACTIVATE', payload: 'dontcandcel' });
+										chatDispatch({ type: 'ACTIVATE', payload: 'dontcandcel' });
+										chatDispatch({ type: 'ACTIVATE', payload: 'showOptionsUserChannel' });
+										chatDispatch({ type: 'SET_CURRENT_OPTION_CHANNEL_NAME', payload: user.login });
+										chatDispatch({ type: 'SET_CURRENT_USER', payload: user });
+										chatDispatch({ type: 'DISABLE', payload: 'showBackComponent' });
+									}} />
+								</>
+								}
+								{!user.isAdmin && !user.isOwner &&
 								<img
-								className='img-list-users-channel-admin'
+								className='img-list-users-channel'
 								src={`${process.env.API_URL}${user.avatarURL}`}
 								onClick={() => {
-									chatDispatch({ type: 'ACTIVATE', payload: 'dontcandcel' });
-									chatDispatch({ type: 'ACTIVATE', payload: 'dontcandcel' });
-									chatDispatch({ type: 'ACTIVATE', payload: 'showOptionsUserChannel' });
-									chatDispatch({ type: 'SET_CURRENT_OPTION_CHANNEL_NAME', payload: user.login });
-									chatDispatch({ type: 'DISABLE', payload: 'showBackComponent' });
-								}} />
-							</>
-						}
-						{!user.isAdmin && !user.isOwner &&
-						  <img
-						  className='img-list-users-channel'
-						  src={`${process.env.API_URL}${user.avatarURL}`}
-						  onClick={() => {
-								chatDispatch({ type: 'SET_CURRENT_TARGET', payload: user});
-								chatDispatch({ type: 'ACTIVATE', payload: 'dontcandcel' });
-								chatDispatch({ type: 'ACTIVATE', payload: 'showOptionsUserChannel' });
-								chatDispatch({ type: 'SET_CURRENT_OPTION_CHANNEL_NAME', payload: user.login });
-								chatDispatch({ type: 'DISABLE', payload: 'showBackComponent' });
-							}} />}
-					  </div>
-					  {chatState.showOptionsUserChannel && !user.isOwner && currentUser &&
-						(<OptionsUserChannel user={user} me={currentUser}/>)
+										chatDispatch({ type: 'SET_CURRENT_TARGET', payload: user});
+										chatDispatch({ type: 'ACTIVATE', payload: 'dontcandcel' });
+										chatDispatch({ type: 'ACTIVATE', payload: 'showOptionsUserChannel' });
+										chatDispatch({ type: 'SET_CURRENT_OPTION_CHANNEL_NAME', payload: user.login });
+										chatDispatch({ type: 'SET_CURRENT_USER', payload: user });
+										chatDispatch({ type: 'DISABLE', payload: 'showBackComponent' });
+									}} />}
+							</div>
+						</div>
+				  	))}
+					{chatState.showOptionsUserChannel && !chatState.currentUser.isOwner && currentUser &&
+					(<OptionsUserChannel user={chatState.currentUser} me={currentUser}/>)
 					}
-					</div>
-				  ))}
 				</div>
 				</div>
 				<div ref={messagesContainerRef} className="bloc-channel-chat">
 				{messages.map((message: Message, id: number) => (
 					<div key={id} className="bloc-contain">
 					<div className="bloc-avatar-username">
-						{message.from === 'Bot' ?
+					{message.from === 'Bot' ?
 							<>
 								<img
 									src="./robot.png"
@@ -259,7 +261,7 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 								alt="User Avatar"
 								/>
 								<div className="user-name">{message.from}</div>
-							</>
+								</>
 						}
 					</div>
 					<div className={`message-container ${isMyMessage(message) ? 'my-message-channel' : 'other-message-channel'}`}>
@@ -274,4 +276,4 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 		);
 	};
 
-export default ReceiveBoxChannelComponent;
+	export default ReceiveBoxChannelComponent;
