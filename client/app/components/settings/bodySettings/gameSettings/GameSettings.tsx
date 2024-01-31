@@ -2,7 +2,7 @@ import './GameSettings.css'
 import React, { useEffect, useState } from 'react';
 import HistoryComponent from './history/History';
 import StatsComponent from './stats/Stats';
-import { Stats } from 'fs';
+import { toast } from 'react-toastify';
 
 const GameSettingsComponent: React.FC = () => {
 

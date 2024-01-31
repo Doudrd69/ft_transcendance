@@ -457,8 +457,6 @@ export class UsersService {
 		const user: User = await this.usersRepository.findOne({ where: { username: blockUserDto.initiatorLogin } });
 		const userToBlock: User = await this.usersRepository.findOne({ where: { username: blockUserDto.recipientLogin } });
 
-		console.log("user: ", user);
-		console.log("usertoblock: ", userToBlock);
 		if (user && userToBlock) {
 			// const checkUserDouble = user.blockedUsers.find((username: string) => username === userToBlock.username);
 			user.blockedUsers.forEach((username: string) => {
@@ -467,7 +465,6 @@ export class UsersService {
 				}
 			});
 
-			console.log("OK!");
 			user.blockedUsers.push(userToBlock.login);
 			await this.usersRepository.save(user);
 			return true;
