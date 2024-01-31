@@ -62,6 +62,7 @@ const PasswordChangeComponent: React.FC = () => {
 
 	const handleClosePassword = () => {
 		chatDispatch({ type: 'ACTIVATE', payload: 'showOptionChannel' });
+		chatDispatch({ type: 'ACTIVATE', payload: 'showBackComponent' });
 		chatDispatch({ type: 'DISABLE', payload: 'showPasswordChange' });
 	};
 
