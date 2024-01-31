@@ -136,24 +136,6 @@ const FriendsListTabComponent: React.FC<FriendsListTabComponentProps> = ({ user 
 		if (typeof globalState.gameSocket !== "undefined") {
 			globalState.gameSocket.on('acceptInvitation', () => {
 				console.log("validation :");
-				// const gameSocket: Socket = io('http://localhost:3001/game', {
-				// 	autoConnect: false,
-				// 	auth: {
-				// 		token: sessionStorage.getItem("jwt"),
-				// 	}
-				// });
-				// gameSocket.connect();
-				// dispatch({ type: 'SET_GAME_SOCKET', payload: gameSocket });
-				// gameSocket.on('connect', () => {
-				// 	console.log("INgameInvite gameSocketConnected :", globalState?.gameSocket);
-				// 	console.log("socketID PLAYERTWO :", gameSocket.id);
-				// 	globalState.userSocket?.emit('inviteToGame', {
-				// 		usernameToInvite: user.username,
-				// 		senderID: gameSocket.id,
-				// 		senderUsername: sessionStorage.getItem("currentUserLogin"),
-				// 		senderUserID: sessionStorage.getItem("currentUserID"),
-				// 	});
-				// });
 				setgameInviteValidation(true);
 			});
 			globalState.userSocket?.on('deniedInvitation', () => {

@@ -493,7 +493,7 @@ export class UsersService {
 	/**************************************************************/
 
 	async getUserByID(userID: number): Promise<User> {
-		console.log(userID);
+		// console.log(userID);
 		return await this.usersRepository.findOne({ where: { id: userID } });
 	}
 

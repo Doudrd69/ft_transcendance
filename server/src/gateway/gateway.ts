@@ -194,7 +194,7 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
     @SubscribeMessage('inviteDenied')
 	@UseGuards(GatewayGuard)
     handleInviteDenied(@ConnectedSocket() client: Socket, @MessageBody() data: {senderUsername: string}) {
-        console.log("CLOSED DENY")
+        console.log("DENY")
         this.server.to([data.senderUsername]).emit('deniedInvitation');
     }
 

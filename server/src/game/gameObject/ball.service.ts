@@ -69,15 +69,17 @@ export class BallService {
 		const nextSecondPoint = this.VectorService.add(secondPoint, normalizedSpeed);
 		// calcul des droites de first et second
 		// equation des intersections avec chacun des segments
-		console.log(`firstPoint: ${firstPoint.x}, ${firstPoint.y}`)
-		console.log(`ballPos: ${ball.position.x}, ${ball.position.y}`)
-		console.log(`nextFirstPoint: ${nextFirstPoint.x}, ${nextFirstPoint.y}`)
-		console.log(`normalizedSpeed: ${normalizedSpeed.x}, ${normalizedSpeed.y}`)
+		// console.log(`firstPoint: ${firstPoint.x}, ${firstPoint.y}`)
+		// console.log(`ballPos: ${ball.position.x}, ${ball.position.y}`)
+		// console.log(`nextFirstPoint: ${nextFirstPoint.x}, ${nextFirstPoint.y}`)
+		// console.log(`normalizedSpeed: ${normalizedSpeed.x}, ${normalizedSpeed.y}`)
 		if (this.findSegmentIntersection( paddle.start,  paddle.end , firstPoint, nextSecondPoint)) {
-			console.log(`COLLIDE`); return true;
+			// console.log(`COLLIDE`); 
+			return true;
 		}
 		if (this.findSegmentIntersection( paddle.start,  paddle.end , secondPoint, nextFirstPoint)) {
-			console.log(`COLLIDE`); return true;
+			// console.log(`COLLIDE`);
+			return true;
 		}
 		return false;
 	}

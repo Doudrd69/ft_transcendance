@@ -225,7 +225,7 @@ export class GameService {
 			console.log(`null`)
 			return false;
 		}
-		console.log(`user ${userId} has already game socket`);
+		console.log(`user ${userId} has already game socket : ${this.userGameSockets[userId]}`);
 		return true;
 	}
 

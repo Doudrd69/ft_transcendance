@@ -127,8 +127,7 @@ export class GameGateway {
     async handleCheckgameInvite(@ConnectedSocket() client: Socket, @MessageBody() data: { userOneId: number, userTwoId: number, playerTwoId: string, playerOneLogin: string, playerTwoLogin: string }) {
         //     // du coup en amont il faut creer des sockets pour les deux users. si pas bon supprimer les deux sockets
         // envoyer un emit accept a lautre user
-        console.log(`check : id : ${client.id}, ${data.playerTwoId} ${data.userOneId} ${data.userTwoId} playerOneLogin: string, playerTwoLogin: string`)
-        console.log(`playerTwoID :=====> ${data.playerTwoId}`);
+        console.log(`invite accpeted :=====> ${data.playerTwoId}`);
         this.server.to([data.playerTwoId]).emit('acceptInvitation');
         if (!this.GameService.userHasAlreadyGameSockets(data.userOneId)) {
             if (!this.GameService.userHasAlreadyGameSockets(data.userTwoId)) {
@@ -141,7 +140,7 @@ export class GameGateway {
                 this.game = await this.GameService.createGame(client.id, data.playerTwoId, "NORMAL");
                 const gameInstance: game_instance = this.GameEngineceService.createGameInstance(this.game);
                 this.game_instance.push(gameInstance);
-                this.server.to([client.id, data.playerTwoId]).emit('setgame');
+                this.server.to([client.id, data.playerTwoId]).emit('setGameInvited');
                 this.server.to([client.id, data.playerTwoId]).emit('joinGame', {
                     gameId: this.game.gameId,
                     playerOneID: this.game.playerOneID,
@@ -164,10 +163,12 @@ export class GameGateway {
                 }, 1000);
             }
             else {
+                console.log(`User have already socket : ${data.playerTwoLogin}` )
                 this.server.to([client.id, data.playerTwoId]).emit('gameInProgress');
             }
         }
         else {
+            console.log(`User have already socket : ${data.playerOneLogin}` )
             this.server.to([client.id, data.playerTwoId]).emit('gameInProgress');
         }
     }

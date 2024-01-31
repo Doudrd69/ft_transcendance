@@ -40,7 +40,7 @@ const Menu = () => {
             globalState.gameSocket?.emit('join-matchmaking',{ playerLogin: sessionStorage.getItem("currentUserLogin"),  gameMode: gameMode, userId: Number(sessionStorage.getItem("currentUserID"))});
         });
 
-        globalState.gameSocket?.on('setgame', () => {
+        globalState.gameSocket?.on('setGameInvited', () => {
             console.log("SET GAME");
             dispatchGame({
                 type: 'TOGGLE',
@@ -51,7 +51,7 @@ const Menu = () => {
 
         return () => {
             globalState.gameSocket?.off('gameNotInProgress');
-            globalState.gameSocket?.off('setgame');
+            globalState.gameSocket?.off('setGameInvited');
         }
 
     })
@@ -67,7 +67,7 @@ const Menu = () => {
                 }
             });
             gameSocket.connect();
-
+            globalState.gameSocket?.emit('linkSocketWithUser', { playerLogin: sessionStorage.getItem("currentUserLogin"), userId: sessionStorage.getItem("currentUserID") });
             dispatch({ type: 'SET_GAME_SOCKET', payload: gameSocket });
             // dispatchGame({ type: 'TOGGLE', payload: 'showGameMatchmaking' });
     
@@ -91,7 +91,7 @@ const Menu = () => {
                 }
             });
             gameSocket.connect();
-
+            globalState.gameSocket?.emit('linkSocketWithUser', { playerLogin: sessionStorage.getItem("currentUserLogin"), userId: sessionStorage.getItem("currentUserID") });
             dispatch({ type: 'SET_GAME_SOCKET', payload: gameSocket });
             // dispatchGame({ type: 'TOGGLE', payload: 'showGameMatchmaking' });
     
