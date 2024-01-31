@@ -13,6 +13,9 @@ export class User {
 
 	@Column({ default: false })
 	inMatchmaking: boolean;
+
+	@Column({ default: false })
+	inSpeedQueue: boolean;
 	
 	@Column({ default: false })
 	inGame: boolean;

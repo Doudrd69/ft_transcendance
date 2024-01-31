@@ -83,8 +83,10 @@ export class GameService {
 		// console.log("USER ONE: ", UserOne);
 		// console.log("USER TWO: ", UserTwo);
 		UserOne.inMatchmaking = false;
+		UserOne.inSpeedQueue = false;
 		UserOne.inGame = true;
 		UserTwo.inMatchmaking = false;
+		UserTwo.inSpeedQueue = false;
 		UserTwo.inGame = true;
 		await this.usersRepository.save(UserOne);
 		await this.usersRepository.save(UserTwo);
@@ -135,8 +137,10 @@ export class GameService {
 		// console.log("USER ONE: ", UserOne);
 		// console.log("USER TWO: ", UserTwo);
 		UserOne.inMatchmaking = false;
+		UserOne.inSpeedQueue = false;
 		UserOne.inGame = true;
 		UserTwo.inMatchmaking = false;
+		UserTwo.inSpeedQueue = false;
 		UserTwo.inGame = true;
 		await this.usersRepository.save(UserOne);
 		await this.usersRepository.save(UserTwo);
