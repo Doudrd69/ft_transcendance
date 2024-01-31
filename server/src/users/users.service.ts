@@ -33,7 +33,7 @@ export class UsersService {
 	) { }
 
 	private async isUsernameValid(usernameToFInd: string): Promise<boolean> {
-
+		
 		const usernameMatch = await this.usersRepository.findOne({ where: { username: usernameToFInd } });
 
 		if (usernameMatch) {
@@ -119,7 +119,6 @@ export class UsersService {
 	}
 
 	async getAvatar(userId: number): Promise<string | null> {
-		console.log("== Get avatar of user: ", userId);
 		const user = await this.usersRepository.findOne({ where: { id: userId }});
 		if (!user || !user.avatarURL) {
 			console.log("Avatar not found");
@@ -210,7 +209,6 @@ export class UsersService {
 		new42User.firstname = userData.firstname;
 		new42User.officialProfileImage = userData.image;
 		new42User.groups = [];
-		// new42User.games = [];
 		new42User.blockedUsers = [];
 		return this.usersRepository.save(new42User);
 	}
@@ -232,7 +230,6 @@ export class UsersService {
 		}
 
 		throw new HttpException('Username is already used', HttpStatus.BAD_REQUEST);
-		// throw new Error("username is already used");
 	}
 
 	// async blockUser(blockUserDto: BlockUserDto): Promise<boolean> {

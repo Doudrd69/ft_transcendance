@@ -30,7 +30,6 @@ const ListMyChannelComponent: React.FC<ListMyChannelComponentProps> = ({ user, f
 	const [showPassword, setShowPassword] = useState<boolean>(false);
 	const [password, setPassword] = useState('');
 
-	console.log('isAdd',isAdd);
 	const handlePasswordSubmit = (password: string) => {
 		setPassword(password);
 	};
@@ -44,8 +43,7 @@ const ListMyChannelComponent: React.FC<ListMyChannelComponentProps> = ({ user, f
 
 	const loadDiscussions = async () => {
 		try {
-			console.log('loadDiscussions');
-			console.log('userID', user);
+
 			const response = await fetch(`${process.env.API_URL}/chat/getConversationsToAdd/${friendID}`, {
 				method: 'GET',
 				headers: {
@@ -72,7 +70,6 @@ const ListMyChannelComponent: React.FC<ListMyChannelComponentProps> = ({ user, f
 	};
 	const loadDiscussionsPublic = async () => {
 		try {
-			console.log('loadDiscussionsPublic');
 			const response = await fetch(`${process.env.API_URL}/chat/getConversationsPublic/${userID}`, {
 				method: 'GET',
 				headers: {
@@ -81,7 +78,6 @@ const ListMyChannelComponent: React.FC<ListMyChannelComponentProps> = ({ user, f
 			});
 			if (response.ok) {
 				const conversationPublic = await response.json();
-				console.log('conversationPublic', conversationPublic);
 				if (conversationPublic)
 					setConversations((prevConversations: Conversation[]) => [...prevConversations, ...conversationPublic]);
 			}
@@ -100,7 +96,6 @@ const ListMyChannelComponent: React.FC<ListMyChannelComponentProps> = ({ user, f
 
 	const addUserToConversation = async (convID: number, friend: string) => {
 		try {
-			console.log("uueueuwerweurweiruwoeiruweoiruweoriuweoriuweroiweurw")
 
 			const addUserToConversationDto = {
 				userToAdd: friend,
@@ -116,7 +111,7 @@ const ListMyChannelComponent: React.FC<ListMyChannelComponentProps> = ({ user, f
 			});
 
 			if (response.ok) {
-				console.log("uueueuwerweurweiruwoeiruweoiruweoriuweoriuweroiweurw")
+
 				const conversation = await response.json();
 
 				if (globalState.userSocket?.connected) {

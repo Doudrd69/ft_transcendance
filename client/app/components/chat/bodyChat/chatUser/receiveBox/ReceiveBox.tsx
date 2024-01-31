@@ -15,7 +15,6 @@ interface Message {
 }
 
 const ReceiveBoxComponent: React.FC = () => {
-	console.log("ReceiveBoxComponent");
 	const { chatState } = useChat();
 	const { globalState } = useGlobal()
 	const [messages, setMessages] = useState<Message[]>([]);

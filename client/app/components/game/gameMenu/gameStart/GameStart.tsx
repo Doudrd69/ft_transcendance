@@ -12,25 +12,19 @@ const MatchMaking = () => {
 	const handleLeave= () => {
 
 		if (globalState.gameSocket?.connected) {
-			console.log("Player leaves matchmaking")
 			globalState.gameSocket?.emit('leave-matchmaking', { playerLogin: sessionStorage.getItem("currentUserLogin"), userId: sessionStorage.getItem("currentUserID") });
-		}
-		else {
-			console.log("ERROR: GameSocket pas connecté (leave matchmaking)");
 		}
 	};
 	
     useEffect(() => {
 
         globalState.gameSocket?.on('leave-game', () => {
-            console.log("Event leave-game");
             globalState.gameSocket?.disconnect();
             dispatchGame({ type: 'TOGGLE', payload: 'showGameMenu'});
             state.showGameMenu = true;
         });
             
         globalState.gameSocket?.on('setgame', () => {
-            console.log("SET GAME");
             dispatchGame({
                 type: 'TOGGLE',
                 payload: 'showGame',
@@ -38,7 +32,6 @@ const MatchMaking = () => {
             state.showGame = true;
         });
         globalState.gameSocket?.on('gameInProgress', () => {
-            console.log(`DISPATCH_IP`);
             globalState.gameSocket?.disconnect();
             dispatchGame({ type: 'TOGGLE', payload: 'showGameMenu'});
             state.showGameMenu = true;

@@ -24,7 +24,6 @@ const HistoryComponent: React.FC = () => {
 	
 			if (response.ok) {
 				const gameHistoryData = await response.json();
-				console.log(gameHistoryData);
 				setGameHistory([...gameHistoryData]);
 			}
 			else {

@@ -28,7 +28,6 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 	const { chatState, chatDispatch } = useChat();
 	if (chatState.currentUserList) {
 		setMe(chatState.currentUserList.filter((user: userList) => user.login === sessionStorage.getItem("currentUserLogin")));
-		console.log('me', me);
 	}
 	if (me) {
 		setIsAdmin(me[0].isAdmin);
@@ -54,7 +53,6 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 			});
 
 			if (response.ok) {
-				console.log("isPublicTrue");
 				globalState.userSocket?.emit('refreshChannelList', {
 					roomName : chatState.currentConversation,
 					roomID: chatState.currentConversationID,
@@ -91,7 +89,6 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 			});
 
 			if (response.ok) {
-				console.log("isPublicFalse");
 				globalState.userSocket?.emit('refreshChannelList', {
 					roomName : chatState.currentConversation,
 					roomID: chatState.currentConversationID,

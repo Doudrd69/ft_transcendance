@@ -38,7 +38,6 @@ const PasswordChangeComponent: React.FC = () => {
 				});
 		
 				if (response.ok) {
-					console.log("isProtectedTrue");
 					globalState.userSocket?.emit('refreshChannelList', {
 						roomName : chatState.currentConversation,
 						roomID: chatState.currentConversationID,

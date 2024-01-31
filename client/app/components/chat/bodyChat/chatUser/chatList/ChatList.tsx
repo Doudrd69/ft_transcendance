@@ -54,7 +54,6 @@ const ChatListComponent: React.FC = () => {
 	useEffect(() => {
 
 		globalState.userSocket?.on('refreshDmList', () => {
-			console.log("Loading DMs...");
 			loadDMs();
 		});
 		
@@ -75,7 +74,6 @@ const ChatListComponent: React.FC = () => {
 	}, [globalState?.userSocket]);
 
 	useEffect(() => {
-		console.log("Loading DMs...");
 		loadDMs();
 	}, [chatState.refreshFriendList]);
 

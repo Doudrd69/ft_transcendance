@@ -321,7 +321,6 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 	const demoteAdminUser = async() => {
 		
 		try{
-			console.log(user);
 			const userOptionDto = {
 				conversationID: Number(chatState.currentConversationID),
 				target: user.id,
@@ -488,7 +487,6 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 				const conversation : Conversation = await response.json();
 				let tmp = conversation.name;
 				let conversationName = tmp.replace(me.login, "");
-				console.log("conversationName: ", conversationName);
 				chatDispatch({ type: 'SET_CURRENT_CONVERSATION', payload: conversationName });
 				chatDispatch({ type: 'SET_CURRENT_ROOM', payload: conversation.name });
 				chatDispatch({ type: 'SET_CURRENT_CONVERSATION_ID', payload: conversation.id });

@@ -36,9 +36,7 @@ const SendBoxComponent: React.FC = () => {
 			});
 			
 			if (response.ok) {
-				console.log('globalState.userSocket?.connected', globalState.userSocket?.connected);
-				console.log('messageDto', messageDto);
-				console.log('chatState.currentRoom', chatState.currentRoom);
+
 				if (globalState.userSocket?.connected) {
 					globalState.userSocket?.emit('message', { dto: messageDto, conversationName: chatState.currentRoom });
 				}

@@ -17,8 +17,6 @@ const clientId = process.env.SERVER_TOKEN_CLIENT_ID;
 const clientSecret = process.env.SERVER_TOKEN_CLIENT_SECRET;
 const baseURL = process.env.PROJECT_URL;
 
-console.log("======================================================================= BASE URL: ", baseURL);
-
 @Injectable()
 export class AuthService {
 	constructor(

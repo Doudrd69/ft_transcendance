@@ -8,8 +8,6 @@ import RootLayout from './layout';
 
 export default function Home() {
 
-	console.log(`API_URL => ${process.env.API_URL}`);
-
 		return (
 			<RootLayout>
 				<GlobalProvider>

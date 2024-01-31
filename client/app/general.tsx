@@ -37,8 +37,6 @@ interface GameInviteDto {
 }
 
 const GeneralComponent = () => {
-	
-	// console.log(`ENV ====> ${process.env.REACT_APP_PROJECT_URL}`);
 
 	const { globalState, dispatch } = useGlobal();
 	const [showLogin, setShowLogin] = useState(true);
@@ -170,7 +168,6 @@ const GeneralComponent = () => {
 		if (userReconnects())
 			return true;
 
-		console.log(process.env.API_URL);
 		const response = await fetch(`${process.env.API_URL}/auth/access`, {
 			method: 'POST',
 			headers: {
@@ -254,7 +251,6 @@ const GeneralComponent = () => {
 		});
 
 		globalState.userSocket?.on('gameInvite', (gameInviteDto: GameInviteDto) => {
-			console.log("senderID :", gameInviteDto.senderUserID);
 			toast(<GameInviteNotification gameInviteDto={gameInviteDto} />,
 				{
 					pauseOnFocusLoss: false,
@@ -317,7 +313,6 @@ const GeneralComponent = () => {
 		})
 
 		globalState.gameSocket?.on('joinGame', (game: Game) => {
-			console.log("JOIN GAME");
 			setGame((prevState: Game | undefined) => ({
 				...prevState,
 				gameId: game.gameId,
@@ -371,7 +366,6 @@ const GeneralComponent = () => {
 	// Login form useEffect
 	useEffect(() => {
 		if (code) {
-			console.log('code : ', code)
 			handleAccessToken(code).then(result => {
 				check2faActivate();
 			})

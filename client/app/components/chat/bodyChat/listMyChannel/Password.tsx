@@ -35,7 +35,6 @@ const PasswordComponent: React.FC = () => {
 			});
 		
 			if (response.ok) {
-				console.log("isProtectedTrue");
 
 				chatDispatch({ type: 'DISABLE', payload: 'showPassword' });
 			}

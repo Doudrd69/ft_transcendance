@@ -38,7 +38,6 @@ const AddFriendComponent: React.FC<AddFriendComponentProps> = ({ updateFriends, 
 				
 				const data = await response.json();
 				if (!data) {
-					console.log("Request denied, please enter a valid username");
 					return;
 				}
 				

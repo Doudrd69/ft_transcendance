@@ -110,7 +110,6 @@ const FriendsListTabComponent: React.FC<FriendsListTabComponentProps> = ({ user 
 	const gameInvite = () => {
 		// envoyer toast a lautre user et attendre la reponse
 		// si l'autre accept envoyer emit de userOneId playerOneid userTwoId 
-		console.log("Inviting user to play");
 
 		if (gameSocketConnected === false) {
 			const gameSocket = io(`${process.env.API_URL}/game`, {
@@ -123,7 +122,6 @@ const FriendsListTabComponent: React.FC<FriendsListTabComponentProps> = ({ user 
 		  gameSocketConnected = true;
 		  gameSocket.on('connect', () => {
 			dispatch({ type: 'SET_GAME_SOCKET', payload: gameSocket });
-			console.log("socketID :", gameSocket.id);
 			globalState.userSocket?.emit('inviteToGame', {
 			  usernameToInvite: user.username,
 			  senderID: gameSocket.id,
@@ -133,7 +131,6 @@ const FriendsListTabComponent: React.FC<FriendsListTabComponentProps> = ({ user 
 			setTimeout(() => {
 			  gameSocketConnected = false;
 			  if (gameInviteValidation === false) {
-				console.log("validationoooooooo :", gameInviteValidation);
 				globalState.gameSocket?.disconnect();
 			  }
 			}, 8000)
@@ -143,7 +140,6 @@ const FriendsListTabComponent: React.FC<FriendsListTabComponentProps> = ({ user 
 	  
 	  useEffect(() => {
 		const subscription = globalState.gameSocket?.on('acceptInvitation', () => {
-		  console.log("validation :", gameInviteValidation);
 		  setgameInviteValidation(true);
 		  // gameInviteValidation = true;
 		});

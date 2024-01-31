@@ -52,7 +52,6 @@ const AddConversationComponent: React.FC<AddConversationComponentProps> = ({ loa
 					globalState.userSocket?.emit('joinRoom', { roomName: data.name, roomID: data.id });
 				}
 		
-				console.log("Conversation successfully created");
 				chatDispatch({ type: 'DISABLE', payload: 'showCreateChannel' });
 				chatDispatch({ type: 'DISABLE', payload: 'showAddCreateChannel' });
 				chatDispatch({ type: 'TOGGLEX', payload: 'refreshChannel'});

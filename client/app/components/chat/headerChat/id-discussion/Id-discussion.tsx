@@ -39,7 +39,7 @@ const IdDiscussionComponent: React.FC = () => {
 	}
 	else
 		id = chatState.currentConversation;
-	console.log("isAdmin", chatState.isAdmin);
+
 	return (
 		<div className='bloc-id'>
 			<p className="id">{id}</p>

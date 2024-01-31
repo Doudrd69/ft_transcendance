@@ -41,7 +41,6 @@ const TimerComponent: React.FC<TimerComponentProps> = ({user}) => {
 				from: Number(sessionStorage.getItem("currentUserID")),
 				mutedUntil: Number(timer),
 			}
-			console.log(muteUserDto);
 			const response = await fetch(`${process.env.API_URL}/chat/muteUser`, {
 				method: 'POST',
 				headers: {
