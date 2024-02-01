@@ -109,7 +109,6 @@ export class GameGateway {
                         const gameInstance: game_instance = this.GameService.getGameInstance(this.game_instance, game.gameId);
                         console.log(`[handleDisconnect] User is in Game ${game.gameId}, is it ended :? ${gameInstance.game_has_ended}`)
                         if (gameInstance && gameInstance.game_has_ended !== true) {
-                            const gameInstance: game_instance = this.GameService.getGameInstance(this.game_instance, game.gameId);
                             console.log(`[handleDisconnect] User will be disconnect from game ${gameInstance}`)
                             if (user.login === gameInstance.playersLogin[0])
                                 await this.GameService.disconnectSocket(gameInstance.players[1], gameInstance.gameID)
@@ -121,7 +120,7 @@ export class GameGateway {
             }
         }
         catch (error) {
-            throw new Error(`yaya  ${error}`);
+            console.log(error);
         }
         console.log(`[${client.id}] GameGtw client disconnected : ${client.id}`);
     }
@@ -286,6 +285,8 @@ export class GameGateway {
             }
             const user1: User = await this.GameService.getUserWithUserId(gameInstance.usersId[0]);
             const user2: User = await this.GameService.getUserWithUserId(gameInstance.usersId[1]);
+            await this.GameService.deleteGame(this.game);
+            await this.GameService.createGameStop(user1, user2, gameInstance, disconnectedSockets);
             await this.GameService.updateStateGameForUsers(user1, user2);
             this.GameService.deleteGameSocketsIdForPlayers(user1, user2);
 

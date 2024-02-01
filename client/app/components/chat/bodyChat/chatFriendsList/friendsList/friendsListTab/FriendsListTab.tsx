@@ -116,10 +116,11 @@ const FriendsListTabComponent: React.FC<FriendsListTabComponentProps> = ({ user 
 
 			setgameSocketConnected(true);
 			setgameInviteValidation(false);
-			// globalState.userSocket?.emit('checkSenderInMatch', {
-			// 	senderUsername: sessionStorage.getItem("currentUserLogin"),
-			// })
-			// globalState.userSocket?.on('senderNotInGame', () => {
+			globalState.userSocket?.emit('checkSenderInMatch', {
+				senderUsername: sessionStorage.getItem("currentUserLogin"),
+				senderUserId: sessionStorage.getItem("currentUserID"),
+			})
+			globalState.userSocket?.on('senderNotInGame', () => {
 				console.log(`INVITATION`);
 				const gameSocket: Socket = io('http://localhost:3001/game', {
 					autoConnect: false,
@@ -138,7 +139,7 @@ const FriendsListTabComponent: React.FC<FriendsListTabComponentProps> = ({ user 
 						senderUserID: sessionStorage.getItem("currentUserID"),
 					});
 				})
-			// })
+			})
 		}
 	};
 
