@@ -189,7 +189,7 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	@UseGuards(GatewayGuard)
 	async inviteUserToGame( @MessageBody() data: { usernameToInvite: string, userIdToInvite: number, senderID: string, senderUsername: string, senderUserID: number } ) {
 		const { usernameToInvite, userIdToInvite, senderID, senderUsername, senderUserID } = data;
-		if (await this.userService.userToInviteGameIsAlreadyInGame(userIdToInvite))is.userService.userToInviteGameIsAlreadyInGame(usernameToInvite))
+		if (await this.userService.userToInviteGameIsAlreadyInGame(userIdToInvite))
 		{
 			this.server.to(senderUsername).emit('userToInviteAlreadyInGame');
 			return;
