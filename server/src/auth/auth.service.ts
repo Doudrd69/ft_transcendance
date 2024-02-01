@@ -45,25 +45,25 @@ export class AuthService {
 			if (response.ok) {
 				const responseContent = await response.json();
 
-				const userInformation = {
-					'login': responseContent.login,
-					'firstname': responseContent.first_name,
-					'image': responseContent.image,
-				}
+				if (responseContent && responseContent.login && responseContent.first_name && responseContent.image) {
 
-				const result = await this.usersService.getUserByLogin(userInformation.login);
-				if (result) {
-					console.log("User already exists in DB");
-					return result;
-				}
-				else {
-					return this.usersService.createNew42User(userInformation);
+					const userInformation = {
+						'login': responseContent.login,
+						'firstname': responseContent.first_name,
+						'image': responseContent.image,
+					}
+	
+					const result = await this.usersService.getUserByLogin(userInformation.login);
+					if (result) {
+						console.log("User already exists in DB");
+						return result;
+					}
+					else {
+						return this.usersService.createNew42User(userInformation);
+					}
 				}
 			}
-			else {
-				throw "42 API request failed";
-			}
-
+			throw new HttpException('Fatal error', HttpStatus.BAD_REQUEST);
 		} catch (error) {
 			console.log(error);
 		}
