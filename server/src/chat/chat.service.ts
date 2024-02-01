@@ -389,7 +389,8 @@ export class ChatService {
 	/***					CHANNEL PASSWORD					***/
 	/**************************************************************/
 
-	async compareChannelPassword(checkPasswordDto: CheckPasswordDto): Promise<boolean> {
+	// attention userID soit le bon user
+	async compareChannelPassword(checkPasswordDto: CheckPasswordDto, userID: number): Promise<boolean> {
 
 		const conversation : Conversation = await this.conversationRepository.findOne({ where: {id: checkPasswordDto.conversationID} });
 		if (conversation) {
@@ -401,7 +402,7 @@ export class ChatService {
 					conversationID: conversation.id,
 				}
 
-				const conversationToAdd = await this.addUserToConversation(addUserToConversationDto);
+				const conversationToAdd = await this.addUserToConversation(addUserToConversationDto, userID);
 				if (conversationToAdd)
 					return true;
 				else
@@ -437,10 +438,10 @@ export class ChatService {
 	/***						CHANNEL OPTIONS					***/
 	/**************************************************************/
 
-	async updateChannelPublicStatusToTrue(updateIsPublicDto: UpdateIsPublicDto, _user: User): Promise<boolean> {
+	async updateChannelPublicStatusToTrue(updateIsPublicDto: UpdateIsPublicDto, userID: number): Promise<boolean> {
 
 		const user : User = await this.usersRepository.findOne({
-			where: { id: updateIsPublicDto.userID },
+			where: { id: userID },
 			relations: ["groups", "groups.conversation"],
 		});
 
@@ -465,10 +466,10 @@ export class ChatService {
 		throw new HttpException('Fatal error', HttpStatus.BAD_REQUEST);
 	}
 
-	async updateChannelPublicStatusToFalse(updateIsPublicDto: UpdateIsPublicDto, _user: User): Promise<boolean> {
+	async updateChannelPublicStatusToFalse(updateIsPublicDto: UpdateIsPublicDto, userID: number): Promise<boolean> {
 
 		const user : User = await this.usersRepository.findOne({
-			where: { id: updateIsPublicDto.userID },
+			where: { id: userID },
 			relations: ["groups", "groups.conversation"],
 		});
 
@@ -494,10 +495,10 @@ export class ChatService {
 	}
 
 
-	async updateChannelIsProtectedStatusToTrue(channelOptionsDto: ChannelOptionsDto): Promise<boolean> {
+	async updateChannelIsProtectedStatusToTrue(channelOptionsDto: ChannelOptionsDto, userID: number): Promise<boolean> {
 
 		const user : User = await this.usersRepository.findOne({
-			where: { id: channelOptionsDto.userID},
+			where: { id: userID},
 			relations: ["groups", "groups.conversation"],
 		});
 
@@ -523,10 +524,10 @@ export class ChatService {
 		throw new HttpException('Fatal error', HttpStatus.BAD_REQUEST);
 	}
 
-	async updateChannelIsProtectedStatusToFalse( updateProtectFalseDto: UpdateProtectFalseDto): Promise<boolean> {
+	async updateChannelIsProtectedStatusToFalse( updateProtectFalseDto: UpdateProtectFalseDto, userID: number): Promise<boolean> {
 
 		const user : User = await this.usersRepository.findOne({
-			where: { id: updateProtectFalseDto.userID},
+			where: { id: userID},
 			relations: ["groups", "groups.conversation"],
 		});
 
@@ -806,44 +807,49 @@ export class ChatService {
 	/***					CONVERSATION						***/
 	/**************************************************************/
 	
-	async deleteConversation(deleteConversationDto: DeleteConversationDto): Promise<boolean> {
+	async deleteConversation(deleteConversationDto: DeleteConversationDto, userID: number): Promise<boolean> {
 
 		const conversationToDelete: Conversation = await this.conversationRepository.findOne({ where: { id: deleteConversationDto.conversationID } });
 
 		const user = await this.usersRepository.findOne({
-			where: { id: deleteConversationDto.userID },
+			where: { id: userID },
 			relations: ['groups', 'groups.conversation'],
 		});
 
 		if (user && conversationToDelete) {
 
 			const userGroup = await this.getRelatedGroup(user, conversationToDelete);
-			if (userGroup && userGroup.isOwner) {
-				
-				const idToDelete = conversationToDelete.id;
-	
-				await this.groupMemberRepository
-					  .createQueryBuilder()
-					  .delete()
-					  .from(GroupMember)
-					 .where("conversation.id = :id", { id: idToDelete })
-					  .execute();
-	
-				await this.conversationRepository
-					.createQueryBuilder()
-					.delete()
-					.from(Message)
-					.where("conversation.id = :id", { id: conversationToDelete.id })
-					.execute()
-	
-				await this.conversationRepository
-					.createQueryBuilder()
-					.delete()
-					.from(Conversation)
-					.where("id = :id", { id: conversationToDelete.id })
-					.execute()
-	
-				return true ;
+			if (userGroup) {
+
+				if (userGroup.isOwner) {
+
+					const idToDelete = conversationToDelete.id;
+		
+					await this.groupMemberRepository
+						  .createQueryBuilder()
+						  .delete()
+						  .from(GroupMember)
+						 .where("conversation.id = :id", { id: idToDelete })
+						  .execute();
+		
+					await this.conversationRepository
+						.createQueryBuilder()
+						.delete()
+						.from(Message)
+						.where("conversation.id = :id", { id: conversationToDelete.id })
+						.execute()
+		
+					await this.conversationRepository
+						.createQueryBuilder()
+						.delete()
+						.from(Conversation)
+						.where("id = :id", { id: conversationToDelete.id })
+						.execute()
+		
+					return true ;
+				}
+
+				throw new HttpException('User is not the owner', HttpStatus.BAD_REQUEST);
 			}
 		}
 
@@ -887,10 +893,10 @@ export class ChatService {
 		return false;
 	}
 
-	async quitConversation(quiConversationDto: QuitConversationDto): Promise<boolean> {
+	async quitConversation(quiConversationDto: QuitConversationDto, userID: number): Promise<boolean> {
 
 		const user : User = await this.usersRepository.findOne({
-			where: { id: quiConversationDto.userID },
+			where: { id: userID },
 			relations: ["groups", "groups.conversation"],
 		});
 
@@ -970,10 +976,10 @@ export class ChatService {
 		throw new HttpException('Fatal error', HttpStatus.BAD_REQUEST);
 	}
 	
-	async addUserToConversation(addUserToConversationDto: AddUserToConversationDto): Promise<Conversation> {
+	async addUserToConversation(addUserToConversationDto: AddUserToConversationDto, userID: number): Promise<Conversation> {
 		
 		const userToAdd = await this.usersRepository.findOne({
-			where: { username: addUserToConversationDto.userToAdd },
+			where: { id: userID },
 			relations: ['groups', 'groups.conversation'],
 		});
 		
@@ -1047,10 +1053,11 @@ export class ChatService {
 		return conversationCheck;
 	}
 
-	async createPrivateConversation(DMcreationDto: DMcreationDto): Promise<Conversation> {
+	// attention ordre userID et user2 mdr
+	async createPrivateConversation(DMcreationDto: DMcreationDto, userID: number): Promise<Conversation> {
 
 		const user1 = await this.usersRepository.findOne({
-			where: { id: DMcreationDto.user1 },
+			where: { id: userID },
 			relations: ['groups', 'groups.conversation'],
 		});
 
@@ -1070,11 +1077,11 @@ export class ChatService {
 	}
 	
 	// Let admins update conversation to private/public and add/remove password
-	async updateConversation(updateConversationDto: UpdateConversationDto): Promise<Conversation> {
+	async updateConversation(updateConversationDto: UpdateConversationDto, userID: number): Promise<Conversation> {
 		
 		const conversationToUpdate = await this.conversationRepository.findOne({ where: { id: updateConversationDto.conversationID} });
 		const user = await this.usersRepository.findOne({
-			where: { id: updateConversationDto.userID },
+			where: { id: userID },
 			relations: ["groups", "groups.conversation"],
 		});
 
@@ -1097,10 +1104,10 @@ export class ChatService {
 		throw new HttpException('Fatal error', HttpStatus.BAD_REQUEST);
 	}
 	
-	async createConversation(conversationDto: ConversationDto): Promise<Conversation> {
+	async createConversation(conversationDto: ConversationDto, userID: number): Promise<Conversation> {
 		
 		const user = await this.usersRepository.findOne({
-			where: { id: conversationDto.userID},
+			where: { id: userID},
 			relations: ['groups', 'groups.conversation'],
 		});
 
@@ -1139,11 +1146,11 @@ export class ChatService {
 	/**************************************************************/
 
 	// need to check muteStatus here or in front?
-	async createMessage(messageDto: MessageDto): Promise<Message> {
+	async createMessage(messageDto: MessageDto, userID: number): Promise<Message> {
 		
 		const conversation : Conversation = await this.conversationRepository.findOne({ where: {id: messageDto.conversationID} });
 		const sender : User = await this.usersRepository.findOne({
-			where: { username: messageDto.from },
+			where: { id: userID },
 			relations: ["groups", "groups.conversation"],
 		});
 
