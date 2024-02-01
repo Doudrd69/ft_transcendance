@@ -206,8 +206,6 @@ export class ChatController {
 	@UseGuards(AuthGuard)
 	@Get('getConversationsPublic/:userID')
 	getConversationsPublicOption(@Param('userID') userID: number)  {
-		console.log("getConversationsPublic");
-
 		return this.chatService.getAllPublicConversationsOption(userID);
 	}
 
@@ -222,7 +220,6 @@ export class ChatController {
 	@Get('getConversationsToAdd/:userID')
 	getConversationsToAdd(@Req() req, @Param('userID') userID: number) {
 		const { user } = req;
-		console.log("getConversationsToAdd");
 		return this.chatService.getConversationsToAdd(userID, user.sub);
 	}
 	@UseGuards(AuthGuard)

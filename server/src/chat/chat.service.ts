@@ -167,32 +167,37 @@ export class ChatService {
 			relations: ["groups", "groups.conversation"],
 		});
 
-		let array = [];
-		user.groups.forEach((userGroup: GroupMember) => {
-			if (userGroup.conversation.is_channel) {
-				let userListForThisGroup = [];
-				users.forEach((user_: User) => {
-						user_.groups.forEach((group: GroupMember) => {
-							if (group.conversation.id == userGroup.conversation.id) {
-								if (group.conversation.is_channel)
-									userListForThisGroup.push({
-										id: user_.id,
-										login: user_.username,
-										avatarURL: user_.avatarURL,
-										isOwner: group.isOwner,
-										isAdmin: group.isAdmin,
-										isBan: group.isBan,
-										isMute: group.isMute,
-										blockList: user_.blockedUsers,
-									});
-							}
-						});
-				});
-				array.push(userListForThisGroup);
-			}
-		});
+		if (users) {
+			
+			let array = [];
+			user.groups.forEach((userGroup: GroupMember) => {
+				if (userGroup.conversation.is_channel) {
+					let userListForThisGroup = [];
+					users.forEach((user_: User) => {
+							user_.groups.forEach((group: GroupMember) => {
+								if (group.conversation.id == userGroup.conversation.id) {
+									if (group.conversation.is_channel)
+										userListForThisGroup.push({
+											id: user_.id,
+											login: user_.username,
+											avatarURL: user_.avatarURL,
+											isOwner: group.isOwner,
+											isAdmin: group.isAdmin,
+											isBan: group.isBan,
+											isMute: group.isMute,
+											blockList: user_.blockedUsers,
+										});
+								}
+							});
+					});
+					array.push(userListForThisGroup);
+				}
+			});
+				
+			return array;
+		}
 
-		return array;
+		throw new HttpException('Fatal error', HttpStatus.BAD_REQUEST);
 	}
 
 	private async getUserListFromTargetConversation(conversationID: number) {
@@ -232,24 +237,26 @@ export class ChatService {
 	private async getAllMessages(conversationID: number, userID: number): Promise<Message[]> {
 
 		const conversation = await this.conversationRepository.findOne({ where: {id: conversationID} });
-		if (!conversation) {
-			console.error("Conversation  not found");
-			return [];
-		}
-
+		
 		const user : User = await this.usersRepository.findOne({
 			where: { id: userID },
 			relations: ['groups', 'groups.conversation'],
 		});
 
-		const group = await this.getRelatedGroup(user, conversation)
-		if (!group) {
-			console.error("Unauthorized");
-		}
+		if (user && conversation) {
+			
+			const group = await this.getRelatedGroup(user, conversation)
+			if (group) {
 
-		const messages = await this.messageRepository.find({ where: {conversation: conversation}});
-		const filteredMessages = messages.filter((message: Message) => !user.blockedUsers.includes(message.from));
-		return filteredMessages;
+				const messages = await this.messageRepository.find({ where: {conversation: conversation}});
+				const filteredMessages = messages.filter((message: Message) => !user.blockedUsers.includes(message.from));
+				return filteredMessages;
+			}
+
+			throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
+		}
+		
+		throw new HttpException('Fatal error', HttpStatus.BAD_REQUEST);
 	}
 
 	private async getAllChannels(userID: number): Promise<Conversation[]> {
@@ -272,8 +279,8 @@ export class ChatService {
 			}
 			return [];
 		}
-		console.error("Fatal error2: user not found");
-		return [];
+
+		throw new HttpException('Fatal error', HttpStatus.BAD_REQUEST);
 	}
 
 	async getUserListFromDms(userID: number) {
@@ -283,42 +290,49 @@ export class ChatService {
 			relations: ['groups', 'groups.conversation'],
 		});
 
-		// les dms = group.conversation -->!is_channel
-		let userDMs = [];
-		myuser.groups.forEach((group: GroupMember) => {
-			if (!group.conversation.is_channel) {
-				userDMs.push(group.conversation);
-			}
-		});
+		if (myuser) {
 
-		const users = await this.usersRepository.find({
-			relations: ['groups', 'groups.conversation'],
-		});
+			// les dms = group.conversation -->!is_channel
+			let userDMs = [];
+			myuser.groups.forEach((group: GroupMember) => {
+				if (!group.conversation.is_channel) {
+					userDMs.push(group.conversation);
+				}
+			});
+	
+			const users = await this.usersRepository.find({
+				relations: ['groups', 'groups.conversation'],
+			});
+	
+			if (users) {
 
-		// tout les users
-		let DMList = [];
-		users.forEach((user: User) => {
-			// tout les groups d'un user
-			if (user.id != myuser.id) {
-				user.groups.forEach((userGroup: GroupMember) => {
-					// chaque groupe du user par rapport a NOS groups de DM
-					userDMs.forEach((dm: Conversation) => {
-						// Si on a une conv privee
-						if (userGroup.conversation.id == dm.id) {
-							DMList.push({
-								id: userGroup.conversation.id,
-								username: user.username,
-								avatarURL: user.avatarURL,
-								name: userGroup.conversation.name,
-								onlineStatus: user.isActive,
-							});
-						}
-					})
+				let DMList = [];
+				users.forEach((user: User) => {
+					// tout les groups d'un user
+					if (user.id != myuser.id) {
+						user.groups.forEach((userGroup: GroupMember) => {
+							// chaque groupe du user par rapport a NOS groups de DM
+							userDMs.forEach((dm: Conversation) => {
+								// Si on a une conv privee
+								if (userGroup.conversation.id == dm.id) {
+									DMList.push({
+										id: userGroup.conversation.id,
+										username: user.username,
+										avatarURL: user.avatarURL,
+										name: userGroup.conversation.name,
+										onlineStatus: user.isActive,
+									});
+								}
+							})
+						});
+					}
 				});
-			}
-		});
 
-		return DMList;
+				return DMList;
+			}
+		}
+
+		throw new HttpException('Fatal error', HttpStatus.BAD_REQUEST);
 	}
 
 	private async getDMsConversations(userID: number): Promise<Conversation[]> {
@@ -1282,7 +1296,7 @@ export class ChatService {
 		return await this.getUserListFromTargetConversation(conversationID);
 	}
 
-	// return un array d'array d'objets "user" : login, avatarURL
+
 	async getConversationsWithStatus(userID: number) {
 
 		const user = await this.usersRepository.findOne({
@@ -1300,6 +1314,7 @@ export class ChatService {
 
 			const conversationList = await this.getAllChannels(userID);
 			const usersList = await this.getUserListFromConversations(user, conversationList);
+
 			if (conversationList && usersList) {
 				const conversationArray = {
 					conversationList: conversationList,
@@ -1307,13 +1322,12 @@ export class ChatService {
 					usersList: usersList,
 					blockList: user.blockedUsers,
 				}
-	
+
 				return conversationArray;
 			}
 		}
 
-		console.error("Fatal error: conversations not found");
-		return [];
+		throw new HttpException('Fatal error', HttpStatus.BAD_REQUEST);
 	}
 
 	async getConversationsToAdd(friendID: number, userID: number) {
@@ -1332,25 +1346,30 @@ export class ChatService {
 			where: {is_channel: true},
 		});
 
-		let friendChannels = [];
-		friend.groups.forEach((group: GroupMember) => {
-			conversations.forEach((conversation: Conversation) => {
-				if (group.conversation.id == conversation.id && conversation.is_channel)
-				friendChannels.push(conversation);
+		if (user && friend && conversations) {
+
+			let friendChannels = [];
+			friend.groups.forEach((group: GroupMember) => {
+				conversations.forEach((conversation: Conversation) => {
+					if (group.conversation.id == conversation.id && conversation.is_channel)
+					friendChannels.push(conversation);
+				});
 			});
-		});
-	
-		let arrayDelete = [];
-		user.groups.forEach((group: GroupMember) => {
-			conversations.forEach((conversation: Conversation) => {
-				if (group.isAdmin && group.conversation.id == conversation.id && conversation.is_channel)
-					arrayDelete.push(conversation);
+		
+			let arrayDelete = [];
+			user.groups.forEach((group: GroupMember) => {
+				conversations.forEach((conversation: Conversation) => {
+					if (group.isAdmin && group.conversation.id == conversation.id && conversation.is_channel)
+						arrayDelete.push(conversation);
+				});
 			});
-		});
-	
-		const array1 = conversations.filter((conversation: Conversation) => arrayDelete.includes(conversation));
-		const array2 = array1.filter((conversation: Conversation) => !friendChannels.includes(conversation));
-		return array2;
+		
+			const array1 = conversations.filter((conversation: Conversation) => arrayDelete.includes(conversation));
+			const array2 = array1.filter((conversation: Conversation) => !friendChannels.includes(conversation));
+			return array2;
+		}
+
+		throw new HttpException('Fatal error', HttpStatus.BAD_REQUEST);
 	}
 
 	async getAllPublicConversationsOption(userID : number) {
@@ -1359,20 +1378,25 @@ export class ChatService {
 			where: { id: userID },
 			relations: ["groups", "groups.conversation"],
 		});
-		console.log("user: ", user.login);
 
 		let conversations : Conversation[] = await this.conversationRepository.find({
 			where: {isPublic: true, is_channel: true},
 		});
-		
-		let arrayDelete = [];
-		user.groups.forEach((group: GroupMember) => {
-			conversations.forEach((conversation: Conversation) => {
-				if (group.conversation.id == conversation.id && conversation.is_channel && conversation.isPublic)
-					arrayDelete.push(conversation);
+
+		if (user && conversations) {
+
+			let arrayDelete = [];
+			user.groups.forEach((group: GroupMember) => {
+				conversations.forEach((conversation: Conversation) => {
+					if (group.conversation.id == conversation.id && conversation.is_channel && conversation.isPublic)
+						arrayDelete.push(conversation);
+				});
 			});
-		});
-		const array = conversations.filter((conversation: Conversation) => !arrayDelete.includes(conversation));
-		return array;
+
+			const array = conversations.filter((conversation: Conversation) => !arrayDelete.includes(conversation));
+			return array;
+		}
+		
+		throw new HttpException('Fatal error', HttpStatus.BAD_REQUEST);
 	}
 }
