@@ -118,6 +118,7 @@ const FriendsListTabComponent: React.FC<FriendsListTabComponentProps> = ({ user 
 					dispatch({ type: 'SET_GAME_SOCKET', payload: gameSocket });
 					globalState.userSocket?.emit('inviteToGame', {
 						usernameToInvite: user.username,
+						userIdToInvite: user.id,
 						senderID: gameSocket.id,
 						senderUsername: sessionStorage.getItem("currentUserLogin"),
 						senderUserID: sessionStorage.getItem("currentUserID"),

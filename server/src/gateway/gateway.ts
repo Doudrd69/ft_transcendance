@@ -173,8 +173,8 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 
 	@SubscribeMessage('checkSenderInMatch')
 	@UseGuards(GatewayGuard)
-	async checkIfSendInMatch(@MessageBody() data: { senderUsername: string } ) {
-		if (await this.userService.userToInviteGameIsAlreadyInGame(data.senderUsername))
+	async checkIfSendInMatch(@MessageBody() data: { senderUsername: string, senderUserId: number } ) {
+		if (await this.userService.userToInviteGameIsAlreadyInGame(data.senderUserId))
 		{
 			return;
 		}
@@ -183,9 +183,9 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 
 	@SubscribeMessage('inviteToGame')
 	@UseGuards(GatewayGuard)
-	async inviteUserToGame( @MessageBody() data: { usernameToInvite: string, senderID: string, senderUsername: string, senderUserID: number } ) {
-		const { usernameToInvite, senderID, senderUsername, senderUserID } = data;
-		if (await this.userService.userToInviteGameIsAlreadyInGame(usernameToInvite))
+	async inviteUserToGame( @MessageBody() data: { usernameToInvite: string, userIdToInvite: number, senderID: string, senderUsername: string, senderUserID: number } ) {
+		const { usernameToInvite, userIdToInvite, senderID, senderUsername, senderUserID } = data;
+		if (await this.userService.userToInviteGameIsAlreadyInGame(userIdToInvite))
 		{
 			this.server.to(senderUsername).emit('userToInviteAlreadyInGame');
 			return;
