@@ -1067,6 +1067,8 @@ export class ChatService {
 			relations: ["groups", "groups.conversation"],
 		});
 
+		// check si le type est dans le hannel mdrrrrr
+
 		const isMuteStatus = await this.getGroupIsMuteStatus(sender, conversation);
 		const isBanStatus = await this.getGroupIsBanStatus(sender, conversation);
 

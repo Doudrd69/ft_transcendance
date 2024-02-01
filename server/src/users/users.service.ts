@@ -287,7 +287,6 @@ export class UsersService {
 				.where('(game.userOneId = :id) OR (game.userTwoId = :id)', { id: user.id })
 				.getMany()
 
-			console.log(`User ${user.username} games history: `);
 			let array = [];
 			userGames.forEach((game: Game) => {
 				array.push({

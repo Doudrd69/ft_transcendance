@@ -13,6 +13,9 @@ import { UseGuards } from '@nestjs/common'
 import { ExecutionContext } from '@nestjs/common';
 import { User } from 'src/users/entities/users.entity';
 import { on } from 'events';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 export interface vector_instance {
     x: number;
@@ -64,7 +67,7 @@ let gameInstance: game_instance | null = null;
 @WebSocketGateway({
     namespace: 'game',
     cors: {
-        origin: ['http://localhost:3000', 'http://10.12.11.2:3000']
+        origin: ['http://localhost:3000', `${process.env.SERVER_REDIRECT_URI}`]
     },
     middlewares: [GatewayGuard],
 })

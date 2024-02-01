@@ -8,11 +8,14 @@ import { MessageDto } from 'src/chat/dto/message.dto';
 import { GatewayGuard } from './Gatewayguard.guard';
 import { UseGuards } from '@nestjs/common'
 import { Req } from '@nestjs/common'
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 @WebSocketGateway({
 	namespace: 'user',
 	cors: {
-		origin: ['http://localhost:3000', 'http://10.12.11.2:3000']
+		origin: ['http://localhost:3000', `${process.env.SERVER_REDIRECT_URI}`]
 	},
 	middlewares: [GatewayGuard],
 })
