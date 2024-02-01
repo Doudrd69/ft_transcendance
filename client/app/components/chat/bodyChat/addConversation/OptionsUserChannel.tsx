@@ -5,6 +5,7 @@ import './AddConversation.css';
 import { RSC } from 'next/dist/client/components/app-router-headers';
 import { useGlobal } from '@/app/GlobalContext';
 import TimerComponent from './Timer';
+import { toast } from 'react-toastify';
 
 interface User {
 	id: number;
@@ -50,7 +51,7 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 			recipientLogin: user.login,
 		}
 
-		const response = await fetch(`http://localhost:3001/users/blockUser`, {
+		const response = await fetch(`${process.env.API_URL}/users/blockUser`, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
@@ -69,7 +70,11 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 			}
 		}
 		else {
-			console.error("Fatal error");
+			const error = await response.json();
+			if (Array.isArray(error.message))
+				toast.warn(error.message[0]);
+			else
+				toast.warn(error.message);
 		}
 	}
 
@@ -80,7 +85,7 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 			recipientLogin: user.login,
 		}
 
-		const response = await fetch(`http://localhost:3001/users/unblockUser`, {
+		const response = await fetch(`${process.env.API_URL}/users/unblockUser`, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
@@ -99,7 +104,11 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 			}
 		}
 		else {
-			console.error("Fatal error");
+			const error = await response.json();
+			if (Array.isArray(error.message))
+				toast.warn(error.message[0]);
+			else
+				toast.warn(error.message);
 		}
 	}
 
@@ -112,7 +121,7 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 				state: false,
 			}
 	
-			const response = await fetch(`http://localhost:3001/chat/unmuteUser`, {
+			const response = await fetch(`${process.env.API_URL}/chat/unmuteUser`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
@@ -131,6 +140,13 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 						channelID: chatState.currentConversationID,
 					});
 				}
+			}
+			else {
+				const error = await response.json();
+				if (Array.isArray(error.message))
+					toast.warn(error.message[0]);
+				else
+					toast.warn(error.message);
 			}
 		}
 		catch (error) {
@@ -154,7 +170,7 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 				state : true,
 			}
 	
-			const response = await fetch(`http://localhost:3001/chat/banUser`, {
+			const response = await fetch(`${process.env.API_URL}/chat/banUser`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
@@ -180,8 +196,13 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 						channelID: chatState.currentConversationID,
 					});
 				}
-
-
+				else {
+					const error = await response.json();
+					if (Array.isArray(error.message))
+						toast.warn(error.message[0]);
+					else
+						toast.warn(error.message);
+				}
 			}
 		}
 		catch (error) {
@@ -199,7 +220,7 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 				state : false,
 			}
 	
-			const response = await fetch(`http://localhost:3001/chat/unbanUser`, {
+			const response = await fetch(`${process.env.API_URL}/chat/unbanUser`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
@@ -225,8 +246,13 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 						channelID: chatState.currentConversationID,
 					});
 				}
-
-
+				else {
+					const error = await response.json();
+					if (Array.isArray(error.message))
+						toast.warn(error.message[0]);
+					else
+						toast.warn(error.message);
+				}
 			}
 		}
 		catch (error) {
@@ -243,7 +269,7 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 				state : true,
 			}
 	
-			const response = await fetch(`http://localhost:3001/chat/promoteAdminUser`, {
+			const response = await fetch(`${process.env.API_URL}/chat/promoteAdminUser`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
@@ -279,6 +305,13 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 
 				setAdmin(true);
 			}
+			else {
+				const error = await response.json();
+				if (Array.isArray(error.message))
+					toast.warn(error.message[0]);
+				else
+					toast.warn(error.message);
+			}
 		}
 		catch (error) {
 			console.error(error);
@@ -288,14 +321,13 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 	const demoteAdminUser = async() => {
 		
 		try{
-			console.log(user);
 			const userOptionDto = {
 				conversationID: Number(chatState.currentConversationID),
 				target: user.id,
 				state : false,
 			}
 	
-			const response = await fetch(`http://localhost:3001/chat/demoteAdminUser`, {
+			const response = await fetch(`${process.env.API_URL}/chat/demoteAdminUser`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
@@ -330,6 +362,13 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 
 				setAdmin(false);
 			}
+			else {
+				const error = await response.json();
+				if (Array.isArray(error.message))
+					toast.warn(error.message[0]);
+				else
+					toast.warn(error.message);
+			}
 		}
 		catch (error) {
 			console.error(error);
@@ -343,7 +382,7 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 					userID: user.id,
 			}
 	
-			const response = await fetch(`http://localhost:3001/chat/quitConversation`, {
+			const response = await fetch(`${process.env.API_URL}/chat/quitConversation`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
@@ -368,6 +407,13 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 						});
 					}
 			}
+			else {
+				const error = await response.json();
+				if (Array.isArray(error.message))
+					toast.warn(error.message[0]);
+				else
+					toast.warn(error.message);
+			}
 		}
 		catch (error) {
 			console.log(error);
@@ -381,7 +427,7 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 					userToKickID: user.id,
 			}
 	
-			const response = await fetch(`http://localhost:3001/chat/kickUser`, {
+			const response = await fetch(`${process.env.API_URL}/chat/kickUser`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
@@ -408,6 +454,13 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 						});
 					}
 				}
+				else {
+					const error = await response.json();
+					if (Array.isArray(error.message))
+						toast.warn(error.message[0]);
+					else
+						toast.warn(error.message);
+				}
 		}
 		catch (error) {
 			console.log(error);
@@ -421,7 +474,7 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 				user1: Number(user.id),
 				user2: Number(sessionStorage.getItem("currentUserID")),
 			}
-			const response = await fetch(`http://localhost:3001/chat/newDMConversation`, {
+			const response = await fetch(`${process.env.API_URL}/chat/newDMConversation`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
@@ -434,7 +487,6 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 				const conversation : Conversation = await response.json();
 				let tmp = conversation.name;
 				let conversationName = tmp.replace(me.login, "");
-				console.log("conversationName: ", conversationName);
 				chatDispatch({ type: 'SET_CURRENT_CONVERSATION', payload: conversationName });
 				chatDispatch({ type: 'SET_CURRENT_ROOM', payload: conversation.name });
 				chatDispatch({ type: 'SET_CURRENT_CONVERSATION_ID', payload: conversation.id });
@@ -451,6 +503,13 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 					target: 'refreshDmList',
 					status: true
 				});
+			}
+			else {
+				const error = await response.json();
+				if (Array.isArray(error.message))
+					toast.warn(error.message[0]);
+				else
+					toast.warn(error.message);
 			}
 		}
 		catch (error) {

@@ -7,6 +7,7 @@ import ListMyChannelComponent from '../../listMyChannel/ListMyChannel';
 import PasswordComponent from '../../listMyChannel/Password';
 import { setCurrentComponent } from '../../../ChatContext';
 import { useGlobal } from '@/app/GlobalContext';
+import { toast } from 'react-toastify';
 
 interface Conversation {
 	id: string;
@@ -42,7 +43,7 @@ const ChannelListComponent: React.FC = () => {
 
 		try{
 
-			const response = await fetch(`http://localhost:3001/chat/getConversationsWithStatus/${userID}`, {
+			const response = await fetch(`${process.env.API_URL}/chat/getConversationsWithStatus/${userID}`, {
 				method: 'GET',
 				headers: {
 					'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
@@ -60,6 +61,13 @@ const ChannelListComponent: React.FC = () => {
 					setUserList([...usersList]);
 				}	
 			}
+			else {
+				const error = await response.json();
+				if (Array.isArray(error.message))
+					toast.warn(error.message[0]);
+				else
+					toast.warn(error.message);
+			}
 		}
 		catch (error) {
 			console.error(error);
@@ -68,9 +76,8 @@ const ChannelListComponent: React.FC = () => {
 
 	useEffect(() => {
 
-		globalState.userSocket?.on('userIsBan', () => {
-			chatDispatch({ type: 'DISABLE', payload: 'showChannel' });
-			chatDispatch({ type: 'ACTIVATE', payload: 'showChannelList' });
+		globalState.userSocket?.on('userIsBan', ( data: { roomName: string, roomID: number} ) => {
+			const { roomName, roomID } = data;
 			loadDiscussions();
 		});
 
@@ -103,6 +110,7 @@ const ChannelListComponent: React.FC = () => {
 			globalState.userSocket?.off('channelDeleted');
 			globalState.userSocket?.off('refreshAdmin');
 			globalState.userSocket?.off('refreshChannelListBis');
+			globalState.userSocket?.off('userIsBan');
 		}
 
 	}, [globalState?.userSocket]);

@@ -40,7 +40,7 @@ const FriendsListTabComponent: React.FC<FriendsListTabComponentProps> = ({ user 
 				recipientLogin: user.username,
 			}
 
-			const response = await fetch(`http://localhost:3001/users/blockUser`, {
+			const response = await fetch(`${process.env.API_URL}/users/blockUser`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
@@ -53,6 +53,13 @@ const FriendsListTabComponent: React.FC<FriendsListTabComponentProps> = ({ user 
 				user.isBlocked = true;
 				chatDispatch({ type: 'DISABLE', payload: 'showConfirmation' })
 				globalState.userSocket?.emit('joinRoom', { roomName: `whoblocked${user.username}`, roomID: '' });
+			}
+			else {
+				const error = await response.json();
+				if (Array.isArray(error.message))
+					toast.warn(error.message[0]);
+				else
+					toast.warn(error.message);
 			}
 		}
 		catch (error) {
@@ -67,7 +74,7 @@ const FriendsListTabComponent: React.FC<FriendsListTabComponentProps> = ({ user 
 				initiatorLogin: sessionStorage.getItem("currentUserLogin"),
 				recipientLogin: user.username,
 			}
-			const response = await fetch(`http://localhost:3001/users/unblockUser`, {
+			const response = await fetch(`${process.env.API_URL}/users/unblockUser`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
@@ -81,6 +88,13 @@ const FriendsListTabComponent: React.FC<FriendsListTabComponentProps> = ({ user 
 
 				globalState.userSocket?.emit('leaveRoom', { roomName: `whoblocked${user.username}`, roomID: '' });
 				chatDispatch({ type: 'DISABLE', payload: 'showConfirmation' })
+			}
+			else {
+				const error = await response.json();
+				if (Array.isArray(error.message))
+					toast.warn(error.message[0]);
+				else
+					toast.warn(error.message);
 			}
 		}
 		catch (error) {
@@ -170,7 +184,6 @@ const FriendsListTabComponent: React.FC<FriendsListTabComponentProps> = ({ user 
 		else {
 			console.log("gameSocket undefined");
 		}
-
 		return () => {
 			globalState.gameSocket?.off('acceptInvitation');
 			globalState.userSocket?.off('closedInvitation');
@@ -187,7 +200,7 @@ const FriendsListTabComponent: React.FC<FriendsListTabComponentProps> = ({ user 
 				recipientLogin: user.username,
 			}
 
-			const response = await fetch('http://localhost:3001/users/removeFriend', {
+			const response = await fetch(`${process.env.API_URL}/users/removeFriend`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
@@ -209,6 +222,13 @@ const FriendsListTabComponent: React.FC<FriendsListTabComponentProps> = ({ user 
 					target: 'refreshFriends',
 					status: true
 				});
+			}
+			else {
+				const error = await response.json();
+				if (Array.isArray(error.message))
+					toast.warn(error.message[0]);
+				else
+					toast.warn(error.message);
 			}
 		}
 		catch (error) {

@@ -1,13 +1,10 @@
-FROM node:20.2-alpine3.18
+FROM node:20.3.1
 
 RUN mkdir -p /srv/app/admin-server
 
 WORKDIR /srv/app/admin-server
 
 COPY package*.json ./
-
-COPY script.sh ./
-
 
 RUN npm install	&& \
 	npm install @nestjs/jwt \
@@ -28,19 +25,12 @@ RUN npm install	&& \
 	@types/image-type \
 	jimp@latest	\
 	@nestjs/platform-express \
-	class-validator class-transformer \
-	sudo
-
-# RUN chmod 777 ./script.sh
+	class-validator class-transformer
 
 COPY . .
 
 RUN [ "npm", "run", "build" ]
 
-# RUN mkdir -pv dist/users/avatars
-
 COPY ./avatar.png ./dist/users/avatars/avatar.png
 
-# ENTRYPOINT [ "./script.sh" ]
-
-CMD ["npm", "run", "start:dev"]
+CMD ["npm", "run", "start:prod"]

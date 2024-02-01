@@ -3,6 +3,7 @@ import React, { useState , useEffect, useRef } from 'react';
 import { Socket } from 'socket.io-client'
 import { useChat } from '../../../ChatContext';
 import { useGlobal } from '@/app/GlobalContext';
+import { toast } from 'react-toastify';
 
 interface Message {
 	from: string;
@@ -10,10 +11,10 @@ interface Message {
 	post_datetime: string;
 	conversationName: string;
 	conversationID?: number;
+	senderId: number;
 }
 
 const ReceiveBoxComponent: React.FC = () => {
-	console.log("ReceiveBoxComponent");
 	const { chatState } = useChat();
 	const { globalState } = useGlobal()
 	const [messages, setMessages] = useState<Message[]>([]);
@@ -48,7 +49,7 @@ const ReceiveBoxComponent: React.FC = () => {
 	const getMessage = async () => {
 
 		try {
-			const response = await fetch(`http://localhost:3001/chat/getMessages/${chatState.currentConversationID}`, {
+			const response = await fetch(`${process.env.API_URL}/chat/getMessages/${chatState.currentConversationID}`, {
 				method: 'GET',
 				headers: {
 					'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
@@ -58,6 +59,13 @@ const ReceiveBoxComponent: React.FC = () => {
 			if (response.ok) {
 				const messageList = await response.json();
 				setMessages((prevMessages: Message[]) => [...prevMessages, ...messageList]);
+			}
+			else {
+				const error = await response.json();
+				if (Array.isArray(error.message))
+					toast.warn(error.message[0]);
+				else
+					toast.warn(error.message);
 			}
 		} catch (error) {
 			console.log(error);
@@ -87,6 +95,7 @@ const ReceiveBoxComponent: React.FC = () => {
 	useEffect(() => {
 		scrollToBottom();
 	}, [messages]);
+
 	return (
 		<div ref={messagesContainerRef} className="bloc-discussion-chat">
 			{messages.map((message: Message, index: number) => (

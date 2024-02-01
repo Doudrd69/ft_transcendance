@@ -1,4 +1,4 @@
-FROM node:20.2-alpine3.18
+FROM node:20.3.1
 
 RUN mkdir -p /srv/app/admin-client
 
@@ -6,6 +6,8 @@ WORKDIR /srv/app/admin-client
 
 COPY package*.json ./
 
+ARG API_URL
+ENV NEXT_PUBLIC_API_URL=$API_URL
 
 RUN npm install && \
 	npm install -y socket.io-client && \
@@ -13,14 +15,12 @@ RUN npm install && \
 	npm install @types/express && \
 	npm install @types/socket.io-client && \
 	npm install class-validator class-transformer && \
-	npm install zustand && \
-	npm install sudo
+	npm install sudo && \
+	npm install dotenv
 
 COPY . .
 
+
 RUN npm run build
 
-# ENTRYPOINT ["./script.sh"]
-
-# CMD ["npm", "start"] production context
-CMD ["npm", "run", "dev"]
+CMD [ "npm", "run" ,"start" ]

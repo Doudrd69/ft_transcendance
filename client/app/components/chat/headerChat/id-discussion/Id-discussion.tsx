@@ -24,7 +24,6 @@ const IdDiscussionComponent: React.FC = () => {
 	var id;
 
 	useEffect(() => {
-		console.log("coucou");
 		globalState.userSocket?.on('refreshAdmin', () => {
 			chatDispatch({type: 'TOGGLEX', payload: 'isAdmin' });
 		});
@@ -36,12 +35,11 @@ const IdDiscussionComponent: React.FC = () => {
 
 	if (chatState.currentChannelBool)
 	{
-		console.log("coucou");
 		id = `${chatState.currentConversation}#${chatState.currentConversationID}`;
 	}
 	else
 		id = chatState.currentConversation;
-	console.log("isAdmin", chatState.isAdmin);
+
 	return (
 		<div className='bloc-id'>
 			<p className="id">{id}</p>

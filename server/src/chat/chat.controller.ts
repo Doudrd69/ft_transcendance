@@ -182,7 +182,7 @@ export class ChatController {
 	@Get('getMessages/:conversationID')
 	getMessagesFromConversation(@Req() req, @Param('conversationID') conversationID: number): Promise<Message[]> {
 		const { user } = req;
-		return this.chatService.getMessages(conversationID, user.id);
+		return this.chatService.getMessages(conversationID, user.sub);
 	}
 
 	@UseGuards(AuthGuard)

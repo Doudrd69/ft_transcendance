@@ -1,25 +1,17 @@
-import { useSearchParams } from 'next/navigation'
-import Image from 'next/image'
-import React, { useState, useEffect } from 'react';
-import RootLayout from './layout'
-import Chat from './components/chat/Chat'
-import Game from './components/game/Game'
-import TFAComponent from './components/TFA/TFAComponent'
-import Header from './components/header/Header'
-import Authentificationcomponent from './components/chat/auth/Authentification';
-import { GameProvider } from './components/game/GameContext';
-import { io, Socket } from 'socket.io-client'
+import { useSearchParams } from 'next/navigation';
+import React, { useEffect, useState } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import SettingsComponent from './components/settings/Settings';
-import BodyComponent from './components/body/Body';
-import SetComponent from './components/Avatar/SetAvatar';
-import { totalmem } from 'os';
-import GameHeader from './components/game/GameHeader';
-import { setGameSocket, useGlobal } from './GlobalContext';
-import { ChatProvider, useChat } from './components/chat/ChatContext';
+import { io } from 'socket.io-client';
+import { useGlobal } from './GlobalContext';
 import AccessComponent from './access';
-import { send } from 'process';
+import BodyComponent from './components/body/Body';
+import { ChatProvider } from './components/chat/ChatContext';
+import Game from './components/game/Game';
+import Header from './components/header/Header';
+// import dotenv from 'dotenv';
+
+// dotenv.config();
 
 interface Game {
 	gameId: number;
@@ -58,7 +50,7 @@ const GeneralComponent = () => {
 	// GAME INVITE
 	const gameInviteValidation = (gameInviteDto: GameInviteDto) => {
 
-		const gameSocket = io('http://localhost:3001/game', {
+		const gameSocket = io(`${process.env.API_URL}/game`, {
 			autoConnect: false,
 			auth: {
 				token: sessionStorage.getItem("jwt"),
@@ -110,7 +102,7 @@ const GeneralComponent = () => {
 	// FRIEND REQUEST
 	const friendRequestValidation = async (friendRequestDto: FriendRequestDto) => {
 
-		const response = await fetch('http://localhost:3001/users/acceptFriendRequest', {
+		const response = await fetch(`${process.env.API_URL}/users/acceptFriendRequest`, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
@@ -127,7 +119,11 @@ const GeneralComponent = () => {
 			}
 		}
 		else {
-			console.error("Fatal error: friend request failed");
+			const error = await response.json();
+			if (Array.isArray(error.message))
+				toast.warn(error.message[0]);
+			else
+				toast.warn(error.message);
 		}
 	};
 
@@ -168,7 +164,7 @@ const GeneralComponent = () => {
 	const userReconnects = () => {
 
 		if (sessionStorage.getItem("jwt")) {
-			const userSocket = io('http://localhost:3001/user', {
+			const userSocket = io(`${process.env.API_URL}/user`, {
 				autoConnect: false,
 				auth: {
 					token: sessionStorage.getItem("jwt"),
@@ -187,22 +183,22 @@ const GeneralComponent = () => {
 
 		if (userReconnects())
 			return true;
-		console.log('handleAccessToken');
-		const response = await fetch('http://localhost:3001/auth/access', {
+
+		const response = await fetch(`${process.env.API_URL}/auth/access`, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
 			},
 			body: JSON.stringify({ code }),
 		});
-		console.log("Access token request sent");
+
 		if (response.ok) {
-			console.log("Access token received");
+
 			const token = await response.json();
 			sessionStorage.setItem("jwt", token.access_token);
 			if (token.access_token) {
 				await setUserSession(token.access_token);
-				const userSocket = io('http://localhost:3001/user', {
+				const userSocket = io(`${process.env.API_URL}/user`, {
 					autoConnect: false,
 					auth: {
 						token: token.access_token,
@@ -213,6 +209,12 @@ const GeneralComponent = () => {
 				if (globalState.activate2FA)
 					dispatch({ type: 'ACTIVATE', payload: 'show2FA' });
 			}
+		} else {
+			const error = await response.json();
+			if (Array.isArray(error.message))
+				toast.warn(error.message[0]);
+			else
+				toast.warn(error.message);
 		}
 
 		return false;
@@ -265,7 +267,6 @@ const GeneralComponent = () => {
 		});
 
 		globalState.userSocket?.on('gameInvite', (gameInviteDto: GameInviteDto) => {
-			console.log("senderID :", gameInviteDto.senderUserID);
 			toast(<GameInviteNotification gameInviteDto={gameInviteDto} />,
 				{
 					pauseOnFocusLoss: false,
@@ -327,7 +328,6 @@ const GeneralComponent = () => {
 		})
 
 		globalState.gameSocket?.on('joinGame', (game: Game) => {
-			console.log("JOIN GAME");
 			setGame((prevState: Game | undefined) => ({
 				...prevState,
 				gameId: game.gameId,
@@ -353,7 +353,7 @@ const GeneralComponent = () => {
 	const check2faActivate = async () => {
 		console.log("check2faActivate")
 		try {
-			const response = await fetch('http://localhost:3001/auth/get2fa', {
+			const response = await fetch(`${process.env.API_URL}/auth/get2fa`, {
 				method: 'GET',
 				headers: {
 					'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
@@ -366,6 +366,13 @@ const GeneralComponent = () => {
 				else
 					dispatch({ type: 'ACTIVATE', payload: 'isConnected' });
 			}
+			else {
+				const error = await response.json();
+				if (Array.isArray(error.message))
+					toast.warn(error.message[0]);
+				else
+					toast.warn(error.message);
+			}
 		}
 		catch (error) {
 			console.error(error);
@@ -374,7 +381,6 @@ const GeneralComponent = () => {
 	// Login form useEffect
 	useEffect(() => {
 		if (code) {
-			console.log('code : ', code)
 			handleAccessToken(code).then(result => {
 				check2faActivate();
 			})

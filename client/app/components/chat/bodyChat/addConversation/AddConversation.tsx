@@ -3,6 +3,7 @@ import { Socket } from 'socket.io-client';
 import { useChat } from '../../ChatContext';
 import './AddConversation.css';
 import { useGlobal } from '@/app/GlobalContext';
+import { toast } from 'react-toastify';
 
 interface AddConversationComponentProps {
 	loadDiscussions: () => void;
@@ -34,7 +35,7 @@ const AddConversationComponent: React.FC<AddConversationComponentProps> = ({ loa
 				password: !isPassword ? '' : passwordValue,
 			}
 
-			const response = await fetch('http://localhost:3001/chat/newConversation', {
+			const response = await fetch(`${process.env.API_URL}/chat/newConversation`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
@@ -51,11 +52,17 @@ const AddConversationComponent: React.FC<AddConversationComponentProps> = ({ loa
 					globalState.userSocket?.emit('joinRoom', { roomName: data.name, roomID: data.id });
 				}
 		
-				console.log("Conversation successfully created");
 				chatDispatch({ type: 'DISABLE', payload: 'showCreateChannel' });
 				chatDispatch({ type: 'DISABLE', payload: 'showAddCreateChannel' });
 				chatDispatch({ type: 'TOGGLEX', payload: 'refreshChannel'});
 				
+			}
+			else {
+				const error = await response.json();
+				if (Array.isArray(error.message))
+					toast.warn(error.message[0]);
+				else
+					toast.warn(error.message);
 			}
 		}
 		catch(error) {

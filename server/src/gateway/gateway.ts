@@ -7,11 +7,15 @@ import { Conversation } from 'src/chat/entities/conversation.entity';
 import { MessageDto } from 'src/chat/dto/message.dto';
 import { GatewayGuard } from './Gatewayguard.guard';
 import { UseGuards } from '@nestjs/common'
+import { Req } from '@nestjs/common'
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 @WebSocketGateway({
 	namespace: 'user',
 	cors: {
-		origin: ['http://localhost:3000']
+		origin: ['http://localhost:3000', `${process.env.SERVER_REDIRECT_URI}`]
 	},
 	middlewares: [GatewayGuard],
 })
@@ -185,7 +189,7 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	@UseGuards(GatewayGuard)
 	async inviteUserToGame( @MessageBody() data: { usernameToInvite: string, userIdToInvite: number, senderID: string, senderUsername: string, senderUserID: number } ) {
 		const { usernameToInvite, userIdToInvite, senderID, senderUsername, senderUserID } = data;
-		if (await this.userService.userToInviteGameIsAlreadyInGame(userIdToInvite))
+		if (await this.userService.userToInviteGameIsAlreadyInGame(userIdToInvite))is.userService.userToInviteGameIsAlreadyInGame(usernameToInvite))
 		{
 			this.server.to(senderUsername).emit('userToInviteAlreadyInGame');
 			return;
@@ -215,14 +219,15 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 
 	@SubscribeMessage('message')
 	@UseGuards(GatewayGuard)
-	async handleMessage( @MessageBody() data: { dto: MessageDto, conversationName: string } ) {
+	async handleMessage(@ConnectedSocket() client: Socket, @MessageBody() data: { dto: MessageDto, conversationName: string } ) {
 
 		const { dto, conversationName } = data;
-		// console.log("Message sent to: ", conversationName + dto.conversationID);
+		const user = client.handshake.auth.user;
 
 		// The room's name is not the conversation's name in DB
 		this.server.to(conversationName + dto.conversationID).except(`whoblocked${dto.from}`).emit('onMessage', {
 			from: dto.from,
+			senderId: user.sub,
 			content: dto.content,
 			post_datetime: dto.post_datetime,
 			conversationID: dto.conversationID,
@@ -332,7 +337,6 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	@SubscribeMessage('emitNotification')
 	@UseGuards(GatewayGuard)
 	async handleNotif(@MessageBody() data: { channel: string, content: string, channelID: string} ) {
-		console.log("aakajajajaajajaj");
 		const { channel, content, channelID } = data;
 		const dto = {
 			from: 'Bot',

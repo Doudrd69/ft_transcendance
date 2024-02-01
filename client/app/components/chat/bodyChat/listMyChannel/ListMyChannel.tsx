@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useChat } from '../../ChatContext';
 import { Socket } from 'socket.io-client';
 import { useGlobal } from '@/app/GlobalContext';
+import { toast } from 'react-toastify';
 
 interface ListMyChannelComponentProps {
 	user: string;
@@ -29,7 +30,6 @@ const ListMyChannelComponent: React.FC<ListMyChannelComponentProps> = ({ user, f
 	const [showPassword, setShowPassword] = useState<boolean>(false);
 	const [password, setPassword] = useState('');
 
-	console.log('isAdd',isAdd);
 	const handlePasswordSubmit = (password: string) => {
 		setPassword(password);
 	};
@@ -43,9 +43,8 @@ const ListMyChannelComponent: React.FC<ListMyChannelComponentProps> = ({ user, f
 
 	const loadDiscussions = async () => {
 		try {
-			console.log('loadDiscussions');
-			console.log('userID', user);
-			const response = await fetch(`http://localhost:3001/chat/getConversationsToAdd/${friendID}`, {
+
+			const response = await fetch(`${process.env.API_URL}/chat/getConversationsToAdd/${friendID}`, {
 				method: 'GET',
 				headers: {
 					'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
@@ -57,6 +56,13 @@ const ListMyChannelComponent: React.FC<ListMyChannelComponentProps> = ({ user, f
 					setConversations((prevConversations: Conversation[]) => [...prevConversations, ...responseData]);
 
 			}
+			else {
+				const error = await response.json();
+				if (Array.isArray(error.message))
+					toast.warn(error.message[0]);
+				else
+					toast.warn(error.message);
+			}
 		}
 		catch (error) {
 			console.error(error);
@@ -64,8 +70,7 @@ const ListMyChannelComponent: React.FC<ListMyChannelComponentProps> = ({ user, f
 	};
 	const loadDiscussionsPublic = async () => {
 		try {
-			console.log('loadDiscussionsPublic');
-			const response = await fetch(`http://localhost:3001/chat/getConversationsPublic/${userID}`, {
+			const response = await fetch(`${process.env.API_URL}/chat/getConversationsPublic/${userID}`, {
 				method: 'GET',
 				headers: {
 					'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
@@ -73,9 +78,15 @@ const ListMyChannelComponent: React.FC<ListMyChannelComponentProps> = ({ user, f
 			});
 			if (response.ok) {
 				const conversationPublic = await response.json();
-				console.log('conversationPublic', conversationPublic);
 				if (conversationPublic)
 					setConversations((prevConversations: Conversation[]) => [...prevConversations, ...conversationPublic]);
+			}
+			else {
+				const error = await response.json();
+				if (Array.isArray(error.message))
+					toast.warn(error.message[0]);
+				else
+					toast.warn(error.message);
 			}
 		}
 		catch (error) {
@@ -85,13 +96,12 @@ const ListMyChannelComponent: React.FC<ListMyChannelComponentProps> = ({ user, f
 
 	const addUserToConversation = async (convID: number, friend: string) => {
 		try {
-			console.log("uueueuwerweurweiruwoeiruweoiruweoriuweoriuweroiweurw")
 
 			const addUserToConversationDto = {
 				userToAdd: friend,
 				conversationID: convID,
 			}
-			const response = await fetch('http://localhost:3001/chat/addUserToConversation', {
+			const response = await fetch(`${process.env.API_URL}/chat/addUserToConversation`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
@@ -101,7 +111,7 @@ const ListMyChannelComponent: React.FC<ListMyChannelComponentProps> = ({ user, f
 			});
 
 			if (response.ok) {
-				console.log("uueueuwerweurweiruwoeiruweoiruweoriuweoriuweroiweurw")
+
 				const conversation = await response.json();
 
 				if (globalState.userSocket?.connected) {
@@ -125,6 +135,13 @@ const ListMyChannelComponent: React.FC<ListMyChannelComponentProps> = ({ user, f
 					chatDispatch({ type: 'TOGGLEX', payload: 'showAddChannel' });
 					chatDispatch({ type: 'DISABLE', payload: 'showListChannelAdd' });
 				}
+			}
+			else {
+				const error = await response.json();
+				if (Array.isArray(error.message))
+					toast.warn(error.message[0]);
+				else
+					toast.warn(error.message);
 			}
 		}
 		catch (error) {

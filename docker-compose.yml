@@ -30,7 +30,7 @@ services:
       - SERVER_REDIRECT_URI=${SERVER_REDIRECT_URI}
       - SERVER_TOKEN_CLIENT_ID=${SERVER_TOKEN_CLIENT_ID}
       - SERVER_TOKEN_CLIENT_SECRET=${SERVER_TOKEN_CLIENT_SECRET}
-      - PROJECT_URL=${PROJECT_URL}
+      - API_URL=${API_URL}
     ports:
       - '3001:3001'
     depends_on:
@@ -41,8 +41,11 @@ services:
       - app-network
 
   client:
-    build: ./client
     container_name: client
+    build:
+      context: ./client
+      args:
+        API_URL: ${API_URL}
     depends_on:
       - server
     ports:

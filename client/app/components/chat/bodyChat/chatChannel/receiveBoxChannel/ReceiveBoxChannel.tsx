@@ -13,6 +13,7 @@ interface Message {
 	content: string;
 	post_datetime: string;
 	conversationID: number;
+	senderId: number;
 }
 
 interface User {
@@ -64,17 +65,25 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 
 	const getMessages = async () => {
 		try {
-		const response = await fetch(`http://localhost:3001/chat/getMessages/${chatState.currentConversationID}`, {
-			method: 'GET',
-			headers: {
-			'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
-			},
-		});
 
-		if (response.ok) {
-			const messageList = await response.json();
-			setMessages((prevMessages: Message[]) => [...prevMessages, ...messageList]);
-		}
+			const response = await fetch(`${process.env.API_URL}/chat/getMessages/${chatState.currentConversationID}`, {
+				method: 'GET',
+				headers: {
+				'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
+				},
+			});
+
+			if (response.ok) {
+				const messageList = await response.json();
+				setMessages((prevMessages: Message[]) => [...prevMessages, ...messageList]);
+			}
+			else {
+				const error = await response.json();
+				if (Array.isArray(error.message))
+					toast.warn(error.message[0]);
+				else
+					toast.warn(error.message);
+			}
 		} catch (error) {
 			console.log(error);
 		}
@@ -83,7 +92,7 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 	const loadUserList = async () => {
 
 		try {
-			const response = await fetch(`http://localhost:3001/chat/getUserlist/${chatState.currentConversationID}`, {
+			const response = await fetch(`${process.env.API_URL}/chat/getUserlist/${chatState.currentConversationID}`, {
 				method: 'GET',
 				headers: {
 				'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
@@ -94,7 +103,14 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 				const data = await response.json();
 				setUserList([...data]);
 				setOwnerUser(data.find((user:User) => user.isOwner));
-				setCurrentUser(data.find((user:User) => user.login === sessionStorage.getItem("currentUserLogin")));
+				setCurrentUser(data.find((user:User) => user.id === Number(sessionStorage.getItem("currentUserID"))));
+			}
+			else {
+				const error = await response.json();
+				if (Array.isArray(error.message))
+					toast.warn(error.message[0]);
+				else
+					toast.warn(error.message);
 			}
 		} catch (error) {
 			console.log(error);
@@ -106,6 +122,11 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 		globalState.userSocket?.on('userJoinedRoom', (notification: Message) => {
 			loadUserList();
 			// setMessages((prevMessages: Message[]) => [...prevMessages, notification])
+		});
+
+		globalState.userSocket?.on('userIsBan', () => {
+			chatDispatch({ type: 'DISABLE', payload: 'showChannel' });
+			chatDispatch({ type: 'ACTIVATE', payload: 'showChannelList' });
 		});
 
 		globalState.userSocket?.on('onMessage', (message: Message) => {
@@ -140,6 +161,7 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 			globalState.userSocket?.off('kickUser');
 			globalState.userSocket?.off('channelDeleted');
 			globalState.userSocket?.off('recv_notif');
+			globalState.userSocket?.off('userIsBan');
 		};
 		
 	}, [globalState?.userSocket]);
@@ -166,7 +188,7 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 						<img className='admin-user' src='./crown.png' alt='user' />
 						<img
 						className='img-list-users-channel-admin'
-						src={`http://localhost:3001${ownerUser?.avatarURL}`}
+						src={`${process.env.API_URL}${ownerUser?.avatarURL}`}
 						onClick={() => {
 						  chatDispatch({ type: 'ACTIVATE', payload: 'dontcandcel' });
 						  chatDispatch({ type: 'ACTIVATE', payload: 'showOptionsUserChannelOwner' });
@@ -181,46 +203,48 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 					<div className='list-users-channel'>
 					{userList && userList?.map((user: User, index: number) => (
 						<div key={index} className='user-list-item'>
-						<div className='avatar-container'>
-							{user.isAdmin && !user.isOwner &&
-							<>
-								<img className='admin-user' src='./crown.png' alt='user' />
+							<div className='avatar-container'>
+								{user.isAdmin && !user.isOwner &&
+								<>
+									<img className='admin-user' src='./crown.png' alt='user' />
+									<img
+									className='img-list-users-channel-admin'
+									src={`${process.env.API_URL}${user.avatarURL}`}
+									onClick={() => {
+										chatDispatch({ type: 'ACTIVATE', payload: 'dontcandcel' });
+										chatDispatch({ type: 'ACTIVATE', payload: 'dontcandcel' });
+										chatDispatch({ type: 'ACTIVATE', payload: 'showOptionsUserChannel' });
+										chatDispatch({ type: 'SET_CURRENT_OPTION_CHANNEL_NAME', payload: user.login });
+										chatDispatch({ type: 'SET_CURRENT_USER', payload: user });
+										chatDispatch({ type: 'DISABLE', payload: 'showBackComponent' });
+									}} />
+								</>
+								}
+								{!user.isAdmin && !user.isOwner &&
 								<img
-								className='img-list-users-channel-admin'
-								src={`http://localhost:3001${user.avatarURL}`}
+								className='img-list-users-channel'
+								src={`${process.env.API_URL}${user.avatarURL}`}
 								onClick={() => {
-									chatDispatch({ type: 'ACTIVATE', payload: 'dontcandcel' });
-									chatDispatch({ type: 'ACTIVATE', payload: 'dontcandcel' });
-									chatDispatch({ type: 'ACTIVATE', payload: 'showOptionsUserChannel' });
-									chatDispatch({ type: 'SET_CURRENT_OPTION_CHANNEL_NAME', payload: user.login });
-									chatDispatch({ type: 'DISABLE', payload: 'showBackComponent' });
-								}} />
-							</>
-						}
-						{!user.isAdmin && !user.isOwner &&
-						  <img
-						  className='img-list-users-channel'
-						  src={`http://localhost:3001${user.avatarURL}`}
-						  onClick={() => {
-								chatDispatch({ type: 'SET_CURRENT_TARGET', payload: user});
-								chatDispatch({ type: 'ACTIVATE', payload: 'dontcandcel' });
-								chatDispatch({ type: 'ACTIVATE', payload: 'showOptionsUserChannel' });
-								chatDispatch({ type: 'SET_CURRENT_OPTION_CHANNEL_NAME', payload: user.login });
-								chatDispatch({ type: 'DISABLE', payload: 'showBackComponent' });
-							}} />}
-					  </div>
-					  {chatState.showOptionsUserChannel && !user.isOwner && currentUser &&
-						(<OptionsUserChannel user={user} me={currentUser}/>)
+										chatDispatch({ type: 'SET_CURRENT_TARGET', payload: user});
+										chatDispatch({ type: 'ACTIVATE', payload: 'dontcandcel' });
+										chatDispatch({ type: 'ACTIVATE', payload: 'showOptionsUserChannel' });
+										chatDispatch({ type: 'SET_CURRENT_OPTION_CHANNEL_NAME', payload: user.login });
+										chatDispatch({ type: 'SET_CURRENT_USER', payload: user });
+										chatDispatch({ type: 'DISABLE', payload: 'showBackComponent' });
+									}} />}
+							</div>
+						</div>
+				  	))}
+					{chatState.showOptionsUserChannel && !chatState.currentUser.isOwner && currentUser &&
+					(<OptionsUserChannel user={chatState.currentUser} me={currentUser}/>)
 					}
-					</div>
-				  ))}
 				</div>
 				</div>
 				<div ref={messagesContainerRef} className="bloc-channel-chat">
 				{messages.map((message: Message, id: number) => (
 					<div key={id} className="bloc-contain">
 					<div className="bloc-avatar-username">
-						{message.from === 'Bot' ?
+					{message.from === 'Bot' ?
 							<>
 								<img
 									src="./robot.png"
@@ -232,12 +256,12 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 							:
 							<>
 								<img
-								src={`http://localhost:3001/users/getAvatarByLogin/${message.from}/${timestamp}`}
+								src={`${process.env.API_URL}/users/getAvatar/${message.senderId}/${timestamp}`}
 								className='avatar-channel'
 								alt="User Avatar"
 								/>
 								<div className="user-name">{message.from}</div>
-							</>
+								</>
 						}
 					</div>
 					<div className={`message-container ${isMyMessage(message) ? 'my-message-channel' : 'other-message-channel'}`}>
@@ -252,4 +276,4 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 		);
 	};
 
-export default ReceiveBoxChannelComponent;
+	export default ReceiveBoxChannelComponent;
