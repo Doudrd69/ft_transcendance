@@ -98,7 +98,9 @@ export class GameService {
 	}
 
 	getUserIdWithSocketId(socketId: string): number {
+		console.log(`userGameSocket : ${this.userGameSockets[1]}, userId: ${1}`);
 		for (const [userIdValue, socketIdValue] of Object.entries(this.userGameSockets)) {
+			console.log("USERID VALUE: ", Number(userIdValue), "socket :", socketIdValue, "||||", this.userGameSockets[1] );
 			if (socketIdValue === socketId) {
 				return Number(userIdValue);
 			}
@@ -224,7 +226,7 @@ export class GameService {
 			console.log(`null`)
 			return false;
 		}
-		console.log(`user ${userId} has already game socket`);
+		console.log(`user ${userId} has already game socket : ${this.userGameSockets[userId]}`);
 		return true;
 	}
 
@@ -245,6 +247,7 @@ export class GameService {
 	}
 
 	async deconnectUserMatchmaking(user: User, userId: number) {
+		console.log(`userGameSocket : ${this.userGameSockets[userId]}, userId: ${userId}`);
 		user.inMatchmaking = false;
 		this.userGameSockets[userId] = null;
 		await this.usersRepository.save(user);

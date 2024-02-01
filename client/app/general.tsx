@@ -79,14 +79,14 @@ const GeneralComponent = () => {
 		globalState.userSocket?.emit('inviteClosed', {
 			senderUsername: gameInviteDto.senderUsername,
 		})
-		// envoyer emit toast close
 	}
 
 	const gameInviteDeny = (gameInviteDto: GameInviteDto) => {
-		globalState.userSocket?.emit('inviteDenied', {
-			senderUsername: gameInviteDto.senderUsername,
-		})
-		// envoyer emit toast deny
+		setTimeout(() => {
+			globalState.userSocket?.emit('inviteClosed', {
+				senderUsername: gameInviteDto.senderUsername,
+			});
+		}, 1000);
 	}
 
 	const GameInviteNotification = ({ closeToast, toastProps, gameInviteDto }: any) => (
@@ -320,8 +320,6 @@ const GeneralComponent = () => {
 	useEffect(() => {
 
 		globalState.gameSocket?.on('connect', () => {
-
-			globalState.gameSocket?.emit('linkSocketWithUser', { playerLogin: sessionStorage.getItem("currentUserLogin"), userId: sessionStorage.getItem("currentUserID") });
 		})
 
 		globalState.gameSocket?.on('disconnect', () => {
