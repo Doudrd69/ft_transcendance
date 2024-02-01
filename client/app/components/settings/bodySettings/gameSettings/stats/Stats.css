@@ -1,0 +1,39 @@
+.bloc-stats{
+	display: flex;
+	flex-direction: column;
+
+}
+
+.title-stats {
+	margin: 10px 10px 10px 10px;
+	font-size: 20px;
+	font-weight: bold;
+	font-family: 'Gill Sans' , sans-serif;
+}
+
+.victory{
+	display: flex;
+	justify-content: space-between;
+	border: 3px solid #1d9512;
+	border-radius: 5px;
+	margin : 10px;
+	padding: 10px;
+}
+
+.defeat{
+	display: flex;
+	justify-content: space-between;
+	border: 3px solid #a01919;
+	border-radius: 5px;
+	margin : 10px;
+	padding: 10px;
+}
+
+.winrate{
+	display: flex;
+	justify-content: space-between;
+	border: 3px solid #ccc;
+	border-radius: 5px;
+	margin : 10px;
+	padding: 10px;
+}
