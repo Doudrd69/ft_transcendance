@@ -25,7 +25,8 @@ RUN npm install	&& \
 	@types/image-type \
 	jimp@latest	\
 	@nestjs/platform-express \
-	class-validator class-transformer
+	class-validator class-transformer \ 
+	npm i -D madge
 
 COPY . .
 
@@ -33,4 +34,4 @@ RUN [ "npm", "run", "build" ]
 
 COPY ./avatar.png ./dist/users/avatars/avatar.png
 
-CMD ["npm", "run", "start:prod"]
+CMD ["npm", "run", "start:dev"]
