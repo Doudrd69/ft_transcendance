@@ -69,15 +69,17 @@ export class BallService {
 		const nextSecondPoint = this.VectorService.add(secondPoint, normalizedSpeed);
 		// calcul des droites de first et second
 		// equation des intersections avec chacun des segments
-		console.log(`firstPoint: ${firstPoint.x}, ${firstPoint.y}`)
-		console.log(`ballPos: ${ball.position.x}, ${ball.position.y}`)
-		console.log(`nextFirstPoint: ${nextFirstPoint.x}, ${nextFirstPoint.y}`)
-		console.log(`normalizedSpeed: ${normalizedSpeed.x}, ${normalizedSpeed.y}`)
+		// console.log(`firstPoint: ${firstPoint.x}, ${firstPoint.y}`)
+		// console.log(`ballPos: ${ball.position.x}, ${ball.position.y}`)
+		// console.log(`nextFirstPoint: ${nextFirstPoint.x}, ${nextFirstPoint.y}`)
+		// console.log(`normalizedSpeed: ${normalizedSpeed.x}, ${normalizedSpeed.y}`)
 		if (this.findSegmentIntersection( paddle.start,  paddle.end , firstPoint, nextSecondPoint)) {
-			console.log(`COLLIDE`); return true;
+			// console.log(`COLLIDE`); 
+			return true;
 		}
 		if (this.findSegmentIntersection( paddle.start,  paddle.end , secondPoint, nextFirstPoint)) {
-			console.log(`COLLIDE`); return true;
+			// console.log(`COLLIDE`);
+			return true;
 		}
 		return false;
 	}
@@ -104,12 +106,12 @@ export class BallService {
 			((x1 * y2 - y1 * x2) * (x3 - x4) - (x1 - x2) * (x3 * y4 - y3 * x4)) / denominator;
 		const intersectionY =
 			((x1 * y2 - y1 * x2) * (y3 - y4) - (y1 - y2) * (x3 * y4 - y3 * x4)) / denominator;
-		console.log(`intersectionX: ${intersectionX}`)
-		console.log(`intersectionY: ${intersectionY}`)
-		console.log(`this.isBetween(intersectionX, x1, x2: ${this.isBetween(intersectionX, x1, x2)}`)
-		console.log(`this.isBetween(intersectionY, y1, y2: ${this.isBetween(intersectionY, y1, y2)}`)
-		console.log(`this.isBetween(intersectionX, x3, x4: ${this.isBetween(intersectionX, x3, x4)}`)
-		console.log(`this.isBetween(intersectionY, y3, y4: ${this.isBetween(intersectionY, y3, y4)}`)			
+		// console.log(`intersectionX: ${intersectionX}`)
+		// console.log(`intersectionY: ${intersectionY}`)
+		// console.log(`this.isBetween(intersectionX, x1, x2: ${this.isBetween(intersectionX, x1, x2)}`)
+		// console.log(`this.isBetween(intersectionY, y1, y2: ${this.isBetween(intersectionY, y1, y2)}`)
+		// console.log(`this.isBetween(intersectionX, x3, x4: ${this.isBetween(intersectionX, x3, x4)}`)
+		// console.log(`this.isBetween(intersectionY, y3, y4: ${this.isBetween(intersectionY, y3, y4)}`)			
 		// Vérifier si le point d'intersection se trouve sur les deux segments
 		if (
 			this.isBetween(parseFloat(intersectionX.toFixed(3)), parseFloat(x1.toFixed(3)), parseFloat(x2.toFixed(3))) &&
@@ -147,7 +149,7 @@ export class BallService {
 		// how check behind or not? si y est entre paddle starty et endy + ball.r
 		// puis pour le x check si il est > 0.975 - ball.r ou pour lautre paddle < 0.25 + ball.r
 		if ((paddle.number == 1 && newBall.position.x - newBall.r <= paddle.start.x) || (paddle.number == 2 && newBall.position.x + newBall.r >= paddle.start.x)) {
-			console.log(`BEHIND:`);
+			// console.log(`BEHIND:`);
 			return (true);
 		}
 		return (false);
