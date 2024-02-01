@@ -137,27 +137,26 @@ export class AuthService {
 	/**************************************************************/
 
 
-	async desactivate2FA(requestTfaDto: RequestTfaDto) {
+	async desactivate2FA(userID: number) {
 
-		const user : User = await this.usersService.getUserByID(requestTfaDto.userID);
+		const user : User = await this.usersService.getUserByID(userID);
 
 		if (user) {
 			await this.usersService.upate2FAState(user, false);
 			return false;
 		}
 
-		throw new HttpException('Fatal error', HttpStatus.BAD_REQUEST);
+		throw new HttpException('User not found', HttpStatus.BAD_REQUEST);
 	}
 
-	// On genere le qrcode a la demande d'activation de la 2fa
-	async activate2FA(requestTfaDto: RequestTfaDto) {
+	async activate2FA(userID: number) {
 
 		try {
-			// Verifier si le secret existe deja, auquel cas, ne pas le regenerer
-			const secret = await this.usersService.get2faSecret(requestTfaDto.userID);
+
+			const secret = await this.usersService.get2faSecret(userID);
 			if (!secret) {
 				const newSecret = speakeasy.generateSecret();
-				await this.usersService.register2FATempSecret(requestTfaDto.userID, newSecret.base32);
+				await this.usersService.register2FATempSecret(userID, newSecret.base32);
 
 				const qrcodeURL = await new Promise<string> ( (resolve, reject) => {
 					QRCode.toDataURL(newSecret.otpauth_url, function(err, data_url) {
@@ -173,7 +172,7 @@ export class AuthService {
 						}
 					});
 				});
-				console.log("returnng qrcode");
+
 				return { qrcodeURL };
 			}
 		}
@@ -184,21 +183,21 @@ export class AuthService {
 
 	async get2fa(userID: number) {
 		const user = await this.usersService.getUserByID(userID);
-		console.log("get2fa", user.TFA_isEnabled);
+
 		if (user) {
 			return user.TFA_isEnabled;
 		}
 
-		throw new HttpException('User does not exist', HttpStatus.BAD_REQUEST);
+		throw new HttpException('User not found', HttpStatus.BAD_REQUEST);
 	}
 
-	async verifyCode(authenticatorCodeDto: AuthenticatorCodeDto) {
+	async verifyCode(authenticatorCodeDto: AuthenticatorCodeDto, userID: number) {
 
 		// We find the user whose need a check to retrieve its temporary secret
 		// and compare it with the code he has on its authenticator service
 		try {
 
-			const user = await this.usersService.getUserByID(authenticatorCodeDto.userID);
+			const user = await this.usersService.getUserByID(userID);
 			if (user) {
 
 				// Si on a pas de secret, on prend le temporaire
