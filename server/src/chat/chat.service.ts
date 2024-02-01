@@ -434,19 +434,21 @@ export class ChatService {
 			where: { id: updateIsPublicDto.conversationID },
 		});
 
-		const isUserIsAdmin = await this.getGroupIsAdminStatus(user, channelToUpdate);
+		if (user && channelToUpdate) {
 
-		if (isUserIsAdmin) {
-			if (channelToUpdate) {
+			const isUserIsAdmin = await this.getGroupIsAdminStatus(user, channelToUpdate);
+	
+			if (isUserIsAdmin) {
+
 				channelToUpdate.isPublic = true;
 				await this.conversationRepository.save(channelToUpdate);
 				return true;
 			}
-
-			throw new HttpException('Fatal error', HttpStatus.BAD_REQUEST);
+	
+			throw new HttpException(`${user.username} is not admin`, HttpStatus.BAD_REQUEST);
 		}
 
-		throw new HttpException(`${user.username} is not admin`, HttpStatus.BAD_REQUEST);
+		throw new HttpException('Fatal error', HttpStatus.BAD_REQUEST);
 	}
 
 	async updateChannelPublicStatusToFalse(updateIsPublicDto: UpdateIsPublicDto, _user: User): Promise<boolean> {
@@ -460,19 +462,21 @@ export class ChatService {
 			where: { id: updateIsPublicDto.conversationID },
 		});
 
-		const isUserIsAdmin = await this.getGroupIsAdminStatus(user, channelToUpdate);
+		if (user && channelToUpdate) {
 
-		if (isUserIsAdmin) {
-			if (channelToUpdate) {
+			const isUserIsAdmin = await this.getGroupIsAdminStatus(user, channelToUpdate);
+	
+			if (isUserIsAdmin) {
+
 				channelToUpdate.isPublic = false;
 				await this.conversationRepository.save(channelToUpdate);
 				return true;
 			}
-
-			throw new HttpException('Fatal error', HttpStatus.BAD_REQUEST);
+	
+			throw new HttpException(`${user.username} is not admin`, HttpStatus.BAD_REQUEST);
 		}
 
-		throw new HttpException(`${user.username} is not admin`, HttpStatus.BAD_REQUEST);
+		throw new HttpException('Fatal error', HttpStatus.BAD_REQUEST);
 	}
 
 
@@ -487,20 +491,22 @@ export class ChatService {
 			where: { id: channelOptionsDto.conversationID },
 		});
 
-		const isUserIsAdmin = await this.getGroupIsAdminStatus(user, channelToUpdate);
+		if (user && channelToUpdate) {
 
-		if (isUserIsAdmin) {
-			if (channelToUpdate) {
+			const isUserIsAdmin = await this.getGroupIsAdminStatus(user, channelToUpdate);
+	
+			if (isUserIsAdmin) {
+
 				channelToUpdate.isProtected = true;
 				channelToUpdate.password = await this.hashChannelPassword(channelOptionsDto.password)
 				await this.conversationRepository.save(channelToUpdate);
 				return true;
-				}
-
-				throw new HttpException('Fatal error', HttpStatus.BAD_REQUEST);
 			}
-	
+			
 			throw new HttpException(`${user.username} is not admin`, HttpStatus.BAD_REQUEST);
+		}
+
+		throw new HttpException('Fatal error', HttpStatus.BAD_REQUEST);
 	}
 
 	async updateChannelIsProtectedStatusToFalse( updateProtectFalseDto: UpdateProtectFalseDto): Promise<boolean> {
@@ -509,23 +515,27 @@ export class ChatService {
 			where: { id: updateProtectFalseDto.userID},
 			relations: ["groups", "groups.conversation"],
 		});
+
 		const channelToUpdate : Conversation = await this.conversationRepository.findOne({
 			where: { id: updateProtectFalseDto.conversationID },
 		});
 
-		const isUserIsAdmin = await this.getGroupIsAdminStatus(user, channelToUpdate);
+		if (user && channelToUpdate) {
 
-		if (isUserIsAdmin) {
-			if (channelToUpdate) {
-						channelToUpdate.isProtected = false;
-						channelToUpdate.password = "";
-						await this.conversationRepository.save(channelToUpdate);
-						return true;
-				}
-				throw new HttpException('Fatal error', HttpStatus.BAD_REQUEST);
+			const isUserIsAdmin = await this.getGroupIsAdminStatus(user, channelToUpdate);
+	
+			if (isUserIsAdmin) {
+
+				channelToUpdate.isProtected = false;
+				channelToUpdate.password = "";
+				await this.conversationRepository.save(channelToUpdate);
+				return true;
 			}
-
+	
 			throw new HttpException(`${user.username} is not admin`, HttpStatus.BAD_REQUEST);
+		}
+
+		throw new HttpException('Fatal error', HttpStatus.BAD_REQUEST);
 	}
 
 
