@@ -43,6 +43,7 @@ export class MatchmakingService {
             this.playersSpeedQueue.push(playerID);
         }
         newUser.inMatchmaking = true;
+        console.log(`User game : ${newUser.inGame}`);
         console.log(`joinSpeedQueue: ${this.playersSpeedQueue}`)
         console.log(`joinNormalQueue: ${this.playersNormalQueue}`)
         await this.usersRepository.save(newUser);
