@@ -82,9 +82,11 @@ const GeneralComponent = () => {
 	}
 
 	const gameInviteDeny = (gameInviteDto: GameInviteDto) => {
-		globalState.userSocket?.emit('inviteDenied', {
-			senderUsername: gameInviteDto.senderUsername,
-		})
+		setTimeout(() => {
+			globalState.userSocket?.emit('inviteClosed', {
+				senderUsername: gameInviteDto.senderUsername,
+			});
+		}, 1000);
 	}
 
 	const GameInviteNotification = ({ closeToast, toastProps, gameInviteDto }: any) => (

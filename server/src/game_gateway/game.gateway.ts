@@ -94,8 +94,8 @@ export class GameGateway {
         try {
             const userId: number = this.GameService.getUserIdWithSocketId(client.id);
             // console.log(`[${client.id}] userLogin de ses morts 1: ${userLogin}`);
+            console.log("disconect USER NOW")
             if (userId) {
-                console.log("disconect USER NOW")
                 console.log(`userId = ${userId}`)
                 const user: User = await this.GameService.getUserWithUserId(userId);
                 if (user && this.GameService.userInGameOrInMacthmaking(user)) {
@@ -104,8 +104,8 @@ export class GameGateway {
                     }
                     else {
                         this.game = await this.GameService.getGameWithUserId(userId);
-                        const gameInstance: game_instance = this.GameService.getGameInstance(this.game_instance, this.game.gameId);
                         if (gameInstance && gameInstance.game_has_ended !== true) {
+                            const gameInstance: game_instance = this.GameService.getGameInstance(this.game_instance, this.game.gameId);
                             if (user.login === gameInstance.playersLogin[0])
                                 this.GameService.disconnectSocket(gameInstance.players[1], gameInstance.gameID)
                             else
@@ -124,7 +124,7 @@ export class GameGateway {
 
     @SubscribeMessage('inviteAccepted')
     @UseGuards(GatewayGuard)
-    async handleCheckgameInvite(@ConnectedSocket() client: Socket, @MessageBody() data: { userOneId: number, userTwoId: number, playerTwoId: string, playerOneLogin: string, playerTwoLogin: string }) {
+    async handleCheckGameInvite(@ConnectedSocket() client: Socket, @MessageBody() data: { userOneId: number, userTwoId: number, playerTwoId: string, playerOneLogin: string, playerTwoLogin: string }) {
         //     // du coup en amont il faut creer des sockets pour les deux users. si pas bon supprimer les deux sockets
         // envoyer un emit accept a lautre user
         console.log(`invite accpeted :=====> ${data.playerTwoId}`);
@@ -200,7 +200,7 @@ export class GameGateway {
     @SubscribeMessage('join-matchmaking')
     @UseGuards(GatewayGuard)
     async handleJoinMatchmaking(@ConnectedSocket() client: Socket, @MessageBody() data: { playerLogin: string, gameMode: string, userId: number }) {
-        console.log(`== ${data.playerLogin} JOINS MATCHMAKING ==`);
+        console.log(`== ${data.playerLogin}, userID= ${data.userId} JOINS MATCHMAKING ==`);
         console.log(`gameMode ==== ${data.gameMode}`);
         await this.MatchmakingService.joinQueue(client.id, data.userId, data.gameMode);
         const enoughPlayers = await this.MatchmakingService.IsThereEnoughPairs(data.gameMode);
@@ -320,7 +320,7 @@ export class GameGateway {
         else {
             this.MatchmakingService.leaveQueue(client.id, "NORMAL", data.userId);
         }
-        this.GameService.deleteGameSocketsIdForPlayer(data.userId);
+        // this.GameService.deleteGameSocketsIdForPlayer(data.userId);
         this.server.to(client.id).emit('leave-game');
     }
 

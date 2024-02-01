@@ -11,7 +11,7 @@ const Menu = () => {
 
     const { state, dispatchGame } = useGame();
     const { globalState, dispatch } = useGlobal();
-    const [gameMode, setGameMode] =  useState<string | null>(null);
+    const [gameMode, setGameMode] = useState<string | null>(null);
 
     interface Game {
         gameId: number;
@@ -32,12 +32,12 @@ const Menu = () => {
         scoreOne: 0,
         scoreTwo: 0,
     };
-    
+
     useEffect(() => {
         globalState.gameSocket?.on('gameNotInProgress', () => {
             console.log(`DISPATCH`);
-            dispatchGame({ type: 'TOGGLE', payload: 'showGameMatchmaking'});
-            globalState.gameSocket?.emit('join-matchmaking',{ playerLogin: sessionStorage.getItem("currentUserLogin"),  gameMode: gameMode, userId: Number(sessionStorage.getItem("currentUserID"))});
+            dispatchGame({ type: 'TOGGLE', payload: 'showGameMatchmaking' });
+            globalState.gameSocket?.emit('join-matchmaking', { playerLogin: sessionStorage.getItem("currentUserLogin"), gameMode: gameMode, userId: Number(sessionStorage.getItem("currentUserID")) });
         });
 
         globalState.gameSocket?.on('setGameInvited', () => {
@@ -67,17 +67,17 @@ const Menu = () => {
                 }
             });
             gameSocket.connect();
-            globalState.gameSocket?.emit('linkSocketWithUser', { playerLogin: sessionStorage.getItem("currentUserLogin"), userId: sessionStorage.getItem("currentUserID") });
-            dispatch({ type: 'SET_GAME_SOCKET', payload: gameSocket });
+            gameSocket.on('connect', () => {
+                dispatch({ type: 'SET_GAME_SOCKET', payload: gameSocket });
+                gameSocket.emit('linkSocketWithUser', { playerLogin: sessionStorage.getItem("currentUserLogin"), userId: sessionStorage.getItem("currentUserID") });
+            });
             // dispatchGame({ type: 'TOGGLE', payload: 'showGameMatchmaking' });
-    
+
             // console.log("After Dispatch: ", globalState?.gameSocket);
 
         } catch (error) {
             console.error(error);
         }
-
-        
     };
 
     const handleSpeedClick = () => {
@@ -91,16 +91,18 @@ const Menu = () => {
                 }
             });
             gameSocket.connect();
-            globalState.gameSocket?.emit('linkSocketWithUser', { playerLogin: sessionStorage.getItem("currentUserLogin"), userId: sessionStorage.getItem("currentUserID") });
-            dispatch({ type: 'SET_GAME_SOCKET', payload: gameSocket });
+            gameSocket.on('connect', () => {
+                dispatch({ type: 'SET_GAME_SOCKET', payload: gameSocket });
+                gameSocket.emit('linkSocketWithUser', { playerLogin: sessionStorage.getItem("currentUserLogin"), userId: sessionStorage.getItem("currentUserID") });
+            });
             // dispatchGame({ type: 'TOGGLE', payload: 'showGameMatchmaking' });
-    
+
             // console.log("After Dispatch: ", globalState?.gameSocket);
 
         } catch (error) {
             console.error(error);
         }
-        
+
     };
 
     return (
@@ -109,12 +111,12 @@ const Menu = () => {
                 <h1 className='titleClass'>PONG GAME</h1>
             </div>
             <div className="background-game">
-                <button className={`buttonclass ${state.showGameMatchmaking ? 'clicked' : ''}`} onClick={() => { 
-                    handleStartClick(); 
-                    }}>START GAME: NORMAL MODE</button>
-                    <button className={`buttonclass ${state.showGameMatchmaking ? 'clicked' : ''}`} onClick={() => { 
-                    handleSpeedClick(); 
-                    }}>START GAME: SPEED MODE</button>
+                <button className={`buttonclass ${state.showGameMatchmaking ? 'clicked' : ''}`} onClick={() => {
+                    handleStartClick();
+                }}>START GAME: NORMAL MODE</button>
+                <button className={`buttonclass ${state.showGameMatchmaking ? 'clicked' : ''}`} onClick={() => {
+                    handleSpeedClick();
+                }}>START GAME: SPEED MODE</button>
                 {/* <button className="buttonclass" >PROFILE</button> */}
                 {/* <button className={`buttonclass ${state.showGameSettings ? 'clicked' : ''}`} onClick={() => dispatch({ type: 'TOGGLE', payload: 'showGameSettings' })}>SETTINGS</button> */}
             </div>

@@ -42,6 +42,15 @@ export class UsersService {
 		return true;
 	}
 
+	async userToInviteGameIsAlreadyInGame(usernameToInvite: string) {
+		const userToInvite: User = await this.usersRepository.findOne({ where: { username: usernameToInvite } })
+		if (userToInvite.inGame === true || userToInvite.inMatchmaking === true) {
+			console.log(`usernametoinvite : game: ${userToInvite.inGame} match: ${userToInvite.inMatchmaking}`);
+			return true;
+		}
+		return false;
+}
+
 	/**************************************************************/
 	/***							2FA							***/
 	/**************************************************************/
