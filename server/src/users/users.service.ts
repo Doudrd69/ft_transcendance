@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, Res, Inject, forwardRef } from '@nestjs/common';
+import { Injectable, NotFoundException, Res, Inject, forwardRef, HttpException, HttpStatus } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository, UpdateResult } from 'typeorm'
 import * as bcrypt from 'bcrypt'
@@ -33,7 +33,7 @@ export class UsersService {
 	) { }
 
 	private async isUsernameValid(usernameToFInd: string): Promise<boolean> {
-
+		
 		const usernameMatch = await this.usersRepository.findOne({ where: { username: usernameToFInd } });
 
 		if (usernameMatch) {
@@ -103,7 +103,7 @@ export class UsersService {
 				unlinkSync(oldAvatarPath);
 			}
 			if (!user) {
-				throw new Error("user not found");
+				throw new HttpException(`User not found`, HttpStatus.BAD_REQUEST);
 			}
 
 			const updateResult = await this.usersRepository.update({ id: userID }, { avatarURL });
@@ -123,15 +123,12 @@ export class UsersService {
 			return signature === "89504e470d0a1a0a";
 
 		} catch (error) {
-			console.error("Error reading file or checking format:", error);
-			throw new Error("Invalid file format");
+			throw new HttpException(`Invalid params`, HttpStatus.BAD_REQUEST);
 		}
 	}
 
 	async getAvatar(userId: number): Promise<string | null> {
-		// console.log("getAvatar");
-		const user = await this.getUserByID(userId);
-		// console.log("user: ", user.avatarURL);
+		const user = await this.usersRepository.findOne({ where: { id: userId }});
 		if (!user || !user.avatarURL) {
 			console.log("Avatar not found");
 			return null;
@@ -193,7 +190,7 @@ export class UsersService {
 			newUser.officialProfileImage = "";
 			return await this.usersRepository.save(newUser);
 		}
-		throw new Error('User with this username already exists');
+		throw new HttpException(`Username already used`, HttpStatus.BAD_REQUEST);
 	}
 
 	// async deleteUser(username: string) {
@@ -221,7 +218,6 @@ export class UsersService {
 		new42User.firstname = userData.firstname;
 		new42User.officialProfileImage = userData.image;
 		new42User.groups = [];
-		// new42User.games = [];
 		new42User.blockedUsers = [];
 		return this.usersRepository.save(new42User);
 	}
@@ -239,10 +235,10 @@ export class UsersService {
 				return { newUsername: user.username };
 			}
 
-			throw new Error("Fatal error");
+			throw new HttpException('Fatal error', HttpStatus.BAD_REQUEST);
 		}
 
-		throw new Error("username is already used");
+		throw new HttpException('Username is already used', HttpStatus.BAD_REQUEST);
 	}
 
 	// async blockUser(blockUserDto: BlockUserDto): Promise<boolean> {
@@ -291,7 +287,6 @@ export class UsersService {
 				.where('(game.userOneId = :id) OR (game.userTwoId = :id)', { id: user.id })
 				.getMany()
 
-			console.log(`User ${user.username} games history: `);
 			let array = [];
 			userGames.forEach((game: Game) => {
 				array.push({
@@ -311,7 +306,7 @@ export class UsersService {
 			}
 		}
 
-		throw new Error('Fatal error');
+		throw new HttpException('Fatal error', HttpStatus.BAD_REQUEST);
 	}
 	
 	async getUsersStats(userId: number) {
@@ -337,7 +332,7 @@ export class UsersService {
 	async createFriendship(friendRequestDto: FriendRequestDto): Promise<boolean> {
 
 		if (friendRequestDto.initiatorLogin === friendRequestDto.recipientLogin) {
-			throw new Error("Fatal error");
+			throw new HttpException('Fatal error', HttpStatus.BAD_REQUEST);
 		}
 
 		const initiator = await this.usersRepository.findOne({
@@ -351,7 +346,7 @@ export class UsersService {
 		});
 
 		if (!recipient) {
-			throw new Error("user does not exist");
+			throw new HttpException(`User not found`, HttpStatus.BAD_REQUEST);
 		}
 
 		if (initiator) {
@@ -375,11 +370,10 @@ export class UsersService {
 			else if (friendshipAlreadyExists && !friendshipAlreadyExists.isAccepted) {
 				return true;
 			}
-
-			throw new Error(`${recipient.username} is already in your friend list`);
+			throw new HttpException(`${recipient.username} is already in your friend list`, HttpStatus.BAD_REQUEST);
 		}
 
-		throw new Error("Fatal error");
+		throw new HttpException('Fatal error', HttpStatus.BAD_REQUEST);
 	}
 
 	async findDMConversation(user1: User, user2: User) {
@@ -440,10 +434,10 @@ export class UsersService {
 				return friendshipToUpdate;
 			}
 
-			throw new Error("Users are not friend");
+			throw new HttpException('Users are not friend', HttpStatus.BAD_REQUEST);
 		}
 
-		throw new Error("Fatal error");
+		throw new HttpException('Fatal error', HttpStatus.BAD_REQUEST);
 	}
 
 	async acceptFriendship(friendRequestDto: FriendRequestDto): Promise<Conversation | Friendship> {
@@ -453,7 +447,7 @@ export class UsersService {
 			return newConversationBetweenFriends;
 		}
 
-		throw new Error("Fatal error");
+		throw new HttpException('Fatal error', HttpStatus.BAD_REQUEST);
 	}
 
 	async removeFriend(blockUserDto: BlockUserDto): Promise<Conversation | Friendship> {
@@ -463,7 +457,7 @@ export class UsersService {
 			return friendshipToUpdate;
 		}
 
-		throw new Error("Fatal error");
+		throw new HttpException('Fatal error', HttpStatus.BAD_REQUEST);
 	}
 
 	async blockUser(blockUserDto: BlockUserDto): Promise<boolean> {
@@ -471,23 +465,20 @@ export class UsersService {
 		const user: User = await this.usersRepository.findOne({ where: { username: blockUserDto.initiatorLogin } });
 		const userToBlock: User = await this.usersRepository.findOne({ where: { username: blockUserDto.recipientLogin } });
 
-		console.log("user: ", user);
-		console.log("usertoblock: ", userToBlock);
 		if (user && userToBlock) {
 			// const checkUserDouble = user.blockedUsers.find((username: string) => username === userToBlock.username);
 			user.blockedUsers.forEach((username: string) => {
 				if (username === userToBlock.username) {
-					throw new Error("User already blocked");
+					throw new HttpException('User already blocked', HttpStatus.BAD_REQUEST);
 				}
 			});
 
-				console.log("OK!");
-				user.blockedUsers.push(userToBlock.login);
-				await this.usersRepository.save(user);
+			user.blockedUsers.push(userToBlock.login);
+			await this.usersRepository.save(user);
 			return true;
 		}
 
-		throw new Error("Fatal error");
+		throw new HttpException('Fatal error', HttpStatus.BAD_REQUEST);
 	}
 
 	async unblockUser(blockUserDto: BlockUserDto): Promise<boolean> {
@@ -502,7 +493,7 @@ export class UsersService {
 			return true;
 		}
 
-		throw new Error("Fatal error");
+		throw new HttpException('Fatal error', HttpStatus.BAD_REQUEST);
 	}
 
 	/**************************************************************/

@@ -11,6 +11,7 @@ import { useChat } from '../chat/ChatContext';
 const HeaderComponent: React.FC = () => {
 	const {chatDispatch} = useChat();
 	const { globalState, dispatch } = useGlobal();
+	const timestmp = new Date();
 	const uploadAvatar =  () => {
 		dispatch({ type: 'ACTIVATE', payload: 'showUploadAvatar' });
 	}
@@ -40,7 +41,8 @@ const HeaderComponent: React.FC = () => {
 						chatDispatch({ type: 'DISABLE', payload: 'showBackComponent' });
 
 					}}}>
-					{renderComponent(<AvatarImageComponent className="profils" refresh={globalState.showRefresh}/>, globalState.showUploadAvatar)}
+						<img className='profils' src={`${process.env.API_URL}/users/getAvatar/${sessionStorage.getItem("currentUserID")}/${timestmp}`}/>
+					{/* {renderComponent(<AvatarImageComponent className="profils" refresh={globalState.showRefresh}/>, globalState.showUploadAvatar)} */}
 				</button>
 			</div>
 		<div className="bloc-pong">PONG&CHAT</div>

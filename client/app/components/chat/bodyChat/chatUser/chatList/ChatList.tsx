@@ -3,10 +3,9 @@ import React, { useState, useEffect } from 'react';
 import {useChat} from '../../../ChatContext';
 import AddConversationComponent from '../../addConversation/AddConversation';
 import { Socket } from 'socket.io-client';
-import AvatarImageComponent from '@/app/components/Avatar/Avatar';
-import AvatarImageBisComponent from '@/app/components/Avatar/AvatarBis';
 import { setCurrentComponent } from '../../../ChatContext';
 import { useGlobal } from '@/app/GlobalContext';
+import { toast } from 'react-toastify';
 
 
 
@@ -28,7 +27,7 @@ const ChatListComponent: React.FC = () => {
   
 	const loadDMs = async () => {
 		try {
-			const requestDms = await fetch(`http://localhost:3001/chat/getDMsConversations/${sessionStorage.getItem("currentUserID")}`, {
+			const requestDms = await fetch(`${process.env.API_URL}/chat/getDMsConversations/${sessionStorage.getItem("currentUserID")}`, {
 				method: 'GET',
 				headers: {
 					'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
@@ -39,6 +38,13 @@ const ChatListComponent: React.FC = () => {
 				const dmResult = await requestDms.json();
 				setDm([...dmResult]);
 			}
+			else {
+				const error = await requestDms.json();
+				if (Array.isArray(error.message))
+					toast.warn(error.message[0]);
+				else
+					toast.warn(error.message);
+			}
 	}
 		catch (error) {
 			console.error(error);
@@ -48,7 +54,6 @@ const ChatListComponent: React.FC = () => {
 	useEffect(() => {
 
 		globalState.userSocket?.on('refreshDmList', () => {
-			console.log("Loading DMs...");
 			loadDMs();
 		});
 		
@@ -69,7 +74,6 @@ const ChatListComponent: React.FC = () => {
 	}, [globalState?.userSocket]);
 
 	useEffect(() => {
-		console.log("Loading DMs...");
 		loadDMs();
 	}, [chatState.refreshFriendList]);
 
@@ -80,7 +84,7 @@ const ChatListComponent: React.FC = () => {
 			{dm.map((dm: Conversation, id: number) => (
 				<div key={dm.id} className="bloc-button-discussion-list">
 				<img
-						src={`http://localhost:3001/users/getAvatar/${dm.id}/${timestamp}`}
+						src={`${process.env.API_URL}/users/getAvatar/${dm.id}/${timestamp}`}
 					className={`profil-discussion-list`}
 					alt="User Avatar"
 					/>

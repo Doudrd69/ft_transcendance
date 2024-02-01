@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Socket } from 'socket.io-client'
 import { useChat } from '../../../ChatContext';
 import { useGlobal } from '@/app/GlobalContext';
+import { toast } from 'react-toastify';
 
 const SendBoxComponent: React.FC = () => {
 
@@ -25,7 +26,7 @@ const SendBoxComponent: React.FC = () => {
 		try {
 			e.preventDefault();
 	
-			const response = await fetch('http://localhost:3001/chat/newMessage', {
+			const response = await fetch(`${process.env.API_URL}/chat/newMessage`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
@@ -35,13 +36,18 @@ const SendBoxComponent: React.FC = () => {
 			});
 			
 			if (response.ok) {
-				console.log('globalState.userSocket?.connected', globalState.userSocket?.connected);
-				console.log('messageDto', messageDto);
-				console.log('chatState.currentRoom', chatState.currentRoom);
+
 				if (globalState.userSocket?.connected) {
 					globalState.userSocket?.emit('message', { dto: messageDto, conversationName: chatState.currentRoom });
 				}
 				setMessageValue('');
+			}
+			else {
+				const error = await response.json();
+				if (Array.isArray(error.message))
+					toast.warn(error.message[0]);
+				else
+					toast.warn(error.message);
 			}
 		}
 		catch (error) {

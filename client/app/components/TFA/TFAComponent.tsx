@@ -1,5 +1,6 @@
 import React, { use, useEffect, useState } from 'react';
 import { useGlobal } from '../../GlobalContext';
+import { toast } from 'react-toastify';
 
 
 
@@ -22,7 +23,7 @@ const TFAComponent: React.FC  = () => {
 				code: String(authenticatorCodeInput),
 			}
 
-			const response = await fetch('http://localhost:3001/auth/checkAuthenticatorCode', {
+			const response = await fetch(`${process.env.API_URL}/auth/checkAuthenticatorCode`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
@@ -32,6 +33,13 @@ const TFAComponent: React.FC  = () => {
 	
 			if (response.ok) {
 				dispatch({ type: 'ACTIVATE', payload: 'isConnected' });
+			}
+			else {
+				const error = await response.json();
+				if (Array.isArray(error.message))
+					toast.warn(error.message[0]);
+				else
+					toast.warn(error.message);
 			}
 		}
 		catch (error) {

@@ -35,13 +35,11 @@ const Menu = () => {
 
     useEffect(() => {
         globalState.gameSocket?.on('gameNotInProgress', () => {
-            console.log(`DISPATCH`);
-            dispatchGame({ type: 'TOGGLE', payload: 'showGameMatchmaking' });
-            globalState.gameSocket?.emit('join-matchmaking', { playerLogin: sessionStorage.getItem("currentUserLogin"), gameMode: gameMode, userId: Number(sessionStorage.getItem("currentUserID")) });
+            dispatchGame({ type: 'TOGGLE', payload: 'showGameMatchmaking'});
+            globalState.gameSocket?.emit('join-matchmaking',{ playerLogin: sessionStorage.getItem("currentUserLogin"),  gameMode: gameMode, userId: Number(sessionStorage.getItem("currentUserID"))});
         });
 
-        globalState.gameSocket?.on('setGameInvited', () => {
-            console.log("SET GAME");
+        globalState.gameSocket?.on('setgame', () => {
             dispatchGame({
                 type: 'TOGGLE',
                 payload: 'showGame',
@@ -53,14 +51,13 @@ const Menu = () => {
             globalState.gameSocket?.off('gameNotInProgress');
             globalState.gameSocket?.off('setGameInvited');
         }
-
-    })
+    }, [globalState?.gameSocket])
 
     const handleStartClick = () => {
 
         try {
             setGameMode("NORMAL");
-            const gameSocket = io('http://localhost:3001/game', {
+            const gameSocket = io(`${process.env.API_URL}/game`, {
                 autoConnect: false,
                 auth: {
                     token: sessionStorage.getItem("jwt"),
@@ -84,7 +81,7 @@ const Menu = () => {
 
         try {
             setGameMode("SPEED");
-            const gameSocket = io('http://localhost:3001/game', {
+            const gameSocket = io(`${process.env.API_URL}/game`, {
                 autoConnect: false,
                 auth: {
                     token: sessionStorage.getItem("jwt"),

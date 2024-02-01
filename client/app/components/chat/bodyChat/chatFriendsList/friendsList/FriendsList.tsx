@@ -6,6 +6,7 @@ import AddFriendComponent from '../../addConversation/AddFriends';
 import { Socket } from 'socket.io-client';
 import AvatarImageComponent from '@/app/components/Avatar/Avatar';
 import { useGlobal } from '@/app/GlobalContext';
+import { toast } from 'react-toastify';
 
 interface FriendShip {
 	id: number;
@@ -41,7 +42,7 @@ const FriendsListComponent: React.FC = () => {
 	
 	const loadFriendList = async () => {
 		try {
-			const response = await fetch(`http://localhost:3001/users/getFriends/${username}`, {
+			const response = await fetch(`${process.env.API_URL}/users/getFriends/${username}`, {
 				method: 'GET',
 				headers: {
 					'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
@@ -50,6 +51,13 @@ const FriendsListComponent: React.FC = () => {
 			if (response.ok) {
 				const friends = await response.json();
 				setFriendList([...friends]);
+			}
+			else {
+				const error = await response.json();
+				if (Array.isArray(error.message))
+					toast.warn(error.message[0]);
+				else
+					toast.warn(error.message);
 			}
 		}
 		catch (error) {
@@ -105,7 +113,7 @@ const FriendsListComponent: React.FC = () => {
 			<div className="tab-and-userclicked" key={id}>
 				<div className="bloc-button-friendslist">
 						<img
-							src={`http://localhost:3001/users/getAvatar/${friend.id}/${timestamp}`}
+							src={`${process.env.API_URL}/users/getAvatar/${friend.id}/${timestamp}`}
 							className={`profil-friendslist`}
 							alt="User Avatar"
 						/>

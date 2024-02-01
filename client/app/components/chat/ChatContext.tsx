@@ -28,6 +28,7 @@ type ActionType =
   |	'SET_CURRENT_CONVERSATION_IS_PRIVATE'
   | 'SET_CURRENT_CONVERSATION_IS_PROTECTED'
   | 'SET_CURRENT_COMPONENT'
+  | 'SET_CURRENT_USER'
   | 'SET_CURRENT_TARGET';
 // Définir l'interface de l'action
 interface Action {
@@ -80,6 +81,7 @@ interface ChatState {
 	showBackComponent: boolean;
 	showTimer: boolean;
 	currentTarget: any;
+	currentUser: any;
 	[key: string]: boolean  | number | string | null | userList[] | userList;
 }
 
@@ -129,6 +131,7 @@ const initialState: ChatState = {
 	currentChannelBool: false,
 	showTimer: false,
 	currentTarget: null,
+	currentUser: null,
 };
 
 // Réducteur
@@ -176,6 +179,8 @@ const chatReducer = (state: ChatState, action: Action): ChatState => {
 			return { ...state, currentComponent: action.payload || null };
 		case 'SET_CURRENT_TARGET':
 			return { ...state, currentTarget: action.payload || null };
+		case 'SET_CURRENT_USER':
+			return { ...state, currentUser: action.payload || null };
 	  default:
 		return state;
 	}

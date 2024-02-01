@@ -3,8 +3,7 @@ import { Socket } from 'socket.io-client';
 import { useChat } from '../../ChatContext';
 import './AddConversation.css';
 import { useGlobal } from '@/app/GlobalContext';
-
-
+import { toast } from 'react-toastify';
 
 interface OptionsChannelProps {
 	title: string;
@@ -29,7 +28,6 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 	const { chatState, chatDispatch } = useChat();
 	if (chatState.currentUserList) {
 		setMe(chatState.currentUserList.filter((user: userList) => user.login === sessionStorage.getItem("currentUserLogin")));
-		console.log('me', me);
 	}
 	if (me) {
 		setIsAdmin(me[0].isAdmin);
@@ -45,7 +43,7 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 				userID: Number(sessionStorage.getItem("currentUserID")),
 			}
 
-			const response = await fetch(`http://localhost:3001/chat/updateIsPublicTrue`, {
+			const response = await fetch(`${process.env.API_URL}/chat/updateIsPublicTrue`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
@@ -55,12 +53,18 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 			});
 
 			if (response.ok) {
-				console.log("isPublicTrue");
 				globalState.userSocket?.emit('refreshChannelList', {
 					roomName : chatState.currentConversation,
 					roomID: chatState.currentConversationID,
 				});
 				chatDispatch({ type: 'ACTIVATE', payload: 'currentConversationIsPrivate' });
+			}
+			else {
+				const error = await response.json();
+				if (Array.isArray(error.message))
+					toast.warn(error.message[0]);
+				else
+					toast.warn(error.message);
 			}
 		}
 		catch (error) {
@@ -75,7 +79,7 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 				userID: Number(sessionStorage.getItem("currentUserID")),
 			}
 
-			const response = await fetch(`http://localhost:3001/chat/updateIsPublicFalse`, {
+			const response = await fetch(`${process.env.API_URL}/chat/updateIsPublicFalse`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
@@ -85,12 +89,18 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 			});
 
 			if (response.ok) {
-				console.log("isPublicFalse");
 				globalState.userSocket?.emit('refreshChannelList', {
 					roomName : chatState.currentConversation,
 					roomID: chatState.currentConversationID,
 				});
 				chatDispatch({ type: 'DISABLE', payload: 'currentConversationIsPrivate' });
+			}
+			else {
+				const error = await response.json();
+				if (Array.isArray(error.message))
+					toast.warn(error.message[0]);
+				else
+					toast.warn(error.message);
 			}
 		}
 		catch (error) {
@@ -106,7 +116,7 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 				userID: Number(sessionStorage.getItem("currentUserID")),
 			}
 	
-			const response = await fetch(`http://localhost:3001/chat/deleteConversation`, {
+			const response = await fetch(`${process.env.API_URL}/chat/deleteConversation`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
@@ -128,6 +138,13 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 				chatDispatch({ type: 'ACTIVATE', payload: 'showBackComponent' });
 				chatDispatch({ type: 'ACTIVATE', payload: 'showChannelList' });
 			}
+			else {
+				const error = await response.json();
+				if (Array.isArray(error.message))
+					toast.warn(error.message[0]);
+				else
+					toast.warn(error.message);
+			}
 		}
 		catch (error) {
 			console.error(error);
@@ -143,7 +160,7 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 				state: chatState.currentConversationIsProtected,
 			}
 
-			const response = await fetch(`http://localhost:3001/chat/updateIsProtectedFalse`, {
+			const response = await fetch(`${process.env.API_URL}/chat/updateIsProtectedFalse`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
@@ -158,6 +175,13 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 						roomID: chatState.currentConversationID,
 					});
 					chatDispatch({ type: 'DISABLE', payload: 'currentConversationIsProtected' });
+			}
+			else {
+				const error = await response.json();
+				if (Array.isArray(error.message))
+					toast.warn(error.message[0]);
+				else
+					toast.warn(error.message);
 			}
 		}
 		catch (error) {

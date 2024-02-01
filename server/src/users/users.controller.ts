@@ -1,4 +1,4 @@
-import { Controller, Post, HttpCode, HttpStatus, Body, Get, UploadedFile, UseInterceptors, Param, Res, UseGuards } from '@nestjs/common';
+import { Controller, Post, HttpCode, HttpStatus, Body, Get, UploadedFile, UseInterceptors, Param, Res, UseGuards, HttpException } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { FriendRequestDto } from './dto/FriendRequestDto.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -56,11 +56,11 @@ export class UsersController {
 		try
 		{
 			if (!avatar) {
-				throw new Error("No files uploaded");
+				throw new HttpException(`No files uploaded`, HttpStatus.BAD_REQUEST);
 			}
 			const isValidPNG = await this.usersService.isPNG(avatar.path);
 			if (!isValidPNG) {
-				throw new Error('Invalid file format');
+				throw new HttpException(`Invalid file format`, HttpStatus.BAD_REQUEST);
 			}
 			const avatarURL = `/avatars/${avatar.filename}`;
 			await this.usersService.uploadAvatarURL(avatarURL, userId);
@@ -77,7 +77,7 @@ export class UsersController {
 		try {
 			const avatarURL = await this.usersService.getAvatar(userId);
 			if (!avatarURL) {
-				throw new Error("Avatar not found");
+				throw new HttpException(`Avatar found`, HttpStatus.BAD_REQUEST);
 			}
 			res.setHeader('Content-Type', 'image/*'); 
 			res.redirect(301, avatarURL);
@@ -93,7 +93,7 @@ export class UsersController {
 		try {
 			const avatarURL = await this.usersService.getAvatarbyLogin(login);
 			if (!avatarURL) {
-				throw new Error("Avatar not found");
+				throw new HttpException(`Avatar found`, HttpStatus.BAD_REQUEST);
 			}
 			res.setHeader('Content-Type', 'image/*'); 
 			res.redirect(301, avatarURL);
@@ -109,7 +109,7 @@ export class UsersController {
 		try {
 			const avatarURL = await this.usersService.getAvatarbyLogin(login);
 			if (!avatarURL) {
-				throw new Error("Avatar not found");
+				throw new HttpException(`Avatar found`, HttpStatus.BAD_REQUEST);
 			}
 			res.setHeader('Content-Type', 'image/*'); 
 			res.redirect(301, avatarURL);
@@ -125,7 +125,7 @@ export class UsersController {
 		try {
 			const avatarURL = await this.usersService.getAvatar(userId);
 			if (!avatarURL) {
-				throw new Error("Avatar not found");
+				throw new HttpException(`Avatar found`, HttpStatus.BAD_REQUEST);
 			}
 			res.setHeader('Content-Type', 'image/*'); 
 			res.redirect(301, avatarURL);
