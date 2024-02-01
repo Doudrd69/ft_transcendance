@@ -80,7 +80,7 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 
 		const user = await this.userService.getUserByID(userID);
 		if (user) {
-			const friends = await this.userService.getFriendships(user.username);
+			const friends = await this.userService.getFriendships(userID);
 			if (friends) {
 				friends.forEach((friend: any) => {
 					console.log("Notifying ", friend.username);

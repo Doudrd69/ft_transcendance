@@ -966,7 +966,8 @@ export class ChatService {
 						conversationID: conversation.id,
 						userID: userToKick.id,
 					}
-					return await this.quitConversation(dto);
+					// attention id du user
+					return await this.quitConversation(dto, userToKick.id);
 				}
 				throw new HttpException(`${userToKick.username} is the owner`, HttpStatus.BAD_REQUEST);
 			}
