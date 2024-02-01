@@ -76,7 +76,6 @@ export class GameGateway {
 
     @WebSocketServer()
     server: Server;
-    game: Game;
     paddle: Paddle;
     game_instance: game_instance[];
 
@@ -93,26 +92,29 @@ export class GameGateway {
     }
 
     async handleDisconnect(@ConnectedSocket() client: Socket) {
-        console.log("ONE DISCONNECT");
+        console.log("[handleDisconnect] ONE DISCONNECT");
         try {
             const userId: number = this.GameService.getUserIdWithSocketId(client.id);
-            // console.log(`[${client.id}] userLogin de ses morts 1: ${userLogin}`);
-            console.log("disconect USER NOW")
+            console.log(`[handleDisconnect] User ${userId} retrieved by socketId`)
             if (userId) {
-                console.log(`userId = ${userId}`)
                 const user: User = await this.GameService.getUserWithUserId(userId);
-                if (user && this.GameService.userInGameOrInMacthmaking(user)) {
+                console.log(`[handleDisconnect] Retrieved disconnected user : ${user.login}`)
+                if (user && await this.GameService.userInGameOrInMacthmaking(user)) {
                     if (user.inMatchmaking === true) {
+                        console.log(`[handleDisconnect] User is in the matchmaking`)
                         await this.GameService.deconnectUserMatchmaking(user, userId);
                     }
                     else {
-                        this.game = await this.GameService.getGameWithUserId(userId);
+                        let game = await this.GameService.getGameWithUserId(userId);
+                        const gameInstance: game_instance = this.GameService.getGameInstance(this.game_instance, game.gameId);
+                        console.log(`[handleDisconnect] User is in Game ${game.gameId}, is it ended :? ${gameInstance.game_has_ended}`)
                         if (gameInstance && gameInstance.game_has_ended !== true) {
-                            const gameInstance: game_instance = this.GameService.getGameInstance(this.game_instance, this.game.gameId);
+                            const gameInstance: game_instance = this.GameService.getGameInstance(this.game_instance, game.gameId);
+                            console.log(`[handleDisconnect] User will be disconnect from game ${gameInstance}`)
                             if (user.login === gameInstance.playersLogin[0])
-                                this.GameService.disconnectSocket(gameInstance.players[1], gameInstance.gameID)
+                                await this.GameService.disconnectSocket(gameInstance.players[1], gameInstance.gameID)
                             else
-                                this.GameService.disconnectSocket(gameInstance.players[0], gameInstance.gameID)
+                                await this.GameService.disconnectSocket(gameInstance.players[0], gameInstance.gameID)
                         }
                     }
                 }
@@ -141,30 +143,30 @@ export class GameGateway {
                     //             // creating a personnal room so we can emit to the user
                     client.join(data.playerOneLogin);
                     client.join(data.playerTwoLogin);
-                    this.game = await this.GameService.createGame(client.id, data.playerTwoId, "NORMAL");
-                    if (!this.game)
+                    let game = await this.GameService.createGame(client.id, data.playerTwoId, "NORMAL");
+                    if (!game)
                         throw new Error("Fatal error");
-                    const gameInstance: game_instance = this.GameEngineceService.createGameInstance(this.game);
+                    const gameInstance: game_instance = this.GameEngineceService.createGameInstance(game);
                     this.game_instance.push(gameInstance);
                     this.server.to([client.id, data.playerTwoId]).emit('setGameInvited');
                     this.server.to([client.id, data.playerTwoId]).emit('joinGame', {
-                        gameId: this.game.gameId,
-                        playerOneID: this.game.playerOneID,
-                        playerTwoID: this.game.playerTwoID,
-                        playerOneLogin: this.game.playerOneLogin,
-                        playerTwoLogin: this.game.playerTwoLogin,
-                        scoreOne: this.game.scoreOne,
-                        scoreTwo: this.game.scoreTwo,
+                        gameId: game.gameId,
+                        playerOneID: game.playerOneID,
+                        playerTwoID: game.playerTwoID,
+                        playerOneLogin: game.playerOneLogin,
+                        playerTwoLogin: game.playerTwoLogin,
+                        scoreOne: game.scoreOne,
+                        scoreTwo: game.scoreTwo,
                     });
                     setTimeout(() => {
                         this.server.to([client.id, data.playerTwoId]).emit('gameStart', {
-                            gameId: this.game.gameId,
-                            playerOneID: this.game.playerOneID,
-                            playerTwoID: this.game.playerTwoID,
-                            playerOneLogin: this.game.playerOneLogin,
-                            playerTwoLogin: this.game.playerTwoLogin,
-                            scoreOne: this.game.scoreOne,
-                            scoreTwo: this.game.scoreTwo,
+                            gameId: game.gameId,
+                            playerOneID: game.playerOneID,
+                            playerTwoID: game.playerTwoID,
+                            playerOneLogin: game.playerOneLogin,
+                            playerTwoLogin: game.playerTwoLogin,
+                            scoreOne: game.scoreOne,
+                            scoreTwo: game.scoreTwo,
                         });
                     }, 1000);
                 }
@@ -220,33 +222,33 @@ export class GameGateway {
             const pairs: [string, string][] = await this.MatchmakingService.getPlayersPairsQueue(data.gameMode);
             for (const pair of pairs) {
                 const socketIDs: [string, string] = [pair[0], pair[1]];
-                this.game = await this.GameService.createGame(pair[0], pair[1], data.gameMode);
-                if (!this.game)
+                let game = await this.GameService.createGame(pair[0], pair[1], data.gameMode);
+                if (!game)
                     throw new Error("Fatal error");
-                const gameInstance: game_instance = this.GameEngineceService.createGameInstance(this.game);
+                const gameInstance: game_instance = this.GameEngineceService.createGameInstance(game);
                 this.game_instance.push(gameInstance);
-                this.MatchmakingService.leaveQueue(pair[0], data.gameMode, gameInstance.usersId[0]);
-                this.MatchmakingService.leaveQueue(pair[1], data.gameMode, gameInstance.usersId[1]);
+                await this.MatchmakingService.leaveQueue(pair[0], data.gameMode, gameInstance.usersId[0]);
+                await this.MatchmakingService.leaveQueue(pair[1], data.gameMode, gameInstance.usersId[1]);
                 console.log("SOCKET IDs: ", socketIDs);
                 this.server.to(socketIDs).emit('setgame');
                 this.server.to(socketIDs).emit('joinGame', {
-                    gameId: this.game.gameId,
-                    playerOneID: this.game.playerOneID,
-                    playerTwoID: this.game.playerTwoID,
-                    playerOneLogin: this.game.playerOneLogin,
-                    playerTwoLogin: this.game.playerTwoLogin,
-                    scoreOne: this.game.scoreOne,
-                    scoreTwo: this.game.scoreTwo,
+                    gameId: game.gameId,
+                    playerOneID: game.playerOneID,
+                    playerTwoID: game.playerTwoID,
+                    playerOneLogin: game.playerOneLogin,
+                    playerTwoLogin: game.playerTwoLogin,
+                    scoreOne: game.scoreOne,
+                    scoreTwo: game.scoreTwo,
                 });
                 setTimeout(() => {
                     this.server.to(socketIDs).emit('gameStart', {
-                        gameId: this.game.gameId,
-                        playerOneID: this.game.playerOneID,
-                        playerTwoID: this.game.playerTwoID,
-                        playerOneLogin: this.game.playerOneLogin,
-                        playerTwoLogin: this.game.playerTwoLogin,
-                        scoreOne: this.game.scoreOne,
-                        scoreTwo: this.game.scoreTwo,
+                        gameId: game.gameId,
+                        playerOneID: game.playerOneID,
+                        playerTwoID: game.playerTwoID,
+                        playerOneLogin: game.playerOneLogin,
+                        playerTwoLogin: game.playerTwoLogin,
+                        scoreOne: game.scoreOne,
+                        scoreTwo: game.scoreTwo,
                     });
                 }, 1000);
             }
@@ -286,7 +288,9 @@ export class GameGateway {
             const user2: User = await this.GameService.getUserWithUserId(gameInstance.usersId[1]);
             await this.GameService.updateStateGameForUsers(user1, user2);
             this.GameService.deleteGameSocketsIdForPlayers(user1, user2);
-            await this.GameService.deleteGame(this.game);
+
+            let game = await this.GameService.getGameWithUserId(user1.id);
+            await this.GameService.deleteGame(game);
             this.GameService.clearDisconnections(gameInstance.gameID);
             // delete gameInstance
         }
@@ -300,8 +304,9 @@ export class GameGateway {
             const user2: User = await this.GameService.getUserWithUserId(gameInstance.usersId[1]);
             await this.GameService.updateStateGameForUsers(user1, user2);
             this.GameService.deleteGameSocketsIdForPlayers(user1, user2);
-            if (this.game.gameEnd === false) {
-                await this.GameService.endOfGame(this.game, gameInstance);
+            let game = await this.GameService.getGameWithUserId(user1.id);
+            if (game.gameEnd === false) {
+                await this.GameService.endOfGame(game, gameInstance);
             }
         }
         // if (gameInstance.stop === true) {

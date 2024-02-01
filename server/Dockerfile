@@ -33,4 +33,4 @@ RUN [ "npm", "run", "build" ]
 
 COPY ./avatar.png ./dist/users/avatars/avatar.png
 
-CMD ["npm", "run", "start:prod"]
+CMD ["npm", "run", "start:dev"]
