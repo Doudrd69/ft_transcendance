@@ -41,7 +41,9 @@ const HeaderComponent: React.FC = () => {
 						chatDispatch({ type: 'DISABLE', payload: 'showBackComponent' });
 
 					}}}>
-						<img className='profils' src={`${process.env.API_URL}/users/getAvatar/${sessionStorage.getItem("currentUserID")}/${timestmp}`}/>
+							<img className='profils' src={`${process.env.API_URL}/users/getAvatar/${sessionStorage.getItem("currentUserID")}/${timestmp}`}/>
+							<div className='username'>{sessionStorage.getItem("currentUserLogin")}</div>
+
 					{/* {renderComponent(<AvatarImageComponent className="profils" refresh={globalState.showRefresh}/>, globalState.showUploadAvatar)} */}
 				</button>
 			</div>
