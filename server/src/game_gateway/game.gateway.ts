@@ -369,8 +369,8 @@ export class GameGateway {
                 BallPosition: {x: gameInstance.ball.position.x, y: gameInstance.ball.position.y},
                 scoreOne: gameInstance.player1_score,
                 scoreTwo: gameInstance.player2_score,
-                paddleOne: {x: gameInstance.paddles[0].start.x - 0.025, y: gameInstance.paddles[0].start.y},
-                paddleTwo: {x: gameInstance.paddles[1].start.x, y: gameInstance.paddles[1].start.y},
+                paddleOne: {x: gameInstance.paddles[0].start.x - 0.025, y: gameInstance.paddles[0].start.y, width: 0.025, height: gameInstance.paddles[0].end.y - gameInstance.paddles[0].start.y},
+                paddleTwo: {x: gameInstance.paddles[1].start.x, y: gameInstance.paddles[1].start.y, width: 0.025, height: gameInstance.paddles[1].end.y - gameInstance.paddles[1].start.y},
             })
         } catch (error) {
             console.log(`[GAME_LOOP_ERROR]: ${error.stack}`)
