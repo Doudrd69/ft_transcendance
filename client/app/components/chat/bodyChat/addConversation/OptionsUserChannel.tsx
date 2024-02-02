@@ -530,6 +530,7 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 		chatDispatch({ type: 'DISABLE', payload: 'showOptionsUserChannelOwner' });
 	}
 
+
 	const handleTabClick = (target: User) => {
 		chatDispatch({ type: 'SET_CURRENT_TARGET', payload: target });
 		console.log(chatState.currentTarget);
