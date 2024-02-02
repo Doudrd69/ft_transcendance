@@ -88,3 +88,21 @@
 	transform: scale(1.15);
 	transition: transform 0.3s ease; /* Ajoutez une transition pour une animation fluide */
 }
+
+.button-ok {
+	background-color: #4CAF50; /* Couleur de fond verte (peut être modifiée) */
+	border: none;
+	color: white; /* Couleur du texte (peut être modifiée) */
+	padding: 10px 20px; /* Marge intérieure (ajustez selon vos besoins) */
+	text-align: center;
+	text-decoration: none;
+	display: inline-block;
+	font-size: 16px; /* Taille de la police (ajustez selon vos besoins) */
+	margin: 4px 2px;
+	cursor: pointer;
+	border-radius: 5px; /* Coins arrondis (ajustez selon vos besoins) */
+  }
+  
+  .button-ok:hover {
+	background-color: #45a049; /* Changement de couleur au survol (peut être modifié) */
+  }
