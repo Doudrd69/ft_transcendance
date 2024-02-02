@@ -108,7 +108,6 @@ const FileDropZoneComponent: React.FC<FileDropZoneProps> = ({ onChange }) => {
 	};
 
 	return (
-		<div className='bloc-drag-avatar'>
 		<div
 			className={`file-drop-zone ${isDragging ? 'dragging' : ''}`}
 			onDragEnter={handleDragEnter}
@@ -117,8 +116,6 @@ const FileDropZoneComponent: React.FC<FileDropZoneProps> = ({ onChange }) => {
 			onDrop={handleDrop}
 			title='Drop here'
 		>
-
-		</div>
 		</div>
 	);
 };

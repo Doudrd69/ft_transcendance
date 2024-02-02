@@ -6,16 +6,21 @@
 
 }
 .profil-image{
-	height: auto;
-	width: 33%;
+	max-width: 33%;
 	margin: 10px;
+	aspect-ratio: 1/1;
 }
+.upload-image img {
+	width: 100%;
+	height: auto;
+	object-fit: contain; /* Cette propriété permet de conserver le ratio d'aspect tout en coupant l'image si nécessaire */
+  }
 .upload-image {
     flex-direction: row;
     display: flex;
     height: 50%;
-    align-items: center;
     justify-content: space-around;
+    margin: 20px;
 }
 .change-username{
 	justify-content: center;
