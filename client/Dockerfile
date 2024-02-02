@@ -16,7 +16,10 @@ RUN npm install && \
 	npm install @types/socket.io-client && \
 	npm install class-validator class-transformer && \
 	npm install sudo && \
-	npm install dotenv
+	npm install dotenv && \
+	npm install image-js  && \
+	npm install promise-file-reader
+
 
 COPY . .
 

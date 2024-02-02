@@ -99,14 +99,14 @@ export class UsersService {
 		try {
 
 			const user = await this.getUserByID(userID);
-			const oldAvatarPath = join(__dirname, 'users', user.avatarURL);
+			const oldAvatarPath = join(__dirname, user.avatarURL);
+			console.log(oldAvatarPath)
 			if (existsSync(oldAvatarPath)) {
 				unlinkSync(oldAvatarPath);
 			}
 			if (!user) {
 				throw new HttpException(`User not found`, HttpStatus.BAD_REQUEST);
 			}
-
 			const updateResult = await this.usersRepository.update({ id: userID }, { avatarURL });
 			return updateResult;
 		} catch (error) {
