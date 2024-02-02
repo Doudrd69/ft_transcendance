@@ -300,6 +300,8 @@ export class GameService {
 		UserOne.inGame = false;
 		UserTwo.inGame = false;
 
+		game.scoreOne = gameInstance.player1_score;
+		game.scoreTwo = gameInstance.player2_score;
 		console.log("Before U1: ", UserOne.victory, UserOne.defeat);
 		console.log("Before U2: ", UserTwo.victory, UserTwo.defeat);
 		if (game.scoreOne > game.scoreTwo) {
@@ -319,8 +321,6 @@ export class GameService {
 		game.userOneId = UserOne.id;
 		game.userTwoId = UserTwo.id;
 		game.gameEnd = true;
-		game.scoreOne = gameInstance.player1_score;
-		game.scoreTwo = gameInstance.player2_score;
 		await this.gameRepository.save(game);
 		return (game);
 	}
