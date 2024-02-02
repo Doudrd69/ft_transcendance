@@ -28,14 +28,16 @@ export class AuthController {
 	// @HttpCode(HttpStatus.OK)
 	@UseGuards(AuthGuard)
 	@Post('request2fa')
-	activate2FA(@Body() requestTfaDto: RequestTfaDto) {
-		return this.authService.activate2FA(requestTfaDto);
+	activate2FA(@Req() req, @Body() requestTfaDto: RequestTfaDto) {
+		const { user } = req;
+		return this.authService.activate2FA(user.sub);
 	}
 
 	@UseGuards(AuthGuard)
 	@Post('desactivate2fa')
-	desactivate2FA(@Body() requestTfaDto: RequestTfaDto) {
-		return this.authService.desactivate2FA(requestTfaDto);
+	desactivate2FA(@Req() req, @Body() requestTfaDto: RequestTfaDto) {
+		const { user } = req;
+		return this.authService.desactivate2FA(user.sub);
 	}
 
 	@UseGuards(AuthGuard)
@@ -44,10 +46,12 @@ export class AuthController {
 		const { user } = req;
 		return this.authService.get2fa(user.sub);
 	}
-	// @UseGuards(AuthGuard)
+
+	@UseGuards(AuthGuard)
 	@Post('checkAuthenticatorCode')
-	verifyCode(@Body() authenticatorCodeDto: AuthenticatorCodeDto) {
-		return this.authService.verifyCode(authenticatorCodeDto);
+	verifyCode(@Req() req, @Body() authenticatorCodeDto: AuthenticatorCodeDto) {
+		const { user } = req;
+		return this.authService.verifyCode(authenticatorCodeDto, user.sub);
 	}
 
 	// class-validator

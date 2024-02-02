@@ -10,6 +10,7 @@ interface OptionsChannelProps {
 }
 
 interface userList {
+	id: number;
 	login: string;
 	avatarURL: string;
 	isAdmin: boolean;
@@ -27,7 +28,7 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 	const { globalState } = useGlobal();
 	const { chatState, chatDispatch } = useChat();
 	if (chatState.currentUserList) {
-		setMe(chatState.currentUserList.filter((user: userList) => user.login === sessionStorage.getItem("currentUserLogin")));
+		setMe(chatState.currentUserList.filter((user: userList) => user.id=== Number(sessionStorage.getItem("currentUserID"))));
 	}
 	if (me) {
 		setIsAdmin(me[0].isAdmin);

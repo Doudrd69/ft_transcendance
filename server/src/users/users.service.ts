@@ -99,14 +99,14 @@ export class UsersService {
 		try {
 
 			const user = await this.getUserByID(userID);
-			const oldAvatarPath = join(__dirname, 'users', user.avatarURL);
+			const oldAvatarPath = join(__dirname, user.avatarURL);
+			console.log(oldAvatarPath)
 			if (existsSync(oldAvatarPath)) {
 				unlinkSync(oldAvatarPath);
 			}
 			if (!user) {
 				throw new HttpException(`User not found`, HttpStatus.BAD_REQUEST);
 			}
-
 			const updateResult = await this.usersRepository.update({ id: userID }, { avatarURL });
 			return updateResult;
 		} catch (error) {
@@ -223,23 +223,26 @@ export class UsersService {
 		return this.usersRepository.save(new42User);
 	}
 
-	async updateUsername(updateUsernameDto: UpdateUsernameDto) {
+	async updateUsername(updateUsernameDto: UpdateUsernameDto, userID: number) {
 
-		const user: User = await this.usersRepository.findOne({ where: { id: updateUsernameDto.userID } });
-		const usernameValidation = await this.isUsernameValid(updateUsernameDto.newUsername);
+		const user: User = await this.usersRepository.findOne({ where: { id: userID } });
 
-		if (usernameValidation) {
-
-			if (user) {
+		if (user) {
+			
+			const usernameValidation = await this.isUsernameValid(updateUsernameDto.newUsername);
+	
+			if (usernameValidation) {
+	
 				user.username = updateUsernameDto.newUsername;
 				await this.usersRepository.save(user);
 				return { newUsername: user.username };
+	
 			}
-
-			throw new HttpException('Fatal error', HttpStatus.BAD_REQUEST);
+			
+			throw new HttpException('Username is already used', HttpStatus.BAD_REQUEST);
 		}
-
-		throw new HttpException('Username is already used', HttpStatus.BAD_REQUEST);
+		
+		throw new HttpException('User not found', HttpStatus.BAD_REQUEST);
 	}
 
 	// async blockUser(blockUserDto: BlockUserDto): Promise<boolean> {
@@ -330,14 +333,10 @@ export class UsersService {
 	/***				FRIENDSHIP MANAGEMENT					***/
 	/**************************************************************/
 
-	async createFriendship(friendRequestDto: FriendRequestDto): Promise<boolean> {
-
-		if (friendRequestDto.initiatorLogin === friendRequestDto.recipientLogin) {
-			throw new HttpException('Fatal error', HttpStatus.BAD_REQUEST);
-		}
+	async createFriendship(friendRequestDto: FriendRequestDto, userID: number): Promise<boolean> {
 
 		const initiator = await this.usersRepository.findOne({
-			where: { username: friendRequestDto.initiatorLogin },
+			where: { id: userID },
 			relations: ["initiatedFriendships"],
 		});
 
@@ -346,12 +345,11 @@ export class UsersService {
 			relations: ["initiatedFriendships"],
 		});
 
-		if (!recipient) {
-			throw new HttpException(`User not found`, HttpStatus.BAD_REQUEST);
-		}
+		if (initiator && recipient) {
 
-		if (initiator) {
-
+			if (initiator.id == recipient.id)
+				throw new HttpException('Seriously?', HttpStatus.BAD_REQUEST);
+	
 			const friendshipAlreadyExists = await this.friendshipRepository
 				.createQueryBuilder('friendship')
 				.where('(friendship.initiator.id = :initiatorId AND friendship.friend.id = :friendId) OR (friendship.initiator.id = :friendId AND friendship.friend.id = :initiatorId)', {
@@ -361,7 +359,7 @@ export class UsersService {
 				.getOne();
 
 			if (!friendshipAlreadyExists) {
-
+	
 				let newFriendship = new Friendship();
 				newFriendship.initiator = initiator;
 				newFriendship.friend = recipient;
@@ -371,6 +369,7 @@ export class UsersService {
 			else if (friendshipAlreadyExists && !friendshipAlreadyExists.isAccepted) {
 				return true;
 			}
+
 			throw new HttpException(`${recipient.username} is already in your friend list`, HttpStatus.BAD_REQUEST);
 		}
 
@@ -395,10 +394,10 @@ export class UsersService {
 		return conversation;
 	}
 
-	async updateFriendship(friendRequestDto: FriendRequestDto, flag: boolean): Promise<Conversation | Friendship> {
+	async updateFriendship(friendRequestDto: FriendRequestDto, flag: boolean, userID: number): Promise<Conversation | Friendship> {
 
 		const initiator = await this.usersRepository.findOne({
-			where: { username: friendRequestDto.initiatorLogin },
+			where: { id: userID },
 			relations: ["initiatedFriendships", "acceptedFriendships", "groups", "groups.conversation"],
 		});
 
@@ -423,8 +422,7 @@ export class UsersService {
 				await this.friendshipRepository.save(friendshipToUpdate);
 
 				const privateConversation = await this.findDMConversation(initiator, friend);
-				console.log("Found DM: ", privateConversation);
-				// si la conv existe deja, on la recreer pas
+
 				if (!privateConversation) {
 					if (flag) {
 						const conversation = this.chatService.createDMConversation(initiator, friend);
@@ -435,15 +433,15 @@ export class UsersService {
 				return friendshipToUpdate;
 			}
 
-			throw new HttpException('Users are not friend', HttpStatus.BAD_REQUEST);
+			throw new HttpException('Users are not friends', HttpStatus.BAD_REQUEST);
 		}
 
 		throw new HttpException('Fatal error', HttpStatus.BAD_REQUEST);
 	}
 
-	async acceptFriendship(friendRequestDto: FriendRequestDto): Promise<Conversation | Friendship> {
+	async acceptFriendship(friendRequestDto: FriendRequestDto, userID: number): Promise<Conversation | Friendship> {
 
-		const newConversationBetweenFriends = await this.updateFriendship(friendRequestDto, true);
+		const newConversationBetweenFriends = await this.updateFriendship(friendRequestDto, true, userID);
 		if (newConversationBetweenFriends) {
 			return newConversationBetweenFriends;
 		}
@@ -451,9 +449,9 @@ export class UsersService {
 		throw new HttpException('Fatal error', HttpStatus.BAD_REQUEST);
 	}
 
-	async removeFriend(blockUserDto: BlockUserDto): Promise<Conversation | Friendship> {
+	async removeFriend(blockUserDto: BlockUserDto, userID: number): Promise<Conversation | Friendship> {
 
-		const friendshipToUpdate = await this.updateFriendship(blockUserDto, false);
+		const friendshipToUpdate = await this.updateFriendship(blockUserDto, false, userID);
 		if (friendshipToUpdate) {
 			return friendshipToUpdate;
 		}
@@ -461,13 +459,13 @@ export class UsersService {
 		throw new HttpException('Fatal error', HttpStatus.BAD_REQUEST);
 	}
 
-	async blockUser(blockUserDto: BlockUserDto): Promise<boolean> {
+	async blockUser(blockUserDto: BlockUserDto, userID: number): Promise<boolean> {
 
-		const user: User = await this.usersRepository.findOne({ where: { username: blockUserDto.initiatorLogin } });
+		const user: User = await this.usersRepository.findOne({ where: { id: userID } });
 		const userToBlock: User = await this.usersRepository.findOne({ where: { username: blockUserDto.recipientLogin } });
 
 		if (user && userToBlock) {
-			// const checkUserDouble = user.blockedUsers.find((username: string) => username === userToBlock.username);
+	
 			user.blockedUsers.forEach((username: string) => {
 				if (username === userToBlock.username) {
 					throw new HttpException('User already blocked', HttpStatus.BAD_REQUEST);
@@ -482,9 +480,9 @@ export class UsersService {
 		throw new HttpException('Fatal error', HttpStatus.BAD_REQUEST);
 	}
 
-	async unblockUser(blockUserDto: BlockUserDto): Promise<boolean> {
+	async unblockUser(blockUserDto: BlockUserDto, userID: number): Promise<boolean> {
 
-		const user: User = await this.usersRepository.findOne({ where: { username: blockUserDto.initiatorLogin } });
+		const user: User = await this.usersRepository.findOne({ where: { id: userID} });
 		const userToUnblock: User = await this.usersRepository.findOne({ where: { username: blockUserDto.recipientLogin } });
 
 		if (user && userToUnblock) {
@@ -502,12 +500,10 @@ export class UsersService {
 	/**************************************************************/
 
 	async getUserByID(userID: number): Promise<User> {
-		// console.log(userID);
 		return await this.usersRepository.findOne({ where: { id: userID } });
 	}
 
 	async getUserByLogin(loginToSearch: string): Promise<User> {
-		// We search by login because it is unique
 		return await this.usersRepository.findOne({ where: { login: loginToSearch } });
 	}
 
@@ -518,73 +514,94 @@ export class UsersService {
 			return user.blockedUsers;
 		}
 
-		return [];
+		throw new HttpException('User not found', HttpStatus.BAD_REQUEST);
 	}
 
-	async getFriendships(username: string): Promise<Friendship[]> {
+	async getFriendships(userID: number): Promise<Friendship[]> {
 
-		const user: User = await this.usersRepository.findOne({ where: { username: username } });
+		const user: User = await this.usersRepository.findOne({ where: { id: userID } });
 
-		const initiatedFriends = await this.friendshipRepository
-		.createQueryBuilder('friendship')
-		.innerJoinAndSelect('friendship.friend', 'friend')
-		.where('friendship.initiator = :userId', { userId: user.id })
-		.andWhere('friendship.isAccepted = true')
-		.getMany();
-	  
+		if (user) {
 
-		const acceptedFriends = await this.friendshipRepository
-		.createQueryBuilder('friendship')
-		.innerJoinAndSelect('friendship.initiator', 'initiator')
-		.where('friendship.friend = :userId', { userId: user.id })
-		.andWhere('friendship.isAccepted = true')
-		.getMany();
-
-		let array = [];
-		const friendships = [...initiatedFriends, ...acceptedFriends];
-		friendships.forEach((element: Friendship) => {
-			let blockStatus = false;
-			user.blockedUsers.forEach((blockedFriend: string) => {
-				if (blockedFriend == (element.friend ? element.friend.username : element.initiator ? element.initiator.username : '')) {
-					blockStatus = true;
-				}
+			const initiatedFriends = await this.friendshipRepository
+				.createQueryBuilder('friendship')
+				.innerJoinAndSelect('friendship.friend', 'friend')
+				.where('friendship.initiator = :userId', { userId: user.id })
+				.andWhere('friendship.isAccepted = true')
+				.getMany();
+		  
+	
+			const acceptedFriends = await this.friendshipRepository
+				.createQueryBuilder('friendship')
+				.innerJoinAndSelect('friendship.initiator', 'initiator')
+				.where('friendship.friend = :userId', { userId: user.id })
+				.andWhere('friendship.isAccepted = true')
+				.getMany();
+	
+			let array = [];
+			const friendships = [...initiatedFriends, ...acceptedFriends];
+			friendships.forEach((element: Friendship) => {
+				let blockStatus = false;
+				user.blockedUsers.forEach((blockedFriend: string) => {
+					if (blockedFriend == (element.friend ? element.friend.username : element.initiator ? element.initiator.username : '')) {
+						blockStatus = true;
+					}
+				});
+				array.push({
+					id: element.friend ? element.friend.id : element.initiator ? element.initiator.id : -1,
+					username: element.friend ? element.friend.username : element.initiator ? element.initiator.username : 'unknown user',
+					isBlocked: blockStatus,
+					onlineStatus:  element.friend ? element.friend.isActive : element.initiator ? element.initiator.isActive : false,
+				});
 			});
-			array.push({
-				id: element.friend ? element.friend.id : element.initiator ? element.initiator.id : -1,
-				username: element.friend ? element.friend.username : element.initiator ? element.initiator.username : 'unknown user',
-				isBlocked: blockStatus,
-				onlineStatus:  element.friend ? element.friend.isActive : element.initiator ? element.initiator.isActive : false,
-			});
-		});
+	
+			return array;
+		}
 
-		return array;
+		throw new HttpException('User not found', HttpStatus.BAD_REQUEST);
 	}
 
-	async getPendingFriendships(username: string): Promise<Friendship[]> {
+	async getPendingFriendships(userID: number): Promise<Friendship[]> {
 
-		const initiatedfriends = await this.friendshipRepository
-			.createQueryBuilder('friendship')
-			.leftJoinAndSelect('friendship.initiator', 'initiator')
-			.where('initiator.username != :username', { username })
-			.andWhere('friendship.isAccepted = false')
-			.getMany();
+		const user: User = await this.usersRepository.findOne({ where: { id: userID } });
 
-		const acceptedfriends = await this.friendshipRepository
-			.createQueryBuilder('friendship')
-			.leftJoinAndSelect('friendship.friend', 'friend')
-			.where('friend.username != :username', { username })
-			.andWhere('friendship.isAccepted = false')
-			.getMany();
+		if (user) {
 
-		// let array = [];
-		const friendships = [...initiatedfriends, ...acceptedfriends];
-		// friendships.forEach((element: Friendship) => {
-		// 	array.push({
-		// 		id: element.friend ? element.friend.id : element.initiator ? element.initiator.id : -1,
-		// 		username: element.friend ? element.friend.username : element.initiator ? element.initiator.username : 'unknown user',
-		// 	});
-		// });
+			const initiatedFriends = await this.friendshipRepository
+				.createQueryBuilder('friendship')
+				.innerJoinAndSelect('friendship.friend', 'friend')
+				.where('friendship.initiator = :userId', { userId: user.id })
+				.andWhere('friendship.isAccepted != true')
+				.getMany();
+		  
+	
+			const acceptedFriends = await this.friendshipRepository
+				.createQueryBuilder('friendship')
+				.innerJoinAndSelect('friendship.initiator', 'initiator')
+				.where('friendship.friend = :userId', { userId: user.id })
+				.andWhere('friendship.isAccepted != true')
+				.getMany();
+	
+			let array = [];
+			const friendships = [...initiatedFriends, ...acceptedFriends];
+			friendships.forEach((element: Friendship) => {
+				let blockStatus = false;
+				user.blockedUsers.forEach((blockedFriend: string) => {
+					if (blockedFriend == (element.friend ? element.friend.username : element.initiator ? element.initiator.username : '')) {
+						blockStatus = true;
+					}
+				});
+				array.push({
+					id: element.friend ? element.friend.id : element.initiator ? element.initiator.id : -1,
+					username: element.friend ? element.friend.username : element.initiator ? element.initiator.username : 'unknown user',
+					isBlocked: blockStatus,
+					onlineStatus:  element.friend ? element.friend.isActive : element.initiator ? element.initiator.isActive : false,
+				});
+			});
+		
+			return array;
+		}
 
-		return friendships;
+		throw new HttpException('User not found', HttpStatus.BAD_REQUEST);
 	}
 }

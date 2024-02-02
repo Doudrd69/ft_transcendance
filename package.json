@@ -19,6 +19,7 @@
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
     "dotenv": "^16.4.1",
+    "image-js": "^0.35.5",
     "install": "^0.13.0",
     "jimp": "^0.22.10",
     "next": "^13.4.19",

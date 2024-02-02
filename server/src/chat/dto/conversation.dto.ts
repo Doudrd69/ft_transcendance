@@ -40,8 +40,8 @@ export class ConversationDto {
 	isProtected: boolean;
 
 	// @Length(6, 20)
-	// @IsAscii()
-	// @IsAlpha()
+	@IsAscii()
+	@IsAlpha()
 	@IsString()
 	@Matches(/^[^"';%()|<>\\]*$/)
 	password?: string;
