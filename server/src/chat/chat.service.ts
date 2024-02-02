@@ -319,6 +319,7 @@ export class ChatService {
 										id: userGroup.conversation.id,
 										username: user.username,
 										avatarURL: user.avatarURL,
+										userID: user.id,
 										name: userGroup.conversation.name,
 										onlineStatus: user.isActive,
 									});

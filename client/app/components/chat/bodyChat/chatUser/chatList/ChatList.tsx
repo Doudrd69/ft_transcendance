@@ -13,6 +13,7 @@ interface Conversation {
 	id: number,
 	username: string;
 	avatarURL: string;
+	userID: number;
 	name: string;
 	onlineStatus: boolean;
 }
@@ -83,10 +84,10 @@ const ChatListComponent: React.FC = () => {
 	return (
 		<div className="bloc-discussion-list">
 			{dm.map((dm: Conversation, id: number) => (
-				console.log(`/users/getAvatar/${dm.id}`),
+				console.log("user.name :", dm.username),
 				<div key={dm.id} className="bloc-button-discussion-list">
 				<img
-					src={`${process.env.API_URL}/users/getAvatar/${dm.id}/${timestamp}`}
+					src={`${process.env.API_URL}/users/getAvatar/${dm.userID}/${timestamp}`}
 					className={`profil-discussion-list`}
 					alt="User Avatar"
 					/>
