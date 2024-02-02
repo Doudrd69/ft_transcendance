@@ -35,9 +35,11 @@ export class BallService {
 			ball.player2Scored = true;
 		}
 		if (ball.position.y - ball.r < 0) {
+			ball.position.y = ball.r;
 			ball.speed.y *= -1
 		}
 		else if (ball.position.y + ball.r > 1) {
+			ball.position.y = 1 - ball.r;
 			ball.speed.y *= -1
 		}
 		return (ball);
