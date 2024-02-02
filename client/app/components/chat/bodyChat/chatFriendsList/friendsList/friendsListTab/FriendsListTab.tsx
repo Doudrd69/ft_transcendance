@@ -298,7 +298,7 @@ const FriendsListTabComponent: React.FC<FriendsListTabComponentProps> = ({ user,
 			<div className="bloc-tab">
 
 				{all &&
-					<img className='image-tab' src="ajouter.png" onClick={() => handleTabClick(`Etes vous sur de vouloir ajouter à de votre liste d'amies ${user.username} ?`, handlFriendRequest(user.username))} />
+					<img className='image-tab' src="ajouter.png" onClick={() => handleTabClick(`Etes vous sur de vouloir ajouter à de votre liste d'amies ${user.username} ?`, () => handlFriendRequest(user.username))} />
 				}
 				<img className='image-tab' src="ping-pong.png" onClick={() => handleTabClick(`Etes vous sur de vouloir défier ${user.username} ?`, gameInvite)} />
 				<img className='image-tab' src="ajouter-un-groupe.png" onClick={() => chatDispatch({ type: 'ACTIVATE', payload: 'showListChannelAdd' })} />

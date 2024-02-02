@@ -100,6 +100,15 @@ const AddFriendComponent: React.FC<AddFriendComponentProps> = ({ updateFriends, 
 									onChange={(e) => setFormValue(e.target.value)}
 								/>
 							</form>
+							<button
+								className='button-ok'
+								onClick={(e) => {
+									handleFriendRequest(e);
+									handleCancel();
+								}}
+								>
+								OK
+							</button>
 						</div>
 					</div>
 				</div>
