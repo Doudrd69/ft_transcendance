@@ -121,6 +121,7 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 				this.userRejoinsRooms(client, userID);
 				this.userService.updateUserStatus(userID, true);
 				this.notifyFriendList(userID, personnalRoom, 'newConnection', 'online');
+				this.server.emit('newUser');
 		
 				client.on('disconnect', () => {
 					console.log("===> Disconnecting user ", personnalRoom, " with ID ", userID);
@@ -356,12 +357,10 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		this.server.to(userToRefresh).emit(target, status);
 	}
 
-	@SubscribeMessage('refreshChannel')
+	@SubscribeMessage('userJoinedChannel')
 	@UseGuards(GatewayGuard)
-	handleChannelrRefresh(@MessageBody() data: { channel: string } ) {
-		const { channel } = data;
-		console.log("refreshing channel");
-		this.server.to(channel).emit('refresh_channel');
+	handleRefreshUserSearchList(@MessageBody() roomName: string) {
+		this.server.to(roomName).emit('refreshChannelList');
 	}
 
 	@SubscribeMessage('emitNotification')
