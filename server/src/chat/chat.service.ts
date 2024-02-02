@@ -594,7 +594,7 @@ export class ChatService {
 			}
 		}
 
-		throw new HttpException('Fatal error', HttpStatus.BAD_REQUEST);
+		throw new HttpException('User not found', HttpStatus.BAD_REQUEST);
 	}
 
 	async updateUserUnmuteStatusFromConversation(muteUserDto: UserOptionsDto, userID: number): Promise<boolean> {
@@ -629,7 +629,7 @@ export class ChatService {
 			}
 		}
 
-		throw new HttpException('Fatal error', HttpStatus.BAD_REQUEST);
+		throw new HttpException('User not found', HttpStatus.BAD_REQUEST);
 	}
 
 	async updateUserBanStatusFromConversation(banUserDto: UserOptionsDto, userID: number): Promise<boolean> {
@@ -672,7 +672,7 @@ export class ChatService {
 			}
 		}
 
-		throw new HttpException('Fatal error', HttpStatus.BAD_REQUEST);
+		throw new HttpException('User not found', HttpStatus.BAD_REQUEST);
 	}
 
 	async updateUserUnbanStatusFromConversation(banUserDto: UserOptionsDto, userID: number): Promise<boolean> {
@@ -712,7 +712,7 @@ export class ChatService {
 			}
 		}
 
-		throw new HttpException('Fatal error', HttpStatus.BAD_REQUEST);
+		throw new HttpException('User not found', HttpStatus.BAD_REQUEST);
 	}
 
 	async updateUserAdminStatusFromConversationTrue(promoteUserToAdminDto: UserOptionsDto, userID: number): Promise<boolean> {
@@ -757,7 +757,7 @@ export class ChatService {
 			}
 		}
 
-		throw new HttpException('Fatal error', HttpStatus.BAD_REQUEST);
+		throw new HttpException('user not found', HttpStatus.BAD_REQUEST);
 	}
 
 	async updateUserAdminStatusFromConversationFalse(promoteUserToAdminDto: UserOptionsDto, userID: number): Promise<boolean> {
@@ -799,7 +799,7 @@ export class ChatService {
 			}
 		}
 
-		throw new HttpException('Fatal error', HttpStatus.BAD_REQUEST);
+		throw new HttpException('User not found', HttpStatus.BAD_REQUEST);
 	}
 
 
@@ -1060,12 +1060,12 @@ export class ChatService {
 	async createPrivateConversation(DMcreationDto: DMcreationDto, userID: number): Promise<Conversation> {
 
 		const user1 = await this.usersRepository.findOne({
-			where: { id: userID },
+			where: { id: DMcreationDto.user1 },
 			relations: ['groups', 'groups.conversation'],
 		});
 
 		const user2 = await this.usersRepository.findOne({
-			where: { id: DMcreationDto.user2 },
+			where: { id: userID },
 			relations: ['groups', 'groups.conversation'],
 		});
 

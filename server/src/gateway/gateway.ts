@@ -84,7 +84,7 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 			const friends = await this.userService.getFriendships(userID);
 			if (friends) {
 				friends.forEach((friend: any) => {
-					console.log("Notifying ", friend.username);
+					console.log("Notifying ", friend.username, " on event ", event);
 					this.server.except(personnalRoom).to(friend.username).emit(event, `${personnalRoom} is ${status}`);
 				});
 			}
@@ -109,7 +109,6 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 			client.on('disconnect', () => {
 				console.log("===> Disconnecting user ", personnalRoom, " with ID ", userID);
 				this.notifyFriendList(userID, personnalRoom , 'newDeconnection', 'offline');
-				// this.server.except(personnalRoom).emit('newDeconnection', `${personnalRoom} is now offline`);
 				client.leave(personnalRoom);
 				console.log("Client ", client.id, " has left ", personnalRoom, " room");
 				this.userLeavesRooms(client, userID);
