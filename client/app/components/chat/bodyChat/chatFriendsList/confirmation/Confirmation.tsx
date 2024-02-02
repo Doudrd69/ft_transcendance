@@ -12,6 +12,7 @@ const ConfirmationComponent: React.FC<ConfirmationComponentProps> = ({ phrase, f
 
 	const handleCancel = () => {
 		chatDispatch({ type: 'DISABLE', payload: 'showConfirmation' })
+		chatDispatch({ type: 'ACTIVATE', payload: 'showBackComponent' });
 	};
 
 	useEffect(() => {

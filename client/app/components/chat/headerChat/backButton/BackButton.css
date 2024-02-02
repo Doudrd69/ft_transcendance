@@ -1,17 +1,17 @@
 .back-button{
-	scroll-behavior: auto;
-	box-sizing: border-box;
-	aspect-ratio: 1/1;
-	margin: 10px 10px 10px 10px;
-	width: 7%;
-	height: auto;
-	background-color: transparent;
-	color: #000000;
-	border: none;
-	background-size: contain;
-	background-repeat: no-repeat;
-	background-position: center center;
-	transition: transform 0.2s ease;
+    scroll-behavior: auto;
+    box-sizing: border-box;
+    aspect-ratio: 1/1;
+    margin: 10px 10px 10px 10px;
+    width: 40px;
+    height: auto;
+    background-color: transparent;
+    color: #000000;
+    border: none;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center center;
+    transition: transform 0.2s ease;
 }
 .back-button:hover {
     transform: scale(1.4);

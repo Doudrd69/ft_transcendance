@@ -47,19 +47,19 @@ export class UsersController {
 	@Post('upload-avatar')
 	@UseInterceptors(FileInterceptor('avatar',
 			{
-	
 				storage: diskStorage({ destination: null,
-				filename: async (req, file, callback) => {
-					const randomName = randomBytes(16).toString('hex');
-					const fileExtension = extname(file.originalname);
-					const newFilename = `${randomName}${fileExtension}`;
-					callback(null, newFilename);
-			},
-		}),
-	}))
+					filename: async (req, file, callback) => {
+						const randomName = randomBytes(16).toString('hex');
+						const fileExtension = extname(file.originalname);
+						const newFilename = `${randomName}${fileExtension}`;
+						callback(null, newFilename);
+					},
+				}),
+			}))
 	async uploadAvatar(@UploadedFile() avatar: Express.Multer.File, @Req() req) {
 		try
 		{
+
 			const { user } = req;
 			const cheminImageSortie = path.join(__dirname, 'avatars', `carredanslaxe_${avatar.filename}`);
 			const image = await Jimp.read(avatar.path);
@@ -72,11 +72,11 @@ export class UsersController {
 				.resize(200, 200)
 				.writeAsync(cheminImageSortie);
 
-			const URLAvatar = `/avatars/carredanslaxe_${avatar.filename}`;
-			const status = await this.usersService.uploadAvatarURL(URLAvatar, user.sub);
+			const avatarURL = `/avatars/carredanslaxe_${avatar.filename}`;
+			const status = await this.usersService.uploadAvatarURL(avatarURL, user.sub);
 			if (!status)
 				throw new HttpException('Upload failed', HttpStatus.BAD_REQUEST);
-			return { URLAvatar };
+			return { avatarURL};
 		}
 		catch (error){
 			throw error;

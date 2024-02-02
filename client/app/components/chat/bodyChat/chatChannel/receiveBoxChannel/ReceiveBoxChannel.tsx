@@ -7,6 +7,9 @@ import { useGlobal } from '@/app/GlobalContext';
 import { toast } from 'react-toastify';
 import { setCurrentUserList } from '../../../ChatContext';
 import TimerComponent from '../../addConversation/Timer';
+import ConfirmationComponent from '../../chatFriendsList/confirmation/Confirmation';
+import { io } from 'socket.io-client';
+
 
 interface Message {
 	from: string;
@@ -37,6 +40,11 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 	const [userList, setUserList] = useState<User[]>();
 	const [ownerUser, setOwnerUser] = useState<User>();
 	const [currentUser, setCurrentUser] = useState<User>();
+	const [gameSocketConnected, setgameSocketConnected] = useState<boolean>(false);
+	const [gameInviteValidation, setgameInviteValidation] = useState<boolean>(false);
+	const [gameInviteCalled, setGameInviteCalled] = useState<boolean>(false);
+
+	const { dispatch } = useGlobal();
 
 
 	const isMyMessage = (message: Message): boolean => {
@@ -165,6 +173,7 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 		};
 		
 	}, [globalState?.userSocket]);
+	console.log(chatState);
 	
 	useEffect(() => {
 		getMessages();
@@ -178,9 +187,50 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 		scrollToBottom();
 	}, [messages]);
 
+
+	const gameInvite = () => {
+		console.log("gameSocketConnected :", globalState?.gameSocket);
+		// !gameInviteCalled && gameSocketConnected === false
+		if (gameSocketConnected === false) {
+			// setGameInviteCalled(true); // Marquer gameInvite comme appelée
+			globalState.userSocket?.off('senderNotInGame');
+			setgameInviteValidation(false);
+			console.log("GAMEINVITE");
+			globalState.userSocket?.emit('checkSenderInMatch', {
+				senderUsername: sessionStorage.getItem("currentUserLogin"),
+				senderUserId: sessionStorage.getItem("currentUserID"),
+			})
+			globalState.userSocket?.on('senderNotInGame', () => {
+				console.log(`INVITATION: ${globalState.userSocket?.id}`);
+				const gameSocket: Socket = io('http://localhost:3001/game', {
+					autoConnect: false,
+					auth: {
+						token: sessionStorage.getItem("jwt"),
+					}
+				});
+				gameSocket.connect();
+				gameSocket.on('connect', () => {
+					setgameSocketConnected(true);
+					dispatch({ type: 'SET_GAME_SOCKET', payload: gameSocket });
+					// emit le fait que je rentre en matchmaking, si l'autre refuse je fait un emethode pour le quitter avant de disconnect la socket
+					gameSocket.emit('throwGameInvite')
+					globalState.userSocket?.emit('inviteToGame', {
+						usernameToInvite: chatState.currentTarget.login,
+						userIdToInvite: chatState.currentTarget.id,
+						senderID: gameSocket.id,
+						senderUsername: sessionStorage.getItem("currentUserLogin"),
+						senderUserID: sessionStorage.getItem("currentUserID"),
+					});
+				})
+			})
+
+
+		}
+	};
 	const timestamp = new Date().getTime();
 		return (
 			<>
+			
 			  <div className='bloc-owner-user'>
 				<div className='list-users-channel-owner'>
 				  <div className='user-list-item'>
@@ -271,7 +321,11 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 					</div>		
 				))}
 				</div>
+				
 				{chatState.showTimer && <TimerComponent user={chatState.currentTarget}/>}
+				{chatState.showConfirmation && (
+				<ConfirmationComponent phrase={`Etes vous sur de vouloir defier ${chatState.currentTarget.login}`} functionToExecute={gameInvite} />
+			)}
 			</>
 		);
 	};
