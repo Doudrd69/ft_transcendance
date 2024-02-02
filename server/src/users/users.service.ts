@@ -96,22 +96,19 @@ export class UsersService {
 	/**************************************************************/
 
 	async uploadAvatarURL(avatarURL: string, userID: number): Promise<UpdateResult | undefined> {
-		try {
 
-			const user = await this.getUserByID(userID);
+		const user = this.usersRepository.findOne({ where: { id: userID } });
+		if (user) {
+
 			const oldAvatarPath = join(__dirname, user.avatarURL);
-			console.log(oldAvatarPath)
-			if (existsSync(oldAvatarPath)) {
+			if (existsSync(oldAvatarPath))
 				unlinkSync(oldAvatarPath);
-			}
-			if (!user) {
-				throw new HttpException(`User not found`, HttpStatus.BAD_REQUEST);
-			}
+
 			const updateResult = await this.usersRepository.update({ id: userID }, { avatarURL });
 			return updateResult;
-		} catch (error) {
-			throw error;
 		}
+
+		throw new HttpException('User not found', HttpStatus.BAD_REQUEST);
 	}
 
 	async isPNG(filePath: string): Promise<boolean> {
@@ -544,6 +541,39 @@ export class UsersService {
 		const user = await this.usersRepository.findOne({ where: { id: userID } });
 		if (user) {
 			return user.blockedUsers;
+		}
+
+		throw new HttpException('User not found', HttpStatus.BAD_REQUEST);
+	}
+
+	async getUserList(userId: number) {
+
+		const user = await this.usersRepository.findOne({ where: { id: userId } });
+		if (user) {
+
+			const users = await this.usersRepository.find();
+			if (users) {
+
+				let array = [];
+				users.forEach((user_: User) => {
+					let blockStatus = false;
+					user.blockedUsers.forEach((blockedFriend: string) => {
+						if (blockedFriend == user_.username) {
+							blockStatus = true;
+						}
+					});
+					array.push({
+						id: user_.id,
+						username: user_.username,
+						avatar: user_.avatarURL,
+						isBlocked: blockStatus,
+					});
+				})
+
+				return array;
+			}
+
+			throw new HttpException('Failed to load user list', HttpStatus.BAD_REQUEST);
 		}
 
 		throw new HttpException('User not found', HttpStatus.BAD_REQUEST);

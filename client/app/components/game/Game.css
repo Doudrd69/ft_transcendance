@@ -1,8 +1,9 @@
 .right-half {
-	background-color: rgb(67, 58, 58);
-	height: 100%;
-	width: 65%;
-	}
+    background-color: #453232ff;
+    radius: 20px;
+    height: calc(100%);
+    width: 75%;
+    }
 
 @media only screen and (max-width: 800px) {
 	.right-half {

@@ -2,7 +2,7 @@
     position: relative;
     width: 100%;
     height: 100%;
-    background-color: #410010;
+    background-color: #453232;
     overflow: hidden;
     display: flex;
     /* align-self: center; */
@@ -13,7 +13,7 @@
 {
   width: 20%;
   height: 15%;
-  background: #4c1d95;
+  background: #332122;
   border-radius: 12px;
   border: 3px solid white;
   justify-content: space-around;
@@ -55,10 +55,23 @@
     height: 50%;
     width: 40%;
     text-align: center;
-    color: #f94f6d;
+    color: #998a8a;
   }
+  
 
-
+  @media only screen and (max-width: 600px) {
+    body {
+      padding:20px 0px;
+      height:100%;
+    }
+    .container {
+      margin: auto auto;
+      padding-block: 30px;
+      flex-direction: column;
+      gap: 10px;
+      max-height: 100%;
+    }
+  }
   
   .game-blur {
     filter: blur(5px); /* Ajustez la quantité de flou selon vos préférences */
@@ -71,4 +84,14 @@
     transform: translate(-50%, -50%);
     font-size: 48px;
     color: white;
-  }
+    animation: gameCountdown 3s linear forwards; /* Animation de 3 secondes */
+}
+
+@keyframes gameCountdown {
+    0% { opacity: 1; } /* Début de l'animation */
+    100% { opacity: 0; } /* Fin de l'animation */
+}
+
+.no-blur-game {
+  filter: none;
+}

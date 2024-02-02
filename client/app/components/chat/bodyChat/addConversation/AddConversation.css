@@ -137,6 +137,7 @@
 	width: 50px;
 	height: auto;
 	margin: 10px;
+	z-index: 1;
 }
 .special-cadenas-image {
 	width: 30px;

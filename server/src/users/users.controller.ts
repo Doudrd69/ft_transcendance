@@ -44,7 +44,7 @@ export class UsersController {
 
 	@UseGuards(AuthGuard)
 	@HttpCode(HttpStatus.OK)
-	@Post('upload-avatar/:userId')
+	@Post('upload-avatar')
 	@UseInterceptors(FileInterceptor('avatar',
 			{
 	
@@ -57,21 +57,25 @@ export class UsersController {
 			},
 		}),
 	}))
-	async uploadAvatar(@UploadedFile() avatar: Express.Multer.File, @Param('userId') userId: number) {
+	async uploadAvatar(@UploadedFile() avatar: Express.Multer.File, @Req() req) {
 		try
 		{
-			
+			const { user } = req;
 			const cheminImageSortie = path.join(__dirname, 'avatars', `carredanslaxe_${avatar.filename}`);
 			const image = await Jimp.read(avatar.path);
 			const taille = Math.min(image.bitmap.width, image.bitmap.height);
 			const xOffset = (image.bitmap.width - taille) / 2;
 			const yOffset = (image.bitmap.height - taille) / 2;
+
 			await image
 				.crop(xOffset, yOffset, taille, taille)
 				.resize(200, 200)
 				.writeAsync(cheminImageSortie);
+
 			const URLAvatar = `/avatars/carredanslaxe_${avatar.filename}`;
-			await this.usersService.uploadAvatarURL(URLAvatar, userId);
+			const status = await this.usersService.uploadAvatarURL(URLAvatar, user.sub);
+			if (!status)
+				throw new HttpException('Upload failed', HttpStatus.BAD_REQUEST);
 			return { URLAvatar };
 		}
 		catch (error){
@@ -206,6 +210,13 @@ export class UsersController {
 	getFriendsList(@Req() req, ): Promise<Friendship[]> {
 		const { user } = req;
 		return this.usersService.getFriendships(user.sub);
+	}
+
+	@UseGuards(AuthGuard)
+	@Get('getUserList')
+	getUserList(@Req() req, ): Promise<Friendship[]> {
+		const { user } = req;
+		return this.usersService.getUserList(user.sub);
 	}
 
 	@UseGuards(AuthGuard)

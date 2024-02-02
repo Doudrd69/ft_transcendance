@@ -45,32 +45,32 @@ const PongComponent = () => {
 
     let countdownInterval: NodeJS.Timeout;
 
-	useEffect(() => {
-		const pongContainer = document.querySelector('.pong-container');
-		
-		if (pongContainer) {
-			const handleResize = () => {
-				setContainerWidth(pongContainer.clientWidth);
-				setContainerHeight(pongContainer.clientHeight);
-				const newGameState = {
-					BallPosition: { x: gameState.BallPosition!.x * containerWidth || containerWidth / 2, y: gameState.BallPosition!.y * containerHeight || containerHeight / 2 },
-					scoreOne: gameState.scoreOne,
-					scoreTwo: gameState.scoreTwo,
-					paddleOne: { x: gameState.paddleOne!.x * containerWidth, y: gameState.paddleOne!.y * containerHeight, width: containerWidth * 0.025, height: containerHeight * 0.17 },
-					paddleTwo: { x: gameState.paddleTwo!.x * containerWidth, y: gameState.paddleTwo!.y * containerHeight, width: containerWidth * 0.025, height: containerHeight * 0.17 },
-				};
-				setGameState(newGameState);
-			};
-			
-			window.addEventListener('resize', handleResize);
-			handleResize();
-			
-			return () => {
-				window.removeEventListener('resize', handleResize);
-			};
-		}
-	}, [blurGame]);
-	
+    useEffect(() => {
+        const pongContainer = document.querySelector('.pong-container');
+
+        if (pongContainer) {
+            const handleResize = () => {
+                setContainerWidth(pongContainer.clientWidth);
+                setContainerHeight(pongContainer.clientHeight);
+                const newGameState = {
+                    BallPosition: { x: gameState.BallPosition!.x * containerWidth || containerWidth / 2, y: gameState.BallPosition!.y * containerHeight || containerHeight / 2 },
+                    scoreOne: gameState.scoreOne,
+                    scoreTwo: gameState.scoreTwo,
+                    paddleOne: { x: gameState.paddleOne!.x * containerWidth, y: gameState.paddleOne!.y * containerHeight, width: containerWidth * 0.025, height: containerHeight * 0.17 },
+                    paddleTwo: { x: gameState.paddleTwo!.x * containerWidth, y: gameState.paddleTwo!.y * containerHeight, width: containerWidth * 0.025, height: containerHeight * 0.17 },
+                };
+                setGameState(newGameState);
+            };
+
+            window.addEventListener('resize', handleResize);
+            handleResize();
+
+            return () => {
+                window.removeEventListener('resize', handleResize);
+            };
+        }
+    }, [blurGame]);
+
 
     const defaultGameState: gameState = {
         BallPosition: { x: 0.5 * containerWidth, y: 0.5 * containerHeight },
@@ -116,8 +116,8 @@ const PongComponent = () => {
                 setCountdown((prevCountdown) => prevCountdown - 1);
             }, 1000);
 
-                clearInterval(countdownInterval);
-                globalState.gameSocket?.on('startGameLoop', () => {
+            clearInterval(countdownInterval);
+            globalState.gameSocket?.on('startGameLoop', () => {
                 setCountdown(0);
                 setBlurGame(false);
                 setGame((prevState) => ({
@@ -154,11 +154,11 @@ const PongComponent = () => {
         globalState.gameSocket?.on('GameUpdate', (gameState: gameState) => {
             // console.log("DISBALE THIS BLUR");
             const newGameState: gameState = {
-                BallPosition: { x: gameState.BallPosition!.x * containerWidth || 0.5 * containerWidth, y: gameState.BallPosition!.y * containerHeight || 0.5 * containerHeight  },
+                BallPosition: { x: gameState.BallPosition!.x * containerWidth || 0.5 * containerWidth, y: gameState.BallPosition!.y * containerHeight || 0.5 * containerHeight },
                 scoreOne: gameState.scoreOne,
                 scoreTwo: gameState.scoreTwo,
-                paddleOne: { x: gameState.paddleOne!.x * containerWidth, y: gameState.paddleOne!.y * containerHeight, width: containerWidth * 0.025, height: containerHeight * 0.17 },
-                paddleTwo: { x: gameState.paddleTwo!.x * containerWidth, y: gameState.paddleTwo!.y * containerHeight, width: containerWidth * 0.025, height: containerHeight * 0.17 },
+                paddleOne: { x: gameState.paddleOne!.x * containerWidth, y: gameState.paddleOne!.y * containerHeight, width: containerWidth * gameState.paddleOne!.width, height: containerHeight * gameState.paddleOne!.height },
+                paddleTwo: { x: gameState.paddleTwo!.x * containerWidth, y: gameState.paddleTwo!.y * containerHeight, width: containerWidth * gameState.paddleTwo!.width, height: containerHeight * gameState.paddleTwo!.height },
             }
             setGameState(newGameState);
         });
@@ -167,30 +167,30 @@ const PongComponent = () => {
 
         const handleKeyDown = (e: KeyboardEvent) => {
             if (keyState.ArrowDown.down !== true && keyState.ArrowUp.down !== true) {
-                    if (e.key === 'ArrowUp') {
-                        keyState.ArrowUp.down = true;
-                        if (Game.pause !== true) {
-                            globalState.gameSocket?.emit('gameInputDown', { input: "ArrowUp", gameID: gameID });
-                        }
-
-                    } else if (e.key === 'ArrowDown') {
-                        keyState.ArrowUp.down = true;
-                        if (Game.pause !== true) {
-                            globalState.gameSocket?.emit('gameInputDown', { input: "ArrowDown", gameID: gameID });
-                        }
+                if (e.key === 'ArrowUp') {
+                    keyState.ArrowUp.down = true;
+                    if (Game.pause !== true) {
+                        globalState.gameSocket?.emit('gameInputDown', { input: "ArrowUp", gameID: gameID });
                     }
+
+                } else if (e.key === 'ArrowDown') {
+                    keyState.ArrowUp.down = true;
+                    if (Game.pause !== true) {
+                        globalState.gameSocket?.emit('gameInputDown', { input: "ArrowDown", gameID: gameID });
+                    }
+                }
             }
         };
 
         globalState.gameSocket?.on('GameGoal', (gameState: gameState) => {
-            // console.log("DISBALE THIS BLUR");
             const newGameState: gameState = {
                 BallPosition: { x: gameState.BallPosition!.x * containerWidth || 0.5 * containerWidth, y: gameState.BallPosition!.y * containerHeight || 0.5 * containerHeight },
                 scoreOne: gameState.scoreOne,
                 scoreTwo: gameState.scoreTwo,
-                paddleOne: { x: gameState.paddleOne!.x * containerWidth, y: gameState.paddleOne!.y * containerHeight, width: containerWidth * 0.025, height: containerHeight * 0.17 },
-                paddleTwo: { x: gameState.paddleTwo!.x * containerWidth, y: gameState.paddleTwo!.y * containerHeight, width: containerWidth * 0.025, height: containerHeight * 0.17 },
+                paddleOne: { x: gameState.paddleOne!.x * containerWidth, y: gameState.paddleOne!.y * containerHeight, width: containerWidth * gameState.paddleOne!.width, height: containerHeight * gameState.paddleOne!.height },
+                paddleTwo: { x: gameState.paddleTwo!.x * containerWidth, y: gameState.paddleTwo!.y * containerHeight, width: containerWidth * gameState.paddleTwo!.width, height: containerHeight * gameState.paddleTwo!.height },
             }
+            console.log("GAME GOOOOOOAAAAL")
             setGameState(newGameState);
             setGame((prevState) => ({
                 ...prevState,
@@ -203,7 +203,7 @@ const PongComponent = () => {
                 }));
             }, 3000);
         });
-        
+
         globalState.gameSocket?.on('GameEnd', (game: Game) => {
             setGame((prevState) => ({
                 ...prevState,
@@ -213,6 +213,7 @@ const PongComponent = () => {
                 type: 'TOGGLE',
                 payload: 'showGameMenu',
             });
+            console.log("GAME END FOR MATTHEO")
             state.showGameMenu = true;
             globalState.gameSocket?.disconnect();
         });
@@ -226,6 +227,7 @@ const PongComponent = () => {
                 ...prevState,
                 pause: true,
             }));
+            console.log("GAME STOP FOR MATTHEO (c'est a dire un joueur a quitte pdt la game")
             state.showGameMenu = true;
             globalState.gameSocket?.disconnect();
         });
@@ -262,23 +264,23 @@ const PongComponent = () => {
 
 
     return (
-        <div className={`pong-container ${blurGame ? 'game-blur' : ''}`} tabIndex={0}>
-            {countdown > 0 && (
-                <div className="countdown-container" style={{ filter: 'none' }}>{countdown}</div>
-            )}
+        <div className={`pong-container`} tabIndex={0}>
             <div className="scoreboard">
-                <div className="col-heading">
+                <div className={`col-heading ${blurGame ? 'game-blur' : ''}`}>
                     <h1>{Game.playerOneLogin}</h1>
-                    <div className="col-display" id={Game.playerOneLogin}>{gameState.scoreOne}</div>
+                    <div className={`col-display ${blurGame ? 'game-blur' : ''}`} id={Game.playerOneLogin}>{gameState.scoreOne}</div>
                 </div>
-                <div className="col-heading">
+                <div className={`col-heading ${blurGame ? 'game-blur' : ''}`}>
                     <h1>{Game.playerTwoLogin}</h1>
-                    <div className="col-display" id={Game.playerTwoLogin}>{gameState.scoreTwo}</div>
+                    <div className={`col-display ${blurGame ? 'game-blur' : ''}`} id={Game.playerTwoLogin}>{gameState.scoreTwo}</div>
                 </div>
             </div>
             <div className="ball" style={{ left: `${gameState!.BallPosition!.x - 0.5 * 0.04 * containerWidth}px`, top: `${gameState!.BallPosition!.y - 0.5 * 0.04 * containerHeight}px`, width: 0.04 * containerWidth, height: 0.04 * containerHeight }}></div>
             <div className="pongpaddle" style={{ top: `${gameState!.paddleOne!.y}px`, left: `${gameState!.paddleOne!.x}px`, width: `${gameState!.paddleOne!.width}px`, height: `${gameState!.paddleOne!.height}px` }}></div>
             <div className="pongpaddle" style={{ left: `${gameState!.paddleTwo!.x}px`, top: `${gameState!.paddleTwo!.y}px`, width: `${gameState!.paddleTwo!.width}px`, height: `${gameState!.paddleTwo!.height}px` }}></div>
+            {countdown > 0 && (
+                <div className={`countdown-container ${blurGame ? '' : 'no-blur-game'}`}>{"START"}</div>
+            )}
         </div>
     );
 };
