@@ -311,6 +311,7 @@ export class UsersService {
 	}
 	
 	async getUsersStats(userId: number) {
+
 		const user : User = await this.usersRepository.findOne({ where: { id: userId } });
 
 		if (user) {
@@ -323,7 +324,7 @@ export class UsersService {
 			return object;
 		}
 
-		throw new Error('Fatal error');
+		throw new HttpException('User not found', HttpStatus.BAD_REQUEST);
 	}
 
 	/**************************************************************/
