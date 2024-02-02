@@ -380,8 +380,8 @@ export class ChatService {
 			}
 			return [];
 		}
-		console.error("Fatal error1: user not found");
-		return [];
+
+		throw new HttpException('User not found', HttpStatus.NOT_FOUND);
 	}
 
 

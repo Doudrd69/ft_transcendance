@@ -6,7 +6,7 @@ import { UsersService } from 'src/users/users.service';
 import { Conversation } from 'src/chat/entities/conversation.entity';
 import { MessageDto } from 'src/chat/dto/message.dto';
 import { GatewayGuard } from './Gatewayguard.guard';
-import { UseGuards } from '@nestjs/common'
+import { HttpException, HttpStatus, UseGuards } from '@nestjs/common'
 import { Req } from '@nestjs/common'
 import dotenv from 'dotenv';
 
@@ -33,25 +33,30 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	private connectedUsers: { [userId: string]: Socket } = {};
 
 	private  async userRejoinsRooms(client: Socket, userID: number) {
-		const conversations = await this.chatService.getAllConversations(userID);
-		if (conversations) {
-			let ids = <number[]>[];
-			conversations.forEach(function (value) {
-				ids.push(value.id);
-			});
-	
-			const conv = await this.chatService.getConversationArrayByID(ids);
-			conv.forEach(function (value) {
-				client.join(value.name + value.id);
-			})
 
-			console.log("user", userID)
-			const blockedUsers = await this.userService.getBlockedUserList(userID);
-			if (blockedUsers) {
-				blockedUsers.forEach((blockedUser: string) => {
-					client.join(`whoblocked${blockedUser}`)
+		try {
+			const conversations = await this.chatService.getAllConversations(userID);
+			if (conversations) {
+				let ids = <number[]>[];
+				conversations.forEach(function (value) {
+					ids.push(value.id);
+				});
+		
+				const conv = await this.chatService.getConversationArrayByID(ids);
+				conv.forEach(function (value) {
+					client.join(value.name + value.id);
 				})
+	
+				console.log("user", userID)
+				const blockedUsers = await this.userService.getBlockedUserList(userID);
+				if (blockedUsers) {
+					blockedUsers.forEach((blockedUser: string) => {
+						client.join(`whoblocked${blockedUser}`)
+					})
+				}
 			}
+		} catch (error) {
+			throw error;
 		}
 	}
 
@@ -93,29 +98,42 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		return ;
 	}
 
+	@UseGuards(GatewayGuard)
 	handleConnection(client: Socket) {
 
-		console.log(`---> GeneralGtw client connected    : ${client.id}`);
-		// client got the auth.token payload, we will know if connection is good
-		this.connectedUsers[client.id] = client;
+		try {
+			
+			console.log(`---> GeneralGtw client connected    : ${client.id}`);
+			// client got the auth.token payload, we will know if connection is good
+			this.connectedUsers[client.id] = client;
+	
+			// On connection, client only has 
+			if (client.handshake.auth.token) {
+				console.log("===========================> User has token");
+				console.log("User data: ", client.handshake.auth.user);
+	
+				client.on('joinPersonnalRoom', (personnalRoom: string, userID: number) => {
+					client.join(personnalRoom);
+					console.log("Client ", client.id, " has joined ", personnalRoom, " room");
+					this.userRejoinsRooms(client, userID);
+					this.userService.updateUserStatus(userID, true);
+					this.notifyFriendList(userID, personnalRoom, 'newConnection', 'online');
 		
-		client.on('joinPersonnalRoom', (personnalRoom: string, userID: number) => {
-			client.join(personnalRoom);
-			console.log("Client ", client.id, " has joined ", personnalRoom, " room");
-			this.userRejoinsRooms(client, userID);
-			this.userService.updateUserStatus(userID, true);
-			this.notifyFriendList(userID, personnalRoom, 'newConnection', 'online');
-
-			client.on('disconnect', () => {
-				console.log("===> Disconnecting user ", personnalRoom, " with ID ", userID);
-				this.notifyFriendList(userID, personnalRoom , 'newDeconnection', 'offline');
-				client.leave(personnalRoom);
-				console.log("Client ", client.id, " has left ", personnalRoom, " room");
-				this.userLeavesRooms(client, userID);
-				this.userService.updateUserStatus(userID, false);
-			})
-
-		});
+					client.on('disconnect', () => {
+						console.log("===> Disconnecting user ", personnalRoom, " with ID ", userID);
+						this.notifyFriendList(userID, personnalRoom , 'newDeconnection', 'offline');
+						client.leave(personnalRoom);
+						console.log("Client ", client.id, " has left ", personnalRoom, " room");
+						this.userLeavesRooms(client, userID);
+						this.userService.updateUserStatus(userID, false);
+					})
+		
+				});
+			}
+		} catch (error) {
+			console.log("Gateway error: ", error);
+		}
+		// throw new HttpException('User not found', HttpStatus.BAD_REQUEST);
 	}
 	
 	handleDisconnect(client: Socket) {

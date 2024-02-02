@@ -18,6 +18,7 @@ export class  GatewayGuard implements CanActivate {
 
 		try {
 			const payload = await this.jwtService.verifyAsync(token, { secret: jwtConstants.secret } );
+			console.log("IN GATEWAY GUARD: ", payload);
 			client.handshake.auth = {
 				token: token,
 				user: payload,
