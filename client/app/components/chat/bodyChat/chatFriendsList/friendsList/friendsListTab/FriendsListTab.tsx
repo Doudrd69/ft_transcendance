@@ -7,6 +7,7 @@ import { io, Socket } from 'socket.io-client';
 import { handleWebpackExternalForEdgeRuntime } from 'next/dist/build/webpack/plugins/middleware-plugin';
 import { setGameSocket, useGlobal } from '@/app/GlobalContext';
 import { ToastContainer, toast } from 'react-toastify';
+import { globalAgent } from 'http';
 
 interface User {
 	id: number;
@@ -113,14 +114,15 @@ const FriendsListTabComponent: React.FC<FriendsListTabComponentProps> = ({ user 
 		// !gameInviteCalled && gameSocketConnected === false
 		if (gameSocketConnected === false) {
 			// setGameInviteCalled(true); // Marquer gameInvite comme appelée
-
-			setgameSocketConnected(true);
+			globalState.userSocket?.off('senderNotInGame');
 			setgameInviteValidation(false);
-			// globalState.userSocket?.emit('checkSenderInMatch', {
-			// 	senderUsername: sessionStorage.getItem("currentUserLogin"),
-			// })
-			// globalState.userSocket?.on('senderNotInGame', () => {
-				console.log(`INVITATION`);
+			console.log("GAMEINVITE");
+			globalState.userSocket?.emit('checkSenderInMatch', {
+				senderUsername: sessionStorage.getItem("currentUserLogin"),
+				senderUserId: sessionStorage.getItem("currentUserID"),
+			})
+			globalState.userSocket?.on('senderNotInGame', () => {
+				console.log(`INVITATION: ${globalState.userSocket?.id}`);
 				const gameSocket: Socket = io('http://localhost:3001/game', {
 					autoConnect: false,
 					auth: {
@@ -129,7 +131,10 @@ const FriendsListTabComponent: React.FC<FriendsListTabComponentProps> = ({ user 
 				});
 				gameSocket.connect();
 				gameSocket.on('connect', () => {
+					setgameSocketConnected(true);
 					dispatch({ type: 'SET_GAME_SOCKET', payload: gameSocket });
+					// emit le fait que je rentre en matchmaking, si l'autre refuse je fait un emethode pour le quitter avant de disconnect la socket
+					gameSocket.emit('throwGameInvite')
 					globalState.userSocket?.emit('inviteToGame', {
 						usernameToInvite: user.username,
 						userIdToInvite: user.id,
@@ -138,14 +143,11 @@ const FriendsListTabComponent: React.FC<FriendsListTabComponentProps> = ({ user 
 						senderUserID: sessionStorage.getItem("currentUserID"),
 					});
 				})
-			// })
+			})
 		}
 	};
-
-	// si un joueur invite un mec deja en game? verif dans invite game peut etre?
-
-
-	// le souci, peu pas rappeler un gameInvite meme si la socket est supprime
+	// stock une fois a chaque fois, recoi
+	// si je suis inMatchmaking tt va bien, par contre si j'invite mais que en meme temps je lance un matchmaking? le matchmaking check si je suis ingame 
 
 	useEffect(() => {
 		console.log("UseEffect gameSocketConnected :", gameSocketConnected)
@@ -163,19 +165,28 @@ const FriendsListTabComponent: React.FC<FriendsListTabComponentProps> = ({ user 
 			globalState.userSocket?.on('deniedInvitation', () => {
 				console.log("DENIED :", globalState.gameSocket?.id)
 				setgameSocketConnected(false);
+				globalState.gameSocket?.emit('gameInviteRejected')
+				// enlever le userGameSockets
 				globalState.gameSocket?.disconnect();
 
 			});
 			globalState.userSocket?.on('userToInviteAlreadyInGame', () => {
 				setgameSocketConnected(false);
+				// enlever le userGameSockets
+				globalState.gameSocket?.emit('gameInviteRejected')
 				globalState.gameSocket?.disconnect();
 
 			});
+			globalState.userSocket?.on('senderInGame', () => {
+				setgameSocketConnected(false);
+			})
 			globalState.userSocket?.on('closedInvitation', () => {
 				console.log("CLOSED :", globalState.gameSocket?.id)
 				if (gameInviteValidation == false) {
+					// enlever le userGameSockets
 					console.log("CLOSED DENY :", globalState.gameSocket?.id)
 					setgameSocketConnected(false);
+					globalState.gameSocket?.emit('gameInviteRejected')
 					globalState.gameSocket?.disconnect();
 				}
 				setgameSocketConnected(false);

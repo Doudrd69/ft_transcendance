@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { APP_FILTER } from '@nestjs/core';
 import { join } from 'path';
 import dotenv from 'dotenv';
 import { User } from './users/entities/users.entity'
@@ -15,6 +16,7 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { GameModule } from './game/game.module';
 import { GatewayModule } from './gateway/gateway.module';
 import { GameGatewayModule } from './game_gateway/gameGateway.module';
+import {ErrorFilter} from "./app-exception.filter";
 
 //We set the synchronize option to true, which means that TypeORM will automatically
 //generate database tables based on the entities. However, this option should be used
@@ -67,6 +69,6 @@ imports: [
 ],
 
 	controllers: [AppController],
-	providers: [AppService],
+	providers: [AppService, {provide: APP_FILTER, useClass: ErrorFilter}],
 })
 export class AppModule {}

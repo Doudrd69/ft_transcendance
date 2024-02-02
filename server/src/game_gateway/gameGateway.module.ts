@@ -1,11 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { UsersService } from 'src/users/users.service';
-import { UsersController } from 'src/users/users.controller';
 import { User } from 'src/users/entities/users.entity';
 import { Friendship } from 'src/users/entities/friendship.entity';
-import { ChatService } from 'src/chat/chat.service';
-import { Conversation } from 'src/chat/entities/conversation.entity';
 import { GameService } from 'src/game/game.service';
 import { GameController } from 'src/game/game.controller';
 import { MatchmakingService } from 'src/game/matchmaking/matchmaking.service';
@@ -18,6 +14,8 @@ import { BallService } from 'src/game/gameObject/ball.service';
 import { VectorService } from 'src/game/gameObject/vector.service';
 import { Vector } from 'src/game/entities/vector.entity';
 import { GameGateway } from './game.gateway';
+import {APP_FILTER} from "@nestjs/core";
+import {AllExceptionsFilter} from "./game-exception.filter";
 
 
 @Module({
@@ -31,13 +29,14 @@ import { GameGateway } from './game.gateway';
 	  ],
 	  controllers: [GameController],
 	  providers: [
-		GameGateway,
-		GameService,
-		MatchmakingService,
-		GameEngineService,
-		PaddleService,
-		BallService,
-		VectorService,
+		  {provide: APP_FILTER, useClass: AllExceptionsFilter},
+		  GameGateway,
+		  GameService,
+		  MatchmakingService,
+		  GameEngineService,
+		  PaddleService,
+		  BallService,
+		  VectorService,
 	  ],
 	  exports: [GameService],
 	})

@@ -83,15 +83,16 @@ export class GameService {
 
 	) {
 
-	this.userGameSockets = {};
-	this.disconnections = {};
-	// this.game_instance = [];
+		this.userGameSockets = {};
+		this.disconnections = {};
+		// this.game_instance = [];
 	}
 
 	userGameSockets: { [userId: number]: string };
-	disconnections: {[gameID: number]: string[]} ;
+	disconnections: { [gameID: number]: string[] };
 
 	async disconnectSocket(socketId: string, gameID: number) {
+		console.log("DISCONNECTSOCKET");
 		const userId = this.getUserIdWithSocketId(socketId);
 		const user: User = await this.usersRepository.findOne({ where: { id: userId } });
 		if (!user)
@@ -113,8 +114,7 @@ export class GameService {
 		this.disconnections[gameId] = []
 	}
 
-	async getLoginByUserId(userId: number)
-	{
+	async getLoginByUserId(userId: number) {
 		const user: User = await this.usersRepository.findOne({ where: { id: userId } });
 		if (!user)
 			throw new Error("getLoginByUserID not found")
@@ -124,71 +124,71 @@ export class GameService {
 	// async gameInvite(server: any, client: any, gameInfoDto: GameInfoDto ) {
 	// 		const playerTwoLogin = await this.getLoginByUserId(gameInfoDto.userTwoId)
 	// 		const playerOneLogin = await this.getLoginByUserId(gameInfoDto.userOneId)
-    //         server.to([gameInfoDto.playerTwoId]).emit('acceptInvitation');
-    //         if (!this.userHasAlreadyGameSockets(gameInfoDto.userOneId)) {
-    //             if (!this.userHasAlreadyGameSockets(gameInfoDto.userTwoId)) {
+	//         server.to([gameInfoDto.playerTwoId]).emit('acceptInvitation');
+	//         if (!this.userHasAlreadyGameSockets(gameInfoDto.userOneId)) {
+	//             if (!this.userHasAlreadyGameSockets(gameInfoDto.userTwoId)) {
 	// 				this.addGameInviteSocket(client.id, gameInfoDto.userOneId, gameInfoDto.playerTwoId, gameInfoDto.userTwoId);
-    //                 await this.linkSocketIDWithUser(client.id, gameInfoDto.userOneId);
-    //                 await this.linkSocketIDWithUser(gameInfoDto.playerTwoId, gameInfoDto.userTwoId);
-    //                 // creating a personnal room so we can emit to the user
-    //                 client.join(playerOneLogin);
-    //                 client.join(playerTwoLogin);
-    //                 let game = await this.createGame(client.id, gameInfoDto.playerTwoId, "NORMAL");
-    //                 if (!game)
+	//                 await this.linkSocketIDWithUser(client.id, gameInfoDto.userOneId);
+	//                 await this.linkSocketIDWithUser(gameInfoDto.playerTwoId, gameInfoDto.userTwoId);
+	//                 // creating a personnal room so we can emit to the user
+	//                 client.join(playerOneLogin);
+	//                 client.join(playerTwoLogin);
+	//                 let game = await this.createGame(client.id, gameInfoDto.playerTwoId, "NORMAL");
+	//                 if (!game)
 	// 				throw new Error("Fatal error");
 	// 			const gameInstance: game_instance = this.GameEngineService.createGameInstance(game);
 	// 			this.game_instance.push(gameInstance);
 	// 			server.to([client.id, gameInfoDto.playerTwoId]).emit('setGameInvited');
 	// 			server.to([client.id, gameInfoDto.playerTwoId]).emit('joinGame', {
-    //                     gameId: game.gameId,
-    //                     playerOneID: game.playerOneID,
-    //                     playerTwoID: game.playerTwoID,
-    //                     playerOneLogin: game.playerOneLogin,
-    //                     playerTwoLogin: game.playerTwoLogin,
-    //                     scoreOne: game.scoreOne,
-    //                     scoreTwo: game.scoreTwo,
-    //                 });
-    //                 setTimeout(() => {
+	//                     gameId: game.gameId,
+	//                     playerOneID: game.playerOneID,
+	//                     playerTwoID: game.playerTwoID,
+	//                     playerOneLogin: game.playerOneLogin,
+	//                     playerTwoLogin: game.playerTwoLogin,
+	//                     scoreOne: game.scoreOne,
+	//                     scoreTwo: game.scoreTwo,
+	//                 });
+	//                 setTimeout(() => {
 	// 					console.log("OUINOUIN");
-    //                     server.to([client.id, gameInfoDto.playerTwoId]).emit('gameStart', {
-    //                         gameId: game.gameId,
-    //                         playerOneID: game.playerOneID,
-    //                         playerTwoID: game.playerTwoID,
-    //                         playerOneLogin: game.playerOneLogin,
-    //                         playerTwoLogin: game.playerTwoLogin,
-    //                         scoreOne: game.scoreOne,
-    //                         scoreTwo: game.scoreTwo,
-    //                     });
-    //                 }, 1000);
-    //             }
-    //             else {
-    //                 console.log(`User have already socket : ${playerTwoLogin}`)
-    //                 server.to([client.id, gameInfoDto.playerTwoId]).emit('gameInProgress');
-    //             }
-    //         }
-    //         else {
-    //             console.log(`User have already socket : ${playerOneLogin}`)
-    //             server.to([client.id, gameInfoDto.playerTwoId]).emit('gameInProgress');
-    //         }
+	//                     server.to([client.id, gameInfoDto.playerTwoId]).emit('gameStart', {
+	//                         gameId: game.gameId,
+	//                         playerOneID: game.playerOneID,
+	//                         playerTwoID: game.playerTwoID,
+	//                         playerOneLogin: game.playerOneLogin,
+	//                         playerTwoLogin: game.playerTwoLogin,
+	//                         scoreOne: game.scoreOne,
+	//                         scoreTwo: game.scoreTwo,
+	//                     });
+	//                 }, 1000);
+	//             }
+	//             else {
+	//                 console.log(`User have already socket : ${playerTwoLogin}`)
+	//                 server.to([client.id, gameInfoDto.playerTwoId]).emit('gameInProgress');
+	//             }
+	//         }
+	//         else {
+	//             console.log(`User have already socket : ${playerOneLogin}`)
+	//             server.to([client.id, gameInfoDto.playerTwoId]).emit('gameInProgress');
+	//         }
 	// }
-	
+
 	async createGame(player1ID: string, player2ID: string, gameMode: string): Promise<Game> {
 		const playersLogin: [string, string] = await this.getLoginByIDpairStartGame(player1ID, player2ID);
 		const usersId: [number, number] = await this.getUserIdByIDpairStartGame(player1ID, player2ID);
-			const game = new Game();
-			game.playerOneID = player1ID;
-			game.playerTwoID = player2ID;
-			game.playerOneLogin = playersLogin[0];
-			game.playerTwoLogin = playersLogin[1];
-			game.scoreOne = 0;
-			game.scoreTwo = 0;
-			game.gameEnd = false;
-			game.userOneId = usersId[0];
-			game.userTwoId = usersId[1];
-			if (gameMode === "SPEED")
-				game.gameMode = "SPEED";
-			await this.gameRepository.save(game);
-			return (game);
+		const game = new Game();
+		game.playerOneID = player1ID;
+		game.playerTwoID = player2ID;
+		game.playerOneLogin = playersLogin[0];
+		game.playerTwoLogin = playersLogin[1];
+		game.scoreOne = 0;
+		game.scoreTwo = 0;
+		game.gameEnd = false;
+		game.userOneId = usersId[0];
+		game.userTwoId = usersId[1];
+		if (gameMode === "SPEED")
+			game.gameMode = "SPEED";
+		await this.gameRepository.save(game);
+		return (game);
 	}
 
 	async getUserIdByIDpairStartGame(player1ID: string, player2ID: string) {
@@ -216,7 +216,7 @@ export class GameService {
 	getUserIdWithSocketId(socketId: string): number {
 		console.log(`userGameSocket : ${this.userGameSockets[1]}, userId: ${1}`);
 		for (const [userIdValue, socketIdValue] of Object.entries(this.userGameSockets)) {
-			console.log("USERID VALUE: ", Number(userIdValue), "socket :", socketIdValue, "||||", this.userGameSockets[1] );
+			console.log("USERID VALUE: ", Number(userIdValue), "socket :", socketIdValue, "||||", this.userGameSockets[1]);
 			if (socketIdValue === socketId) {
 				return Number(userIdValue);
 			}
@@ -230,6 +230,7 @@ export class GameService {
 	}
 
 	async userInGameOrInMacthmaking(user: User) {
+		console.log(`user ingame : ${user.inGame}, user inmatchmaking: ${user.inMatchmaking}`);
 		if (user.inGame === true || user.inMatchmaking === true)
 			return true;
 		return false;
@@ -241,7 +242,7 @@ export class GameService {
 		if (!Player)
 			throw new Error()
 		Player.gameSocketId = playerID;
-		
+
 		// console.log(`playerID link : ${playerID}, ${Player.gameSocketId}`)
 		await this.usersRepository.save(Player);
 		const otherPlayer: User = await this.usersRepository.findOne({ where: { gameSocketId: playerID } })
@@ -352,6 +353,13 @@ export class GameService {
 		this.userGameSockets[userId] = gameSocketId;
 	}
 
+	async setUserInMatchmaking(userId: number)
+	{
+		let user: User = await this.getUserWithUserId(userId);
+		user.inMatchmaking = true;
+		await this.usersRepository.save(user);
+	}
+
 	addGameInviteSocket(gameSocketIdOne: string, userOneId: number, gameSocketIdTwo: string, userTwoId: number) {
 		this.userGameSockets[userOneId] = gameSocketIdOne;
 		this.userGameSockets[userTwoId] = gameSocketIdTwo;
@@ -372,7 +380,7 @@ export class GameService {
 	}
 
 	async getGameWithUserId(userId: number): Promise<Game> {
-        console.log(`[${this.userGameSockets[userId]}] userId de ses morts gameWithUserLogin: ${userId}`);
+		console.log(`[${this.userGameSockets[userId]}] userId de ses morts gameWithUserLogin: ${userId}`);
 		const gameOne = await this.gameRepository.findOne({ where: { playerOneID: this.userGameSockets[userId] } })
 		if (gameOne) {
 			return gameOne;
@@ -388,7 +396,7 @@ export class GameService {
 			otherUser = await this.usersRepository.findOne({ where: { id: user.id } })
 		}
 		else if (user.id === game.userTwoId) {
-			otherUser = await this.usersRepository.findOne({ where: { id: user.id} })
+			otherUser = await this.usersRepository.findOne({ where: { id: user.id } })
 		}
 		return otherUser
 	}
@@ -413,5 +421,47 @@ export class GameService {
 	async updateStateGameForUser(user: User) {
 		user.inGame = false;
 		await this.usersRepository.save(user);
+	}
+
+	async createGameStop(user1: User, user2: User, gameInstance: game_instance, disconnectedSockets: string[]) {
+		console.log("==== STOP GAME ====");
+		let game = new Game;
+		game.playerOneID = gameInstance.players[0];
+		game.playerTwoID = gameInstance.players[1];
+		game.playerOneLogin = gameInstance.playersLogin[0];
+		game.playerTwoLogin = gameInstance.playersLogin[1];
+		game.scoreOne = 5;
+		game.scoreTwo = 5;
+		game.gameEnd = false;
+		game.userOneId = gameInstance.usersId[0];
+		game.userTwoId = gameInstance.usersId[1];
+		const UserOne: User = await this.usersRepository.findOne({ where: { gameSocketId: gameInstance.players[0] } })
+		const UserTwo: User = await this.usersRepository.findOne({ where: { gameSocketId: gameInstance.players[1] } })
+		UserOne.inGame = false;
+		UserTwo.inGame = false;
+		if (disconnectedSockets.includes(gameInstance.players[0])) {
+			console.log(`PlayerOne QUIT`)
+			game.scoreOne = 0;
+		}
+		if (disconnectedSockets.includes(gameInstance.players[1])) {
+			console.log(`PlayerTwo QUIT`)
+			game.scoreTwo = 0;
+		}
+		if (game.scoreOne > game.scoreTwo) {
+			UserOne.victory += 1;
+			UserTwo.defeat += 1;
+		}
+		else {
+			UserOne.defeat += 1;
+			UserTwo.victory += 1;
+		}
+		await this.usersRepository.save(UserOne);
+		await this.usersRepository.save(UserTwo);
+
+		console.log("After U1: ", UserOne.victory, UserOne.defeat);
+		console.log("After U2: ", UserTwo.victory, UserTwo.defeat);
+
+		game.gameEnd = true;
+		await this.gameRepository.save(game);
 	}
 }
