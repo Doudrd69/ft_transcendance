@@ -96,22 +96,19 @@ export class UsersService {
 	/**************************************************************/
 
 	async uploadAvatarURL(avatarURL: string, userID: number): Promise<UpdateResult | undefined> {
-		try {
 
-			const user = await this.getUserByID(userID);
+		const user = this.usersRepository.findOne({ where: { id: userID } });
+		if (user) {
+
 			const oldAvatarPath = join(__dirname, user.avatarURL);
-			console.log(oldAvatarPath)
-			if (existsSync(oldAvatarPath)) {
+			if (existsSync(oldAvatarPath))
 				unlinkSync(oldAvatarPath);
-			}
-			if (!user) {
-				throw new HttpException(`User not found`, HttpStatus.BAD_REQUEST);
-			}
+
 			const updateResult = await this.usersRepository.update({ id: userID }, { avatarURL });
 			return updateResult;
-		} catch (error) {
-			throw error;
 		}
+
+		throw new HttpException('User not found', HttpStatus.BAD_REQUEST);
 	}
 
 	async isPNG(filePath: string): Promise<boolean> {
