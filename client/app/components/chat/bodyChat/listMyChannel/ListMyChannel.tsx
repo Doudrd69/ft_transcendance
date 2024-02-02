@@ -70,7 +70,7 @@ const ListMyChannelComponent: React.FC<ListMyChannelComponentProps> = ({ user, f
 	};
 	const loadDiscussionsPublic = async () => {
 		try {
-			const response = await fetch(`${process.env.API_URL}/chat/getConversationsPublic/${userID}`, {
+			const response = await fetch(`${process.env.API_URL}/chat/getConversationsPublic`, {
 				method: 'GET',
 				headers: {
 					'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,

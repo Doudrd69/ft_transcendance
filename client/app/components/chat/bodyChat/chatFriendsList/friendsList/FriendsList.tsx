@@ -42,7 +42,7 @@ const FriendsListComponent: React.FC = () => {
 	
 	const loadFriendList = async () => {
 		try {
-			const response = await fetch(`${process.env.API_URL}/users/getFriends/${username}`, {
+			const response = await fetch(`${process.env.API_URL}/users/getFriends`, {
 				method: 'GET',
 				headers: {
 					'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,

@@ -114,6 +114,7 @@ const GeneralComponent = () => {
 		if (response.ok) {
 			const conversationData = await response.json();
 			if (globalState.userSocket?.connected) {
+				console.log("Accepted friendrequest");
 				globalState.userSocket?.emit('friendRequestAccepted', { roomName: conversationData.name, roomID: conversationData.id, initiator: friendRequestDto.initiatorLogin, recipient: friendRequestDto.recipientLogin });
 				globalState.userSocket?.emit('joinRoom', { roomName: conversationData.name, roomID: conversationData.id });
 			}

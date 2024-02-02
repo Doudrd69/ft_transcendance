@@ -1019,6 +1019,7 @@ export class ChatService {
 		const conversationCheck = await this.userService.findDMConversation(initiator, friend);
 		// If not, we can create the DM conversation
 		if (!conversationCheck) {
+
 			const room = new Conversation();
 			room.name = initiator.username + friend.username;
 			room.is_channel = false;
@@ -1163,7 +1164,7 @@ export class ChatService {
 	
 			const isMuteStatus = await this.getGroupIsMuteStatus(sender, conversation);
 			if (isMuteStatus)
-				throw new HttpException(`user is mutes`, HttpStatus.BAD_REQUEST);
+				throw new HttpException(`user is muted`, HttpStatus.BAD_REQUEST);
 	
 			const isBanStatus = await this.getGroupIsBanStatus(sender, conversation);
 			if (isBanStatus)
