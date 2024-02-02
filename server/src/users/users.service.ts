@@ -207,6 +207,8 @@ export class UsersService {
 			user.isActive = flag;
 			return await this.usersRepository.save(user);
 		}
+
+		throw new HttpException('User not found', HttpStatus.NOT_FOUND);
 	}
 
 	async createNew42User(userData): Promise<User> {

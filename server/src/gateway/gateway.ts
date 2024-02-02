@@ -47,7 +47,6 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 					client.join(value.name + value.id);
 				})
 	
-				console.log("user", userID)
 				const blockedUsers = await this.userService.getBlockedUserList(userID);
 				if (blockedUsers) {
 					blockedUsers.forEach((blockedUser: string) => {
@@ -61,79 +60,81 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	}
 
 	private async userLeavesRooms(client: Socket, userID: number) {
-		const conversations = await this.chatService.getAllConversations(userID);
-		if (conversations) {
-			let ids = <number[]>[];
-			conversations.forEach(function (value) {
-				ids.push(value.id);
-			});
 
-			const conv = await this.chatService.getConversationArrayByID(ids);
-			conv.forEach(function (value) {
-				client.leave(value.name);
-			})
-
-			const blockedUsers = await this.userService.getBlockedUserList(userID);
-			if (blockedUsers) {
-				blockedUsers.forEach((blockedUser: string) => {
-					client.leave(`whoblocked${blockedUser}`)
+		try {
+			const conversations = await this.chatService.getAllConversations(userID);
+			if (conversations) {
+				let ids = <number[]>[];
+				conversations.forEach(function (value) {
+					ids.push(value.id);
+				});
+	
+				const conv = await this.chatService.getConversationArrayByID(ids);
+				conv.forEach(function (value) {
+					client.leave(value.name);
 				})
+	
+				const blockedUsers = await this.userService.getBlockedUserList(userID);
+				if (blockedUsers) {
+					blockedUsers.forEach((blockedUser: string) => {
+						client.leave(`whoblocked${blockedUser}`)
+					})
+				}
 			}
+		} catch (error) {
+			throw error;
 		}
 	}
 
 	private async notifyFriendList(userID: number, personnalRoom: string, event: string, status: string) {
 
 		const user = await this.userService.getUserByID(userID);
+		console.log(user);
 		if (user) {
+
 			const friends = await this.userService.getFriendships(userID);
 			if (friends) {
+
 				friends.forEach((friend: any) => {
 					console.log("Notifying ", friend.username, " on event ", event);
 					this.server.except(personnalRoom).to(friend.username).emit(event, `${personnalRoom} is ${status}`);
 				});
+
+				return ;
 			}
 		}
 
-		return ;
+		throw new HttpException('User not found', HttpStatus.NOT_FOUND);
 	}
 
-	@UseGuards(GatewayGuard)
 	handleConnection(client: Socket) {
 
 		try {
 			
 			console.log(`---> GeneralGtw client connected    : ${client.id}`);
-			// client got the auth.token payload, we will know if connection is good
 			this.connectedUsers[client.id] = client;
 	
-			// On connection, client only has 
-			if (client.handshake.auth.token) {
-				console.log("===========================> User has token");
-				console.log("User data: ", client.handshake.auth.user);
-	
-				client.on('joinPersonnalRoom', (personnalRoom: string, userID: number) => {
-					client.join(personnalRoom);
-					console.log("Client ", client.id, " has joined ", personnalRoom, " room");
-					this.userRejoinsRooms(client, userID);
-					this.userService.updateUserStatus(userID, true);
-					this.notifyFriendList(userID, personnalRoom, 'newConnection', 'online');
+			client.on('joinPersonnalRoom', (personnalRoom: string, userID: number) => {
+
+				client.join(personnalRoom);
+				console.log("Client ", client.id, " has joined ", personnalRoom, " room");
+				this.userRejoinsRooms(client, userID);
+				this.userService.updateUserStatus(userID, true);
+				this.notifyFriendList(userID, personnalRoom, 'newConnection', 'online');
 		
-					client.on('disconnect', () => {
-						console.log("===> Disconnecting user ", personnalRoom, " with ID ", userID);
-						this.notifyFriendList(userID, personnalRoom , 'newDeconnection', 'offline');
-						client.leave(personnalRoom);
-						console.log("Client ", client.id, " has left ", personnalRoom, " room");
-						this.userLeavesRooms(client, userID);
-						this.userService.updateUserStatus(userID, false);
-					})
+				client.on('disconnect', () => {
+					console.log("===> Disconnecting user ", personnalRoom, " with ID ", userID);
+					this.notifyFriendList(userID, personnalRoom , 'newDeconnection', 'offline');
+					client.leave(personnalRoom);
+					console.log("Client ", client.id, " has left ", personnalRoom, " room");
+					this.userLeavesRooms(client, userID);
+					this.userService.updateUserStatus(userID, false);
+				})
 		
-				});
-			}
+			});
 		} catch (error) {
-			console.log("Gateway error: ", error);
+			console.log(' == Gatewway: ', error);
 		}
-		// throw new HttpException('User not found', HttpStatus.BAD_REQUEST);
 	}
 	
 	handleDisconnect(client: Socket) {
@@ -196,31 +197,40 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	@SubscribeMessage('checkSenderInMatch')
 	@UseGuards(GatewayGuard)
 	async checkIfSendInMatch(@MessageBody() data: { senderUsername: string, senderUserId: number } ) {
-		if (await this.userService.userToInviteGameIsAlreadyInGame(data.senderUserId))
-		{
-			console.log(`sender already inGame`);
-			this.server.to(data.senderUsername).emit('senderInGame');
-			return;
+
+		try {
+			if (await this.userService.userToInviteGameIsAlreadyInGame(data.senderUserId)) {
+				console.log(`sender already inGame`);
+				this.server.to(data.senderUsername).emit('senderInGame');
+				return;
+			}
+			this.server.to(data.senderUsername).emit('senderNotInGame');
+		} catch (error) {
+			throw error;
 		}
-		this.server.to(data.senderUsername).emit('senderNotInGame');
 	}
 
 	@SubscribeMessage('inviteToGame')
 	@UseGuards(GatewayGuard)
 	async inviteUserToGame(@ConnectedSocket() client: Socket, @MessageBody() data: { usernameToInvite: string, userIdToInvite: number, senderID: string, senderUsername: string, senderUserID: number } ) {
-		const { usernameToInvite, userIdToInvite, senderID, senderUsername, senderUserID } = data;
-		if (await this.userService.userToInviteGameIsAlreadyInGame(userIdToInvite))
-		{
-			this.server.to(senderUsername).emit('userToInviteAlreadyInGame');
-			return;
+		
+		try {
+			const { usernameToInvite, userIdToInvite, senderID, senderUsername, senderUserID } = data;
+			if (await this.userService.userToInviteGameIsAlreadyInGame(userIdToInvite))
+			{
+				this.server.to(senderUsername).emit('userToInviteAlreadyInGame');
+				return;
+			}
+			console.log("Inviting ", usernameToInvite," to game");
+			console.log("-----> ",  usernameToInvite, senderID, senderUsername, "ho :", senderUserID);
+			this.server.to(usernameToInvite).emit('gameInvite', {
+				senderUserID: senderUserID,
+				senderID: senderID,
+				senderUsername: senderUsername,
+			});
+		} catch (error) {
+			throw error;
 		}
-		console.log("Inviting ", usernameToInvite," to game");
-		console.log("-----> ",  usernameToInvite, senderID, senderUsername, "ho :", senderUserID);
-		this.server.to(usernameToInvite).emit('gameInvite', {
-			senderUserID: senderUserID,
-			senderID: senderID,
-			senderUsername: senderUsername,
-		});
 	}
 
 	@SubscribeMessage('inviteClosed')
@@ -357,14 +367,19 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	@SubscribeMessage('emitNotification')
 	@UseGuards(GatewayGuard)
 	async handleNotif(@MessageBody() data: { channel: string, content: string, channelID: string} ) {
-		const { channel, content, channelID } = data;
-		const dto = {
-			from: 'Bot',
-			content: content,
-			post_datetime: new Date(),
-			conversationID: channelID,
-		};
-		await this.chatService.saveNotification(dto);
-		this.server.to(channel).emit('recv_notif', dto);
+
+		try {
+			const { channel, content, channelID } = data;
+			const dto = {
+				from: 'Bot',
+				content: content,
+				post_datetime: new Date(),
+				conversationID: channelID,
+			};
+			await this.chatService.saveNotification(dto);
+			this.server.to(channel).emit('recv_notif', dto);
+		} catch (error) {
+			throw error;
+		}
 	}
 }
