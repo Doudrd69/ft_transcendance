@@ -5,12 +5,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="3784fed7-65cb-4989-9a75-0ceeaa722d16" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/server/src/app-exception.filter.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/server/src/game_gateway/game-exception.filter.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/client/Dockerfile" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/app/components/chat/auth/Authentification.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/app/components/chat/auth/Authentification.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/server/Dockerfile" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/app.module.ts" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/app.module.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/chat/chat.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/chat/chat.service.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server/src/game_gateway/game.gateway.ts" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/game_gateway/game.gateway.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/game_gateway/gameGateway.module.ts" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/game_gateway/gameGateway.module.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -35,7 +36,7 @@
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "WebServerToolWindowFactoryState": "false",
     "git-widget-placeholder": "ALLEZ-VA-LE-FAIRE-MR",
-    "last_opened_file_path": "/home/gmonacho/projects/42wiwi/ft_transcendance",
+    "last_opened_file_path": "/home/gmonacho/projects/42wiwi/ft_transcendance/server/src/game_gateway",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
     "settings.editor.selected.configurable": "project.propDebugger",
@@ -50,6 +51,7 @@
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/server/src/game_gateway" />
       <recent name="$PROJECT_DIR$" />
     </key>
   </component>

@@ -1060,7 +1060,6 @@ export class ChatService {
 
 	// need to check muteStatus here or in front?
 	async createMessage(messageDto: MessageDto): Promise<Message> {
-		
 		const conversation : Conversation = await this.conversationRepository.findOne({ where: {id: messageDto.conversationID} });
 		const sender : User = await this.usersRepository.findOne({
 			where: { username: messageDto.from },
