@@ -35,11 +35,13 @@ const Menu = () => {
 
     useEffect(() => {
         globalState.gameSocket?.on('gameNotInProgress', () => {
-            dispatchGame({ type: 'TOGGLE', payload: 'showGameMatchmaking'});
-            globalState.gameSocket?.emit('join-matchmaking',{ playerLogin: sessionStorage.getItem("currentUserLogin"),  gameMode: gameMode, userId: Number(sessionStorage.getItem("currentUserID"))});
+            console.log(`DISPATCH`);
+            dispatchGame({ type: 'TOGGLE', payload: 'showGameMatchmaking' });
+            globalState.gameSocket?.emit('join-matchmaking', { playerLogin: sessionStorage.getItem("currentUserLogin"), gameMode: gameMode, userId: Number(sessionStorage.getItem("currentUserID")) });
         });
 
-        globalState.gameSocket?.on('setgame', () => {
+        globalState.gameSocket?.on('setGameInvited', () => {
+            console.log("SET GAME");
             dispatchGame({
                 type: 'TOGGLE',
                 payload: 'showGame',

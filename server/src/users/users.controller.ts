@@ -1,4 +1,4 @@
-import { Controller, Post, HttpCode, HttpStatus, Body, Get, UploadedFile, UseInterceptors, Param, Res, UseGuards, HttpException } from '@nestjs/common';
+import { Req, Controller, Post, HttpCode, HttpStatus, Body, Get, UploadedFile, UseInterceptors, Param, Res, UseGuards, HttpException } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { FriendRequestDto } from './dto/FriendRequestDto.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -146,63 +146,73 @@ export class UsersController {
 	@UseGuards(AuthGuard)
 	@HttpCode(HttpStatus.OK)
 	@Post('updateUsername')
-	updateUsername(@Body() updateUsernameDto: UpdateUsernameDto) {
-		return this.usersService.updateUsername(updateUsernameDto);
+	updateUsername(@Req() req, @Body() updateUsernameDto: UpdateUsernameDto) {
+		const { user } = req; 
+		return this.usersService.updateUsername(updateUsernameDto, user.sub);
 	}
 
 	@UseGuards(AuthGuard)
 	@HttpCode(HttpStatus.OK)
 	@Post('addfriend')
-	createFriendship(@Body() friendRequestDto: FriendRequestDto): Promise<boolean> {
-		return this.usersService.createFriendship(friendRequestDto);
+	createFriendship(@Req() req, @Body() friendRequestDto: FriendRequestDto): Promise<boolean> {
+		const { user } = req; 
+		return this.usersService.createFriendship(friendRequestDto, user.sub);
 	}
 
-	// guard
+	@UseGuards(AuthGuard)
 	@HttpCode(HttpStatus.OK)
 	@Post('friendRequestResponse')
-	updateFriendship(@Body() friendRequestDto: FriendRequestDto, flag: boolean) {
-		return this.usersService.updateFriendship(friendRequestDto, flag);
+	updateFriendship(@Req() req, @Body() friendRequestDto: FriendRequestDto, flag: boolean) {
+		const { user } = req; 
+		return this.usersService.updateFriendship(friendRequestDto, flag, user.sub);
 	}
 
 	@UseGuards(AuthGuard)
 	@HttpCode(HttpStatus.OK)
 	@Post('acceptFriendRequest')
-	acceptFriendship(@Body() friendRequestDto: FriendRequestDto): Promise<Conversation | Friendship> {
-		return this.usersService.acceptFriendship(friendRequestDto);
+	acceptFriendship(@Req() req, @Body() friendRequestDto: FriendRequestDto): Promise<Conversation | Friendship> {
+		const { user } = req; 
+		return this.usersService.acceptFriendship(friendRequestDto, user.sub);
 	}
 
 	@UseGuards(AuthGuard)
 	@HttpCode(HttpStatus.OK)
 	@Post('removeFriend')
-	removeFriend(@Body() blockUserDto: BlockUserDto): Promise<Conversation | Friendship> {
-		return this.usersService.removeFriend(blockUserDto);
+	removeFriend(@Req() req, @Body() blockUserDto: BlockUserDto): Promise<Conversation | Friendship> {
+		const { user } = req; 
+		return this.usersService.removeFriend(blockUserDto, user.sub);
 	}
 
 	@UseGuards(AuthGuard)
 	@HttpCode(HttpStatus.OK)
 	@Post('blockUser')
-	blockUser(@Body() blockUserDto: BlockUserDto): Promise<boolean> {
-		console.log('blockUserDrto', blockUserDto);
-		return this.usersService.blockUser(blockUserDto);
+	blockUser(@Req() req, @Body() blockUserDto: BlockUserDto): Promise<boolean> {
+		const { user } = req; 
+		return this.usersService.blockUser(blockUserDto, user.sub);
 	}
 
 	@UseGuards(AuthGuard)
 	@HttpCode(HttpStatus.OK)
 	@Post('unblockUser')
-	unblockUser(@Body() blockUserDto: BlockUserDto): Promise<boolean> {
-		return this.usersService.unblockUser(blockUserDto);
+	unblockUser(@Req() req, @Body() blockUserDto: BlockUserDto): Promise<boolean> {
+		const { user } = req;
+		return this.usersService.unblockUser(blockUserDto, user.sub);
+	}
+
+	/********* GETTERS	********/
+
+	@UseGuards(AuthGuard)
+	@Get('getFriends')
+	getFriendsList(@Req() req, ): Promise<Friendship[]> {
+		const { user } = req;
+		return this.usersService.getFriendships(user.sub);
 	}
 
 	@UseGuards(AuthGuard)
-	@Get('getFriends/:username')
-	getFriendsList(@Param('username') username: string): Promise<Friendship[]> {
-		return this.usersService.getFriendships(username);
-	}
-
-	@UseGuards(AuthGuard)
-	@Get('getPendingFriends/:username')
-	getPendingFriendsList(@Param('username') username: string): Promise<Friendship[]> {
-		return this.usersService.getPendingFriendships(username);
+	@Get('getPendingFriends')
+	getPendingFriendsList(@Req() req, ): Promise<Friendship[]> {
+		const { user } = req;
+		return this.usersService.getPendingFriendships(user.sub);
 	}
 
 	@UseGuards(AuthGuard)

@@ -80,7 +80,7 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 
 		const user = await this.userService.getUserByID(userID);
 		if (user) {
-			const friends = await this.userService.getFriendships(user.username);
+			const friends = await this.userService.getFriendships(userID);
 			if (friends) {
 				friends.forEach((friend: any) => {
 					console.log("Notifying ", friend.username);
@@ -177,8 +177,8 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 
 	@SubscribeMessage('checkSenderInMatch')
 	@UseGuards(GatewayGuard)
-	async checkIfSendInMatch(@MessageBody() data: { senderUsername: string } ) {
-		if (await this.userService.userToInviteGameIsAlreadyInGame(data.senderUsername))
+	async checkIfSendInMatch(@MessageBody() data: { senderUsername: string, senderUserId: number } ) {
+		if (await this.userService.userToInviteGameIsAlreadyInGame(data.senderUserId))
 		{
 			return;
 		}
@@ -187,9 +187,9 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 
 	@SubscribeMessage('inviteToGame')
 	@UseGuards(GatewayGuard)
-	async inviteUserToGame( @MessageBody() data: { usernameToInvite: string, senderID: string, senderUsername: string, senderUserID: number } ) {
-		const { usernameToInvite, senderID, senderUsername, senderUserID } = data;
-		if (await this.userService.userToInviteGameIsAlreadyInGame(usernameToInvite))
+	async inviteUserToGame( @MessageBody() data: { usernameToInvite: string, userIdToInvite: number, senderID: string, senderUsername: string, senderUserID: number } ) {
+		const { usernameToInvite, userIdToInvite, senderID, senderUsername, senderUserID } = data;
+		if (await this.userService.userToInviteGameIsAlreadyInGame(userIdToInvite))is.userService.userToInviteGameIsAlreadyInGame(usernameToInvite))
 		{
 			this.server.to(senderUsername).emit('userToInviteAlreadyInGame');
 			return;

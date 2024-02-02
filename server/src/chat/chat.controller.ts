@@ -26,57 +26,65 @@ export class ChatController {
 	@UseGuards(AuthGuard)
 	@HttpCode(HttpStatus.OK)
 	@Post('newConversation')
-	createNewConversation(@Body() conversationDto: ConversationDto): Promise<Conversation> {
-		return this.chatService.createConversation(conversationDto);
+	createNewConversation(@Req() req,  @Body() conversationDto: ConversationDto): Promise<Conversation> {
+		const { user } = req;
+		return this.chatService.createConversation(conversationDto, user.sub);
 	}
 
 	@UseGuards(AuthGuard)
 	@HttpCode(HttpStatus.OK)
 	@Post('newDMConversation')
-	createNewDMConversation(@Body() DMcreationDto: DMcreationDto): Promise<Conversation> {
-		return this.chatService.createPrivateConversation(DMcreationDto);
+	createNewDMConversation(@Req() req, @Body() DMcreationDto: DMcreationDto): Promise<Conversation> {
+		const { user } = req;
+		return this.chatService.createPrivateConversation(DMcreationDto, user.sub);
 	}
 
 	@UseGuards(AuthGuard)
 	@HttpCode(HttpStatus.OK)
 	@Post('newMessage')
-	createNewMessage(@Body() messageDto: MessageDto): Promise<Message> {
-		return this.chatService.createMessage(messageDto);
+	createNewMessage(@Req() req, @Body() messageDto: MessageDto): Promise<Message> {
+		const { user } = req;
+		return this.chatService.createMessage(messageDto, user.sub);
 	}
 
 	@UseGuards(AuthGuard)
 	@HttpCode(HttpStatus.OK)
 	@Post('addUserToConversation')
-	addUserToConversation(@Body() addUserToConversationDto: AddUserToConversationDto): Promise<Conversation> {
-		return this.chatService.addUserToConversation(addUserToConversationDto);
+	addUserToConversation(@Req() req, @Body() addUserToConversationDto: AddUserToConversationDto): Promise<Conversation> {
+		const { user } = req;
+		return this.chatService.addUserToConversation(addUserToConversationDto, user.sub);
 	}
 
 	@UseGuards(AuthGuard)
 	@HttpCode(HttpStatus.OK)
 	@Post('updateConversation')
-	updateConversationStatusAndPassword(@Body() updateConversationDto: UpdateConversationDto): Promise<Conversation> {
-		return this.chatService.updateConversation(updateConversationDto);
+	updateConversationStatusAndPassword(@Req() req, @Body() updateConversationDto: UpdateConversationDto): Promise<Conversation> {
+		const { user } = req;
+		return this.chatService.updateConversation(updateConversationDto, user.sub);
 	}
 
 	@UseGuards(AuthGuard)
 	@HttpCode(HttpStatus.OK)
 	@Post('checkPassword')
-	checkuserInputToPassword(@Body() checkPasswordDto: CheckPasswordDto): Promise<boolean> {
-		return this.chatService.compareChannelPassword(checkPasswordDto);
+	checkuserInputToPassword(@Req() req, @Body() checkPasswordDto: CheckPasswordDto): Promise<boolean> {
+		const { user } = req;
+		return this.chatService.compareChannelPassword(checkPasswordDto, user.sub);
 	}
 
 	@UseGuards(AuthGuard)
 	@HttpCode(HttpStatus.OK)
 	@Post('quitConversation')
-	userQuitsConversation(@Body() quitConversationDto: QuitConversationDto): Promise<boolean> {
-		return this.chatService.quitConversation(quitConversationDto);
+	userQuitsConversation(@Req() req, @Body() quitConversationDto: QuitConversationDto): Promise<boolean> {
+		const { user } = req;
+		return this.chatService.quitConversation(quitConversationDto, user.sub);
 	}
 
 	@UseGuards(AuthGuard)
 	@HttpCode(HttpStatus.OK)
 	@Post('deleteConversation')
-	deleteConversation(@Body() deleteConversationDto: DeleteConversationDto): Promise<boolean> {
-		return this.chatService.deleteConversation(deleteConversationDto);
+	deleteConversation(@Req() req, @Body() deleteConversationDto: DeleteConversationDto): Promise<boolean> {
+		const { user } = req;
+		return this.chatService.deleteConversation(deleteConversationDto, user.sub);
 	}
 
 	/******		USER OPTIONS ON CHANNEL		******/
@@ -145,7 +153,7 @@ export class ChatController {
 	@Post('updateIsPublicTrue')
 	updateChannelIsPublicStatusTrue(@Req() req, @Body() updateIsPublicDto: UpdateIsPublicDto){
 		const { user } = req;
-		return this.chatService.updateChannelPublicStatusToTrue(updateIsPublicDto, user);
+		return this.chatService.updateChannelPublicStatusToTrue(updateIsPublicDto, user.sub);
 	}
 
 	@UseGuards(AuthGuard)
@@ -153,21 +161,23 @@ export class ChatController {
 	@Post('updateIsPublicFalse')
 	updateChannelIsPublicStatusFalse(@Req() req, @Body() updateIsPublicDto: UpdateIsPublicDto){
 		const { user } = req;
-		return this.chatService.updateChannelPublicStatusToFalse(updateIsPublicDto, user);
+		return this.chatService.updateChannelPublicStatusToFalse(updateIsPublicDto, user.sub);
 	}
 
 	@UseGuards(AuthGuard)
 	@HttpCode(HttpStatus.OK)
 	@Post('updateIsProtectedTrue')
-	updateChannelIsprotectedStatusTrue(@Body() channelOptionsDto: ChannelOptionsDto): Promise<boolean> {
-		return this.chatService.updateChannelIsProtectedStatusToTrue(channelOptionsDto);
+	updateChannelIsprotectedStatusTrue(@Req() req, @Body() channelOptionsDto: ChannelOptionsDto): Promise<boolean> {
+		const { user } = req;
+		return this.chatService.updateChannelIsProtectedStatusToTrue(channelOptionsDto, user.sub);
 	}
 
 	@UseGuards(AuthGuard)
 	@HttpCode(HttpStatus.OK)
 	@Post('updateIsProtectedFalse')
-	updateChannelIsprotectedStatusFalse(@Body() updateProtectFalseDto: UpdateProtectFalseDto): Promise<boolean> {
-		return this.chatService.updateChannelIsProtectedStatusToFalse(updateProtectFalseDto);
+	updateChannelIsprotectedStatusFalse(@Req() req, @Body() updateProtectFalseDto: UpdateProtectFalseDto): Promise<boolean> {
+		const { user } = req;
+		return this.chatService.updateChannelIsProtectedStatusToFalse(updateProtectFalseDto, user.sub);
 	}
 
 
@@ -186,15 +196,17 @@ export class ChatController {
 	}
 
 	@UseGuards(AuthGuard)
-	@Get('getConversations/:userID')
-	getConversationsFromUser(@Param('userID') userID: number): Promise<Conversation[]> {
-		return this.chatService.getAllChannelsFromUser(userID);
+	@Get('getConversations')
+	getConversationsFromUser(@Req() req): Promise<Conversation[]> {
+		const { user } = req;
+		return this.chatService.getAllChannelsFromUser(user.sub);
 	}
 
 	@UseGuards(AuthGuard)
-	@Get('getDMsConversations/:userID')
-	getDMsConversationsFromUser(@Param('userID') userID: number): Promise<Conversation[]> {
-		return this.chatService.getUserListFromDms(userID);
+	@Get('getDMsConversations')
+	getDMsConversationsFromUser(@Req() req): Promise<Conversation[]> {
+		const { user } = req;
+		return this.chatService.getUserListFromDms(user.sub);
 	}
 
 	// @UseGuards(AuthGuard)
@@ -204,27 +216,28 @@ export class ChatController {
 	// }
 
 	@UseGuards(AuthGuard)
-	@Get('getConversationsPublic/:userID')
-	getConversationsPublicOption(@Param('userID') userID: number)  {
-		console.log("getConversationsPublic");
-
-		return this.chatService.getAllPublicConversationsOption(userID);
+	@Get('getConversationsPublic')
+	getConversationsPublicOption(@Req() req)  {
+		const { user } = req;
+		return this.chatService.getAllPublicConversationsOption(user.sub);
 	}
 
 	// verifier que le number est bon
 	@UseGuards(AuthGuard)
-	@Get('getConversationsWithStatus/:userID')
-	getConversationsRightsFromUser(@Param('userID') userID: number) {
-		return this.chatService.getConversationsWithStatus(userID);
+	@Get('getConversationsWithStatus')
+	getConversationsRightsFromUser(@Req() req) {
+		const { user } = req;
+		return this.chatService.getConversationsWithStatus(user.sub);
 	}
 
+	// on garde le userID sur cette route car il correspond a l'ID du user a ajouter
 	@UseGuards(AuthGuard)
 	@Get('getConversationsToAdd/:userID')
 	getConversationsToAdd(@Req() req, @Param('userID') userID: number) {
 		const { user } = req;
-		console.log("getConversationsToAdd");
 		return this.chatService.getConversationsToAdd(userID, user.sub);
 	}
+
 	@UseGuards(AuthGuard)
 	@Get('getUserList/:conversationID')
 	getUserList(@Param('conversationID') conversation: number) {
