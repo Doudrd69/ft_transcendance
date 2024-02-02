@@ -7,6 +7,7 @@ import {
 	IsInt,
 	IsPositive,
 	Max,
+	IsDate,
 } from 'class-validator';
 
 export class MessageDto {
@@ -23,6 +24,7 @@ export class MessageDto {
 	content: string;
 
 	@IsNotEmpty()
+	@IsDate()
 	post_datetime: Date;
 
 	@IsNotEmpty()

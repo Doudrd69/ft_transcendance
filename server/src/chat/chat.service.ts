@@ -167,32 +167,37 @@ export class ChatService {
 			relations: ["groups", "groups.conversation"],
 		});
 
-		let array = [];
-		user.groups.forEach((userGroup: GroupMember) => {
-			if (userGroup.conversation.is_channel) {
-				let userListForThisGroup = [];
-				users.forEach((user_: User) => {
-						user_.groups.forEach((group: GroupMember) => {
-							if (group.conversation.id == userGroup.conversation.id) {
-								if (group.conversation.is_channel)
-									userListForThisGroup.push({
-										id: user_.id,
-										login: user_.username,
-										avatarURL: user_.avatarURL,
-										isOwner: group.isOwner,
-										isAdmin: group.isAdmin,
-										isBan: group.isBan,
-										isMute: group.isMute,
-										blockList: user_.blockedUsers,
-									});
-							}
-						});
-				});
-				array.push(userListForThisGroup);
-			}
-		});
+		if (users) {
+			
+			let array = [];
+			user.groups.forEach((userGroup: GroupMember) => {
+				if (userGroup.conversation.is_channel) {
+					let userListForThisGroup = [];
+					users.forEach((user_: User) => {
+							user_.groups.forEach((group: GroupMember) => {
+								if (group.conversation.id == userGroup.conversation.id) {
+									if (group.conversation.is_channel)
+										userListForThisGroup.push({
+											id: user_.id,
+											login: user_.username,
+											avatarURL: user_.avatarURL,
+											isOwner: group.isOwner,
+											isAdmin: group.isAdmin,
+											isBan: group.isBan,
+											isMute: group.isMute,
+											blockList: user_.blockedUsers,
+										});
+								}
+							});
+					});
+					array.push(userListForThisGroup);
+				}
+			});
+				
+			return array;
+		}
 
-		return array;
+		throw new HttpException('Fatal error', HttpStatus.BAD_REQUEST);
 	}
 
 	private async getUserListFromTargetConversation(conversationID: number) {
@@ -232,24 +237,26 @@ export class ChatService {
 	private async getAllMessages(conversationID: number, userID: number): Promise<Message[]> {
 
 		const conversation = await this.conversationRepository.findOne({ where: {id: conversationID} });
-		if (!conversation) {
-			console.error("Conversation  not found");
-			return [];
-		}
-
+		
 		const user : User = await this.usersRepository.findOne({
 			where: { id: userID },
 			relations: ['groups', 'groups.conversation'],
 		});
 
-		const group = await this.getRelatedGroup(user, conversation)
-		if (!group) {
-			console.error("Unauthorized");
-		}
+		if (user && conversation) {
+			
+			const group = await this.getRelatedGroup(user, conversation)
+			if (group) {
 
-		const messages = await this.messageRepository.find({ where: {conversation: conversation}});
-		const filteredMessages = messages.filter((message: Message) => !user.blockedUsers.includes(message.from));
-		return filteredMessages;
+				const messages = await this.messageRepository.find({ where: {conversation: conversation}});
+				const filteredMessages = messages.filter((message: Message) => !user.blockedUsers.includes(message.from));
+				return filteredMessages;
+			}
+
+			throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
+		}
+		
+		throw new HttpException('Fatal error', HttpStatus.BAD_REQUEST);
 	}
 
 	private async getAllChannels(userID: number): Promise<Conversation[]> {
@@ -272,8 +279,8 @@ export class ChatService {
 			}
 			return [];
 		}
-		console.error("Fatal error2: user not found");
-		return [];
+
+		throw new HttpException('Fatal error', HttpStatus.BAD_REQUEST);
 	}
 
 	async getUserListFromDms(userID: number) {
@@ -283,42 +290,49 @@ export class ChatService {
 			relations: ['groups', 'groups.conversation'],
 		});
 
-		// les dms = group.conversation -->!is_channel
-		let userDMs = [];
-		myuser.groups.forEach((group: GroupMember) => {
-			if (!group.conversation.is_channel) {
-				userDMs.push(group.conversation);
-			}
-		});
+		if (myuser) {
 
-		const users = await this.usersRepository.find({
-			relations: ['groups', 'groups.conversation'],
-		});
+			// les dms = group.conversation -->!is_channel
+			let userDMs = [];
+			myuser.groups.forEach((group: GroupMember) => {
+				if (!group.conversation.is_channel) {
+					userDMs.push(group.conversation);
+				}
+			});
+	
+			const users = await this.usersRepository.find({
+				relations: ['groups', 'groups.conversation'],
+			});
+	
+			if (users) {
 
-		// tout les users
-		let DMList = [];
-		users.forEach((user: User) => {
-			// tout les groups d'un user
-			if (user.id != myuser.id) {
-				user.groups.forEach((userGroup: GroupMember) => {
-					// chaque groupe du user par rapport a NOS groups de DM
-					userDMs.forEach((dm: Conversation) => {
-						// Si on a une conv privee
-						if (userGroup.conversation.id == dm.id) {
-							DMList.push({
-								id: userGroup.conversation.id,
-								username: user.username,
-								avatarURL: user.avatarURL,
-								name: userGroup.conversation.name,
-								onlineStatus: user.isActive,
-							});
-						}
-					})
+				let DMList = [];
+				users.forEach((user: User) => {
+					// tout les groups d'un user
+					if (user.id != myuser.id) {
+						user.groups.forEach((userGroup: GroupMember) => {
+							// chaque groupe du user par rapport a NOS groups de DM
+							userDMs.forEach((dm: Conversation) => {
+								// Si on a une conv privee
+								if (userGroup.conversation.id == dm.id) {
+									DMList.push({
+										id: userGroup.conversation.id,
+										username: user.username,
+										avatarURL: user.avatarURL,
+										name: userGroup.conversation.name,
+										onlineStatus: user.isActive,
+									});
+								}
+							})
+						});
+					}
 				});
-			}
-		});
 
-		return DMList;
+				return DMList;
+			}
+		}
+
+		throw new HttpException('Fatal error', HttpStatus.BAD_REQUEST);
 	}
 
 	private async getDMsConversations(userID: number): Promise<Conversation[]> {
@@ -375,20 +389,24 @@ export class ChatService {
 	/***					CHANNEL PASSWORD					***/
 	/**************************************************************/
 
-	async compareChannelPassword(checkPasswordDto: CheckPasswordDto): Promise<boolean> {
+	// attention userID soit le bon user
+	async compareChannelPassword(checkPasswordDto: CheckPasswordDto, userID: number): Promise<boolean> {
 
 		const conversation : Conversation = await this.conversationRepository.findOne({ where: {id: checkPasswordDto.conversationID} });
 		if (conversation) {
 			const isMatch = await bcrypt.compare(checkPasswordDto.userInput, conversation.password);
 			if (isMatch) {
+
 				const addUserToConversationDto ={
 					userToAdd: checkPasswordDto.username,
 					conversationID: conversation.id,
 				}
 
-				const conversationToAdd = await this.addUserToConversation(addUserToConversationDto);
+				const conversationToAdd = await this.addUserToConversation(addUserToConversationDto, userID);
 				if (conversationToAdd)
 					return true;
+				else
+					throw new HttpException('Fatal error', HttpStatus.BAD_REQUEST);
 			}
 
 			throw new HttpException('Wrong password', HttpStatus.BAD_REQUEST);
@@ -420,10 +438,10 @@ export class ChatService {
 	/***						CHANNEL OPTIONS					***/
 	/**************************************************************/
 
-	async updateChannelPublicStatusToTrue(updateIsPublicDto: UpdateIsPublicDto, _user: User): Promise<boolean> {
+	async updateChannelPublicStatusToTrue(updateIsPublicDto: UpdateIsPublicDto, userID: number): Promise<boolean> {
 
 		const user : User = await this.usersRepository.findOne({
-			where: { id: updateIsPublicDto.userID },
+			where: { id: userID },
 			relations: ["groups", "groups.conversation"],
 		});
 
@@ -431,25 +449,27 @@ export class ChatService {
 			where: { id: updateIsPublicDto.conversationID },
 		});
 
-		const isUserIsAdmin = await this.getGroupIsAdminStatus(user, channelToUpdate);
+		if (user && channelToUpdate) {
 
-		if (isUserIsAdmin) {
-			if (channelToUpdate) {
+			const isUserIsAdmin = await this.getGroupIsAdminStatus(user, channelToUpdate);
+	
+			if (isUserIsAdmin) {
+
 				channelToUpdate.isPublic = true;
 				await this.conversationRepository.save(channelToUpdate);
 				return true;
 			}
-
-			throw new HttpException('Fatal error', HttpStatus.BAD_REQUEST);
+	
+			throw new HttpException(`${user.username} is not admin`, HttpStatus.BAD_REQUEST);
 		}
 
-		throw new HttpException(`${user.username} is not admin`, HttpStatus.BAD_REQUEST);
+		throw new HttpException('Fatal error', HttpStatus.BAD_REQUEST);
 	}
 
-	async updateChannelPublicStatusToFalse(updateIsPublicDto: UpdateIsPublicDto, _user: User): Promise<boolean> {
+	async updateChannelPublicStatusToFalse(updateIsPublicDto: UpdateIsPublicDto, userID: number): Promise<boolean> {
 
 		const user : User = await this.usersRepository.findOne({
-			where: { id: updateIsPublicDto.userID },
+			where: { id: userID },
 			relations: ["groups", "groups.conversation"],
 		});
 
@@ -457,26 +477,28 @@ export class ChatService {
 			where: { id: updateIsPublicDto.conversationID },
 		});
 
-		const isUserIsAdmin = await this.getGroupIsAdminStatus(user, channelToUpdate);
+		if (user && channelToUpdate) {
 
-		if (isUserIsAdmin) {
-			if (channelToUpdate) {
+			const isUserIsAdmin = await this.getGroupIsAdminStatus(user, channelToUpdate);
+	
+			if (isUserIsAdmin) {
+
 				channelToUpdate.isPublic = false;
 				await this.conversationRepository.save(channelToUpdate);
 				return true;
 			}
-
-			throw new HttpException('Fatal error', HttpStatus.BAD_REQUEST);
+	
+			throw new HttpException(`${user.username} is not admin`, HttpStatus.BAD_REQUEST);
 		}
 
-		throw new HttpException(`${user.username} is not admin`, HttpStatus.BAD_REQUEST);
+		throw new HttpException('Fatal error', HttpStatus.BAD_REQUEST);
 	}
 
 
-	async updateChannelIsProtectedStatusToTrue(channelOptionsDto: ChannelOptionsDto): Promise<boolean> {
+	async updateChannelIsProtectedStatusToTrue(channelOptionsDto: ChannelOptionsDto, userID: number): Promise<boolean> {
 
 		const user : User = await this.usersRepository.findOne({
-			where: { id: channelOptionsDto.userID},
+			where: { id: userID},
 			relations: ["groups", "groups.conversation"],
 		});
 
@@ -484,45 +506,51 @@ export class ChatService {
 			where: { id: channelOptionsDto.conversationID },
 		});
 
-		const isUserIsAdmin = await this.getGroupIsAdminStatus(user, channelToUpdate);
+		if (user && channelToUpdate) {
 
-		if (isUserIsAdmin) {
-			if (channelToUpdate) {
+			const isUserIsAdmin = await this.getGroupIsAdminStatus(user, channelToUpdate);
+	
+			if (isUserIsAdmin) {
+
 				channelToUpdate.isProtected = true;
 				channelToUpdate.password = await this.hashChannelPassword(channelOptionsDto.password)
 				await this.conversationRepository.save(channelToUpdate);
 				return true;
-				}
-
-				throw new HttpException('Fatal error', HttpStatus.BAD_REQUEST);
 			}
-	
+			
 			throw new HttpException(`${user.username} is not admin`, HttpStatus.BAD_REQUEST);
+		}
+
+		throw new HttpException('Fatal error', HttpStatus.BAD_REQUEST);
 	}
 
-	async updateChannelIsProtectedStatusToFalse( updateProtectFalseDto: UpdateProtectFalseDto): Promise<boolean> {
+	async updateChannelIsProtectedStatusToFalse( updateProtectFalseDto: UpdateProtectFalseDto, userID: number): Promise<boolean> {
 
 		const user : User = await this.usersRepository.findOne({
-			where: { id: updateProtectFalseDto.userID},
+			where: { id: userID},
 			relations: ["groups", "groups.conversation"],
 		});
+
 		const channelToUpdate : Conversation = await this.conversationRepository.findOne({
 			where: { id: updateProtectFalseDto.conversationID },
 		});
 
-		const isUserIsAdmin = await this.getGroupIsAdminStatus(user, channelToUpdate);
+		if (user && channelToUpdate) {
 
-		if (isUserIsAdmin) {
-			if (channelToUpdate) {
-						channelToUpdate.isProtected = false;
-						channelToUpdate.password = "";
-						await this.conversationRepository.save(channelToUpdate);
-						return true;
-				}
-				throw new HttpException('Fatal error', HttpStatus.BAD_REQUEST);
+			const isUserIsAdmin = await this.getGroupIsAdminStatus(user, channelToUpdate);
+	
+			if (isUserIsAdmin) {
+
+				channelToUpdate.isProtected = false;
+				channelToUpdate.password = "";
+				await this.conversationRepository.save(channelToUpdate);
+				return true;
 			}
-
+	
 			throw new HttpException(`${user.username} is not admin`, HttpStatus.BAD_REQUEST);
+		}
+
+		throw new HttpException('Fatal error', HttpStatus.BAD_REQUEST);
 	}
 
 
@@ -537,25 +565,32 @@ export class ChatService {
 			where: { username: muteUserDto.username },
 			relations: ["groups"],
 		});
+
 		const user = await this.usersRepository.findOne({ where: { id: userID } });
 		const conversation = await this.conversationRepository.findOne({ where: { id: muteUserDto.conversationID } });
-		const userGroup = await this.getRelatedGroup(user, conversation);
-		if (userGroup.isBan) {
-			throw new HttpException(`${user.username} is ban from this channel`, HttpStatus.BAD_REQUEST);
-		}
 
-		if (userToMute && conversation && userGroup) {
-			const groupToUpdate = await this.getRelatedGroup(userToMute, conversation);
-			if (groupToUpdate.isBan) {
-				throw new HttpException(`${user.username} is ban from this channel`, HttpStatus.BAD_REQUEST);
+		if (userToMute && user && conversation) {
+
+			const userGroup = await this.getRelatedGroup(user, conversation);
+			if (userGroup) {
+
+				if (userGroup.isBan)
+					throw new HttpException(`${user.username} is ban from this channel`, HttpStatus.BAD_REQUEST);
+		
+				const groupToUpdate = await this.getRelatedGroup(userToMute, conversation);
+				if (groupToUpdate) {
+
+					if (groupToUpdate.isBan)
+						throw new HttpException(`${userToMute.username} is ban from this channel`, HttpStatus.BAD_REQUEST);
+			
+					groupToUpdate.isMute = true;
+					const currentDate = new Date();
+					const mutedUntil = new Date(currentDate.getTime() + muteUserDto.mutedUntil * 60000);
+					groupToUpdate.mutedUntil = mutedUntil;
+					await this.groupMemberRepository.save(groupToUpdate);
+					return true;
+				}
 			}
-
-			groupToUpdate.isMute = true;
-			const currentDate = new Date();
-			const mutedUntil = new Date(currentDate.getTime() + muteUserDto.mutedUntil * 60000);
-			groupToUpdate.mutedUntil = mutedUntil;
-			await this.groupMemberRepository.save(groupToUpdate);
-			return true;
 		}
 
 		throw new HttpException('Fatal error', HttpStatus.BAD_REQUEST);
@@ -567,23 +602,32 @@ export class ChatService {
 			where: { id: muteUserDto.target },
 			relations: ["groups"],
 		});
+
 		const user = await this.usersRepository.findOne({ where: { id: userID } });
 		const conversation = await this.conversationRepository.findOne({ where: { id: muteUserDto.conversationID } });
-		const userGroup = await this.getRelatedGroup(user, conversation);
-		if (userGroup.isBan) {
-			throw new HttpException(`${user.username} is ban from this channel`, HttpStatus.BAD_REQUEST);
+
+		if (userToMute && user && conversation) {
+
+			const userGroup = await this.getRelatedGroup(user, conversation);
+			if (userGroup) {
+
+				if (userGroup.isBan)
+					throw new HttpException(`${user.username} is ban from this channel`, HttpStatus.BAD_REQUEST);
+		
+				const groupToUpdate = await this.getRelatedGroup(userToMute, conversation);
+				if (groupToUpdate) {
+
+					if (groupToUpdate.isBan)
+						throw new HttpException(`${userToMute.username} is ban from this channel`, HttpStatus.BAD_REQUEST);
+	
+					groupToUpdate.isMute = false;
+					groupToUpdate.mutedUntil = null;
+					await this.groupMemberRepository.save(groupToUpdate);
+					return true;	
+				}
+			}
 		}
 
-		if (userToMute && conversation && userGroup) {
-			const groupToUpdate = await this.getRelatedGroup(userToMute, conversation);
-			if (groupToUpdate.isBan) {
-				throw new HttpException(`${user.username} is ban from this channel`, HttpStatus.BAD_REQUEST);
-			}
-			groupToUpdate.isMute = false;
-			groupToUpdate.mutedUntil = null;
-			await this.groupMemberRepository.save(groupToUpdate);
-			return true;	
-		}
 		throw new HttpException('Fatal error', HttpStatus.BAD_REQUEST);
 	}
 
@@ -596,28 +640,35 @@ export class ChatService {
 
 		const user = await this.usersRepository.findOne({ where: { id: userID} });
 		const conversation = await this.conversationRepository.findOne({ where: { id: banUserDto.conversationID } });
-		const userGroup = await this.getRelatedGroup(user, conversation);
-		if (userGroup.isBan) {
-			throw new HttpException(`${user.username} is ban from this channel`, HttpStatus.BAD_REQUEST);
-		}
 
-		if (userToBan && conversation && userGroup) {
-			const groupToUpdate = await this.getRelatedGroup(userToBan, conversation);
-			if (groupToUpdate.isBan) {
-				throw new HttpException(`${user.username} is ban from this channel`, HttpStatus.BAD_REQUEST);
-			}
+		if (userToBan && user && conversation) {
 
-			if (userGroup.isOwner || userGroup.isAdmin) {
-				if (groupToUpdate && !groupToUpdate.isOwner || !groupToUpdate.isAdmin) {
-					groupToUpdate.isBan = true;
-					await this.groupMemberRepository.save(groupToUpdate);
-					return true;
+			const userGroup = await this.getRelatedGroup(user, conversation);
+			if (userGroup) {
+
+				if (userGroup.isBan)
+					throw new HttpException(`${user.username} is ban from this channel`, HttpStatus.BAD_REQUEST);
+		
+				const groupToUpdate = await this.getRelatedGroup(userToBan, conversation);
+				if (groupToUpdate) {
+					
+					if (groupToUpdate.isBan)
+						throw new HttpException(`${userToBan.username} is ban from this channel`, HttpStatus.BAD_REQUEST);
+			
+					if (userGroup.isOwner || userGroup.isAdmin) {
+
+						if (!groupToUpdate.isOwner || !groupToUpdate.isAdmin) {
+							groupToUpdate.isBan = true;
+							await this.groupMemberRepository.save(groupToUpdate);
+							return true;
+						}
+	
+						throw new HttpException(`${userToBan.username} has higher privilege`, HttpStatus.BAD_REQUEST);
+					}
+
+					throw new HttpException(`${user.username} is not owner or admin`, HttpStatus.BAD_REQUEST);
 				}
-
-				throw new HttpException(`${userToBan.username} has higher privilege`, HttpStatus.BAD_REQUEST);
 			}
-
-			throw new HttpException(`${user.username} is not owner or admin`, HttpStatus.BAD_REQUEST);
 		}
 
 		throw new HttpException('Fatal error', HttpStatus.BAD_REQUEST);
@@ -629,30 +680,35 @@ export class ChatService {
 			where: { id: banUserDto.target },
 			relations: ["groups"],
 		});
+
 		const user = await this.usersRepository.findOne({ where: { id: userID} });
 		const conversation = await this.conversationRepository.findOne({ where: { id: banUserDto.conversationID } });
-		const userGroup = await this.getRelatedGroup(user, conversation);
-		if (userGroup.isBan) {
-			throw new HttpException(`${user.username} is ban from this channel`, HttpStatus.BAD_REQUEST);
-		}
 
-		if (userToUnban && conversation && userGroup) {
-			const groupToUpdate = await this.getRelatedGroup(userToUnban, conversation);
-			// if (groupToUpdate.isBan) {
-			// 	throw new Error(`${userToUnban.username} is ban from this channel`);
-			// }
+		if (userToUnban && user && conversation) {
 
-			if (userGroup.isOwner || userGroup.isAdmin) {
-				if (groupToUpdate && !groupToUpdate.isOwner || !groupToUpdate.isAdmin) {
-					groupToUpdate.isBan = false;
-					await this.groupMemberRepository.save(groupToUpdate);
-					return true;
+			const userGroup = await this.getRelatedGroup(user, conversation);
+			if (userGroup) {
+
+				if (userGroup.isBan)
+					throw new HttpException(`${user.username} is ban from this channel`, HttpStatus.BAD_REQUEST);
+
+				const groupToUpdate = await this.getRelatedGroup(userToUnban, conversation);
+				if (groupToUpdate) {
+
+					if (userGroup.isOwner || userGroup.isAdmin) {
+
+						if (!groupToUpdate.isOwner || !groupToUpdate.isAdmin) {
+							groupToUpdate.isBan = false;
+							await this.groupMemberRepository.save(groupToUpdate);
+							return true;
+						}
+			
+						throw new HttpException(`${userToUnban.username} has higher privilege`, HttpStatus.BAD_REQUEST);
+					}
+		
+					throw new HttpException(`${user.username} is not owner or admin`, HttpStatus.BAD_REQUEST);
 				}
-
-				throw new HttpException(`${userToUnban.username} has higher privilege`, HttpStatus.BAD_REQUEST);
 			}
-
-			throw new HttpException(`${user.username} is not owner or admin`, HttpStatus.BAD_REQUEST);
 		}
 
 		throw new HttpException('Fatal error', HttpStatus.BAD_REQUEST);
@@ -664,34 +720,40 @@ export class ChatService {
 			where: { id: promoteUserToAdminDto.target },
 			relations: ['groups'],
 		});
+
 		const user = await this.usersRepository.findOne({ where: { id: userID } });
-		if (user.id == userToPromote.id) {
+		if (user.id == userToPromote.id)
 			return false;
-		}
 
 		const conversation = await this.conversationRepository.findOne({ where: { id: promoteUserToAdminDto.conversationID } });
-		const userGroup = await this.getRelatedGroup(user, conversation);
-		if (userGroup.isBan) {
-			throw new HttpException(`${user.username} is ban from this channel`, HttpStatus.BAD_REQUEST);
-		}
-	
-		if (userToPromote && conversation && userGroup) {
-			const groupToUpdate = await this.getRelatedGroup(userToPromote, conversation);
-			if (groupToUpdate.isBan) {
-				throw new HttpException(`${user.username} is ban from this channel`, HttpStatus.BAD_REQUEST);
-			}
+		
+		if (userToPromote && user && conversation) {
 
-			if (userGroup.isOwner || userGroup.isAdmin) {
-				if (groupToUpdate && !groupToUpdate.isOwner || !groupToUpdate.isAdmin) {
-					groupToUpdate.isAdmin = true;
-					await this.groupMemberRepository.save(groupToUpdate);
-					return true;
+			const userGroup = await this.getRelatedGroup(user, conversation);
+			if (userGroup) {
+
+				if (userGroup.isBan)
+					throw new HttpException(`${user.username} is ban from this channel`, HttpStatus.BAD_REQUEST);
+
+				const groupToUpdate = await this.getRelatedGroup(userToPromote, conversation);
+				if (groupToUpdate) {
+
+					if (groupToUpdate.isBan)
+						throw new HttpException(`${userToPromote.username} is ban from this channel`, HttpStatus.BAD_REQUEST);
+			
+					if (userGroup.isOwner || userGroup.isAdmin) {
+						if (!groupToUpdate.isOwner || !groupToUpdate.isAdmin) {
+							groupToUpdate.isAdmin = true;
+							await this.groupMemberRepository.save(groupToUpdate);
+							return true;
+						}
+			
+						throw new HttpException(`${userToPromote.username} has higher privilege`, HttpStatus.BAD_REQUEST);
+					}
+
+					throw new HttpException(`${user.username} is not owner or admin`, HttpStatus.BAD_REQUEST);
 				}
-
-				throw new HttpException(`${userToPromote.username} has higher privilege`, HttpStatus.BAD_REQUEST);
 			}
-
-			throw new HttpException(`${user.username} is not owner or admin`, HttpStatus.BAD_REQUEST);
 		}
 
 		throw new HttpException('Fatal error', HttpStatus.BAD_REQUEST);
@@ -706,28 +768,34 @@ export class ChatService {
 
 		const user = await this.usersRepository.findOne({ where: { id: userID } });
 		const conversation = await this.conversationRepository.findOne({ where: { id: promoteUserToAdminDto.conversationID } });
-		const userGroup = await this.getRelatedGroup(user, conversation);
-		if (userGroup.isBan) {
-			throw new HttpException(`${user.username} is ban from this channel`, HttpStatus.BAD_REQUEST);
-		}
+		
+		if (userToPromote && user && conversation) {
 
-		if (userToPromote && conversation && userGroup) {
-			const groupToUpdate = await this.getRelatedGroup(userToPromote, conversation);
-			if (groupToUpdate.isBan) {
-				throw new HttpException(`${user.username} is ban from this channel`, HttpStatus.BAD_REQUEST);
-			}
+			const userGroup = await this.getRelatedGroup(user, conversation);
+			if (userGroup) {
 
-			if (userGroup.isOwner || userGroup.isAdmin) {
-				if (groupToUpdate && !groupToUpdate.isOwner || !groupToUpdate.isAdmin) {
-					groupToUpdate.isAdmin = false;
-					await this.groupMemberRepository.save(groupToUpdate);
-					return true;
+				if (userGroup.isBan)
+					throw new HttpException(`${user.username} is ban from this channel`, HttpStatus.BAD_REQUEST);
+		
+				const groupToUpdate = await this.getRelatedGroup(userToPromote, conversation);
+				if (groupToUpdate) {
+
+					if (groupToUpdate.isBan)
+						throw new HttpException(`${userToPromote.username} is ban from this channel`, HttpStatus.BAD_REQUEST);
+			
+					if (userGroup.isOwner || userGroup.isAdmin) {
+						if (!groupToUpdate.isOwner || !groupToUpdate.isAdmin) {
+							groupToUpdate.isAdmin = false;
+							await this.groupMemberRepository.save(groupToUpdate);
+							return true;
+						}
+	
+						throw new HttpException(`${userToPromote.username} has higher privilege`, HttpStatus.BAD_REQUEST);
+					}
+
+					throw new HttpException(`${user.username} is not owner or admin`, HttpStatus.BAD_REQUEST);
 				}
-
-				throw new HttpException(`${userToPromote.username} has higher privilege`, HttpStatus.BAD_REQUEST);
 			}
-
-			throw new HttpException(`${user.username} is not owner or admin`, HttpStatus.BAD_REQUEST);
 		}
 
 		throw new HttpException('Fatal error', HttpStatus.BAD_REQUEST);
@@ -739,43 +807,50 @@ export class ChatService {
 	/***					CONVERSATION						***/
 	/**************************************************************/
 	
-	async deleteConversation(deleteConversationDto: DeleteConversationDto): Promise<boolean> {
+	async deleteConversation(deleteConversationDto: DeleteConversationDto, userID: number): Promise<boolean> {
 
-		// recuperer la conv a delete
 		const conversationToDelete: Conversation = await this.conversationRepository.findOne({ where: { id: deleteConversationDto.conversationID } });
-		// verifier is le user qui fait la requete est le owner
+
 		const user = await this.usersRepository.findOne({
-			where: { id: deleteConversationDto.userID },
+			where: { id: userID },
 			relations: ['groups', 'groups.conversation'],
 		});
 
-		const userGroup = await this.getRelatedGroup(user, conversationToDelete);
-		if (userGroup && userGroup.isOwner) {
-			
-			const idToDelete = conversationToDelete.id;
+		if (user && conversationToDelete) {
 
-			await this.groupMemberRepository
-  				.createQueryBuilder()
-  				.delete()
-  				.from(GroupMember)
- 				.where("conversation.id = :id", { id: idToDelete })
-  				.execute();
+			const userGroup = await this.getRelatedGroup(user, conversationToDelete);
+			if (userGroup) {
 
-			await this.conversationRepository
-				.createQueryBuilder()
-				.delete()
-				.from(Message)
-				.where("conversation.id = :id", { id: conversationToDelete.id })
-				.execute()
+				if (userGroup.isOwner) {
 
-			await this.conversationRepository
-				.createQueryBuilder()
-				.delete()
-				.from(Conversation)
-				.where("id = :id", { id: conversationToDelete.id })
-				.execute()
+					const idToDelete = conversationToDelete.id;
+		
+					await this.groupMemberRepository
+						  .createQueryBuilder()
+						  .delete()
+						  .from(GroupMember)
+						 .where("conversation.id = :id", { id: idToDelete })
+						  .execute();
+		
+					await this.conversationRepository
+						.createQueryBuilder()
+						.delete()
+						.from(Message)
+						.where("conversation.id = :id", { id: conversationToDelete.id })
+						.execute()
+		
+					await this.conversationRepository
+						.createQueryBuilder()
+						.delete()
+						.from(Conversation)
+						.where("id = :id", { id: conversationToDelete.id })
+						.execute()
+		
+					return true ;
+				}
 
-			return true ;
+				throw new HttpException('User is not the owner', HttpStatus.BAD_REQUEST);
+			}
 		}
 
 		throw new HttpException('Fatal error', HttpStatus.BAD_REQUEST);
@@ -818,10 +893,10 @@ export class ChatService {
 		return false;
 	}
 
-	async quitConversation(quiConversationDto: QuitConversationDto): Promise<boolean> {
+	async quitConversation(quiConversationDto: QuitConversationDto, userID: number): Promise<boolean> {
 
 		const user : User = await this.usersRepository.findOne({
-			where: { id: quiConversationDto.userID },
+			where: { id: userID },
 			relations: ["groups", "groups.conversation"],
 		});
 
@@ -832,30 +907,32 @@ export class ChatService {
 		if (user && conversation) {
 
 			const groupToRemove = await this.getRelatedGroup(user, conversation);
-			if (groupToRemove.isBan) {
-				throw new HttpException(`${user.username} is ban from this channel`, HttpStatus.BAD_REQUEST);
-			}
-
-			const isOwnerStatus = await this.getGroupIsOwnerStatus(user, conversation);
-			
 			if (groupToRemove) {
-				const newGroups = user.groups.filter((group: GroupMember) => group.id != groupToRemove.id);
-				user.groups = newGroups;
-				await this.usersRepository.save(user);
 
-				await this.groupMemberRepository
-					.createQueryBuilder()
-					.delete()
-					.from(GroupMember)
-					.where("id = :id", { id: groupToRemove.id })
-					.execute()
+				if (groupToRemove.isBan)
+					throw new HttpException(`${user.username} is ban from this channel`, HttpStatus.BAD_REQUEST);
+	
+				const isOwnerStatus = await this.getGroupIsOwnerStatus(user, conversation);
+				
+				if (groupToRemove) {
+					const newGroups = user.groups.filter((group: GroupMember) => group.id != groupToRemove.id);
+					user.groups = newGroups;
+					await this.usersRepository.save(user);
 
-				if (isOwnerStatus) {
-					const status = await this.promoteNewOwner(conversation);
-					console.log("Promote status: ", status);
+					await this.groupMemberRepository
+						.createQueryBuilder()
+						.delete()
+						.from(GroupMember)
+						.where("id = :id", { id: groupToRemove.id })
+						.execute()
+	
+					if (isOwnerStatus) {
+						const status = await this.promoteNewOwner(conversation);
+						console.log("Promote status: ", status);
+					}
+	
+					return true;
 				}
-
-				return true;
 			}
 		}
 
@@ -879,25 +956,31 @@ export class ChatService {
 			where: { id: kickUserDto.conversationID },
 		});
 
-		const kickGroup = await this.getRelatedGroup(userToKick, conversation);
-		const initiatorGroup = await this.getRelatedGroup(userInitiator, conversation); 
-		if (kickGroup && initiatorGroup && initiatorGroup.isAdmin) {
-			if (kickGroup && !kickGroup.isOwner) {
-				const dto : QuitConversationDto = {
-					conversationID: conversation.id,
-					userID: userToKick.id,
+		if (userToKick && userInitiator && conversation) {
+
+			const kickGroup = await this.getRelatedGroup(userToKick, conversation);
+			const initiatorGroup = await this.getRelatedGroup(userInitiator, conversation); 
+			if (kickGroup && initiatorGroup && initiatorGroup.isAdmin) {
+				if (kickGroup && !kickGroup.isOwner) {
+					const dto : QuitConversationDto = {
+						conversationID: conversation.id,
+						userID: userToKick.id,
+					}
+					// attention id du user
+					return await this.quitConversation(dto, userToKick.id);
 				}
-				return await this.quitConversation(dto);
+				throw new HttpException(`${userToKick.username} is the owner`, HttpStatus.BAD_REQUEST);
 			}
-			throw new HttpException(`${userToKick.username} is the owner`, HttpStatus.BAD_REQUEST);
+			throw new HttpException(`You are not admin`, HttpStatus.BAD_REQUEST);
 		}
-		throw new HttpException(`You are not admin`, HttpStatus.BAD_REQUEST);
+
+		throw new HttpException('Fatal error', HttpStatus.BAD_REQUEST);
 	}
 	
-	async addUserToConversation(addUserToConversationDto: AddUserToConversationDto): Promise<Conversation> {
+	async addUserToConversation(addUserToConversationDto: AddUserToConversationDto, userID: number): Promise<Conversation> {
 		
 		const userToAdd = await this.usersRepository.findOne({
-			where: { username: addUserToConversationDto.userToAdd },
+			where: { id: userID },
 			relations: ['groups', 'groups.conversation'],
 		});
 		
@@ -905,29 +988,28 @@ export class ChatService {
 			where: {id: addUserToConversationDto.conversationID}
 		});
 
-		const isGroupInUsersArray = await this.getRelatedGroup(userToAdd, conversationToAdd);
-		if (isGroupInUsersArray) {
-			throw new HttpException(`User has already joined the conversation`, HttpStatus.BAD_REQUEST);
-		}
+		if (userToAdd && conversationToAdd) {
 
-		if (await this.getGroupIsBanStatus(userToAdd, conversationToAdd)) {
-			throw new HttpException(`User is ban from this channel`, HttpStatus.BAD_REQUEST);
-		}
-		if (conversationToAdd && userToAdd) {
-			
+			const isGroupInUsersArray = await this.getRelatedGroup(userToAdd, conversationToAdd);
+			if (isGroupInUsersArray)
+				throw new HttpException(`User has already joined the conversation`, HttpStatus.BAD_REQUEST);
+	
+			if (await this.getGroupIsBanStatus(userToAdd, conversationToAdd))
+				throw new HttpException(`User is ban from this channel`, HttpStatus.BAD_REQUEST);
+				
 			const group = new GroupMember();
 			group.isAdmin = false;
 			group.joined_datetime = new Date();
 			group.conversation = conversationToAdd;
 			await this.groupMemberRepository.save(group);
-			
+				
 			if (group) {
 				userToAdd.groups.push(group);
 				await this.usersRepository.save(userToAdd);
 				return conversationToAdd;
 			}
 		}
-		
+
 		throw new HttpException('Fatal error', HttpStatus.BAD_REQUEST);
 	}
 	
@@ -972,10 +1054,11 @@ export class ChatService {
 		return conversationCheck;
 	}
 
-	async createPrivateConversation(DMcreationDto: DMcreationDto): Promise<Conversation> {
+	// attention ordre userID et user2 mdr
+	async createPrivateConversation(DMcreationDto: DMcreationDto, userID: number): Promise<Conversation> {
 
 		const user1 = await this.usersRepository.findOne({
-			where: { id: DMcreationDto.user1 },
+			where: { id: userID },
 			relations: ['groups', 'groups.conversation'],
 		});
 
@@ -995,17 +1078,19 @@ export class ChatService {
 	}
 	
 	// Let admins update conversation to private/public and add/remove password
-	async updateConversation(updateConversationDto: UpdateConversationDto): Promise<Conversation> {
+	async updateConversation(updateConversationDto: UpdateConversationDto, userID: number): Promise<Conversation> {
 		
 		const conversationToUpdate = await this.conversationRepository.findOne({ where: { id: updateConversationDto.conversationID} });
 		const user = await this.usersRepository.findOne({
-			where: { id: updateConversationDto.userID },
+			where: { id: userID },
 			relations: ["groups", "groups.conversation"],
 		});
 
 		if (user && conversationToUpdate) {
 			
-			if (await this.getGroupIsAdminStatus(user, conversationToUpdate)) {
+			const adminStatus = await this.getGroupIsAdminStatus(user, conversationToUpdate);
+
+			if (adminStatus) {
 
 				conversationToUpdate.isPublic = updateConversationDto.isPublic;
 				conversationToUpdate.isProtected = updateConversationDto.isProtected;
@@ -1020,14 +1105,13 @@ export class ChatService {
 		throw new HttpException('Fatal error', HttpStatus.BAD_REQUEST);
 	}
 	
-	async createConversation(conversationDto: ConversationDto): Promise<Conversation> {
+	async createConversation(conversationDto: ConversationDto, userID: number): Promise<Conversation> {
 		
 		const user = await this.usersRepository.findOne({
-			where: { id: conversationDto.userID},
+			where: { id: userID},
 			relations: ['groups', 'groups.conversation'],
 		});
-		
-		// verifier si conv existe pas deja
+
 		if (user) {
 			
 			const conv = new Conversation();
@@ -1043,13 +1127,17 @@ export class ChatService {
 			// The user who created the conversation is set to admin
 			const group = await this.createGroup(conv, true, true);
 			
-			user.groups.push(group);
-			await this.usersRepository.save(user);
-			
-			return conv;
+			if (group) {
+				
+				user.groups.push(group);
+				await this.usersRepository.save(user);
+				
+				return conv;
+			}
+			throw new HttpException('Fatal error', HttpStatus.BAD_REQUEST);
 		}
 
-		throw new HttpException('Fatal error', HttpStatus.BAD_REQUEST);
+		throw new HttpException('Fatal error: user not found', HttpStatus.BAD_REQUEST);
 	}
 
 
@@ -1059,38 +1147,35 @@ export class ChatService {
 	/**************************************************************/
 
 	// need to check muteStatus here or in front?
-	async createMessage(messageDto: MessageDto): Promise<Message> {
+	async createMessage(messageDto: MessageDto, userID: number): Promise<Message> {
 		
 		const conversation : Conversation = await this.conversationRepository.findOne({ where: {id: messageDto.conversationID} });
 		const sender : User = await this.usersRepository.findOne({
-			where: { username: messageDto.from },
+			where: { id: userID },
 			relations: ["groups", "groups.conversation"],
 		});
 
-		// check si le type est dans le hannel mdrrrrr
-
-		const isMuteStatus = await this.getGroupIsMuteStatus(sender, conversation);
-		const isBanStatus = await this.getGroupIsBanStatus(sender, conversation);
-
-
-		if (isMuteStatus) {
-			console.error("User is mute");
-			throw new HttpException(`user is mutes`, HttpStatus.BAD_REQUEST);
-		}
-
-		if (isBanStatus) {
-			console.error("User is ban");
-			throw new HttpException(`user is ban`, HttpStatus.BAD_REQUEST);
-		}
-
-		if (conversation) {
+		if (conversation && sender) {
+			
+			const userGroup = await this.getRelatedGroup(sender, conversation);
+			if (!userGroup)
+				throw new HttpException(`User is not in channel`, HttpStatus.BAD_REQUEST);
+	
+			const isMuteStatus = await this.getGroupIsMuteStatus(sender, conversation);
+			if (isMuteStatus)
+				throw new HttpException(`user is mutes`, HttpStatus.BAD_REQUEST);
+	
+			const isBanStatus = await this.getGroupIsBanStatus(sender, conversation);
+			if (isBanStatus)
+				throw new HttpException(`user is ban`, HttpStatus.BAD_REQUEST);
+	
 			const newMessage = new Message();
 			newMessage.from = messageDto.from;
 			newMessage.senderId = sender.id;
 			newMessage.content = messageDto.content;
 			newMessage.post_datetime = messageDto.post_datetime;
 			newMessage.conversation = conversation;
-			
+				
 			return await this.messageRepository.save(newMessage);
 		}
 
@@ -1219,7 +1304,7 @@ export class ChatService {
 		return await this.getUserListFromTargetConversation(conversationID);
 	}
 
-	// return un array d'array d'objets "user" : login, avatarURL
+
 	async getConversationsWithStatus(userID: number) {
 
 		const user = await this.usersRepository.findOne({
@@ -1237,6 +1322,7 @@ export class ChatService {
 
 			const conversationList = await this.getAllChannels(userID);
 			const usersList = await this.getUserListFromConversations(user, conversationList);
+
 			if (conversationList && usersList) {
 				const conversationArray = {
 					conversationList: conversationList,
@@ -1244,13 +1330,12 @@ export class ChatService {
 					usersList: usersList,
 					blockList: user.blockedUsers,
 				}
-	
+
 				return conversationArray;
 			}
 		}
 
-		console.error("Fatal error: conversations not found");
-		return [];
+		throw new HttpException('Fatal error', HttpStatus.BAD_REQUEST);
 	}
 
 	async getConversationsToAdd(friendID: number, userID: number) {
@@ -1269,25 +1354,30 @@ export class ChatService {
 			where: {is_channel: true},
 		});
 
-		let friendChannels = [];
-		friend.groups.forEach((group: GroupMember) => {
-			conversations.forEach((conversation: Conversation) => {
-				if (group.conversation.id == conversation.id && conversation.is_channel)
-				friendChannels.push(conversation);
+		if (user && friend && conversations) {
+
+			let friendChannels = [];
+			friend.groups.forEach((group: GroupMember) => {
+				conversations.forEach((conversation: Conversation) => {
+					if (group.conversation.id == conversation.id && conversation.is_channel)
+					friendChannels.push(conversation);
+				});
 			});
-		});
-	
-		let arrayDelete = [];
-		user.groups.forEach((group: GroupMember) => {
-			conversations.forEach((conversation: Conversation) => {
-				if (group.isAdmin && group.conversation.id == conversation.id && conversation.is_channel)
-					arrayDelete.push(conversation);
+		
+			let arrayDelete = [];
+			user.groups.forEach((group: GroupMember) => {
+				conversations.forEach((conversation: Conversation) => {
+					if (group.isAdmin && group.conversation.id == conversation.id && conversation.is_channel)
+						arrayDelete.push(conversation);
+				});
 			});
-		});
-	
-		const array1 = conversations.filter((conversation: Conversation) => arrayDelete.includes(conversation));
-		const array2 = array1.filter((conversation: Conversation) => !friendChannels.includes(conversation));
-		return array2;
+		
+			const array1 = conversations.filter((conversation: Conversation) => arrayDelete.includes(conversation));
+			const array2 = array1.filter((conversation: Conversation) => !friendChannels.includes(conversation));
+			return array2;
+		}
+
+		throw new HttpException('Fatal error', HttpStatus.BAD_REQUEST);
 	}
 
 	async getAllPublicConversationsOption(userID : number) {
@@ -1296,20 +1386,25 @@ export class ChatService {
 			where: { id: userID },
 			relations: ["groups", "groups.conversation"],
 		});
-		console.log("user: ", user.login);
 
 		let conversations : Conversation[] = await this.conversationRepository.find({
 			where: {isPublic: true, is_channel: true},
 		});
-		
-		let arrayDelete = [];
-		user.groups.forEach((group: GroupMember) => {
-			conversations.forEach((conversation: Conversation) => {
-				if (group.conversation.id == conversation.id && conversation.is_channel && conversation.isPublic)
-					arrayDelete.push(conversation);
+
+		if (user && conversations) {
+
+			let arrayDelete = [];
+			user.groups.forEach((group: GroupMember) => {
+				conversations.forEach((conversation: Conversation) => {
+					if (group.conversation.id == conversation.id && conversation.is_channel && conversation.isPublic)
+						arrayDelete.push(conversation);
+				});
 			});
-		});
-		const array = conversations.filter((conversation: Conversation) => !arrayDelete.includes(conversation));
-		return array;
+
+			const array = conversations.filter((conversation: Conversation) => !arrayDelete.includes(conversation));
+			return array;
+		}
+		
+		throw new HttpException('Fatal error', HttpStatus.BAD_REQUEST);
 	}
 }
