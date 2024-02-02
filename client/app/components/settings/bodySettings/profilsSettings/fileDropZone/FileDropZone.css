@@ -1,15 +1,14 @@
 .file-drop-zone {
-	border: 4px dashed #ccc;
-	padding: 10px; /* Réduisez la taille de la zone de dépôt */
-	text-align: center;
-	background-color: var(--fourth); /* Fond rouge */
-	display: relative;
-	align-items: center;
-	justify-content: center;
-	height: 50%;
-	width: 50%;
-	margin-top: 10px;
-	margin-bottom: 10px;
+    border: 4px dashed #ccc;
+    padding: 10px;
+    text-align: center;
+    background-color: var(--fourth);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: auto;
+    width: calc(33% - 20px);
+    aspect-ratio: 1 / 1;
 }
 
 .dragging {
