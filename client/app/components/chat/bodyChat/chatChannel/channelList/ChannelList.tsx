@@ -43,7 +43,7 @@ const ChannelListComponent: React.FC = () => {
 
 		try{
 
-			const response = await fetch(`${process.env.API_URL}/chat/getConversationsWithStatus/${userID}`, {
+			const response = await fetch(`${process.env.API_URL}/chat/getConversationsWithStatus`, {
 				method: 'GET',
 				headers: {
 					'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,

@@ -27,7 +27,7 @@ const ChatListComponent: React.FC = () => {
   
 	const loadDMs = async () => {
 		try {
-			const requestDms = await fetch(`${process.env.API_URL}/chat/getDMsConversations/${sessionStorage.getItem("currentUserID")}`, {
+			const requestDms = await fetch(`${process.env.API_URL}/chat/getDMsConversations`, {
 				method: 'GET',
 				headers: {
 					'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
