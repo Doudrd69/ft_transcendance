@@ -138,50 +138,50 @@ export class GameGateway {
             // this.GameService.gameInvite(this.server, client, {userOneId: data.userOneId, userTwoId: data.userTwoId, playerOneId: client.id, playerTwoId: data.playerTwoId})
             console.log(`invite accpeted :=====> ${data.playerTwoId}`);
             this.server.to([data.playerTwoId]).emit('acceptInvitation');
-            if (!this.GameService.userHasAlreadyGameSockets(data.userOneId)) {
-                if (!this.GameService.userHasAlreadyGameSockets(data.userTwoId)) {
-                    this.GameService.addGameInviteSocket(client.id, data.userOneId, data.playerTwoId, data.userTwoId);
-                    await this.GameService.linkSocketIDWithUser(client.id, data.userOneId);
-                    await this.GameService.linkSocketIDWithUser(data.playerTwoId, data.userTwoId);
-                    //             // creating a personnal room so we can emit to the user
-                    client.join(data.playerOneLogin);
-                    client.join(data.playerTwoLogin);
-                    let game = await this.GameService.createGame(client.id, data.playerTwoId, "NORMAL");
-                    if (!game)
-                        throw new Error("Fatal error");
-                    const gameInstance: game_instance = this.GameEngineceService.createGameInstance(game);
-                    this.game_instance.push(gameInstance);
-                    this.server.to([client.id, data.playerTwoId]).emit('setGameInvited');
-                    this.server.to([client.id, data.playerTwoId]).emit('joinGame', {
-                        gameId: game.gameId,
-                        playerOneID: game.playerOneID,
-                        playerTwoID: game.playerTwoID,
-                        playerOneLogin: game.playerOneLogin,
-                        playerTwoLogin: game.playerTwoLogin,
-                        scoreOne: game.scoreOne,
-                        scoreTwo: game.scoreTwo,
-                    });
-                    setTimeout(() => {
-                        this.server.to([client.id, data.playerTwoId]).emit('gameStart', {
-                            gameId: game.gameId,
-                            playerOneID: game.playerOneID,
-                            playerTwoID: game.playerTwoID,
-                            playerOneLogin: game.playerOneLogin,
-                            playerTwoLogin: game.playerTwoLogin,
-                            scoreOne: game.scoreOne,
-                            scoreTwo: game.scoreTwo,
-                        });
-                    }, 1000);
-                }
-                else {
-                    console.log(`User have already socket : ${data.playerTwoLogin}`)
-                    this.server.to([client.id, data.playerTwoId]).emit('gameInProgress');
-                }
-            }
-            else {
-                console.log(`User have already socket : ${data.playerOneLogin}`)
-                this.server.to([client.id, data.playerTwoId]).emit('gameInProgress');
-            }
+            // if (!this.GameService.userHasAlreadyGameSockets(data.userOneId)) {
+            //     if (!this.GameService.userHasAlreadyGameSockets(data.userTwoId)) {
+            this.GameService.addGameInviteSocket(client.id, data.userOneId, data.playerTwoId, data.userTwoId);
+            await this.GameService.linkSocketIDWithUser(client.id, data.userOneId);
+            await this.GameService.linkSocketIDWithUser(data.playerTwoId, data.userTwoId);
+            //             // creating a personnal room so we can emit to the user
+            client.join(data.playerOneLogin);
+            client.join(data.playerTwoLogin);
+            let game = await this.GameService.createGame(client.id, data.playerTwoId, "NORMAL");
+            if (!game)
+                throw new Error("Fatal error");
+            const gameInstance: game_instance = this.GameEngineceService.createGameInstance(game);
+            this.game_instance.push(gameInstance);
+            this.server.to([client.id, data.playerTwoId]).emit('setGameInvited');
+            this.server.to([client.id, data.playerTwoId]).emit('joinGame', {
+                gameId: game.gameId,
+                playerOneID: game.playerOneID,
+                playerTwoID: game.playerTwoID,
+                playerOneLogin: game.playerOneLogin,
+                playerTwoLogin: game.playerTwoLogin,
+                scoreOne: game.scoreOne,
+                scoreTwo: game.scoreTwo,
+            });
+            setTimeout(() => {
+                this.server.to([client.id, data.playerTwoId]).emit('gameStart', {
+                    gameId: game.gameId,
+                    playerOneID: game.playerOneID,
+                    playerTwoID: game.playerTwoID,
+                    playerOneLogin: game.playerOneLogin,
+                    playerTwoLogin: game.playerTwoLogin,
+                    scoreOne: game.scoreOne,
+                    scoreTwo: game.scoreTwo,
+                });
+            }, 1000);
+            // }
+            //     else {
+            //         console.log(`User have already socket : ${data.playerTwoLogin}`)
+            //         this.server.to([client.id, data.playerTwoId]).emit('gameInProgress');
+            //     }
+            // }
+            // else {
+            //     console.log(`User have already socket : ${data.playerOneLogin}`)
+            //     this.server.to([client.id, data.playerTwoId]).emit('gameInProgress');
+            // }
         }
         catch (error) {
             await this.handleException(error, client)
@@ -209,6 +209,16 @@ export class GameGateway {
         catch (error) {
             await this.handleException(error, client)
         }
+    }
+
+    @SubscribeMessage('throwGameInvite')
+    async handleThrowGameInvite(@ConnectedSocket() client: Socket) {
+        this.GameService.addGameSocket(client.id, client.handshake.auth.userId);
+    }
+
+    @SubscribeMessage('gameInviteRejected')
+    handleGameInviteRejected(@ConnectedSocket() client: Socket) {
+        this.GameService.deleteGameSocketsIdForPlayer(client.handshake.auth.userId);
     }
 
     @SubscribeMessage('Game')

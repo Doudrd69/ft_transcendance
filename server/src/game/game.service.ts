@@ -353,6 +353,13 @@ export class GameService {
 		this.userGameSockets[userId] = gameSocketId;
 	}
 
+	async setUserInMatchmaking(userId: number)
+	{
+		let user: User = await this.getUserWithUserId(userId);
+		user.inMatchmaking = true;
+		await this.usersRepository.save(user);
+	}
+
 	addGameInviteSocket(gameSocketIdOne: string, userOneId: number, gameSocketIdTwo: string, userTwoId: number) {
 		this.userGameSockets[userOneId] = gameSocketIdOne;
 		this.userGameSockets[userTwoId] = gameSocketIdTwo;
