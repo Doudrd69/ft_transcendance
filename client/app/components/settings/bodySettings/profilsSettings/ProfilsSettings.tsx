@@ -57,28 +57,34 @@ const ProfilsSettingsComponent: React.FC = () => {
 	};
 
 	const handleImage = async () => {
+
 		try {
+
 			const formData = new FormData();
 			if (newImage && newImage instanceof File) {
+
 				formData.append('avatar', newImage, newImage.name);
-			}
 
-			const response = await fetch(`${process.env.API_URL}/users/upload-Avatar}`, {
-				method: 'POST',
-				body: formData,
-			});
+				const response = await fetch(`${process.env.API_URL}/users/upload-Avatar}`, {
+					method: 'POST',
+					headers: {
+						'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
+					},
+					body: formData,
+				});
 
-			if (response.ok) {
-				dispatch({ type: 'ACTIVATE', payload: 'showAvatar' });
-				dispatch({ type: 'DISABLE', payload: 'showUploadAvatar' });
-				dispatch({ type: 'TOGGLEX', payload: 'showRefresh'});
-			}
-			else {
-				const error = await response.json();
-				if (Array.isArray(error.message))
-					toast.warn(error.message[0]);
-				else
-					toast.warn(error.message);
+				if (response.ok) {
+					dispatch({ type: 'ACTIVATE', payload: 'showAvatar' });
+					dispatch({ type: 'DISABLE', payload: 'showUploadAvatar' });
+					dispatch({ type: 'TOGGLEX', payload: 'showRefresh'});
+				}
+				else {
+					const error = await response.json();
+					if (Array.isArray(error.message))
+						toast.warn(error.message[0]);
+					else
+						toast.warn(error.message);
+				}
 			}
 		}
 		catch (error) {
