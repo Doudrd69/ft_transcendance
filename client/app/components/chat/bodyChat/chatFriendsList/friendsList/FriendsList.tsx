@@ -107,6 +107,10 @@ const FriendsListComponent: React.FC = () => {
 
 	useEffect(() => {
 
+		globalState.userSocket?.on('newUser', () => {
+			loadAllList();
+		});
+
 		globalState.userSocket?.on('friendRequestAcceptedNotif', () => {
 			loadFriendList();
 		});
@@ -116,12 +120,10 @@ const FriendsListComponent: React.FC = () => {
 		});
 
 		globalState.userSocket?.on('newConnection', (notif: string) => {
-			console.log("Event newConnection");
 			loadFriendList();
 		})
 
 		globalState.userSocket?.on('newDeconnection', (notif: string) => {
-			console.log("Event newDeconnection"); 
 			loadFriendList();
 		})
 
@@ -130,6 +132,7 @@ const FriendsListComponent: React.FC = () => {
 			globalState.userSocket?.off('refreshFriends');
 			globalState.userSocket?.off('newConnection');
 			globalState.userSocket?.off('newDeconnection');
+			globalState.userSocket?.off('newUser');
 		}
 
 	}, [globalState?.userSocket]);
