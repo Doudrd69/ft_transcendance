@@ -29,11 +29,11 @@ export class ChannelOptionsDto {
 	@IsBoolean()
 	state: boolean;
 
-	@IsNotEmpty()
-	@Length(6, 20)
-	@IsAscii()
-	@IsAlphanumeric()
-	@IsString()
+	// @IsNotEmpty()
+	// @Length(6, 20)
+	// @IsAscii()
+	// @IsAlphanumeric()
+	// @IsString()
 	@Matches(/^[^"';%()|<>\\]*$/)
 	password?: string;
 }
