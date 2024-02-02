@@ -62,6 +62,7 @@ const TimerComponent: React.FC<TimerComponentProps> = ({user}) => {
 				globalState.userSocket?.emit('refreshUserChannelList', {
 					userToRefresh: user.login,
 				});
+				chatDispatch({ type: 'ACTIVATE' , payload: 'showBackComponent'});
 				chatDispatch({ type: 'DISABLE' , payload: 'showTimer'});
 			}
 			else {
@@ -78,8 +79,8 @@ const TimerComponent: React.FC<TimerComponentProps> = ({user}) => {
 	}
 
 	const handleCancel = () => {
-		chatDispatch({ type: 'ACTIVATE' , payload: 'showOptionUserChannel'});
 		chatDispatch({ type: 'DISABLE' , payload: 'showTimer'});
+		chatDispatch({ type: 'ACTIVATE' , payload: 'showOptionUserChannel'});
 		chatDispatch({ type: 'ACTIVATE' , payload: 'showBackComponent'});
 		setTimer('');
 	};

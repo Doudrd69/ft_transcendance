@@ -21,6 +21,8 @@ import { BlockUserDto } from './dto/BlockUserDto.dto';
 import { validate, validateOrReject } from 'class-validator'
 import { AuthGuard } from 'src/auth/auth.guard';
 import { Conversation } from 'src/chat/entities/conversation.entity';
+import { createBrotliCompress } from 'zlib';
+// import * as sharp from 'sharp';
 
 @Controller('users')
 export class UsersController {
@@ -43,28 +45,34 @@ export class UsersController {
 	// @UseGuards(AuthGuard)
 	@HttpCode(HttpStatus.OK)
 	@Post('upload-avatar/:userId')
-	@UseInterceptors(FileInterceptor('avatar', { storage: diskStorage({ destination: path.join(__dirname, 'avatars'), filename: async (req, file, callback) => {
-			const randomName = randomBytes(16).toString('hex');
-			const fileExtension = extname(file.originalname);
-			const newFilename = `${randomName}${fileExtension}`;
-			callback(null, newFilename);
-		},
+	@UseInterceptors(FileInterceptor('avatar',
+			{
+	
+				storage: diskStorage({ destination: null,
+				filename: async (req, file, callback) => {
+					const randomName = randomBytes(16).toString('hex');
+					const fileExtension = extname(file.originalname);
+					const newFilename = `${randomName}${fileExtension}`;
+					callback(null, newFilename);
+			},
 		}),
 	}))
-	// @UseGuards(AuthGuard)
 	async uploadAvatar(@UploadedFile() avatar: Express.Multer.File, @Param('userId') userId: number) {
 		try
 		{
-			if (!avatar) {
-				throw new HttpException(`No files uploaded`, HttpStatus.BAD_REQUEST);
-			}
-			const isValidPNG = await this.usersService.isPNG(avatar.path);
-			if (!isValidPNG) {
-				throw new HttpException(`Invalid file format`, HttpStatus.BAD_REQUEST);
-			}
-			const avatarURL = `/avatars/${avatar.filename}`;
-			await this.usersService.uploadAvatarURL(avatarURL, userId);
-			return { avatarURL };
+			
+			const cheminImageSortie = path.join(__dirname, 'avatars', `carredanslaxe_${avatar.filename}`);
+			const image = await Jimp.read(avatar.path);
+			const taille = Math.min(image.bitmap.width, image.bitmap.height);
+			const xOffset = (image.bitmap.width - taille) / 2;
+			const yOffset = (image.bitmap.height - taille) / 2;
+			await image
+				.crop(xOffset, yOffset, taille, taille)
+				.resize(200, 200)
+				.writeAsync(cheminImageSortie);
+			const URLAvatar = `/avatars/carredanslaxe_${avatar.filename}`;
+			await this.usersService.uploadAvatarURL(URLAvatar, userId);
+			return { URLAvatar };
 		}
 		catch (error){
 			throw error;
