@@ -11,7 +11,7 @@ const StatsComponent: React.FC = () => {
 	const [statsUsers, setStatsUser] = useState<StatsUsers>();
 	const handleGameHistory = async () => {
 		try {
-			const response = await fetch(`http://localhost:3001/users/getUserStats/${sessionStorage.getItem("currentUserID")}`, {
+			const response = await fetch(`${process.env.API_URL}/users/getUserStats/${sessionStorage.getItem("currentUserID")}`, {
 				method: 'GET',
 				headers: {
 					'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`
