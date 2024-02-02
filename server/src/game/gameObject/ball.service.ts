@@ -28,11 +28,11 @@ export class BallService {
 		ball.position = this.VectorService.add(ball.position, ball.speed);
 		if (ball.position.x + ball.r <= 0) {
 			ball.alive = false;
-			ball.player1Scored = true;
+			ball.player2Scored = true;
 		}
 		else if (ball.position.x + ball.r >= 1) {
 			ball.alive = false;
-			ball.player2Scored = true;
+			ball.player1Scored = true;
 		}
 		if (ball.position.y - ball.r < 0) {
 			ball.position.y = ball.r;
