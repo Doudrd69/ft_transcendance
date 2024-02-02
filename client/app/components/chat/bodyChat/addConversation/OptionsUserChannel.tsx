@@ -570,7 +570,7 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 	const handleTabClick = (text: string, functionToExecute: any) => {
 		setConfirmationText(text);
 		setFunctionToExecute(() => functionToExecute);
-		console.log(Cstate);
+		console.log(chatState);
 		chatDispatch({ type: 'DISABLE', payload: 'showOptionsUserChannel' });
 		chatDispatch({ type: 'DISABLE', payload: 'showOptionsUserChannelOwner ' });
 		chatDispatch({ type: 'ACTIVATE', payload: 'showConfirmation' });
