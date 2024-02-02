@@ -10,7 +10,7 @@ import { GameService } from 'src/game/game.service';
 import { GameEngineService } from 'src/game/gameEngine.service';
 import { MatchmakingService } from 'src/game/matchmaking/matchmaking.service';
 import { GatewayGuard } from 'src/gateway/Gatewayguard.guard';
-import { UseGuards} from '@nestjs/common'
+import { UseGuards } from '@nestjs/common'
 import { User } from 'src/users/entities/users.entity';
 import dotenv from 'dotenv';
 dotenv.config();
@@ -92,7 +92,7 @@ export class GameGateway {
     async handleException(error: Error, client: Socket) {
         console.log(`[GAME_ERROR]: ${error.stack}`)
         console.log(`[GAME_ERROR] ${error.name}, ${error.message}`)
-        client.emit("exception", {error: error.message})
+        client.emit("exception", { error: error.message })
     }
 
 
@@ -115,9 +115,9 @@ export class GameGateway {
                         if (gameInstance && gameInstance.game_has_ended !== true) {
                             console.log(`[handleDisconnect] User will be disconnect from game ${gameInstance}`)
                             if (user.login === gameInstance.playersLogin[0])
-                                await this.GameService.disconnectSocket(gameInstance.players[1], gameInstance.gameID)
+                                await this.GameService.disconnectSocket(gameInstance.usersId[0], gameInstance.gameID, gameInstance.players[0])
                             else
-                                await this.GameService.disconnectSocket(gameInstance.players[0], gameInstance.gameID)
+                                await this.GameService.disconnectSocket(gameInstance.usersId[1], gameInstance.gameID, gameInstance.players[0])
                         }
                     }
                 }
@@ -317,32 +317,33 @@ export class GameGateway {
         const user2: User = await this.GameService.getUserWithUserId(gameInstance.usersId[1]);
         await this.GameService.updateStateGameForUsers(user1, user2);
         this.GameService.deleteGameSocketsIdForPlayers(user1, user2);
-        let game = await this.GameService.getGameWithUserId(user1.id);
+        let game = await this.GameService.getGameWithGameId(gameInstance.gameID);
+        console.log(`[endGame] score: ${gameInstance.player1_score}, ${gameInstance.player2_score}, game.gameEnd = ${game.gameEnd}, game.id = ${game.gameId}`)
         if (game.gameEnd === false) {
+            console.log(`[endGame] gameEnd is false ${gameInstance.player1_score}, ${gameInstance.player2_score}`)
             await this.GameService.endOfGame(game, gameInstance);
         }
     }
 
 
     async handleUserDisconnection(disconnectedSockets: string[], gameInstance: game_instance, gameLoop: NodeJS.Timeout) {
+        console.log(`[handleUserDisconnection]: ${disconnectedSockets} `)
         try {
+            gameInstance.stop = true
+            clearInterval(gameLoop);
+            for (const userSocket of disconnectedSockets) {
+                this.server.to(userSocket).emit('userDisconnected');
+            }
+            const user1: User = await this.GameService.getUserWithUserId(gameInstance.usersId[0]);
+            const user2: User = await this.GameService.getUserWithUserId(gameInstance.usersId[1]);
+            let game = await this.GameService.getGameWithUserId(user1.id);
+            await this.GameService.deleteGame(game);
+            await this.GameService.createGameStop(user1, user2, gameInstance, disconnectedSockets);
+            await this.GameService.updateStateGameForUsers(user1, user2);
+            this.GameService.deleteGameSocketsIdForPlayers(user1, user2);
 
-        console.log(`disconnectedFound: ${disconnectedSockets} `)
-        gameInstance.stop = true
-        clearInterval(gameLoop);
-        for (const userSocket of disconnectedSockets) {
-            this.server.to(userSocket).emit('userDisconnected');
-        }
-        const user1: User = await this.GameService.getUserWithUserId(gameInstance.usersId[0]);
-        const user2: User = await this.GameService.getUserWithUserId(gameInstance.usersId[1]);
-        let game = await this.GameService.getGameWithUserId(user1.id);
-        await this.GameService.createGameStop(user1, user2, gameInstance, disconnectedSockets);
-        await this.GameService.updateStateGameForUsers(user1, user2);
-        this.GameService.deleteGameSocketsIdForPlayers(user1, user2);
-
-        await this.GameService.deleteGame(game);
-        await this.GameService.clearDisconnections(gameInstance.gameID);
-        // delete gameInstance
+            await this.GameService.clearDisconnections(gameInstance.gameID);
+            // delete gameInstance
         } catch (error) {
             console.log(error.stack)
             console.log("User disconnection handling failed")
@@ -351,8 +352,10 @@ export class GameGateway {
 
     async executeGameTick(gameLoop: NodeJS.Timeout, gameInstance: game_instance, client: string) {
         try {
-            if (gameInstance.stop === true)
+            if (gameInstance.stop === true) {
+                console.log(`[RETURN GAME STOP] gameinstance: ${gameInstance.game_has_ended}`)
                 return
+            }
             const disconnectedSockets = this.GameService.getDisconnections(gameInstance.gameID)
             if (disconnectedSockets.length > 0)
                 await this.handleUserDisconnection(disconnectedSockets, gameInstance, gameLoop)
@@ -366,21 +369,21 @@ export class GameGateway {
             this.GameEngineceService.processInput(gameInstance);
             this.GameEngineceService.updateGameInstance(gameInstance, this.server);
             this.server.to([gameInstance.players[0], gameInstance.players[1]]).emit('GameUpdate', {
-                BallPosition: {x: gameInstance.ball.position.x, y: gameInstance.ball.position.y},
+                BallPosition: { x: gameInstance.ball.position.x, y: gameInstance.ball.position.y },
                 scoreOne: gameInstance.player1_score,
                 scoreTwo: gameInstance.player2_score,
-                paddleOne: {x: gameInstance.paddles[0].start.x - 0.025, y: gameInstance.paddles[0].start.y, width: 0.025, height: gameInstance.paddles[0].end.y - gameInstance.paddles[0].start.y},
-                paddleTwo: {x: gameInstance.paddles[1].start.x, y: gameInstance.paddles[1].start.y, width: 0.025, height: gameInstance.paddles[1].end.y - gameInstance.paddles[1].start.y},
+                paddleOne: { x: gameInstance.paddles[0].start.x - 0.025, y: gameInstance.paddles[0].start.y, width: 0.025, height: gameInstance.paddles[0].end.y - gameInstance.paddles[0].start.y },
+                paddleTwo: { x: gameInstance.paddles[1].start.x, y: gameInstance.paddles[1].start.y, width: 0.025, height: gameInstance.paddles[1].end.y - gameInstance.paddles[1].start.y },
             })
         } catch (error) {
             console.log(`[GAME_LOOP_ERROR]: ${error.stack}`)
             console.log(`[GAME_LOOP_ERROR]: ${error.name}, ${error.message}`)
             const user1: User = await this.GameService.getUserWithUserId(gameInstance.usersId[0]);
             const user2: User = await this.GameService.getUserWithUserId(gameInstance.usersId[1]);
-            await this.GameService.disconnectSocket(user1.gameSocketId, gameInstance.gameID)
-            await this.GameService.disconnectSocket(user2.gameSocketId, gameInstance.gameID)
+            await this.GameService.disconnectSocket(gameInstance.usersId[0], gameInstance.gameID, gameInstance.players[0])
+            await this.GameService.disconnectSocket(gameInstance.usersId[1], gameInstance.gameID, gameInstance.players[0])
             await this.handleUserDisconnection(
-                [user1.gameSocketId, user2.gameSocketId], gameInstance, gameLoop
+                [gameInstance.players[0], gameInstance.players[1]], gameInstance, gameLoop
             )
         }
     }

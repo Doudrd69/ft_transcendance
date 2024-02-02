@@ -320,7 +320,7 @@ export class UsersService {
 			let object = {
 				victory: user.victory,
 				defeat: user.defeat,
-				ratio: user.defeat ? (user.victory / (user.defeat + user.victory) * 100): -1,
+				ratio: user.defeat ? (user.victory / (user.defeat + user.victory) * 100): 0,
 			};
 
 			return object;
