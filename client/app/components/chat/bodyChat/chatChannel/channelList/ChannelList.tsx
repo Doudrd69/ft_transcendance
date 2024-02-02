@@ -203,7 +203,9 @@ const ChannelListComponent: React.FC = () => {
 					{!conversation.isPublic && <img className="icon-private-channel" src='./private.png' alt="private" />}
 					<span>{`${conversation.name}#${conversation.id}`}</span>
 				</button>
+				
 				)
+				
 			))}
 		</div>
 	);
