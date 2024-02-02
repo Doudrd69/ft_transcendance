@@ -116,10 +116,12 @@ const FriendsListComponent: React.FC = () => {
 		});
 
 		globalState.userSocket?.on('newConnection', (notif: string) => {
+			console.log("Event newConnection");
 			loadFriendList();
 		})
 
 		globalState.userSocket?.on('newDeconnection', (notif: string) => {
+			console.log("Event newDeconnection"); 
 			loadFriendList();
 		})
 
