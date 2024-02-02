@@ -63,7 +63,7 @@ const ProfilsSettingsComponent: React.FC = () => {
 				formData.append('avatar', newImage, newImage.name);
 			}
 
-			const response = await fetch(`${process.env.API_URL}/users/upload-Avatar/${sessionStorage.getItem('currentUserID')}`, {
+			const response = await fetch(`${process.env.API_URL}/users/upload-Avatar}`, {
 				method: 'POST',
 				body: formData,
 			});

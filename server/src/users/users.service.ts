@@ -394,7 +394,48 @@ export class UsersService {
 		return conversation;
 	}
 
-	async updateFriendship(friendRequestDto: FriendRequestDto, flag: boolean, userID: number): Promise<Conversation | Friendship> {
+	async updateFriendshipToTrue(friendRequestDto: FriendRequestDto, userID: number): Promise<Conversation | Friendship> {
+
+		const initiator = await this.usersRepository.findOne({
+			where: { username: friendRequestDto.initiatorLogin },
+			relations: ["initiatedFriendships", "acceptedFriendships", "groups", "groups.conversation"],
+		});
+
+		const friend = await this.usersRepository.findOne({
+			where: { id: userID },
+			relations: ["initiatedFriendships", "acceptedFriendships", "groups", "groups.conversation"],
+		});
+
+		if (initiator && friend) {
+
+			const friendshipToUpdate = await this.friendshipRepository
+				.createQueryBuilder('friendship')
+				.where('(friendship.initiator.id = :initiatorId AND friendship.friend.id = :friendId) OR (friendship.initiator.id = :friendId AND friendship.friend.id = :initiatorId)', {
+					initiatorId: initiator.id,
+					friendId: friend.id,
+				})
+				.getOne();
+
+			if (friendshipToUpdate) {
+
+				friendshipToUpdate.isAccepted = true;
+				await this.friendshipRepository.save(friendshipToUpdate);
+
+				const privateConversation = await this.findDMConversation(initiator, friend);
+
+				if (!privateConversation) {
+					const conversation = this.chatService.createDMConversation(initiator, friend);
+					return conversation;
+				}
+
+				return friendshipToUpdate;
+			}
+		}
+
+		throw new HttpException('Fatal error', HttpStatus.BAD_REQUEST);
+	}
+
+	async updateFriendshipToFalse(friendRequestDto: FriendRequestDto, userID: number): Promise<Conversation | Friendship> {
 
 		const initiator = await this.usersRepository.findOne({
 			where: { id: userID },
@@ -418,22 +459,11 @@ export class UsersService {
 
 			if (friendshipToUpdate) {
 
-				friendshipToUpdate.isAccepted = flag;
+				friendshipToUpdate.isAccepted = false;
 				await this.friendshipRepository.save(friendshipToUpdate);
-
-				const privateConversation = await this.findDMConversation(initiator, friend);
-
-				if (!privateConversation) {
-					if (flag) {
-						const conversation = this.chatService.createDMConversation(initiator, friend);
-						return conversation;
-					}
-				}
 
 				return friendshipToUpdate;
 			}
-
-			throw new HttpException('Users are not friends', HttpStatus.BAD_REQUEST);
 		}
 
 		throw new HttpException('Fatal error', HttpStatus.BAD_REQUEST);
@@ -441,7 +471,8 @@ export class UsersService {
 
 	async acceptFriendship(friendRequestDto: FriendRequestDto, userID: number): Promise<Conversation | Friendship> {
 
-		const newConversationBetweenFriends = await this.updateFriendship(friendRequestDto, true, userID);
+		console.log("Add friend: ", friendRequestDto);
+		const newConversationBetweenFriends = await this.updateFriendshipToTrue(friendRequestDto, userID);
 		if (newConversationBetweenFriends) {
 			return newConversationBetweenFriends;
 		}
@@ -451,7 +482,8 @@ export class UsersService {
 
 	async removeFriend(blockUserDto: BlockUserDto, userID: number): Promise<Conversation | Friendship> {
 
-		const friendshipToUpdate = await this.updateFriendship(blockUserDto, false, userID);
+		console.log("Remove friend: ", blockUserDto);
+		const friendshipToUpdate = await this.updateFriendshipToFalse(blockUserDto, userID);
 		if (friendshipToUpdate) {
 			return friendshipToUpdate;
 		}
@@ -512,6 +544,39 @@ export class UsersService {
 		const user = await this.usersRepository.findOne({ where: { id: userID } });
 		if (user) {
 			return user.blockedUsers;
+		}
+
+		throw new HttpException('User not found', HttpStatus.BAD_REQUEST);
+	}
+
+	async getUserList(userId: number) {
+
+		const user = await this.usersRepository.findOne({ where: { id: userId } });
+		if (user) {
+
+			const users = await this.usersRepository.find();
+			if (users) {
+
+				let array = [];
+				users.forEach((user_: User) => {
+					let blockStatus = false;
+					user.blockedUsers.forEach((blockedFriend: string) => {
+						if (blockedFriend == user_.username) {
+							blockStatus = true;
+						}
+					});
+					array.push({
+						id: user_.id,
+						username: user_.username,
+						avatar: user_.avatarURL,
+						isBlocked: blockStatus,
+					});
+				})
+
+				return array;
+			}
+
+			throw new HttpException('Failed to load user list', HttpStatus.BAD_REQUEST);
 		}
 
 		throw new HttpException('User not found', HttpStatus.BAD_REQUEST);

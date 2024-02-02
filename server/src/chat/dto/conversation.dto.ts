@@ -1,5 +1,6 @@
 import {
 	IsAlpha,
+	IsAlphanumeric,
 	IsAscii,
 	IsBoolean,
 	IsNotEmpty,
@@ -40,9 +41,8 @@ export class ConversationDto {
 	isProtected: boolean;
 
 	// @Length(6, 20)
-	@IsAscii()
-	@IsAlpha()
-	@IsString()
+	// @IsAscii()
+	// @IsAlphanumeric()
 	@Matches(/^[^"';%()|<>\\]*$/)
 	password?: string;
 }

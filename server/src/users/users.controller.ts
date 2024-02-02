@@ -42,7 +42,7 @@ export class UsersController {
 	// }
 
 
-	// @UseGuards(AuthGuard)
+	@UseGuards(AuthGuard)
 	@HttpCode(HttpStatus.OK)
 	@Post('upload-avatar/:userId')
 	@UseInterceptors(FileInterceptor('avatar',
@@ -159,13 +159,13 @@ export class UsersController {
 		return this.usersService.createFriendship(friendRequestDto, user.sub);
 	}
 
-	@UseGuards(AuthGuard)
-	@HttpCode(HttpStatus.OK)
-	@Post('friendRequestResponse')
-	updateFriendship(@Req() req, @Body() friendRequestDto: FriendRequestDto, flag: boolean) {
-		const { user } = req; 
-		return this.usersService.updateFriendship(friendRequestDto, flag, user.sub);
-	}
+	// @UseGuards(AuthGuard)
+	// @HttpCode(HttpStatus.OK)
+	// @Post('friendRequestResponse')
+	// updateFriendship(@Req() req, @Body() friendRequestDto: FriendRequestDto, flag: boolean) {
+	// 	const { user } = req; 
+	// 	return this.usersService.updateFriendship(friendRequestDto, flag, user.sub);
+	// }
 
 	@UseGuards(AuthGuard)
 	@HttpCode(HttpStatus.OK)
@@ -206,6 +206,13 @@ export class UsersController {
 	getFriendsList(@Req() req, ): Promise<Friendship[]> {
 		const { user } = req;
 		return this.usersService.getFriendships(user.sub);
+	}
+
+	@UseGuards(AuthGuard)
+	@Get('getUserList')
+	getUserList(@Req() req, ): Promise<Friendship[]> {
+		const { user } = req;
+		return this.usersService.getUserList(user.sub);
 	}
 
 	@UseGuards(AuthGuard)

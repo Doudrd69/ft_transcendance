@@ -3,5 +3,12 @@
 	display: flex;
 	flex-direction: column;
 	justify-content: space-between;
-	width: 25%;
+	width: 35%;
 }
+
+@media only screen and (max-width: 800px) {
+    .left-half {
+		height: 50%;
+	  width: 100%;
+    }
+  }

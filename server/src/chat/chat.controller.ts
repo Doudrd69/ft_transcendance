@@ -26,7 +26,7 @@ export class ChatController {
 	@UseGuards(AuthGuard)
 	@HttpCode(HttpStatus.OK)
 	@Post('newConversation')
-	createNewConversation(@Req() req,  @Body() conversationDto: ConversationDto): Promise<Conversation> {
+	createNewConversation(@Req() req, @Body() conversationDto: ConversationDto): Promise<Conversation> {
 		const { user } = req;
 		return this.chatService.createConversation(conversationDto, user.sub);
 	}

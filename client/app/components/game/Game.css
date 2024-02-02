@@ -4,3 +4,10 @@
     height: calc(100%);
     width: 75%;
     }
+
+@media only screen and (max-width: 800px) {
+	.right-half {
+		height: 50%;
+		width: 100%;
+	}
+	}

@@ -1,0 +1,14 @@
+	.container-bloc {
+		display: flex;
+		flex-direction: row;
+		height: 93%;
+		width: 100%;
+}
+
+@media only screen and (max-width: 800px) {
+    .container-bloc {
+      flex-direction: column;
+      height: 93%;
+	  width: 100%;
+    }
+  }

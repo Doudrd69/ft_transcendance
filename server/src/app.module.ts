@@ -69,6 +69,8 @@ imports: [
 ],
 
 	controllers: [AppController],
-	providers: [AppService, {provide: APP_FILTER, useClass: ErrorFilter}],
+	providers: [AppService],
 })
 export class AppModule {}
+
+//, {provide: APP_FILTER, useClass: ErrorFilter}
