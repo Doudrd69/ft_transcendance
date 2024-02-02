@@ -45,6 +45,7 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 				client.join(value.name + value.id);
 			})
 
+			console.log("user", userID)
 			const blockedUsers = await this.userService.getBlockedUserList(userID);
 			if (blockedUsers) {
 				blockedUsers.forEach((blockedUser: string) => {

@@ -73,4 +73,4 @@ imports: [
 })
 export class AppModule {}
 
-// {provide: APP_FILTER, useClass: ErrorFilter}
+//, {provide: APP_FILTER, useClass: ErrorFilter}

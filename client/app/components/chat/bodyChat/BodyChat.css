@@ -1,5 +1,4 @@
 .powerlifter{
 	display:flex;
 	flex-direction: column;
-	height: 93%;
-}
+	height: calc(100% - 50px);}
