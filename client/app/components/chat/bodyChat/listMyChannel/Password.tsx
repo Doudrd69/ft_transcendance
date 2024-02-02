@@ -35,7 +35,8 @@ const PasswordComponent: React.FC = () => {
 			});
 		
 			if (response.ok) {
-
+				globalState.userSocket?.emit('joinRoom', { roomName: chatState.currentConversation, roomID: chatState.currentConversationID } );
+				globalState.userSocket?.emit('userJoinedChannel', sessionStorage.getItem("currentUserLogin"));
 				chatDispatch({ type: 'DISABLE', payload: 'showPassword' });
 			}
 			else {

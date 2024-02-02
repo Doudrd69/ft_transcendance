@@ -97,11 +97,7 @@ const AddConversationComponent: React.FC<AddConversationComponentProps> = ({ loa
 		};
 	}, []);
 
-	const handleImageClick = (e: React.MouseEvent<HTMLImageElement>) => {
-		// Call the function you want to execute when the image is clicked
-		// For example, you can call handleConversationCreation here
 		handleConversationCreation(e);
-	};
 	
 	return (
 		<>
@@ -138,7 +134,15 @@ const AddConversationComponent: React.FC<AddConversationComponentProps> = ({ loa
 											onChange={(e) => setPasswordValue(e.target.value)}
 										/>
 									)}
-									<img className='img-enter-conversation' src="enter.png" onClick={(e) => handleImageClick(e)} />
+									<button
+										className='button-ok'
+										onClick={(e) => {
+										handleConversationCreation(e);
+										handleCancel();
+										}}
+										>
+										OK
+									</button>
 								</div>
 							</form>
 						</div>

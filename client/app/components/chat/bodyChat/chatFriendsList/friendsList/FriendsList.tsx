@@ -27,6 +27,8 @@ const FriendsListComponent: React.FC = () => {
 	const { globalState } = useGlobal();
 	const [showTabFriendsList, setTabFriendsList] = useState(false);
 	const [activeIndex, setActiveIndex] = useState<number | null>(null);
+	const [activeIndexAll, setActiveIndexAll] = useState<number | null>(null);
+
 	const [friendList, setFriendList] = useState<FriendShip[]>([]);
 	const username = sessionStorage.getItem("currentUserLogin");
 	const [searchValue, setSearchValue] = useState<string>('');
@@ -36,19 +38,26 @@ const FriendsListComponent: React.FC = () => {
 	useEffect(() => {
 		loadAllList();
 	},[]);
-	const activateTabFriendsList = (index: number) => {
-		if (activeIndex === index) {
-		  setActiveIndex(null);
-		} else {
-		  setActiveIndex(index);
+	const activateTabFriendsList = (index: number, all:boolean) => {
+		if (!all) {
+			if (activeIndex === index) {
+			  setActiveIndex(null);
+			} else {
+			  setActiveIndex(index);
+			  setActiveIndexAll(null);
+			}
+		  } else { // Utiliser else ici au lieu de la condition identique (!all)
+			if (activeIndexAll === index) {
+			  setActiveIndexAll(null);
+			} else {
+			  setActiveIndexAll(index);
+			  setActiveIndex(null);
+			}
 		}
 	};
 	
 	const handleSearchChange = (searchValue:string) => {
-		// Vous pouvez maintenant utiliser la valeur de recherche comme vous le souhaitez
-		// Par exemple, vous pourriez filtrer la liste d'amis en fonction de cette valeur
 		setSearchValue(searchValue);
-		// ... Ajoutez le code ici pour effectuer une action en fonction de la valeur de recherche
 	};
 
 	const loadAllList = async () => {
@@ -107,6 +116,10 @@ const FriendsListComponent: React.FC = () => {
 
 	useEffect(() => {
 
+		globalState.userSocket?.on('newUser', () => {
+			loadAllList();
+		});
+
 		globalState.userSocket?.on('friendRequestAcceptedNotif', () => {
 			loadFriendList();
 		});
@@ -116,12 +129,10 @@ const FriendsListComponent: React.FC = () => {
 		});
 
 		globalState.userSocket?.on('newConnection', (notif: string) => {
-			console.log("Event newConnection");
 			loadFriendList();
 		})
 
 		globalState.userSocket?.on('newDeconnection', (notif: string) => {
-			console.log("Event newDeconnection"); 
 			loadFriendList();
 		})
 
@@ -130,6 +141,7 @@ const FriendsListComponent: React.FC = () => {
 			globalState.userSocket?.off('refreshFriends');
 			globalState.userSocket?.off('newConnection');
 			globalState.userSocket?.off('newDeconnection');
+			globalState.userSocket?.off('newUser');
 		}
 
 	}, [globalState?.userSocket]);
@@ -156,7 +168,7 @@ const FriendsListComponent: React.FC = () => {
 									className={`profil-friendslist`}
 									alt="User Avatar"
 								/>
-								<div className="amies" onClick={() => activateTabFriendsList(id)}>
+								<div className="amies" onClick={() => activateTabFriendsList(id, false)}>
 									{friend.onlineStatus ? 
 										<div className="online" />
 										:
@@ -185,6 +197,7 @@ const FriendsListComponent: React.FC = () => {
 						onChange={(e) => handleSearchChange(e.target.value)}
 					/>
 				</div>
+				<div className='scroll-all'>
 				{allList.map((friend: FriendShip, id: number) => (
 					(!searchValue || friend.username.toLowerCase().includes(searchValue.toLowerCase())) && (
 						<div className="tab-and-userclicked" key={id}>
@@ -194,14 +207,17 @@ const FriendsListComponent: React.FC = () => {
 							className={`profil-friendslist`}
 							alt="User Avatar"
 							/>
-							<div className="amies" onClick={() => activateTabFriendsList(id)}>
+							<div className="amies" onClick={() => activateTabFriendsList(id, true)}>
 							{friend.username}
 							</div>
 						</div>
-						{activeIndex === id && <FriendsListTabComponent user={friend} all={true}/>}
+						{activeIndexAll === id && <FriendsListTabComponent user={friend} all={true}/>}
 						</div>
 					)
+					
 				))}
+				
+				</div>
 			</div>
 			
 		</div>

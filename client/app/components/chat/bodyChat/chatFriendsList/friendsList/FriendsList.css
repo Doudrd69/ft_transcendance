@@ -48,12 +48,17 @@
 	box-sizing: border-box;
 	width: calc(100% - 20px);
 	height: 50%;
-	border-radius:10px;
+	border-radius: 10px;
 	margin: 10px;
-	overflow-y: scroll;
 	color: #000000;
-	display : flex;
+	display: flex;
 	flex-direction: column;
+}
+
+.scroll-all{
+	flex-direction: column;
+	display: flex;
+	overflow-y: scroll;
 }
 .bloc-friendslist{
 	box-sizing: border-box;
