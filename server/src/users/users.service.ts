@@ -549,6 +549,39 @@ export class UsersService {
 		throw new HttpException('User not found', HttpStatus.BAD_REQUEST);
 	}
 
+	async getUserList(userId: number) {
+
+		const user = await this.usersRepository.findOne({ where: { id: userId } });
+		if (user) {
+
+			const users = await this.usersRepository.find();
+			if (users) {
+
+				let array = [];
+				users.forEach((user_: User) => {
+					let blockStatus = false;
+					user.blockedUsers.forEach((blockedFriend: string) => {
+						if (blockedFriend == user_.username) {
+							blockStatus = true;
+						}
+					});
+					array.push({
+						id: user_.id,
+						username: user_.username,
+						avatar: user_.avatarURL,
+						isBlocked: blockStatus,
+					});
+				})
+
+				return array;
+			}
+
+			throw new HttpException('Failed to load user list', HttpStatus.BAD_REQUEST);
+		}
+
+		throw new HttpException('User not found', HttpStatus.BAD_REQUEST);
+	}
+
 	async getFriendships(userID: number): Promise<Friendship[]> {
 
 		const user: User = await this.usersRepository.findOne({ where: { id: userID } });
