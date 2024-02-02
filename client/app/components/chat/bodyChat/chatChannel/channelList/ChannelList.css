@@ -52,7 +52,7 @@
 	background-color: whitesmoke;
 	border: var(--fourth);
 	border: 5px solid gray; 
-	flex-basis: calc(50% - 20px); /* Chaque élément occupe 50% de la largeur - marges */
+	flex-basis: calc(33% - 15px); /* Chaque élément occupe 50% de la largeur - marges */
 	margin: 10px; /* Espacement externe pour un aspect agréable */
 	padding: 10px; /* Espacement interne pour un aspect agréable */
 	color: black;

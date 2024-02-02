@@ -58,19 +58,7 @@
     color: #f94f6d;
   }
 
-  @media only screen and (max-width: 600px) {
-    body {
-      padding:20px 0px;
-      height:100%;
-    }
-    .container {
-      margin: auto auto;
-      padding-block: 30px;
-      flex-direction: column;
-      gap: 10px;
-      max-height: 100%;
-    }
-  }
+
   
   .game-blur {
     filter: blur(5px); /* Ajustez la quantité de flou selon vos préférences */

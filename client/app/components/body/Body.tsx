@@ -10,6 +10,7 @@ import ChatComponent from '../chat/Chat';
 import { GameProvider } from '../game/GameContext';
 import GameComponent from '../game/Game';
 import { useGlobal } from '../../GlobalContext';
+import './Body.css';
 
 
 const BodyComponent: React.FC = () => {
@@ -21,7 +22,7 @@ const BodyComponent: React.FC = () => {
 
 	return (
 		<>
-				<div className="container">
+				<div className="container-bloc">
 					{renderComponent(<SettingsComponent/>, globalState.showSettings)}
 						<ChatComponent/>
 						<GameProvider>
