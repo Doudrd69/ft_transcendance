@@ -331,9 +331,7 @@ export class GameGateway {
         try {
             gameInstance.stop = true
             clearInterval(gameLoop);
-            for (const userSocket of disconnectedSockets) {
-                this.server.to(userSocket).emit('userDisconnected');
-            }
+            this.server.to([gameInstance.players[0], gameInstance.players[1]]).emit('userDisconnected');
             const user1: User = await this.GameService.getUserWithUserId(gameInstance.usersId[0]);
             const user2: User = await this.GameService.getUserWithUserId(gameInstance.usersId[1]);
             let game = await this.GameService.getGameWithUserId(user1.id);

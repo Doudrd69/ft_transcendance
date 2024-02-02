@@ -28,7 +28,7 @@ export class GameEngineService {
 				player1Scored: false,
 				player2Scored: false,
 				position: { x: 0.5, y: 0.5},
-				speed: { x: (signe / 100) * 0.177 * 1.5, y: (Math.random() - 0.5) * Math.random() / 60 * 10 },
+				speed: { x: (signe / 100) * 0.177 * 1.5, y: (Math.random() - 0.5) * Math.random() / 60},
 				r: 0.02,
 				alive: true,
 				elasticity: 1.15,
@@ -38,7 +38,7 @@ export class GameEngineService {
 			players: [game.playerOneID, game.playerTwoID],
 			playersLogin: [game.playerOneLogin, game.playerTwoLogin],
 			super_game_mode: false,
-			victory_condition: 1,
+			victory_condition: 5,
 			paddles: [
 				{ number: 1, speed: 1 / 80, ArrowUp: false, ArrowDown: false, end: { x: 0.025, y: 0.585 }, start: { x: 0.025, y: 0.415 }, is_a_paddle: true, length: 0.585 - 0.415 },
 				{ number: 2, speed: 1 / 80, ArrowUp: false, ArrowDown: false, end: { x: 1 - 0.025, y: 0.585 }, start: { x: 1 - 0.025, y: 0.415 }, is_a_paddle: true, length: 0.585 - 0.415 },
