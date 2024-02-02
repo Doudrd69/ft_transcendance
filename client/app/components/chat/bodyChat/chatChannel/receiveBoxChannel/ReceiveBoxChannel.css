@@ -26,7 +26,7 @@
 }
 
 .my-message-channel {
-    background-color: cornflowerblue;
+    background-color: #332122;
     border-radius: 15px 15px 15px 15px;
     margin-left: auto;
 }
@@ -41,7 +41,7 @@
 	text-align: center;
 }
 .other-message-channel {
-	background-color: slategray;
+	background-color: #70504d;
 	border-radius: 15px 15px 15px 15px;
 }
 
