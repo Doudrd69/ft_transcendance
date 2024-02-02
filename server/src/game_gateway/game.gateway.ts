@@ -212,13 +212,15 @@ export class GameGateway {
     }
 
     @SubscribeMessage('throwGameInvite')
+    @UseGuards(GatewayGuard)
     async handleThrowGameInvite(@ConnectedSocket() client: Socket) {
-        this.GameService.addGameSocket(client.id, client.handshake.auth.userId);
+        this.GameService.addGameSocket(client.id, client.handshake.auth.user.sub);
     }
 
     @SubscribeMessage('gameInviteRejected')
+    @UseGuards(GatewayGuard)
     handleGameInviteRejected(@ConnectedSocket() client: Socket) {
-        this.GameService.deleteGameSocketsIdForPlayer(client.handshake.auth.userId);
+        this.GameService.deleteGameSocketsIdForPlayer(client.handshake.auth.user.sub);
     }
 
     @SubscribeMessage('Game')

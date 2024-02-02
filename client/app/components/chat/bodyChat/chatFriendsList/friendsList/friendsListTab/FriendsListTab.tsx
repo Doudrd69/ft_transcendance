@@ -165,7 +165,7 @@ const FriendsListTabComponent: React.FC<FriendsListTabComponentProps> = ({ user 
 			globalState.userSocket?.on('deniedInvitation', () => {
 				console.log("DENIED :", globalState.gameSocket?.id)
 				setgameSocketConnected(false);
-				globalState.gameSocket.emit('gameInviteRejected')
+				globalState.gameSocket?.emit('gameInviteRejected')
 				// enlever le userGameSockets
 				globalState.gameSocket?.disconnect();
 
@@ -173,7 +173,7 @@ const FriendsListTabComponent: React.FC<FriendsListTabComponentProps> = ({ user 
 			globalState.userSocket?.on('userToInviteAlreadyInGame', () => {
 				setgameSocketConnected(false);
 				// enlever le userGameSockets
-				globalState.gameSocket.emit('gameInviteRejected')
+				globalState.gameSocket?.emit('gameInviteRejected')
 				globalState.gameSocket?.disconnect();
 
 			});
@@ -186,7 +186,7 @@ const FriendsListTabComponent: React.FC<FriendsListTabComponentProps> = ({ user 
 					// enlever le userGameSockets
 					console.log("CLOSED DENY :", globalState.gameSocket?.id)
 					setgameSocketConnected(false);
-					globalState.gameSocket.emit('gameInviteRejected')
+					globalState.gameSocket?.emit('gameInviteRejected')
 					globalState.gameSocket?.disconnect();
 				}
 				setgameSocketConnected(false);
