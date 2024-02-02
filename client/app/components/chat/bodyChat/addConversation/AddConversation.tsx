@@ -96,8 +96,6 @@ const AddConversationComponent: React.FC<AddConversationComponentProps> = ({ loa
 			document.removeEventListener('keydown', handleEscape);
 		};
 	}, []);
-
-		handleConversationCreation(e);
 	
 	return (
 		<>

@@ -211,19 +211,19 @@ export class UsersController {
 		const { user } = req;
 		return this.usersService.getFriendships(user.sub);
 	}
-
-	@UseGuards(AuthGuard)
-	@Get('getUserList')
-	getUserList(@Req() req, ): Promise<Friendship[]> {
-		const { user } = req;
-		return this.usersService.getUserList(user.sub);
-	}
-
+	
 	@UseGuards(AuthGuard)
 	@Get('getPendingFriends')
 	getPendingFriendsList(@Req() req, ): Promise<Friendship[]> {
 		const { user } = req;
 		return this.usersService.getPendingFriendships(user.sub);
+	}
+
+	@UseGuards(AuthGuard)
+	@Get('getUserList')
+	getUserList(@Req() req, ) {
+		const { user } = req;
+		return this.usersService.getUserList(user.sub);
 	}
 
 	@UseGuards(AuthGuard)
