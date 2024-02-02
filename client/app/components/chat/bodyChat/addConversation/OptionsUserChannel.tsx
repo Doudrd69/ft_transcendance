@@ -43,6 +43,7 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 	const [gameInviteValidation, setgameInviteValidation] = useState<boolean>(false);
 	const [block, setBlock] = useState<boolean>(false);
 	
+	console.log(chatState);
 	let isBlocked = false;
 	if (me && me.blockList) {
 		isBlocked = !!me.blockList.find((userblock) => userblock === user.login);
@@ -529,51 +530,12 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 		chatDispatch({ type: 'DISABLE', payload: 'showOptionsUserChannelOwner' });
 	}
 
-	const gameInvite = () => {
-		console.log("gameSocketConnected :", globalState?.gameSocket);
-		// !gameInviteCalled && gameSocketConnected === false
-		if (gameSocketConnected === false) {
-			// setGameInviteCalled(true); // Marquer gameInvite comme appelée
-			globalState.userSocket?.off('senderNotInGame');
-			setgameInviteValidation(false);
-			console.log("GAMEINVITE");
-			globalState.userSocket?.emit('checkSenderInMatch', {
-				senderUsername: sessionStorage.getItem("currentUserLogin"),
-				senderUserId: sessionStorage.getItem("currentUserID"),
-			})
-			globalState.userSocket?.on('senderNotInGame', () => {
-				console.log(`INVITATION: ${globalState.userSocket?.id}`);
-				const gameSocket: Socket = io('http://localhost:3001/game', {
-					autoConnect: false,
-					auth: {
-						token: sessionStorage.getItem("jwt"),
-					}
-				});
-				gameSocket.connect();
-				gameSocket.on('connect', () => {
-					setgameSocketConnected(true);
-					dispatch({ type: 'SET_GAME_SOCKET', payload: gameSocket });
-					// emit le fait que je rentre en matchmaking, si l'autre refuse je fait un emethode pour le quitter avant de disconnect la socket
-					gameSocket.emit('throwGameInvite')
-					globalState.userSocket?.emit('inviteToGame', {
-						usernameToInvite: user.login,
-						userIdToInvite: user.id,
-						senderID: gameSocket.id,
-						senderUsername: sessionStorage.getItem("currentUserLogin"),
-						senderUserID: sessionStorage.getItem("currentUserID"),
-					});
-				})
-			})
-		}
-	};
-
-	const handleTabClick = (text: string, functionToExecute: any) => {
-		setConfirmationText(text);
-		setFunctionToExecute(() => functionToExecute);
-		console.log(Cstate);
-		chatDispatch({ type: 'DISABLE', payload: 'showOptionsUserChannel' });
-		chatDispatch({ type: 'DISABLE', payload: 'showOptionsUserChannelOwner ' });
+	const handleTabClick = (target: User) => {
+		chatDispatch({ type: 'SET_CURRENT_TARGET', payload: target });
+		console.log(chatState.currentTarget);
 		chatDispatch({ type: 'ACTIVATE', payload: 'showConfirmation' });
+		chatDispatch({ type: 'DISABLE', payload: 'showOptionsUserChannel' });
+		chatDispatch({ type: 'DISABLE', payload: 'showOptionsUserChannelOwner' });
 	};
 
 	const handleCancel = () => {
@@ -602,11 +564,9 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 			<div className="add_container">
 				<h2 className="add__title">{user.login}</h2>	
 				<div className="option-block">
-					{user.login !== sessionStorage.getItem("currentUserLogin") && (
+					{user.id !== Number(sessionStorage.getItem("currentUserID")) && (
 						<div>
-							<img className='option-image' src="ping-pong.png" onClick={() => 
-									handleTabClick(`Etes vous sur de vouloir défier ${user.login} ?`
-									, gameInvite)} />
+							<img className='option-image' src="ping-pong.png" onClick={() => handleTabClick(user)}/>
 							<img className="option-image" src="chat.png" onClick={handleDms}/>
 							{me.isAdmin && !user.isOwner &&
 									<>

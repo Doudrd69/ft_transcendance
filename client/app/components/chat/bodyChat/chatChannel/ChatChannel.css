@@ -1,5 +1,5 @@
 .chat-channel{
-	display:flex;
-	flex-direction: column;
-	height: 100%;
+    display: flex;
+    flex-direction: column;
+    height: calc(100% - 20px);
 }

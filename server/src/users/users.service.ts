@@ -97,7 +97,7 @@ export class UsersService {
 
 	async uploadAvatarURL(avatarURL: string, userID: number): Promise<UpdateResult | undefined> {
 
-		const user = this.usersRepository.findOne({ where: { id: userID } });
+		const user = await this.usersRepository.findOne({ where: { id: userID } });
 		if (user) {
 
 			const oldAvatarPath = join(__dirname, user.avatarURL);

@@ -29,6 +29,8 @@ const FriendsListComponent: React.FC = () => {
 	const [activeIndex, setActiveIndex] = useState<number | null>(null);
 	const [friendList, setFriendList] = useState<FriendShip[]>([]);
 	const username = sessionStorage.getItem("currentUserLogin");
+	const [searchValue, setSearchValue] = useState<string>('');
+	const [allList, setAllList] = useState<FriendShip[]>([]);
 
 	const disableTabFriendsList = () => setTabFriendsList(false);
 
@@ -40,6 +42,38 @@ const FriendsListComponent: React.FC = () => {
 		}
 	};
 	
+	const handleSearchChange = (searchValue:string) => {
+		// Vous pouvez maintenant utiliser la valeur de recherche comme vous le souhaitez
+		// Par exemple, vous pourriez filtrer la liste d'amis en fonction de cette valeur
+		console.log('Recherche en cours :', searchValue);
+		// ... Ajoutez le code ici pour effectuer une action en fonction de la valeur de recherche
+	};
+
+	const loadAllList = async () => {
+		try {
+			const response = await fetch(`${process.env.API_URL}/users/getFriends`, {
+				method: 'GET',
+				headers: {
+					'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
+				}
+			});
+			if (response.ok) {
+				const friends = await response.json();
+				setAllList([...friends]);
+			}
+			else {
+				const error = await response.json();
+				if (Array.isArray(error.message))
+					toast.warn(error.message[0]);
+				else
+					toast.warn(error.message);
+			}
+		}
+		catch (error) {
+			console.error(error);
+		}
+	}
+
 	const loadFriendList = async () => {
 		try {
 			const response = await fetch(`${process.env.API_URL}/users/getFriends`, {
@@ -99,36 +133,67 @@ const FriendsListComponent: React.FC = () => {
 	const timestamp = new Date().getTime();
 
 	return (
-		<div className="bloc-friendslist">
-			<button
-				className="button-friends-list-add"
-				onClick={() => {
-				chatDispatch({ type: 'ACTIVATE', payload: 'showAddFriend' });
-			}}
-			>
-			+
-			</button>
-			{chatState.showAddFriend && <AddFriendComponent updateFriends={loadFriendList} title="ADD NEW FRIEND"/>}
-			{friendList.map((friend: FriendShip, id: number) => (
-			<div className="tab-and-userclicked" key={id}>
-				<div className="bloc-button-friendslist">
-						<img
-							src={`${process.env.API_URL}/users/getAvatar/${friend.id}/${timestamp}`}
-							className={`profil-friendslist`}
-							alt="User Avatar"
-						/>
-						<div className="amies" onClick={() => activateTabFriendsList(id)}>
-							{friend.onlineStatus ? 
-								<div className="online" />
-								:
-								<div className="offline" />
-							}
-							{friend.username}
-						</div>
+		<div className='bloc-friendslist-all'>
+			<div className="bloc-friendslist">
+				<button
+					className="button-friends-list-add"
+					onClick={() => {
+					chatDispatch({ type: 'ACTIVATE', payload: 'showAddFriend' });
+				}}
+				>
+				+
+				</button>
+				{chatState.showAddFriend && <AddFriendComponent updateFriends={loadFriendList} title="ADD NEW FRIEND"/>}
+				{friendList.map((friend: FriendShip, id: number) => (
+				<div className="tab-and-userclicked" key={id}>
+					<div className="bloc-button-friendslist">
+							<img
+								src={`${process.env.API_URL}/users/getAvatar/${friend.id}/${timestamp}`}
+								className={`profil-friendslist`}
+								alt="User Avatar"
+							/>
+							<div className="amies" onClick={() => activateTabFriendsList(id)}>
+								{friend.onlineStatus ? 
+									<div className="online" />
+									:
+									<div className="offline" />
+								}
+								{friend.username}
+							</div>
+					</div>
+					{activeIndex === id && <FriendsListTabComponent user={friend}/>}
 				</div>
-				{activeIndex === id && <FriendsListTabComponent user={friend}/>}
+			))}
 			</div>
-		  ))}
+					<div className="bloc-all">
+					<input
+						type="text"
+						placeholder="Rechercher des amis..."
+						className="search-bar"
+						onChange={(e) => handleSearchChange(e.target.value)}
+					/>
+					{allList.map((friend: FriendShip, id: number) => (
+					<div className="tab-and-userclicked" key={id}>
+						<div className="bloc-button-friendslist">
+								<img
+									src={`${process.env.API_URL}/users/getAvatar/${friend.id}/${timestamp}`}
+									className={`profil-friendslist`}
+									alt="User Avatar"
+								/>
+								<div className="amies" onClick={() => activateTabFriendsList(id)}>
+									{friend.onlineStatus ? 
+										<div className="online" />
+										:
+										<div className="offline" />
+									}
+									{friend.username}
+								</div>
+						</div>
+						{activeIndex === id && <FriendsListTabComponent user={friend}/>}
+					</div>
+				))}
+				</div>
+			
 		</div>
 	) 
 }
