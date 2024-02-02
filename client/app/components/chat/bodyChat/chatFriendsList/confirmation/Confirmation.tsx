@@ -33,9 +33,10 @@ const ConfirmationComponent: React.FC<ConfirmationComponentProps> = ({ phrase, f
 		<div>
 			<p className='sentence'>{phrase}</p>
 			<div className='yes-no'>
-				<img className='img-enter' src="enter.png" onClick={()=>
-				{functionToExecute();
-				 handleCancel()}}/>
+			<img className='img-enter' src="enter.png" onClick={() => {
+				functionToExecute();
+				handleCancel();
+				}} />
 			</div>
 		</div>
 	  </div>

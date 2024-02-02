@@ -8,6 +8,7 @@ import { handleWebpackExternalForEdgeRuntime } from 'next/dist/build/webpack/plu
 import { setGameSocket, useGlobal } from '@/app/GlobalContext';
 import { ToastContainer, toast } from 'react-toastify';
 import { globalAgent } from 'http';
+import AddFriendComponent from '../../../addConversation/AddFriends';
 
 interface User {
 	id: number;
@@ -17,9 +18,10 @@ interface User {
 
 interface FriendsListTabComponentProps {
 	user: User;
+	all: boolean
 }
 
-const FriendsListTabComponent: React.FC<FriendsListTabComponentProps> = ({ user }) => {
+const FriendsListTabComponent: React.FC<FriendsListTabComponentProps> = ({ user, all }) => {
 
 	// let gameInviteValidation: boolean = false;
 	const [gameSocketConnected, setgameSocketConnected] = useState<boolean>(false);
@@ -246,9 +248,58 @@ const FriendsListTabComponent: React.FC<FriendsListTabComponentProps> = ({ user 
 			console.error(error);
 		}
 	}
+
+	const handlFriendRequest = async (user: string) => {
+		try {
+			const friendRequestDto = {
+				initiatorLogin: sessionStorage.getItem("currentUserLogin"),
+				recipientLogin: user,
+			};
+
+			const response = await fetch(`${process.env.API_URL}/users/addfriend`, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
+				},
+				body: JSON.stringify(friendRequestDto),
+			});
+
+			if (response.ok) {
+				
+				const data = await response.json();
+				if (!data) {
+					return;
+				}
+				
+				chatDispatch({ type: 'TOGGLEX', payload: 'refreshFriendsList' });
+				chatDispatch({ type: 'DISABLE', payload: 'showAddChannel' });
+				chatDispatch({ type: 'DISABLE', payload: 'showAddUser' });
+				chatDispatch({ type: 'DISABLE', payload: 'showAddFriend' });
+
+				if (globalState.userSocket?.connected) {
+					globalState.userSocket?.emit('joinRoom', { roomName: data.name, roomID: data.id });
+					globalState.userSocket?.emit('addFriend', friendRequestDto);
+				}
+			} else {
+				const error = await response.json();
+				if (Array.isArray(error.message))
+					toast.warn(error.message[0]);
+				else
+					toast.warn(error.message);
+			}
+		} catch (error) {
+			console.log(error);
+		}
+	};
+
 	return (
 		<>
 			<div className="bloc-tab">
+
+				{all &&
+					<img className='image-tab' src="ajouter.png" onClick={() => handleTabClick(`Etes vous sur de vouloir ajouter à de votre liste d'amies ${user.username} ?`, handlFriendRequest(user.username))} />
+				}
 				<img className='image-tab' src="ping-pong.png" onClick={() => handleTabClick(`Etes vous sur de vouloir défier ${user.username} ?`, gameInvite)} />
 				<img className='image-tab' src="ajouter-un-groupe.png" onClick={() => chatDispatch({ type: 'ACTIVATE', payload: 'showListChannelAdd' })} />
 				<img className='image-tab' src="stats.png" />
@@ -258,7 +309,9 @@ const FriendsListTabComponent: React.FC<FriendsListTabComponentProps> = ({ user 
 					:
 					<img className='image-tab-opacity' src="block.png" onClick={() => handleTabClick(`Etes vous sur de vouloir bloquer ${user.username} ?`, blockUser)} />
 				}
-				<img className='image-tab' src="closered.png" onClick={() => handleTabClick(`Etes vous sur de vouloir supprimer de votre liste d'amies ${user.username} ?`, removeFriends)} />
+				{!all &&
+					<img className='image-tab' src="closered.png" onClick={() => handleTabClick(`Etes vous sur de vouloir supprimer de votre liste d'amies ${user.username} ?`, removeFriends)} />
+				}
 			</div>
 			{chatState.showConfirmation && (
 				<ConfirmationComponent phrase={confirmationText} functionToExecute={funtionToExecute} />

@@ -1,5 +1,5 @@
 import './FriendsList.css'
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, use } from 'react'
 import FriendsListTabComponent from './friendsListTab/FriendsListTab';
 import { useChat } from '../../../ChatContext';
 import AddFriendComponent from '../../addConversation/AddFriends';
@@ -33,7 +33,9 @@ const FriendsListComponent: React.FC = () => {
 	const [allList, setAllList] = useState<FriendShip[]>([]);
 
 	const disableTabFriendsList = () => setTabFriendsList(false);
-
+	useEffect(() => {
+		loadAllList();
+	},[]);
 	const activateTabFriendsList = (index: number) => {
 		if (activeIndex === index) {
 		  setActiveIndex(null);
@@ -45,13 +47,13 @@ const FriendsListComponent: React.FC = () => {
 	const handleSearchChange = (searchValue:string) => {
 		// Vous pouvez maintenant utiliser la valeur de recherche comme vous le souhaitez
 		// Par exemple, vous pourriez filtrer la liste d'amis en fonction de cette valeur
-		console.log('Recherche en cours :', searchValue);
+		setSearchValue(searchValue);
 		// ... Ajoutez le code ici pour effectuer une action en fonction de la valeur de recherche
 	};
 
 	const loadAllList = async () => {
 		try {
-			const response = await fetch(`${process.env.API_URL}/users/getFriends`, {
+			const response = await fetch(`${process.env.API_URL}/users/getUserList`, {
 				method: 'GET',
 				headers: {
 					'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
@@ -145,34 +147,6 @@ const FriendsListComponent: React.FC = () => {
 				</button>
 				{chatState.showAddFriend && <AddFriendComponent updateFriends={loadFriendList} title="ADD NEW FRIEND"/>}
 				{friendList.map((friend: FriendShip, id: number) => (
-				<div className="tab-and-userclicked" key={id}>
-					<div className="bloc-button-friendslist">
-							<img
-								src={`${process.env.API_URL}/users/getAvatar/${friend.id}/${timestamp}`}
-								className={`profil-friendslist`}
-								alt="User Avatar"
-							/>
-							<div className="amies" onClick={() => activateTabFriendsList(id)}>
-								{friend.onlineStatus ? 
-									<div className="online" />
-									:
-									<div className="offline" />
-								}
-								{friend.username}
-							</div>
-					</div>
-					{activeIndex === id && <FriendsListTabComponent user={friend}/>}
-				</div>
-			))}
-			</div>
-					<div className="bloc-all">
-					<input
-						type="text"
-						placeholder="Rechercher des amis..."
-						className="search-bar"
-						onChange={(e) => handleSearchChange(e.target.value)}
-					/>
-					{allList.map((friend: FriendShip, id: number) => (
 					<div className="tab-and-userclicked" key={id}>
 						<div className="bloc-button-friendslist">
 								<img
@@ -189,10 +163,44 @@ const FriendsListComponent: React.FC = () => {
 									{friend.username}
 								</div>
 						</div>
-						{activeIndex === id && <FriendsListTabComponent user={friend}/>}
+						{activeIndex === id && <FriendsListTabComponent user={friend} all={false}/>}
 					</div>
 				))}
+			</div>
+
+			<div className="bloc-all">
+				<div className="search-bar">
+					{/* <img
+					src="chercher.png"
+					alt="Search Icon"
+					className="search-icon"
+
+					/> */}
+					<input
+						type="text"
+						placeholder="Rechercher des amis..."
+						className="search-input"
+						onChange={(e) => handleSearchChange(e.target.value)}
+					/>
 				</div>
+				{allList.map((friend: FriendShip, id: number) => (
+					(!searchValue || friend.username.toLowerCase().includes(searchValue.toLowerCase())) && (
+						<div className="tab-and-userclicked" key={id}>
+						<div className="bloc-button-friendslist">
+							<img
+							src={`${process.env.API_URL}/users/getAvatar/${friend.id}/${timestamp}`}
+							className={`profil-friendslist`}
+							alt="User Avatar"
+							/>
+							<div className="amies" onClick={() => activateTabFriendsList(id)}>
+							{friend.username}
+							</div>
+						</div>
+						{activeIndex === id && <FriendsListTabComponent user={friend} all={true}/>}
+						</div>
+					)
+				))}
+			</div>
 			
 		</div>
 	) 
