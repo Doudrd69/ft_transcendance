@@ -4,11 +4,11 @@
 }
 
 :root {
-	--first: #dce0d9ff;
-	--second: #31081fff;
+	--first: #998a8aff;
+	--second: #332122ff;
 	--third: #6b0f1aff;
-	--fourth: #595959ff;
-	--fifth: #808f85ff;
+	--fourth: #996e6aff;
+	--fifth: #70504dff;
   }
 body, html {
 	margin: 0;
