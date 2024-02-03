@@ -1,13 +1,13 @@
 .right-half {
-    background-color: #453232ff;
-    radius: 20px;
-    height: calc(100%);
-    width: 75%;
+	height: 90vh;
+    width: 75vw;
+	background: linear-gradient(180deg,#0d0b0c,#aa1359);
+	z-index: 1;
     }
 
 @media only screen and (max-width: 800px) {
 	.right-half {
-		height: 50%;
-		width: 100%;
+		height: 45vh;
+		width: 100vw;
 	}
 	}
