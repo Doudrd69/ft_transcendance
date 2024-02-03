@@ -100,8 +100,7 @@ const Menu = () => {
 		<div className="slider-thumb">
 		{/* <div className="background-game"> */}
 				<h1 className='titleClass'>PINGPON GAME</h1>
-				{!startGame ? 
-
+				{startGame ?
 					<button className={`buttonclass ${state.showGameMatchmaking ? 'clicked' : ''}`} onClick={() => {
 						setStartGame(true);
 					}}>PLAY A GAME</button>
