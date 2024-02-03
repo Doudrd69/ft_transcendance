@@ -28,7 +28,7 @@ const BodyComponent: React.FC = () => {
 						<ChatComponent/>
 						<GameProvider>
 							<GameComponent />
-							<GameInviteComponent userId={globalState.gameUserId} targetId={globalState.gameTargetId}/>
+							<GameInviteComponent/>
 						</GameProvider>
 				</div>
 		</>

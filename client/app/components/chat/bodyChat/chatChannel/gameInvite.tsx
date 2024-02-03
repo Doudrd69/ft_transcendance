@@ -7,34 +7,31 @@ import { handleWebpackExternalForEdgeRuntime } from 'next/dist/build/webpack/plu
 import { setGameSocket, useGlobal } from '@/app/GlobalContext';
 import { ToastContainer, toast } from 'react-toastify';
 
-
-interface GameInviteComponentProps {
-	userId: number;
-	targetId: number;
-}
-
-const GameInviteComponent: React.FC<GameInviteComponentProps> = ({ userId, targetId }) => {
+const GameInviteComponent: React.FC = () => {
 
 	const { globalState, dispatch } = useGlobal();
 	const [gameSocketConnected, setgameSocketConnected] = useState<boolean>(false);
 	const [gameInviteValidation, setgameInviteValidation] = useState<boolean>(false);
 	const { chatState, chatDispatch } = useChat();
 
+	console.log("===> GLOBALSTATE GAME INVITE: ", globalState.gameInvite);
+	console.log(`[GameInviteComponent]: globalstate{userID, targetId}: {${globalState.gameUserId}, ${globalState.gameTargetId}}`)
+
 	const gameInvite = () => {
-		console.log("gameSocketConnected :", globalState?.gameSocket);
+		console.log("Enter game invite");
 		// !gameInviteCalled && gameSocketConnected === false
 		if (gameSocketConnected === false) {
 			// setGameInviteCalled(true); // Marquer gameInvite comme appelée
+			console.log("gameSocket is false");
 			globalState.userSocket?.off('senderNotInGame');
 			setgameInviteValidation(false);
-			console.log("GAMEINVITE");
 			globalState.userSocket?.emit('checkSenderInMatch', {
-				// senderUsername: sessionStorage.getItem("currentUserLogin"),
+				senderUsername: sessionStorage.getItem("currentUserLogin"),
 				senderUserId: sessionStorage.getItem("currentUserID"),
 			})
 			globalState.userSocket?.on('senderNotInGame', () => {
 				console.log(`INVITATION: ${globalState.userSocket?.id}`);
-				const gameSocket: Socket = io('http://localhost:3001/game', {
+				const gameSocket: Socket = io(`${process.env.API_URL}/game`, {
 					autoConnect: false,
 					auth: {
 						token: sessionStorage.getItem("jwt"),
@@ -48,11 +45,9 @@ const GameInviteComponent: React.FC<GameInviteComponentProps> = ({ userId, targe
 					gameSocket.emit('throwGameInvite')
 					globalState.userSocket?.emit('inviteToGame', {
 						usernameToInvite: globalState.targetUsername,
-						// userSocketId: globalState.userSocket.id,
-						userIdToInvite: targetId,
+						userIdToInvite: globalState.gameTargetId,
 						senderID: gameSocket.id,
 						senderUsername: sessionStorage.getItem("currentUserLogin"),
-						senderUserID: userId
 					});
 				})
 			})
@@ -60,19 +55,19 @@ const GameInviteComponent: React.FC<GameInviteComponentProps> = ({ userId, targe
 	};
 
 	useEffect(() => {
-		gameInvite();
-	}, [gameInvite]);
-	// stock une fois a chaque fois, recoi
-	// si je suis inMatchmaking tt va bien, par contre si j'invite mais que en meme temps je lance un matchmaking? le matchmaking check si je suis ingame 
+		console.log("GLOBALSTATE GAME INVITE USE EFFECT: ", globalState.gameInvite);
+		if (globalState.gameInvite)
+			gameInvite();
+	}, [globalState.gameInvite]);
 
 	useEffect(() => {
-		console.log("UseEffect gameSocketConnected :", gameSocketConnected)
-	}, [gameSocketConnected, gameInviteValidation]);
 
+		console.log("useEfects triggerd")
 
-	useEffect(() => {
-		console.log("useEfeccts trigged")
 		if (typeof globalState.gameSocket !== "undefined") {
+
+			console.log("Enter events in use-effect");
+
 			globalState.gameSocket.on('acceptInvitation', () => {
 				console.log("VALIDATION");
 				setgameInviteValidation(true);
@@ -108,16 +103,16 @@ const GameInviteComponent: React.FC<GameInviteComponentProps> = ({ userId, targe
 				setgameSocketConnected(false);
 			});
 		}
-		else {
-			console.log("gameSocket undefined");
-		}
+
 		return () => {
 			globalState.gameSocket?.off('acceptInvitation');
 			globalState.userSocket?.off('closedInvitation');
 			globalState.userSocket?.off('deniedInvitation');
 			globalState.gameSocket?.off('disconnect');
 		};
+
 	}, [globalState?.gameSocket, gameInviteValidation, globalState?.userSocket, gameSocketConnected]);
+
 	return (
 		<div></div>
 	);

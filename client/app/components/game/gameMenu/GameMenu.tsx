@@ -29,6 +29,7 @@ const Menu = () => {
 		globalState.gameSocket?.on('gameNotInProgress', () => {
 			console.log(`DISPATCH`);
 			dispatchGame({ type: 'TOGGLE', payload: 'showGameMatchmaking' });
+			console.log(`[gameNotInProgress] : ${sessionStorage.getItem("currentUserLogin")}`)
 			globalState.gameSocket?.emit('join-matchmaking', { playerLogin: sessionStorage.getItem("currentUserLogin"), gameMode: gameMode, userId: Number(sessionStorage.getItem("currentUserID")) });
 		});
 
@@ -63,7 +64,6 @@ const Menu = () => {
 				gameSocket.emit('linkSocketWithUser', { playerLogin: sessionStorage.getItem("currentUserLogin"), userId: sessionStorage.getItem("currentUserID") });
 			});
 			// dispatchGame({ type: 'TOGGLE', payload: 'showGameMatchmaking' });
-
 			// console.log("After Dispatch: ", globalState?.gameSocket);
 
 		} catch (error) {
@@ -100,7 +100,7 @@ const Menu = () => {
 		<div className="slider-thumb">
 		{/* <div className="background-game"> */}
 				<h1 className='titleClass'>PINGPON GAME</h1>
-				{startGame ? 
+				{!startGame ? 
 
 					<button className={`buttonclass ${state.showGameMatchmaking ? 'clicked' : ''}`} onClick={() => {
 						setStartGame(true);
@@ -117,8 +117,6 @@ const Menu = () => {
 			}
 		{/* </div> */}
 		</div>
-
-
 	);
 };
 
