@@ -2,16 +2,7 @@ import { useGlobal } from '@/app/GlobalContext';
 import { useChat } from '@/app/components/chat/ChatContext';
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { Socket, io } from 'socket.io-client';
 import ListMyChannelComponent from '../../../listMyChannel/ListMyChannel';
-import { io, Socket } from 'socket.io-client';
-import { handleWebpackExternalForEdgeRuntime } from 'next/dist/build/webpack/plugins/middleware-plugin';
-import { setGameSocket, useGlobal } from '@/app/GlobalContext';
-import { ToastContainer, toast } from 'react-toastify';
-import { globalAgent } from 'http';
-import AddFriendComponent from '../../../addConversation/AddFriends';
-import GameInviteComponent from '../../../chatChannel/gameInvite';
-import GameInviteFunction from '../../../chatChannel/gameInvite';
 import ConfirmationComponent from '../../confirmation/Confirmation';
 import './FriendsListTab.css';
 
