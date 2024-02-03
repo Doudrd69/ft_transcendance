@@ -1,25 +1,19 @@
 import React, { use, useState, useEffect } from 'react';
-import ConfirmationComponent from '../../confirmation/Confirmation';
+// import ConfirmationComponent from '../../confirmation/Confirmation';
 import { useChat } from '@/app/components/chat/ChatContext';
-import ListMyChannelComponent from '../../../listMyChannel/ListMyChannel';
+// import ListMyChannelComponent from '../../../listMyChannel/ListMyChannel';
 import { io, Socket } from 'socket.io-client';
 import { handleWebpackExternalForEdgeRuntime } from 'next/dist/build/webpack/plugins/middleware-plugin';
 import { setGameSocket, useGlobal } from '@/app/GlobalContext';
 import { ToastContainer, toast } from 'react-toastify';
 
 
-interface User {
-	id: number;
-	username: string;
-	isBlocked: boolean;
-
-}
-interface gameInviteComponentProps {
-	user: User;
-	all: boolean
+interface GameInviteComponentProps {
+	userId: number;
+	targetId: number;
 }
 
-const gameInviteComponent: React.FC<gameInviteComponentProps> = ({ user, all }) => {
+const GameInviteComponent: React.FC<GameInviteComponentProps> = ({ userId, targetId }) => {
 
 	const { globalState, dispatch } = useGlobal();
 	const [gameSocketConnected, setgameSocketConnected] = useState<boolean>(false);
@@ -35,7 +29,7 @@ const gameInviteComponent: React.FC<gameInviteComponentProps> = ({ user, all }) 
 			setgameInviteValidation(false);
 			console.log("GAMEINVITE");
 			globalState.userSocket?.emit('checkSenderInMatch', {
-				senderUsername: sessionStorage.getItem("currentUserLogin"),
+				// senderUsername: sessionStorage.getItem("currentUserLogin"),
 				senderUserId: sessionStorage.getItem("currentUserID"),
 			})
 			globalState.userSocket?.on('senderNotInGame', () => {
@@ -53,16 +47,21 @@ const gameInviteComponent: React.FC<gameInviteComponentProps> = ({ user, all }) 
 					// emit le fait que je rentre en matchmaking, si l'autre refuse je fait un emethode pour le quitter avant de disconnect la socket
 					gameSocket.emit('throwGameInvite')
 					globalState.userSocket?.emit('inviteToGame', {
-						usernameToInvite: user.username,
-						userIdToInvite: user.id,
+						usernameToInvite: globalState.targetUsername,
+						// userSocketId: globalState.userSocket.id,
+						userIdToInvite: targetId,
 						senderID: gameSocket.id,
 						senderUsername: sessionStorage.getItem("currentUserLogin"),
-						senderUserID: sessionStorage.getItem("currentUserID"),
+						senderUserID: userId
 					});
 				})
 			})
 		}
 	};
+
+	useEffect(() => {
+		gameInvite();
+	}, [gameInvite]);
 	// stock une fois a chaque fois, recoi
 	// si je suis inMatchmaking tt va bien, par contre si j'invite mais que en meme temps je lance un matchmaking? le matchmaking check si je suis ingame 
 
@@ -124,4 +123,4 @@ const gameInviteComponent: React.FC<gameInviteComponentProps> = ({ user, all }) 
 	);
 }
 
-export default gameInviteComponent;
+export default GameInviteComponent;

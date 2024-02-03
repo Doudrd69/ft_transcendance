@@ -213,18 +213,17 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 
 	@SubscribeMessage('inviteToGame')
 	@UseGuards(GatewayGuard)
-	async inviteUserToGame(@ConnectedSocket() client: Socket, @MessageBody() data: { usernameToInvite: string, userIdToInvite: number, senderID: string, senderUsername: string, senderUserID: number } ) {
+	async inviteUserToGame(@ConnectedSocket() client: Socket, @MessageBody() data: { userSocketIdToInvite: number, userIdToInvite: number, senderID: string, senderUsername: string, senderUserID: number } ) {
 		
-		try {
-			const { usernameToInvite, userIdToInvite, senderID, senderUsername, senderUserID } = data;
+		try {	
+			const { userIdToInvite, senderID, senderUsername, senderUserID } = data;
 			if (await this.userService.userToInviteGameIsAlreadyInGame(userIdToInvite))
 			{
-				this.server.to(senderUsername).emit('userToInviteAlreadyInGame');
+				this.server.to(client.id).emit('userToInviteAlreadyInGame');
 				return;
 			}
-			console.log("Inviting ", usernameToInvite," to game");
-			console.log("-----> ",  usernameToInvite, senderID, senderUsername, "ho :", senderUserID);
-			this.server.to(usernameToInvite).emit('gameInvite', {
+
+			this.server.to("test").emit('gameInvite', { // envoyer au socketID du userToInvite
 				senderUserID: senderUserID,
 				senderID: senderID,
 				senderUsername: senderUsername,

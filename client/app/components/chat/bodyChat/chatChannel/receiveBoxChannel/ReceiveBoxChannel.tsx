@@ -187,46 +187,95 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 		scrollToBottom();
 	}, [messages]);
 
+	const handleGameInvite = () => {
+		globalState.gameInvite = !globalState.gameInvite;
+	}
+	// const gameInvite = () => {
+	// 	console.log("gameSocketConnected :", globalState?.gameSocket);
+	// 	// !gameInviteCalled && gameSocketConnected === false
+	// 	if (gameSocketConnected === false) {
+	// 		// setGameInviteCalled(true); // Marquer gameInvite comme appelée
+	// 		globalState.userSocket?.off('senderNotInGame');
+	// 		setgameInviteValidation(false);
+	// 		console.log("GAMEINVITE");
+	// 		globalState.userSocket?.emit('checkSenderInMatch', {
+	// 			senderUsername: sessionStorage.getItem("currentUserLogin"),
+	// 			senderUserId: sessionStorage.getItem("currentUserID"),
+	// 		})
+	// 		globalState.userSocket?.on('senderNotInGame', () => {
+	// 			console.log(`INVITATION: ${globalState.userSocket?.id}`);
+	// 			const gameSocket: Socket = io(`${process.env.API_URL}/game`, {
+	// 				autoConnect: false,
+	// 				auth: {
+	// 					token: sessionStorage.getItem("jwt"),
+	// 				}
+	// 			});
+	// 			gameSocket.connect();
+	// 			gameSocket.on('connect', () => {
+	// 				setgameSocketConnected(true);
+	// 				dispatch({ type: 'SET_GAME_SOCKET', payload: gameSocket });
+	// 				// emit le fait que je rentre en matchmaking, si l'autre refuse je fait un emethode pour le quitter avant de disconnect la socket
+	// 				gameSocket.emit('throwGameInvite')
+	// 				globalState.userSocket?.emit('inviteToGame', {
+	// 					usernameToInvite: chatState.currentTarget.login,
+	// 					userIdToInvite: chatState.currentTarget.id,
+	// 					senderID: gameSocket.id,
+	// 					senderUsername: sessionStorage.getItem("currentUserLogin"),
+	// 					senderUserID: sessionStorage.getItem("currentUserID"),
+	// 				});
+	// 			})
+	// 		})
 
-	const gameInvite = () => {
-		console.log("gameSocketConnected :", globalState?.gameSocket);
-		// !gameInviteCalled && gameSocketConnected === false
-		if (gameSocketConnected === false) {
-			// setGameInviteCalled(true); // Marquer gameInvite comme appelée
-			globalState.userSocket?.off('senderNotInGame');
-			setgameInviteValidation(false);
-			console.log("GAMEINVITE");
-			globalState.userSocket?.emit('checkSenderInMatch', {
-				senderUsername: sessionStorage.getItem("currentUserLogin"),
-				senderUserId: sessionStorage.getItem("currentUserID"),
-			})
-			globalState.userSocket?.on('senderNotInGame', () => {
-				console.log(`INVITATION: ${globalState.userSocket?.id}`);
-				const gameSocket: Socket = io(`${process.env.API_URL}/game`, {
-					autoConnect: false,
-					auth: {
-						token: sessionStorage.getItem("jwt"),
-					}
-				});
-				gameSocket.connect();
-				gameSocket.on('connect', () => {
-					setgameSocketConnected(true);
-					dispatch({ type: 'SET_GAME_SOCKET', payload: gameSocket });
-					// emit le fait que je rentre en matchmaking, si l'autre refuse je fait un emethode pour le quitter avant de disconnect la socket
-					gameSocket.emit('throwGameInvite')
-					globalState.userSocket?.emit('inviteToGame', {
-						usernameToInvite: chatState.currentTarget.login,
-						userIdToInvite: chatState.currentTarget.id,
-						senderID: gameSocket.id,
-						senderUsername: sessionStorage.getItem("currentUserLogin"),
-						senderUserID: sessionStorage.getItem("currentUserID"),
-					});
-				})
-			})
+	// useEffect(() => {
+	// 	console.log("useEfeccts trigged")
+	// 	if (typeof globalState.gameSocket !== "undefined") {
+	// 		globalState.gameSocket.on('acceptInvitation', () => {
+	// 			console.log("VALIDATION");
+	// 			setgameInviteValidation(true);
+	// 			setgameSocketConnected(false);
+	// 		});
+	// 		globalState.userSocket?.on('deniedInvitation', () => {
+	// 			console.log("DENIED :", globalState.gameSocket?.id)
+	// 			setgameSocketConnected(false);
+	// 			globalState.gameSocket?.emit('gameInviteRejected')
+	// 			// enlever le userGameSockets
+	// 			globalState.gameSocket?.disconnect();
 
+	// 		});
+	// 		globalState.userSocket?.on('userToInviteAlreadyInGame', () => {
+	// 			setgameSocketConnected(false);
+	// 			// enlever le userGameSockets
+	// 			globalState.gameSocket?.emit('gameInviteRejected')
+	// 			globalState.gameSocket?.disconnect();
 
-		}
-	};
+	// 		});
+	// 		globalState.userSocket?.on('senderInGame', () => {
+	// 			setgameSocketConnected(false);
+	// 		})
+	// 		globalState.userSocket?.on('closedInvitation', () => {
+	// 			console.log("CLOSED :", globalState.gameSocket?.id)
+	// 			if (gameInviteValidation == false) {
+	// 				// enlever le userGameSockets
+	// 				console.log("CLOSED DENY :", globalState.gameSocket?.id)
+	// 				setgameSocketConnected(false);
+	// 				globalState.gameSocket?.emit('gameInviteRejected')
+	// 				globalState.gameSocket?.disconnect();
+	// 			}
+	// 			setgameSocketConnected(false);
+	// 		});
+	// 	}
+	// 	else {
+	// 		console.log("gameSocket undefined");
+	// 	}
+	// 	return () => {
+	// 		globalState.gameSocket?.off('acceptInvitation');
+	// 		globalState.userSocket?.off('closedInvitation');
+	// 		globalState.userSocket?.off('deniedInvitation');
+	// 		globalState.gameSocket?.off('disconnect');
+	// 	};
+	// }, [globalState?.gameSocket, gameInviteValidation, globalState?.userSocket, gameSocketConnected]);
+		// }
+	// };
 	const timestamp = new Date().getTime();
 		return (
 			<>
@@ -324,7 +373,7 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 				
 				{chatState.showTimer && <TimerComponent user={chatState.currentTarget}/>}
 				{chatState.showConfirmation && (
-				<ConfirmationComponent phrase={`Etes vous sur de vouloir defier ${chatState.currentTarget.login}`} functionToExecute={gameInvite} />
+				<ConfirmationComponent phrase={`Etes vous sur de vouloir defier ${chatState.currentTarget.login}`} functionToExecute={handleGameInvite} />
 			)}
 			</>
 		);
