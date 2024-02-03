@@ -1,7 +1,8 @@
-import './FriendsListTab.css'
-import React, { use, useState, useEffect } from 'react';
-import ConfirmationComponent from '../../confirmation/Confirmation';
+import { useGlobal } from '@/app/GlobalContext';
 import { useChat } from '@/app/components/chat/ChatContext';
+import React, { useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
+import { Socket, io } from 'socket.io-client';
 import ListMyChannelComponent from '../../../listMyChannel/ListMyChannel';
 import { io, Socket } from 'socket.io-client';
 import { handleWebpackExternalForEdgeRuntime } from 'next/dist/build/webpack/plugins/middleware-plugin';
@@ -11,6 +12,8 @@ import { globalAgent } from 'http';
 import AddFriendComponent from '../../../addConversation/AddFriends';
 import GameInviteComponent from '../../../chatChannel/gameInvite';
 import GameInviteFunction from '../../../chatChannel/gameInvite';
+import ConfirmationComponent from '../../confirmation/Confirmation';
+import './FriendsListTab.css';
 
 interface User {
 	id: number;
@@ -25,14 +28,11 @@ interface FriendsListTabComponentProps {
 
 const FriendsListTabComponent: React.FC<FriendsListTabComponentProps> = ({ user, all }) => {
 
-	// let gameInviteValidation: boolean = false;
-	const [gameSocketConnected, setgameSocketConnected] = useState<boolean>(false);
-	const [gameInviteCalled, setGameInviteCalled] = useState(false);
-	const [gameInviteValidation, setgameInviteValidation] = useState<boolean>(false);
 	const { chatState, chatDispatch } = useChat();
 	const { globalState, dispatch } = useGlobal();
+	const [gameSocketConnected, setgameSocketConnected] = useState<boolean>(false);
+	const [gameInviteValidation, setgameInviteValidation] = useState<boolean>(false);
 	const [confirmationText, setConfirmationText] = useState('');
-	const [showConfirmation, setShowConfirmation] = useState(false);
 	const [funtionToExecute, setFunctionToExecute] = useState<() => void>(() => { });
 	const [accepted, setAccepted] = useState(false);
 
@@ -112,7 +112,7 @@ const FriendsListTabComponent: React.FC<FriendsListTabComponentProps> = ({ user,
 		setFunctionToExecute(() => functionToExecute);
 		chatDispatch({ type: 'ACTIVATE', payload: 'showConfirmation' });
 	};
-
+ 
 	const handleGameInvite = () => {
 		globalState.gameTargetId = user.id;
 		globalState.targetUsername = user.username;
@@ -122,33 +122,25 @@ const FriendsListTabComponent: React.FC<FriendsListTabComponentProps> = ({ user,
 	const removeFriends = async () => {
 
 		try {
-			const blockUserDto = {
-				initiatorLogin: sessionStorage.getItem("currentUserLogin"),
-				recipientLogin: user.username,
+			const removeFriendDto = {
+				friendID: user.id,
 			}
 
-			const response = await fetch(`${process.env.API_URL}/users/removeFriend`, {
+			const response = await fetch(`${process.env.API_URL}/users/deleteFriendRequest`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
 					'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`
 				},
-				body: JSON.stringify(blockUserDto),
+				body: JSON.stringify(removeFriendDto),
 			})
 
 			if (response.ok) {
-				const data = await response.json();
-				if (data.accepted)
-					setAccepted(data.accepted);
 				chatDispatch({ type: 'TOGGLEX', payload: 'refreshFriendsList' });
 				chatDispatch({ type: 'DISABLE', payload: 'showConfirmation' });
 
+				globalState.userSocket?.emit('refreshUser', { userToRefresh: user.username, target: 'refreshFriends', status: true});
 
-				globalState.userSocket?.emit('refreshUser', {
-					userToRefresh: user.username,
-					target: 'refreshFriends',
-					status: true
-				});
 			}
 			else {
 				const error = await response.json();
@@ -165,6 +157,7 @@ const FriendsListTabComponent: React.FC<FriendsListTabComponentProps> = ({ user,
 
 	const handlFriendRequest = async (user: string) => {
 		try {
+
 			const friendRequestDto = {
 				initiatorLogin: sessionStorage.getItem("currentUserLogin"),
 				recipientLogin: user,
@@ -206,6 +199,60 @@ const FriendsListTabComponent: React.FC<FriendsListTabComponentProps> = ({ user,
 			console.log(error);
 		}
 	};
+
+	useEffect(() => {
+		console.log("UseEffect gameSocketConnected :", gameSocketConnected)
+	}, [gameSocketConnected, gameInviteValidation]);
+
+
+	useEffect(() => {
+
+		if (typeof globalState.gameSocket !== "undefined") {
+			globalState.gameSocket.on('acceptInvitation', () => {
+				console.log("VALIDATION");
+				setgameInviteValidation(true);
+				setgameSocketConnected(false);
+			});
+			globalState.userSocket?.on('deniedInvitation', () => {
+				console.log("DENIED :", globalState.gameSocket?.id)
+				setgameSocketConnected(false);
+				globalState.gameSocket?.emit('gameInviteRejected')
+				// enlever le userGameSockets
+				globalState.gameSocket?.disconnect();
+
+			});
+			globalState.userSocket?.on('userToInviteAlreadyInGame', () => {
+				setgameSocketConnected(false);
+				// enlever le userGameSockets
+				globalState.gameSocket?.emit('gameInviteRejected')
+				globalState.gameSocket?.disconnect();
+
+			});
+			globalState.userSocket?.on('senderInGame', () => {
+				setgameSocketConnected(false);
+			})
+			globalState.userSocket?.on('closedInvitation', () => {
+				console.log("CLOSED :", globalState.gameSocket?.id)
+				if (gameInviteValidation == false) {
+					// enlever le userGameSockets
+					console.log("CLOSED DENY :", globalState.gameSocket?.id)
+					setgameSocketConnected(false);
+					globalState.gameSocket?.emit('gameInviteRejected')
+					globalState.gameSocket?.disconnect();
+				}
+				setgameSocketConnected(false);
+			});
+		}
+		else {
+			console.log("gameSocket undefined");
+		}
+		return () => {
+			globalState.gameSocket?.off('acceptInvitation');
+			globalState.userSocket?.off('closedInvitation');
+			globalState.userSocket?.off('deniedInvitation');
+			globalState.gameSocket?.off('disconnect');
+		};
+	}, [globalState?.gameSocket, gameInviteValidation, globalState?.userSocket, gameSocketConnected]);
 
 	return (
 		<>

@@ -52,7 +52,10 @@ export class ChatController {
 	@Post('addUserToConversation')
 	addUserToConversation(@Req() req, @Body() addUserToConversationDto: AddUserToConversationDto): Promise<Conversation> {
 		const { user } = req;
-		return this.chatService.addUserToConversation(addUserToConversationDto, user.sub);
+		if (addUserToConversationDto.userToAdd)
+			return this.chatService.addUserToConversation(addUserToConversationDto.conversationID, addUserToConversationDto.userToAdd);
+		else
+			return this.chatService.addUserToConversation(addUserToConversationDto.conversationID, user.sub);
 	}
 
 	@UseGuards(AuthGuard)
@@ -134,7 +137,6 @@ export class ChatController {
 	@Post('promoteAdminUser')
 	promoteadminUserFromConversation(@Req() req, @Body() userOptionsDto: UserOptionsDto): Promise<boolean> {
 		const { user } = req;
-		console.log("CONTROLLER", user);
 		return this.chatService.updateUserAdminStatusFromConversationTrue(userOptionsDto, user.sub);
 	}
 

@@ -89,7 +89,7 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	private async notifyFriendList(userID: number, personnalRoom: string, event: string, status: string) {
 
 		const user = await this.userService.getUserByID(userID);
-		// console.log(user);
+
 		if (user) {
 
 			const friends = await this.userService.getFriendships(userID);
@@ -269,7 +269,6 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		});
 	}
 
-	// je peux aussi utiliser la liste userBlocked pour except les demandes d'amis
 	@SubscribeMessage('addFriend')
 	@UseGuards(GatewayGuard)
 	handleFriendRequest(@MessageBody() dto: any) {
@@ -277,9 +276,9 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 			recipientLogin: dto.recipientLogin,
 			initiatorLogin: dto.initiatorLogin,
 		});
+		this.server.to(dto.recipientLogin).except(`whoblocked${dto.initiatorLogin}`).emit('refreshHeaderNotif');
 	}
 
-	// faut aussi, peut etre le nom de celui qui a accepte mdr
 	@SubscribeMessage('friendRequestAccepted')
 	@UseGuards(GatewayGuard)
 	handleAcceptedFriendRequest(@MessageBody() data: { roomName: string, roomID: string, initiator: string, recipient: string }) {
@@ -291,6 +290,7 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 			recipient: recipient,
 		})
 		this.server.to(recipient).emit('refreshFriends');
+		this.server.to(recipient).emit('refreshHeaderNotif');
 	}
 
 	/* REFRESH HANDLERS */
@@ -321,8 +321,6 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	@UseGuards(GatewayGuard)
 	handleDeleteChannel(@MessageBody() data: { roomName: string, roomID: string }) {
 		const { roomName, roomID } = data;
-		console.log("Emitting to ", roomName + roomID);
-		// recup channelUserList et emit sur chaque user?
 		this.server.to(roomName + roomID).emit('channelDeleted', {
 			roomName: roomName,
 			roomID: roomID,
@@ -348,9 +346,8 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 
 	@SubscribeMessage('refreshChannelList')
 	@UseGuards(GatewayGuard)
-	handleRefreshChannel(@MessageBody() data: { roomName: string, roomID: string }) {
-		console.log("refreshing channel list");
-		const { roomName, roomID } = data;
+	handleRefreshChannel(@MessageBody() data: {roomName: string, roomID: string  } ) {
+		const { roomName, roomID} = data;
 		this.server.to(roomName + roomID).emit('refreshChannelListBis');
 	}
 

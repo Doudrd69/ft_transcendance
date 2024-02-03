@@ -1,11 +1,10 @@
 import { useGlobal } from '@/app/GlobalContext';
-import './Header.css'
-import React, { useState, useEffect } from 'react';
-import { ToastContainer, toast } from 'react-toastify';
+import React, { useEffect } from 'react';
 import 'react-toastify/dist/ReactToastify.css';
-import AvatarImageComponent from '../Avatar/Avatar';
-import { validate, validateOrReject } from 'class-validator';
 import { useChat } from '../chat/ChatContext';
+import './Header.css';
+import { useState } from 'react';
+import { toast } from 'react-toastify';
 
 
 interface FriendShip {
@@ -16,19 +15,34 @@ interface FriendShip {
 }
 
 const HeaderComponent: React.FC = () => {
+
 	const {chatDispatch} = useChat();
 	const { globalState, dispatch } = useGlobal();
 	const timestmp = new Date();
 	const [notify, setNotify] = useState<FriendShip[]>([]);
 	const [showActivateNotif, setShowActivateNotif] = useState(false);
+	const [newNotifications, setNewNotifications] = useState(false);
+	const [reloadNotifications, setReloadNotifications] = useState(false);
+
 	const uploadAvatar =  () => {
 		dispatch({ type: 'ACTIVATE', payload: 'showUploadAvatar' });
 	}
-	const [newNotifications, setNewNotifications] = useState(false);
 
-	useEffect(() => {
-		uploadAvatar();
-	}, [globalState.showRefresh]);
+	const handleLogout = () => {
+
+		localStorage.clear();
+		sessionStorage.clear();
+		window.history.replaceState(null, '', '/');
+		window.location.reload();
+	}
+
+	const activateNotif = () =>  {
+		setShowActivateNotif(!showActivateNotif);
+	}
+
+	const disableNotif = () => {
+		setNewNotifications(false);
+	}
 
 	const loadNotifications = async() => {
 
@@ -55,18 +69,99 @@ const HeaderComponent: React.FC = () => {
 		}
 	}
 
+	const handleFriendshipAccept = async (friendUsername: string) => {
+	
+		const friendRequestDto = {
+			recipientLogin: friendUsername,
+		}
+
+		const response = await fetch(`${process.env.API_URL}/users/acceptFriendRequest`, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`
+			},
+			body: JSON.stringify(friendRequestDto),
+		});
+
+		if (response.ok) {
+			const data = await response.json();
+			if (globalState.userSocket?.connected) {
+				globalState.userSocket?.emit('friendRequestAccepted', {
+					roomName: data.name,
+					roomID: data.id,
+					initiator:  friendUsername,
+					recipient: sessionStorage.getItem("currentUserLogin"),
+				});
+				globalState.userSocket?.emit('joinRoom', {
+					roomName: data.name,
+					roomID: data.id,
+				});
+			}
+			setReloadNotifications(true);
+		}
+		else {
+			const error = await response.json();
+			if (Array.isArray(error.message))
+				toast.warn(error.message[0]);
+			else
+				toast.warn(error.message);
+		}
+	}
+
+	const handleFriendshipDeny = async (friendID: number, friendUsername: string) => {
+
+		const deleteFriendRequestDto = {
+			friendID: friendID,
+		}
+
+		const response = await fetch(`${process.env.API_URL}/users/deleteFriendRequest`, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`
+			},
+			body: JSON.stringify(deleteFriendRequestDto),
+		})
+
+		if (response.ok) {
+			chatDispatch({ type: 'TOGGLEX', payload: 'refreshFriendsList' });
+
+			setReloadNotifications(true);
+		}
+		else {
+			const error = await response.json();
+			if (Array.isArray(error.message))
+				toast.warn(error.message[0]);
+			else
+				toast.warn(error.message);
+		}
+		return ;
+	}
+
+	useEffect(() => {
+		uploadAvatar();
+	}, [globalState.showRefresh]);
+
 	useEffect(() => {
 		loadNotifications();
-	}, []);
+	}, [reloadNotifications]);
+
+	useEffect(() => {
+
+		globalState.userSocket?.on('refreshHeaderNotif', () => {
+			loadNotifications();
+		});
+
+		return () => {
+			globalState.userSocket?.off('refreshHeaderNotif');
+		}
+
+	}, [globalState?.userSocket]);
 
 	const renderComponent = (component: React.ReactNode, condition: boolean) =>
 		condition ? component : null;
-	const activateNotif = () =>  {
-		setShowActivateNotif(!showActivateNotif);
-	}
-	const disableNotif = () => {
-		setNewNotifications(false);
-	}
+
 	return (
 		<div className="header">
 			<div className="bloc-profils">
@@ -91,6 +186,9 @@ const HeaderComponent: React.FC = () => {
 					{/* {renderComponent(<AvatarImageComponent className="profils" refresh={globalState.showRefresh}/>, globalState.showUploadAvatar)} */}
 				</button>
 			</div>
+		<div className="bloc-logout">
+			<button className="button-logout" onClick={() => handleLogout()}></button>
+		</div>
 		<div className="bloc-pong">PINGPON</div>
 		<button className="button-notifications" onClick={() => {activateNotif(); disableNotif();}}>
 				<div className="notification-icon-container">
@@ -102,8 +200,8 @@ const HeaderComponent: React.FC = () => {
 					{notify.map((notif: FriendShip) => (
 						<div className='notif' key={notif.id}>
 						<div className='notif-username'>{notif.username} veut être ton ami </div>
-						<button className='notif-accept' onClick={() => {}}>Accept</button>
-						<button className='notif-decline' onClick={() => {}}>Decline</button>
+						<button className='notif-accept' onClick={() => {handleFriendshipAccept(notif.username)}}>Accept</button>
+						<button className='notif-decline' onClick={() => {handleFriendshipDeny(notif.id, notif.username)}}>Decline</button>
 						</div>
 					))}
 					</div>
