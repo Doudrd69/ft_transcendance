@@ -39,6 +39,8 @@ export class UsersService {
 	}
 	async userToInviteGameIsAlreadyInGame(userIdToInvite: number) {
 		const userToInvite: User = await this.usersRepository.findOne({ where: { id: userIdToInvite } })
+		if (!userToInvite)
+			throw new Error("userToInvite undefined")
 		// userToInvite.inGame = false;
 		// await this.usersRepository.save(userToInvite);
 		if (userToInvite.inGame === true || userToInvite.inMatchmaking === true) {
@@ -313,6 +315,7 @@ export class UsersService {
 		const user : User = await this.usersRepository.findOne({ where: { id: userId } });
 
 		if (user) {
+			console.log(`[getUsersStats] userVictory: ${user.victory}`);
 			let object = {
 				victory: user.victory,
 				defeat: user.defeat,

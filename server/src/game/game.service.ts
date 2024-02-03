@@ -178,6 +178,7 @@ export class GameService {
 	async createGame(player1ID: string, player2ID: string, gameMode: string): Promise<Game> {
 		const usersId: [number, number] = await this.getUserIdByIDpairStartGame(player1ID, player2ID);
 		const playersLogin: [string, string] = await this.getLoginByUserIdStartGame(usersId[0], usersId[1]);
+		console.log(`[createGame] : playersLogin: ${playersLogin}`);
 		const game = new Game();
 		game.playerOneID = player1ID;
 		game.playerTwoID = player2ID;
@@ -247,6 +248,8 @@ export class GameService {
 
 	async linkSocketIDWithUser(playerID: string, userId: number) {
 
+		console.log("Search for userID ", userId);
+		console.log("Search for playerID ", playerID);
 		const Player: User = await this.usersRepository.findOne({ where: { id: userId } })
 		if (!Player)
 			throw new Error()
@@ -264,7 +267,7 @@ export class GameService {
 		const UserTwo: User = await this.usersRepository.findOne({ where: { id : userId2 } })
 
 		if (UserOne && UserTwo) {
-			const playersLogin: [string, string] = [UserOne.login, UserTwo.login]
+			const playersLogin: [string, string] = [UserOne.username, UserTwo.username]
 			return (playersLogin);
 		}
 	}
@@ -300,6 +303,8 @@ export class GameService {
 		UserOne.inGame = false;
 		UserTwo.inGame = false;
 
+		game.scoreOne = gameInstance.player1_score;
+		game.scoreTwo = gameInstance.player2_score;
 		console.log("Before U1: ", UserOne.victory, UserOne.defeat);
 		console.log("Before U2: ", UserTwo.victory, UserTwo.defeat);
 		if (game.scoreOne > game.scoreTwo) {
@@ -319,8 +324,6 @@ export class GameService {
 		game.userOneId = UserOne.id;
 		game.userTwoId = UserTwo.id;
 		game.gameEnd = true;
-		game.scoreOne = gameInstance.player1_score;
-		game.scoreTwo = gameInstance.player2_score;
 		await this.gameRepository.save(game);
 		return (game);
 	}
@@ -438,33 +441,33 @@ export class GameService {
 		game.gameEnd = false;
 		game.userOneId = gameInstance.usersId[0];
 		game.userTwoId = gameInstance.usersId[1];
-		const UserOne: User = await this.usersRepository.findOne({ where: { gameSocketId: gameInstance.players[0] } })
-		const UserTwo: User = await this.usersRepository.findOne({ where: { gameSocketId: gameInstance.players[1] } })
-		UserOne.inGame = false;
-		UserTwo.inGame = false;
+		user1.inGame = false;
+		user2.inGame = false;
 		if (disconnectedSockets.includes(gameInstance.players[0])) {
-			console.log(`PlayerOne QUIT`)
+			console.log(`PlayerOne QUIT: login: ${gameInstance.playersLogin[0]}, gameSocketId: ${gameInstance.players[0]}`)
 			game.scoreOne = 0;
 		}
 		if (disconnectedSockets.includes(gameInstance.players[1])) {
-			console.log(`PlayerTwo QUIT`)
+			console.log(`PlayerTwo QUIT: login: ${gameInstance.playersLogin[1]}, gameSocketId: ${gameInstance.players[1]}`)
 			game.scoreTwo = 0;
 		}
 		if (game.scoreOne > game.scoreTwo) {
-			UserOne.victory += 1;
-			UserTwo.defeat += 1;
+			console.log(`createGameStop, gameScorneOne > gameScoreTwo`)
+			user1.victory += 1;
+			user2.defeat += 1;
 		}
-		else {
-			UserOne.defeat += 1;
-			UserTwo.victory += 1;
+		else if (game.scoreOne < game.scoreTwo) {
+			console.log(`createGameStop, gameScorneOne < gameScoreTwo`)
+			user1.defeat += 1;
+			user2.victory += 1;
 		}
-		await this.usersRepository.save(UserOne);
-		await this.usersRepository.save(UserTwo);
+		await this.usersRepository.save(user1);
+		await this.usersRepository.save(user2);
 
-		console.log("After U1: ", UserOne.victory, UserOne.defeat);
-		console.log("After U2: ", UserTwo.victory, UserTwo.defeat);
+		console.log("After U1: ", user1.victory, user1.defeat);
+		console.log("After U2: ", user2.victory, user2.defeat);
 
-		// game.gameEnd = true;
+		game.gameEnd = true;
 		await this.gameRepository.save(game);
 	}
 }

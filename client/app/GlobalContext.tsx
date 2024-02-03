@@ -26,12 +26,16 @@ interface GlobalState {
 	showGeneralSettings:boolean;
 	showGame: boolean;
 	showChat:boolean;
-	showAvatar:boolean;
+showAvatar:boolean;
 	showHeader:boolean;
 	showUploadAvatar:boolean;
 	showRefresh:boolean;
 	showIsDefault:boolean;
 	avatar:string;
+	gameUserId: number;
+	gameTargetId: number;
+	targetUsername: string;
+	gameInvite: boolean;
 	userSocket: Socket | undefined;
 	gameSocket: Socket | undefined;
 	show2FA: boolean;
@@ -39,7 +43,7 @@ interface GlobalState {
 	showAuth: boolean;
 	activate2FA: boolean;
 
-	[key: string]: boolean | string | Socket | undefined | null;
+	[key: string]: boolean | string | Socket | undefined | number | null;
 }
 
 // État initial
@@ -51,6 +55,10 @@ const initialState: GlobalState = {
 	showGame: true,
 	showChat: true,
 	showAvatar:false,
+	gameInvite: false,
+	gameUserId: 0,
+	gameTargetId: 0,
+	targetUsername: "",
 	showUploadAvatar:true,
 	showHeader:false,
 	showRefresh:false,

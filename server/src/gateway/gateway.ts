@@ -25,14 +25,14 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	constructor(
 		private chatService: ChatService,
 		private userService: UsersService,
-	) {}
+	) { }
 
 	@WebSocketServer()
 	server: Server;
 
 	private connectedUsers: { [userId: string]: Socket } = {};
 
-	private  async userRejoinsRooms(client: Socket, userID: number) {
+	private async userRejoinsRooms(client: Socket, userID: number) {
 
 		try {
 			const conversations = await this.chatService.getAllConversations(userID);
@@ -41,12 +41,12 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 				conversations.forEach(function (value) {
 					ids.push(value.id);
 				});
-		
+
 				const conv = await this.chatService.getConversationArrayByID(ids);
 				conv.forEach(function (value) {
 					client.join(value.name + value.id);
 				})
-	
+
 				const blockedUsers = await this.userService.getBlockedUserList(userID);
 				if (blockedUsers) {
 					blockedUsers.forEach((blockedUser: string) => {
@@ -68,12 +68,12 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 				conversations.forEach(function (value) {
 					ids.push(value.id);
 				});
-	
+
 				const conv = await this.chatService.getConversationArrayByID(ids);
 				conv.forEach(function (value) {
 					client.leave(value.name);
 				})
-	
+
 				const blockedUsers = await this.userService.getBlockedUserList(userID);
 				if (blockedUsers) {
 					blockedUsers.forEach((blockedUser: string) => {
@@ -89,6 +89,7 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	private async notifyFriendList(userID: number, personnalRoom: string, event: string, status: string) {
 
 		const user = await this.userService.getUserByID(userID);
+
 		if (user) {
 
 			const friends = await this.userService.getFriendships(userID);
@@ -99,7 +100,7 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 					this.server.except(personnalRoom).to(friend.username).emit(event, `${personnalRoom} is ${status}`);
 				});
 
-				return ;
+				return;
 			}
 		}
 
@@ -109,10 +110,10 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	handleConnection(client: Socket) {
 
 		try {
-			
+
 			console.log(`---> GeneralGtw client connected    : ${client.id}`);
 			this.connectedUsers[client.id] = client;
-	
+
 			client.on('joinPersonnalRoom', (personnalRoom: string, userID: number) => {
 
 				client.join(personnalRoom);
@@ -121,22 +122,22 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 				this.userService.updateUserStatus(userID, true);
 				this.notifyFriendList(userID, personnalRoom, 'newConnection', 'online');
 				this.server.emit('newUser');
-		
+
 				client.on('disconnect', () => {
 					console.log("===> Disconnecting user ", personnalRoom, " with ID ", userID);
-					this.notifyFriendList(userID, personnalRoom , 'newDeconnection', 'offline');
+					this.notifyFriendList(userID, personnalRoom, 'newDeconnection', 'offline');
 					client.leave(personnalRoom);
 					console.log("Client ", client.id, " has left ", personnalRoom, " room");
 					this.userLeavesRooms(client, userID);
 					this.userService.updateUserStatus(userID, false);
 				})
-		
+
 			});
 		} catch (error) {
 			console.log(' == Gatewway: ', error);
 		}
 	}
-	
+
 	handleDisconnect(client: Socket) {
 		console.log(`===> GeneralGtw client disconnected : ${client.id}`);
 		delete this.connectedUsers[client.id];
@@ -144,11 +145,11 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 
 	@SubscribeMessage('joinRoom')
 	@UseGuards(GatewayGuard)
-	addUserToRoom( @ConnectedSocket() client: Socket, @MessageBody() data: { roomName: string, roomID: string } ) {
+	addUserToRoom(@ConnectedSocket() client: Socket, @MessageBody() data: { roomName: string, roomID: string }) {
 
 		const { roomName, roomID } = data;
 		console.log("==== joinRoom Event ====");
-		console.log("Add ", client.id," to room : ", roomName + roomID);
+		console.log("Add ", client.id, " to room : ", roomName + roomID);
 
 		if (roomID)
 			client.join(roomName + roomID);
@@ -164,30 +165,30 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 
 		this.server.to(roomName + roomID).emit('userJoinedRoom', notif);
 
-		return ;
+		return;
 	}
 
 	@SubscribeMessage('leaveRoom')
 	@UseGuards(GatewayGuard)
-	leaveRoom( @ConnectedSocket() client: Socket, @MessageBody() data: { roomName: string, roomID: string } ) {
+	leaveRoom(@ConnectedSocket() client: Socket, @MessageBody() data: { roomName: string, roomID: string }) {
 
 		const { roomName, roomID } = data;
 		console.log("==== leaveRoom Event ====");
-		console.log("Remove ", client.id," from room : ", roomName + roomID);
+		console.log("Remove ", client.id, " from room : ", roomName + roomID);
 
 		if (roomID)
 			client.leave(roomName + roomID);
 		else
 			client.leave(roomName);
-		return ;
+		return;
 	}
 
 	@SubscribeMessage('addUserToRoom')
 	@UseGuards(GatewayGuard)
-	addUserToNewRoom( @MessageBody() data: { convID: number, convName: string, friend: string} ) {
+	addUserToNewRoom(@MessageBody() data: { convID: number, convName: string, friend: string }) {
 		const { convID, convName, friend } = data;
 		console.log("==== addUserToRoom Event ====");
-		console.log("Emit to add ", friend," to room : ", convName + convID);
+		console.log("Emit to add ", friend, " to room : ", convName + convID);
 		this.server.to(friend).emit('userAddedToRoom', {
 			convID: convID,
 			convName: convName,
@@ -196,8 +197,7 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 
 	@SubscribeMessage('checkSenderInMatch')
 	@UseGuards(GatewayGuard)
-	async checkIfSendInMatch(@MessageBody() data: { senderUsername: string, senderUserId: number } ) {
-
+	async checkIfSendInMatch(@MessageBody() data: { senderUsername: string, senderUserId: number }) {
 		try {
 			if (await this.userService.userToInviteGameIsAlreadyInGame(data.senderUserId)) {
 				console.log(`sender already inGame`);
@@ -206,50 +206,54 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 			}
 			this.server.to(data.senderUsername).emit('senderNotInGame');
 		} catch (error) {
-			throw error;
+			console.log(`[GAME INVITE ERROR]: ${error.stack}`)
 		}
 	}
 
 	@SubscribeMessage('inviteToGame')
 	@UseGuards(GatewayGuard)
-	async inviteUserToGame(@ConnectedSocket() client: Socket, @MessageBody() data: { usernameToInvite: string, userIdToInvite: number, senderID: string, senderUsername: string, senderUserID: number } ) {
-		
+	async inviteUserToGame(@ConnectedSocket() client: Socket, @MessageBody() data: { usernameToInvite: string, userIdToInvite: number, senderID: string, senderUsername: string }) {
+		console.log(`inviteUserToGame:  ${data.userIdToInvite}`);
 		try {
-			const { usernameToInvite, userIdToInvite, senderID, senderUsername, senderUserID } = data;
-			if (await this.userService.userToInviteGameIsAlreadyInGame(userIdToInvite))
-			{
-				this.server.to(senderUsername).emit('userToInviteAlreadyInGame');
+			const { usernameToInvite, userIdToInvite, senderID, senderUsername } = data;
+			const user = client.handshake.auth.user;
+			if (await this.userService.userToInviteGameIsAlreadyInGame(userIdToInvite)) {
+				this.server.to(client.id).emit('userToInviteAlreadyInGame');
 				return;
 			}
-			console.log("Inviting ", usernameToInvite," to game");
-			console.log("-----> ",  usernameToInvite, senderID, senderUsername, "ho :", senderUserID);
+
+			console.log("-------------------> ", usernameToInvite, user.sub, senderID, senderUsername);
 			this.server.to(usernameToInvite).emit('gameInvite', {
-				senderUserID: senderUserID,
+				senderUserID: user.sub,
 				senderID: senderID,
 				senderUsername: senderUsername,
 			});
-		} catch (error) {
-			throw error;
+			// senderUserID: number;
+			// senderID: string,
+			// senderUsername: string;
+		} 
+		catch (error) {
+			console.log(`[GAME INVITE ERROR]: ${error.stack}`)
 		}
 	}
 
 	@SubscribeMessage('inviteClosed')
 	@UseGuards(GatewayGuard)
-    handleInviteClosed(@ConnectedSocket() client: Socket, @MessageBody() data: {senderUsername: string}) {
-        console.log("CLOSED")
-        this.server.to([data.senderUsername]).emit('closedInvitation');
-    }
+	handleInviteClosed(@ConnectedSocket() client: Socket, @MessageBody() data: { senderUsername: string }) {
+		console.log("CLOSED")
+		this.server.to([data.senderUsername]).emit('closedInvitation');
+	}
 
-    @SubscribeMessage('inviteDenied')
+	@SubscribeMessage('inviteDenied')
 	@UseGuards(GatewayGuard)
-    handleInviteDenied(@ConnectedSocket() client: Socket, @MessageBody() data: {senderUsername: string}) {
-        console.log("DENY")
-        this.server.to([data.senderUsername]).emit('deniedInvitation');
-    }
+	handleInviteDenied(@ConnectedSocket() client: Socket, @MessageBody() data: { senderUsername: string }) {
+		console.log("DENY")
+		this.server.to([data.senderUsername]).emit('deniedInvitation');
+	}
 
 	@SubscribeMessage('message')
 	@UseGuards(GatewayGuard)
-	async handleMessage(@ConnectedSocket() client: Socket, @MessageBody() data: { dto: MessageDto, conversationName: string } ) {
+	async handleMessage(@ConnectedSocket() client: Socket, @MessageBody() data: { dto: MessageDto, conversationName: string }) {
 
 		const { dto, conversationName } = data;
 		const user = client.handshake.auth.user;
@@ -277,7 +281,7 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 
 	@SubscribeMessage('friendRequestAccepted')
 	@UseGuards(GatewayGuard)
-	handleAcceptedFriendRequest(@MessageBody() data: { roomName: string, roomID: string, initiator: string, recipient: string } ) {
+	handleAcceptedFriendRequest(@MessageBody() data: { roomName: string, roomID: string, initiator: string, recipient: string }) {
 		const { roomName, roomID, initiator, recipient } = data;
 		this.server.to(initiator).emit('friendRequestAcceptedNotif', {
 			roomName: roomName,
@@ -293,7 +297,7 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 
 	@SubscribeMessage('banUser')
 	@UseGuards(GatewayGuard)
-	handleUserBan(@MessageBody() data: { userToBan: string, roomName: string, roomID: string } ) {
+	handleUserBan(@MessageBody() data: { userToBan: string, roomName: string, roomID: string }) {
 		const { userToBan, roomName, roomID } = data;
 		console.log(userToBan);
 		this.server.to(userToBan).emit('userIsBan', {
@@ -304,7 +308,7 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 
 	@SubscribeMessage('unbanUser')
 	@UseGuards(GatewayGuard)
-	handleUserUnban(@MessageBody() data: { userToUnban: string, roomName: string, roomID: string } ) {
+	handleUserUnban(@MessageBody() data: { userToUnban: string, roomName: string, roomID: string }) {
 		const { userToUnban, roomName, roomID } = data;
 		console.log(userToUnban);
 		this.server.to(userToUnban).emit('userIsUnban', {
@@ -315,7 +319,7 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 
 	@SubscribeMessage('deleteChannel')
 	@UseGuards(GatewayGuard)
-	handleDeleteChannel(@MessageBody() data: { roomName: string, roomID: string } ) {
+	handleDeleteChannel(@MessageBody() data: { roomName: string, roomID: string }) {
 		const { roomName, roomID } = data;
 		this.server.to(roomName + roomID).emit('channelDeleted', {
 			roomName: roomName,
@@ -325,7 +329,7 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 
 	@SubscribeMessage('kickUserFromChannel')
 	@UseGuards(GatewayGuard)
-	handleKickUser(@MessageBody() data: { userToKick: string, roomName: string, roomID: string } ) {
+	handleKickUser(@MessageBody() data: { userToKick: string, roomName: string, roomID: string }) {
 		const { userToKick, roomName, roomID } = data;
 		this.server.to(userToKick).emit('kickUser', {
 			roomName: roomName,
@@ -335,7 +339,7 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 
 	@SubscribeMessage('refreshUserChannelList')
 	@UseGuards(GatewayGuard)
-	handleRefresh(@MessageBody() data: { userToRefresh: string } ) {
+	handleRefresh(@MessageBody() data: { userToRefresh: string }) {
 		const { userToRefresh } = data;
 		this.server.to(userToRefresh).emit('refreshChannelList');
 	}
@@ -349,7 +353,7 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 
 	@SubscribeMessage('refreshUser')
 	@UseGuards(GatewayGuard)
-	handleUserRefresh(@MessageBody() data: { userToRefresh: string, target: string, status: boolean } ) {
+	handleUserRefresh(@MessageBody() data: { userToRefresh: string, target: string, status: boolean }) {
 		const { userToRefresh, target, status } = data;
 		this.server.to(userToRefresh).emit(target, status);
 	}
@@ -362,7 +366,7 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 
 	@SubscribeMessage('emitNotification')
 	@UseGuards(GatewayGuard)
-	async handleNotif(@MessageBody() data: { channel: string, content: string, channelID: string} ) {
+	async handleNotif(@MessageBody() data: { channel: string, content: string, channelID: string }) {
 
 		try {
 			const { channel, content, channelID } = data;

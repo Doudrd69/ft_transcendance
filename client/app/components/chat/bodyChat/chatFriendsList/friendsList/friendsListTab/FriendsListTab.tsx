@@ -4,6 +4,14 @@ import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { Socket, io } from 'socket.io-client';
 import ListMyChannelComponent from '../../../listMyChannel/ListMyChannel';
+import { io, Socket } from 'socket.io-client';
+import { handleWebpackExternalForEdgeRuntime } from 'next/dist/build/webpack/plugins/middleware-plugin';
+import { setGameSocket, useGlobal } from '@/app/GlobalContext';
+import { ToastContainer, toast } from 'react-toastify';
+import { globalAgent } from 'http';
+import AddFriendComponent from '../../../addConversation/AddFriends';
+import GameInviteComponent from '../../../chatChannel/gameInvite';
+import GameInviteFunction from '../../../chatChannel/gameInvite';
 import ConfirmationComponent from '../../confirmation/Confirmation';
 import './FriendsListTab.css';
 
@@ -104,46 +112,12 @@ const FriendsListTabComponent: React.FC<FriendsListTabComponentProps> = ({ user,
 		setFunctionToExecute(() => functionToExecute);
 		chatDispatch({ type: 'ACTIVATE', payload: 'showConfirmation' });
 	};
-
-	const gameInvite = () => {
-		console.log("gameSocketConnected :", globalState?.gameSocket);
-		// !gameInviteCalled && gameSocketConnected === false
-		if (gameSocketConnected === false) {
-			// setGameInviteCalled(true); // Marquer gameInvite comme appelée
-			globalState.userSocket?.off('senderNotInGame');
-			setgameInviteValidation(false);
-			console.log("GAMEINVITE");
-			globalState.userSocket?.emit('checkSenderInMatch', {
-				senderUsername: sessionStorage.getItem("currentUserLogin"),
-				senderUserId: sessionStorage.getItem("currentUserID"),
-			})
-			globalState.userSocket?.on('senderNotInGame', () => {
-				console.log(`INVITATION: ${globalState.userSocket?.id}`);
-				const gameSocket: Socket = io(`${process.env.API_URL}/game`, {
-					autoConnect: false,
-					auth: {
-						token: sessionStorage.getItem("jwt"),
-					}
-				});
-				gameSocket.connect();
-				gameSocket.on('connect', () => {
-					setgameSocketConnected(true);
-					dispatch({ type: 'SET_GAME_SOCKET', payload: gameSocket });
-					// emit le fait que je rentre en matchmaking, si l'autre refuse je fait un emethode pour le quitter avant de disconnect la socket
-					gameSocket.emit('throwGameInvite')
-					globalState.userSocket?.emit('inviteToGame', {
-						usernameToInvite: user.username,
-						userIdToInvite: user.id,
-						senderID: gameSocket.id,
-						senderUsername: sessionStorage.getItem("currentUserLogin"),
-						senderUserID: sessionStorage.getItem("currentUserID"),
-					});
-				})
-			})
-		}
-	};
-	// stock une fois a chaque fois, recoi
-	// si je suis inMatchmaking tt va bien, par contre si j'invite mais que en meme temps je lance un matchmaking? le matchmaking check si je suis ingame 
+ 
+	const handleGameInvite = () => {
+		globalState.gameTargetId = user.id;
+		globalState.targetUsername = user.username;
+		globalState.gameInvite = !globalState.gameInvite;
+	}
 
 	const removeFriends = async () => {
 
@@ -287,7 +261,7 @@ const FriendsListTabComponent: React.FC<FriendsListTabComponentProps> = ({ user,
 				{all &&
 					<img className='image-tab' src="ajouter.png" onClick={() => handleTabClick(`Etes vous sur de vouloir ajouter à de votre liste d'amies ${user.username} ?`, () => handlFriendRequest(user.username))} />
 				}
-				<img className='image-tab' src="ping-pong.png" onClick={() => handleTabClick(`Etes vous sur de vouloir défier ${user.username} ?`, gameInvite)} />
+				<img className='image-tab' src="ping-pong.png" onClick={() => handleTabClick(`Etes vous sur de vouloir défier ${user.username} ?`, handleGameInvite)} />
 				<img className='image-tab' src="ajouter-un-groupe.png" onClick={() => chatDispatch({ type: 'ACTIVATE', payload: 'showListChannelAdd' })} />
 				<img className='image-tab' src="stats.png" />
 				{user.isBlocked ? (

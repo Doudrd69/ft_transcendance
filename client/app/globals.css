@@ -4,11 +4,11 @@
 }
 
 :root {
-	--first: #998a8aff;
-	--second: #332122ff;
-	--third: #6b0f1aff;
-	--fourth: #996e6aff;
-	--fifth: #70504dff;
+	--first: #8ecae6ff;
+	--second: #2671bcff;
+	--third: #e97700ff;
+	--fourth: #ffb703ff;
+	--fifth: #d1470bff;
   }
 body, html {
 	margin: 0;
@@ -20,3 +20,11 @@ body{
   font-size: 20px; /* Exemple de taille de police */
   font-family: 'Gill Sans', sans-serif;
 }
+
+/*
+d1470b
+e97700
+ffb703
+8ecae6
+2671bc
+*/

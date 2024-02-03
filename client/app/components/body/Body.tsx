@@ -11,7 +11,8 @@ import { GameProvider } from '../game/GameContext';
 import GameComponent from '../game/Game';
 import { useGlobal } from '../../GlobalContext';
 import './Body.css';
-
+import GameInviteComponent from '../chat/bodyChat/chatChannel/gameInvite';
+// import { staticGenerationAsyncStorage } from 'next/dist/client/components/static-generation-async-storage.external';
 
 const BodyComponent: React.FC = () => {
 	
@@ -27,6 +28,7 @@ const BodyComponent: React.FC = () => {
 						<ChatComponent/>
 						<GameProvider>
 							<GameComponent />
+							<GameInviteComponent/>
 						</GameProvider>
 				</div>
 		</>

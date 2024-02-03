@@ -32,7 +32,6 @@ interface GameInviteDto {
 	senderUserID: number;
 	senderID: string,
 	senderUsername: string;
-	initiatorLogin: string;
 }
 
 const GeneralComponent = () => {
@@ -57,9 +56,10 @@ const GeneralComponent = () => {
 		});
 		gameSocket.connect();
 		dispatch({ type: 'SET_GAME_SOCKET', payload: gameSocket });
+		console.log("Dto to emit: ", gameInviteDto);
 		gameSocket.emit('inviteAccepted', {
 			userOneId: sessionStorage.getItem("currentUserID"),
-			userTwoId: gameInviteDto.senderUserID,
+			userTwoId: gameInviteDto.senderUserID, // il est null ce connard
 			playerOneLogin: sessionStorage.getItem("currentUserLogin"),
 			playerTwoLogin: gameInviteDto.senderUsername,
 			playerTwoId: gameInviteDto.senderID,
@@ -300,6 +300,8 @@ const GeneralComponent = () => {
 		});
 
 		globalState.userSocket?.on('gameInvite', (gameInviteDto: GameInviteDto) => {
+
+			console.log("REACT GAME INVITE");
 			toast(<GameInviteNotification gameInviteDto={gameInviteDto} />,
 				{
 					pauseOnFocusLoss: false,

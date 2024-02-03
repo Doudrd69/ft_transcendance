@@ -1,11 +1,11 @@
 // BodyComponent.tsx
 import './BodyChat.css';
-import React from 'react';
 import { useChat } from '../ChatContext';
 import { Socket } from 'socket.io-client'
 import ChatUserComponent from './chatUser/ChatUser';
 import ChatChannelComponent from './chatChannel/ChatChannel';
 import ChatFriendsListComponent from './chatFriendsList/ChatFriendsList';
+import React, { use, useState, useEffect } from 'react';
 
 const BodyChatComponent: React.FC = () => {
 
