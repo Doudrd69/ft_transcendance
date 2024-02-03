@@ -19,8 +19,9 @@ interface Conversation {
 	isProtected: boolean;
 }
 
-const ListMyChannelComponent: React.FC<ListMyChannelComponentProps> = ({ user, friendID, isAdd, title }) => {
 
+const ListMyChannelComponent: React.FC<ListMyChannelComponentProps> = ({ user, friendID, isAdd, title }) => {
+	
 	const { chatState, chatDispatch } = useChat();
 	const { globalState } = useGlobal();
 
@@ -248,7 +249,7 @@ const ListMyChannelComponent: React.FC<ListMyChannelComponentProps> = ({ user, f
 										chatDispatch({ type: 'DISABLE', payload: 'showAddCreateChannel' });
 									}
 									else
-										{isAdd ? 
+										{!isAdd ? 
 											(addUserToConversation(Number(conversation.id), friendID))
 											:
 											(addMyselfToConversation(Number(conversation.id)))};

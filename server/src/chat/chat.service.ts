@@ -403,11 +403,11 @@ export class ChatService {
 					conversationID: conversation.id,
 				}
 
-				// const conversationToAdd = await this.addUserToConversation(addUserToConversationDto, userID);
-				// if (conversationToAdd)
-				// 	return true;
-				// else
-				// 	throw new HttpException('Fatal error', HttpStatus.BAD_REQUEST);
+				const conversationToAdd = await this.addUserToConversation(addUserToConversationDto.conversationID, userID);
+				if (conversationToAdd)
+					return true;
+				else
+					throw new HttpException('Fatal error', HttpStatus.BAD_REQUEST);
 			}
 
 			throw new HttpException('Wrong password', HttpStatus.BAD_REQUEST);
@@ -978,7 +978,7 @@ export class ChatService {
 		throw new HttpException('Fatal error', HttpStatus.BAD_REQUEST);
 	}
 	
-	async addUserToConversation(addUserToConversationDto: AddUserToConversationDto, userID: number): Promise<Conversation> {
+	async addUserToConversation(conversationToAddId: number, userID: number): Promise<Conversation> {
 		
 		const userToAdd = await this.usersRepository.findOne({
 			where: { id: userID },
@@ -986,7 +986,7 @@ export class ChatService {
 		});
 		
 		const conversationToAdd = await this.conversationRepository.findOne({
-			where: {id: addUserToConversationDto.conversationID}
+			where: { id: conversationToAddId },
 		});
 
 		if (userToAdd && conversationToAdd) {
