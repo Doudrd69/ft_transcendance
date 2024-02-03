@@ -14,7 +14,7 @@
   }
   
   .button-add-channel-list {
-	background-color: var(--fourth);
+	background-color: #848288;
 	border: none;
 	flex-basis: calc(50% - 20px);
 	margin: 10px;
@@ -45,7 +45,7 @@
   }
   
   .button-add-channel-list:hover {
-	background-color: var(--fifth);
+	background-color: #a09ea3;
   }
 
   .title-list-channel-component {

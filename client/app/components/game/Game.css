@@ -1,8 +1,9 @@
 .right-half {
 	height: 90vh;
     width: 75vw;
-	background: linear-gradient(180deg,#0d0b0c,#aa1359);
-	z-index: 1;
+	background: linear-gradient(180deg,hsl(330, 8%, 5%),#aa1359);
+	z-index: 7;
+	background-color: #8d7fa4;
     }
 
 @media only screen and (max-width: 800px) {

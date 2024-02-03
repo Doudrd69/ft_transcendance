@@ -1,7 +1,7 @@
 .bloc-channel-chat {
     scroll-behavior: auto;
     box-sizing: border-box;
-    background-color: var(--fourth);
+    background-color: #848288;
     margin: 0px 10px 10px 10px;
     width: calc(100% - 20px);
     height: 100%;
@@ -82,7 +82,7 @@
   }
 
 .list-users-channel{
-	background-color: var(--fourth);
+	background-color: #848288;
 
 	margin: 10px;
 	margin-top: 0px;
@@ -94,7 +94,7 @@
 }
 
 .list-users-channel-owner{
-	background-color: var(--fourth);
+	background-color: #848288;
 	width: 70px;
 	margin: 10px;
 	margin-top: 0px;

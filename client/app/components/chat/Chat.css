@@ -1,10 +1,11 @@
 .left-half {
-	background-color: var(--first);
+	background: linear-gradient(180deg,hsl(330, 8%, 5%),#848288);
 	display: flex;
 	flex-direction: column;
 	justify-content: space-between;
 	width: 35%;
 	z-index: 90;
+	height: 90vh;
 }
 
 @media only screen and (max-width: 800px) {
