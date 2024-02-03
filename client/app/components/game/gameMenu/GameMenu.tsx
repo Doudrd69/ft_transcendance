@@ -6,121 +6,119 @@ import React, { useState, useEffect } from 'react';
 import { io, Socket } from 'socket.io-client'
 import { useGlobal } from '@/app/GlobalContext';
 import { stringify } from 'querystring';
+import { start } from 'repl';
 
 const Menu = () => {
 
-    const { state, dispatchGame } = useGame();
-    const { globalState, dispatch } = useGlobal();
-    const [gameMode, setGameMode] = useState<string | null>(null);
+	const { state, dispatchGame } = useGame();
+	const { globalState, dispatch } = useGlobal();
+	const [gameMode, setGameMode] = useState<string | null>(null);
+	const [startGame, setStartGame] = useState(false);
 
-    interface Game {
-        gameId: number;
-        playerOneLogin: string,
-        playerTwoLogin: string,
-        playerOneID: string;
-        playerTwoID: string;
-        scoreOne: number;
-        scoreTwo: number;
-    }
+	interface Game {
+		gameId: number;
+		playerOneLogin: string,
+		playerTwoLogin: string,
+		playerOneID: string;
+		playerTwoID: string;
+		scoreOne: number;
+		scoreTwo: number;
+	}
 
-    const defaultGame: Game = {
-        gameId: 1234,
-        playerOneID: "Mattheo",
-        playerTwoID: "Edouard",
-        playerOneLogin: "Mattheo",
-        playerTwoLogin: "Edouard",
-        scoreOne: 0,
-        scoreTwo: 0,
-    };
+	useEffect(() => {
+		globalState.gameSocket?.on('gameNotInProgress', () => {
+			console.log(`DISPATCH`);
+			dispatchGame({ type: 'TOGGLE', payload: 'showGameMatchmaking' });
+			globalState.gameSocket?.emit('join-matchmaking', { playerLogin: sessionStorage.getItem("currentUserLogin"), gameMode: gameMode, userId: Number(sessionStorage.getItem("currentUserID")) });
+		});
 
-    useEffect(() => {
-        globalState.gameSocket?.on('gameNotInProgress', () => {
-            console.log(`DISPATCH`);
-            dispatchGame({ type: 'TOGGLE', payload: 'showGameMatchmaking' });
-            globalState.gameSocket?.emit('join-matchmaking', { playerLogin: sessionStorage.getItem("currentUserLogin"), gameMode: gameMode, userId: Number(sessionStorage.getItem("currentUserID")) });
-        });
+		globalState.gameSocket?.on('setGameInvited', () => {
+			console.log("SET GAME");
+			dispatchGame({
+				type: 'TOGGLE',
+				payload: 'showGame',
+			});
+			state.showGame = true;
+		});
 
-        globalState.gameSocket?.on('setGameInvited', () => {
-            console.log("SET GAME");
-            dispatchGame({
-                type: 'TOGGLE',
-                payload: 'showGame',
-            });
-            state.showGame = true;
-        });
+		return () => {
+			globalState.gameSocket?.off('gameNotInProgress');
+			globalState.gameSocket?.off('setGameInvited');
+		}
+	}, [globalState?.gameSocket])
 
-        return () => {
-            globalState.gameSocket?.off('gameNotInProgress');
-            globalState.gameSocket?.off('setGameInvited');
-        }
-    }, [globalState?.gameSocket])
+	const handleStartClick = () => {
 
-    const handleStartClick = () => {
+		try {
+			setGameMode("NORMAL");
+			const gameSocket = io(`${process.env.API_URL}/game`, {
+				autoConnect: false,
+				auth: {
+					token: sessionStorage.getItem("jwt"),
+				}
+			});
+			gameSocket.connect();
+			gameSocket.on('connect', () => {
+				dispatch({ type: 'SET_GAME_SOCKET', payload: gameSocket });
+				gameSocket.emit('linkSocketWithUser', { playerLogin: sessionStorage.getItem("currentUserLogin"), userId: sessionStorage.getItem("currentUserID") });
+			});
+			// dispatchGame({ type: 'TOGGLE', payload: 'showGameMatchmaking' });
 
-        try {
-            setGameMode("NORMAL");
-            const gameSocket = io(`${process.env.API_URL}/game`, {
-                autoConnect: false,
-                auth: {
-                    token: sessionStorage.getItem("jwt"),
-                }
-            });
-            gameSocket.connect();
-            gameSocket.on('connect', () => {
-                dispatch({ type: 'SET_GAME_SOCKET', payload: gameSocket });
-                gameSocket.emit('linkSocketWithUser', { playerLogin: sessionStorage.getItem("currentUserLogin"), userId: sessionStorage.getItem("currentUserID") });
-            });
-            // dispatchGame({ type: 'TOGGLE', payload: 'showGameMatchmaking' });
+			// console.log("After Dispatch: ", globalState?.gameSocket);
 
-            // console.log("After Dispatch: ", globalState?.gameSocket);
+		} catch (error) {
+			console.error(error);
+		}
+	};
 
-        } catch (error) {
-            console.error(error);
-        }
-    };
+	const handleSpeedClick = () => {
 
-    const handleSpeedClick = () => {
+		try {
+			setGameMode("SPEED");
+			const gameSocket = io(`${process.env.API_URL}/game`, {
+				autoConnect: false,
+				auth: {
+					token: sessionStorage.getItem("jwt"),
+				}
+			});
+			gameSocket.connect();
+			gameSocket.on('connect', () => {
+				dispatch({ type: 'SET_GAME_SOCKET', payload: gameSocket });
+				gameSocket.emit('linkSocketWithUser', { playerLogin: sessionStorage.getItem("currentUserLogin"), userId: sessionStorage.getItem("currentUserID") });
+			});
+			// dispatchGame({ type: 'TOGGLE', payload: 'showGameMatchmaking' });
 
-        try {
-            setGameMode("SPEED");
-            const gameSocket = io(`${process.env.API_URL}/game`, {
-                autoConnect: false,
-                auth: {
-                    token: sessionStorage.getItem("jwt"),
-                }
-            });
-            gameSocket.connect();
-            gameSocket.on('connect', () => {
-                dispatch({ type: 'SET_GAME_SOCKET', payload: gameSocket });
-                gameSocket.emit('linkSocketWithUser', { playerLogin: sessionStorage.getItem("currentUserLogin"), userId: sessionStorage.getItem("currentUserID") });
-            });
-            // dispatchGame({ type: 'TOGGLE', payload: 'showGameMatchmaking' });
+			// console.log("After Dispatch: ", globalState?.gameSocket);
 
-            // console.log("After Dispatch: ", globalState?.gameSocket);
+		} catch (error) {
+			console.error(error);
+		}
 
-        } catch (error) {
-            console.error(error);
-        }
+	};
 
-    };
+	return (
+		<div className="slider-thumb">
+		{/* <div className="background-game"> */}
+				<h1 className='titleClass'>PINGPON GAME</h1>
+				{startGame ?
+					<button className={`buttonclass ${state.showGameMatchmaking ? 'clicked' : ''}`} onClick={() => {
+						setStartGame(true);
+					}}>PLAY A GAME</button>
+					:
+					<>
+						<button className={`buttonclass ${state.showGameMatchmaking ? 'clicked' : ''}`} onClick={() => {
+							handleStartClick();
+						}}>START GAME: NORMAL MODE</button>
+						<button className={`buttonclass ${state.showGameMatchmaking ? 'clicked' : ''}`} onClick={() => {
+							handleSpeedClick();
+						}}>START GAME: SPEED MODE</button>
+					</>
+			}
+		{/* </div> */}
+		</div>
 
-    return (
-        <div className="background-game">
-            <div className="background-game">
-                <h1 className='titleClass'>PONG GAME</h1>
-            </div>
-            <div className="background-game">
-                <button className={`buttonclass ${state.showGameMatchmaking ? 'clicked' : ''}`} onClick={() => {
-                    handleStartClick();
-                }}>START GAME: NORMAL MODE</button>
-                <button className={`buttonclass ${state.showGameMatchmaking ? 'clicked' : ''}`} onClick={() => {
-                    handleSpeedClick();
-                }}>START GAME: SPEED MODE</button>
-                {/* <button className="buttonclass" >PROFILE</button> */}
-                {/* <button className={`buttonclass ${state.showGameSettings ? 'clicked' : ''}`} onClick={() => dispatch({ type: 'TOGGLE', payload: 'showGameSettings' })}>SETTINGS</button> */}
-            </div>
-        </div>
-    );
+
+	);
 };
 
 export default Menu;
