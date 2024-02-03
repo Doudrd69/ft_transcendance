@@ -34,10 +34,10 @@
 	font-family: 'Gill Sans' , sans-serif;
 	flex: 1;
 	border-radius: 10px;
-	background-color: var(--fourth);
+	background-color: #848288;
 }
 .amies:hover{
-	background-color: var(--fifth);
+	background-color: #a09ea3;
 }
 
 .online {
@@ -65,7 +65,7 @@
 	margin-right: 8px;
 	display: inline-block;
 	margin: 15px;
-	border-color: var(--second);
+	border-color: #aa1359;
   }
 .profil-discussion.on{
 	background-color: green;

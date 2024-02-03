@@ -82,13 +82,13 @@
 .button-friends-list-add {
 	width: (100% - 10px);
 	margin: 10px;
-	border: 5px solid var(--fourth); /* Remplacez var(--border-color) par votre couleur de bordure souhaitée */
+	border: 5px solid #848288; /* Remplacez var(--border-color) par votre couleur de bordure souhaitée */
 	border-radius: 10px;
 	height: 40px;
   }
 
   .button-friends-list-add:hover {
-	background-color: rgb(54, 190, 82);
+	background-color: #aa1359;
   }
 
 .amies{
@@ -103,10 +103,10 @@
 	font-family: 'Gill Sans' , sans-serif;
 	flex: 1;
 	border-radius: 10px;
-	background-color: var(--fourth);
+	background-color: #aa1359;
 }
 .amies:hover{
-	background-color: var(--fifth);
+	background-color: #a09ea3;
 }
 
 .on-off {
@@ -116,7 +116,7 @@
 	margin-right: 8px;
 	display: inline-block;
 	margin: 15px;
-	border-color: var(--second);
+	border-color: #aa1359;
   }
 /* .profil-friendslist.on{
 	 background-color: green;
@@ -160,5 +160,5 @@
 	flex-direction: column;
 }
 .amies.active{
-	background-color: var(--second);
+	background-color: #aa1359;
 }

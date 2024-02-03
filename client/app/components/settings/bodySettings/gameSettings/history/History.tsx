@@ -15,7 +15,7 @@ const HistoryComponent: React.FC = () => {
 	const [gameHistory, setGameHistory] = useState<gameHistory[]>([]);
 	const handleGameHistory = async () => {
 		try {
-			const response = await fetch(`http://localhost:3001/users/getGameHistory/${sessionStorage.getItem("currentUserID")}`, {
+			const response = await fetch(`${process.env.API_URL}/users/getGameHistory/${sessionStorage.getItem("currentUserID")}`, {
 				method: 'GET',
 				headers: {
 					'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`
@@ -45,7 +45,7 @@ const HistoryComponent: React.FC = () => {
 						{gameHistory.map((game: gameHistory, index) => (
 							<div key={index} className="game-history">
 								<div className="game-history-player">
-									<img className='img-history' src={`http://localhost:3001/users/getAvatar/${game?.playerOneId}/${timestamp}`}/>
+									<img className='img-history' src={`${process.env.API_URL}/users/getAvatar/${game?.playerOneId}/${timestamp}`}/>
 									<div className={`game-history-player-name  ${game.scoreP1 > game.scoreP2 ? 'green-text' : 'red-text'}`}>
 										{game.playerOne}
 									</div>
@@ -57,7 +57,7 @@ const HistoryComponent: React.FC = () => {
 									vs
 								</div>
 								<div className="game-history-player">
-									<img className='img-history' src={`http://localhost:3001/users/getAvatar/${game?.playerTwoId}/${timestamp}`}/>
+									<img className='img-history' src={`${process.env.API_URL}/users/getAvatar/${game?.playerTwoId}/${timestamp}`}/>
 									<div className={`game-history-player-name  ${game.scoreP1 < game.scoreP2 ? 'green-text' : 'red-text'}`}>
 											{game.playerTwo}
 									</div>

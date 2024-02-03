@@ -125,7 +125,7 @@ const FriendsListTabComponent: React.FC<FriendsListTabComponentProps> = ({ user,
 			})
 			globalState.userSocket?.on('senderNotInGame', () => {
 				console.log(`INVITATION: ${globalState.userSocket?.id}`);
-				const gameSocket: Socket = io('http://localhost:3001/game', {
+				const gameSocket: Socket = io(`${process.env.API_URL}/game`, {
 					autoConnect: false,
 					auth: {
 						token: sessionStorage.getItem("jwt"),

@@ -41,17 +41,15 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 	const [funtionToExecute, setFunctionToExecute] = useState<() => void>(() => { });
 	const [gameSocketConnected, setgameSocketConnected] = useState<boolean>(false);
 	const [gameInviteValidation, setgameInviteValidation] = useState<boolean>(false);
-	const [block, setBlock] = useState<boolean>(false);
+	const [block, setBlock] = useState<boolean>(!!me.blockList.find((userblock) => userblock === user.login));
 	
-	console.log(chatState);
-	let isBlocked = false;
-	if (me && me.blockList) {
-		isBlocked = !!me.blockList.find((userblock) => userblock === user.login);
-	}
+	// console.log(chatState);
+	// if (me && me.blockList) {
+	// 	setBlock (!!me.blockList.find((userblock) => userblock === user.login));
+	// }
 	
 
 	const blockUser = async() => {
-
 		const BlockUserDto = {
 			initiatorLogin: sessionStorage.getItem("currentUserLogin"),
 			recipientLogin: user.login,
@@ -67,7 +65,9 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 		});
 
 		if (response.ok) {
-			isBlocked = true;
+			console.log("blocked user")
+			if (!block)
+				setBlock(true);
 			if (globalState.userSocket && chatState.currentConversation && chatState.currentConversationID) {
 				globalState.userSocket?.emit('joinRoom', { roomName: `whoblocked${user.login}`, roomID: '' } );
 				globalState.userSocket?.emit('refreshChannel', {
@@ -82,6 +82,8 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 			else
 				toast.warn(error.message);
 		}
+	console.log("block notwork user ")
+
 	}
 
 	const unblockUser = async() => {
@@ -99,9 +101,10 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 			},
 			body: JSON.stringify(BlockUserDto),
 		});
-
+		
 		if (response.ok) {
-			isBlocked = false;
+			if (block)
+				setBlock (false);
 			if (globalState.userSocket && chatState.currentConversation && chatState.currentConversationID) {
 				globalState.userSocket?.emit('leaveRoom', { roomName: `whoblocked${user.login}`, roomID: '' } );
 				globalState.userSocket?.emit('refreshChannel', {
@@ -112,11 +115,12 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 		else {
 			const error = await response.json();
 			if (Array.isArray(error.message))
-				toast.warn(error.message[0]);
-			else
-				toast.warn(error.message);
-		}
-	}
+			toast.warn(error.message[0]);
+		else
+		toast.warn(error.message);
+	console.log("unblock notwork user ")
+}
+}
 
 	const unmuteUser = async() => {
 
@@ -588,7 +592,7 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 										)}
 									</>
 							}
-							{isBlocked ? (
+							{block ? (
 								<img className="option-image" src="block.png" onClick={unblockUser}/>
 								) : (
 									<img className="option-image-opacity" src="block.png" onClick={blockUser}/>
