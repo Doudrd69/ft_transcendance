@@ -1,18 +1,18 @@
 .file-drop-zone {
-    border: 4px dashed #ccc;
+	border: 4px dashed #ccc;
     padding: 10px;
     text-align: center;
     background-color: #848288;
     display: flex;
     align-items: center;
     justify-content: center;
-    height: auto;
-    width: calc(33% - 20px);
-    aspect-ratio: 1 / 1;
+	aspect-ratio: 1/1;
+    width: 15vw;
+    height: 15vw;
 }
 
 .dragging {
-	border-color: #00cc00; /* Changez la couleur de la bordure en vert pendant le glissement */
+	border-color: #aa1359; /* Changez la couleur de la bordure en vert pendant le glissement */
 	background-color: #f0faff;
 }
 .drag-and-drop {

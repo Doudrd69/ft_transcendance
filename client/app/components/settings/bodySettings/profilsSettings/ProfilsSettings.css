@@ -1,76 +1,110 @@
-.bloc-profils-settings{
+.bloc-profils-settings {
+	display: flex;
 	flex-direction: column;
 	width: 100%;
 	height: 100%;
-	text-align: center;
-
-}
-.profil-image{
-	max-width: 33%;
-	margin: 10px;
-	aspect-ratio: 1/1;
-}
-.upload-image img {
-	width: 100%;
-	height: auto;
-	object-fit: contain; /* Cette propriété permet de conserver le ratio d'aspect tout en coupant l'image si nécessaire */
   }
-.upload-image {
-    flex-direction: row;
-    display: flex;
-    height: 50%;
-    justify-content: space-around;
-    margin: 20px;
-}
-.change-username{
-	justify-content: center;
-	flex-direction: row;
-	/* border-bottom: 1px solid #333; */
+  .upload-image {
 	display: flex;
-	width: 100%;
-	height: 50%;
-	margin-bottom: 40px;
-	text-align: center;
+	flex-direction: row;
+	justify-content: space-between;
 	align-items: center;
-
-}
-
-.form-change-username{
-	font-size: 20px;
+	margin: 20px;
+	height: 60%;
+	border-bottom: 2px solid #ccc; 
+  }
+  @media only screen and (max-width: 600px) {
+	  .upload-image {
+		  flex-direction: column;
+		}
+	}
+	
+	.profil-image {
+		width: 33%;
+		height: auto;
+		aspect-ratio: 1/1;
+		margin: 10px;
+	}
+	
+	.file-drop-zone {
+		width: 33%;
+		margin: 10px;
+	}
+	
+	.button-modified-image {
+		width: 15vw;
+		height: 15vw;
+		margin: 10px;
+		padding: 10px 15px;
+		font-size: 16px;
+		background-color: #aa1359;
+		color: #fff;
+		border: none;;
+		border-radius: 4px;
+		cursor: pointer;
+		transition: background-color 0.3s;
+	}
+	
+	.button-modified-image:hover {
+		background-color: #800e43;
+	}
+	
+	.change-username {
+		display: flex;
+		flex-direction: row; 
+		justify-content: center;
+		align-items: center;
+		margin: 20px;
+		width: 100%;
+		
+	}
+	
+	.input-username{
+	  padding: 10px;;
+	}
+  @media only screen and (max-width: 600px) {
+	.change-username {
+	  flex-direction: column;
+	  width: 100%;
+	  height: auto; /* Ajustez la hauteur à votre convenance */
+	}
+  }
+  
+  .form-change-username {
+	width: 33%;
+	padding: 10px;
+  }
+  .bloc-change-username {
+	height: 40%;
 	width: 100%;
-}
-
-
-
-.button-modified-image {
+	display: flex;
+	align-items: center;
+  }
+  .button-modified-username {
+	width: 33%;
 	margin: 10px;
 	padding: 10px 15px;
 	font-size: 16px;
-	background-color: #4caf50;
+	background-color: #aa1359;
 	color: #fff;
 	border: none;
-	border-radius: 4px;
-	cursor: pointer;
-	transition: background-color 0.3s;
-
-  }
-  
-  .button-modified-image:hover {
-	background-color: #45a049;
-  }
-
-.button-modified-username {
-	margin: 10px;
-	padding: 10px 15px;
-	font-size: 16px;
-	background-color: #4caf50;
-	color: #fff;
-	border: none;
+	height: 60px;
 	border-radius: 4px;
 	cursor: pointer;
 	transition: background-color 0.3s;
   }
-  
+  .form-username{
+	display: flex;
+	flex-direction: row;
+	background-color: #848288;
+	border-radius: 5px;
+	align-items: center;
+	box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
+  }
+  .username-profil {
+	margin: 10px;
+  }
   .button-modified-username:hover {
-	background-color: #45a049;
+	background-color: #800e43;
   }
+  

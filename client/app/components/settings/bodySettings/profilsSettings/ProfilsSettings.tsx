@@ -121,14 +121,15 @@ const ProfilsSettingsComponent: React.FC = () => {
 					Update Avatar
 				</button>
 			</div>
-			<div className="change-username">
-				<form onSubmit={handleUsernameSubmit}>
-					<label className="form-change-username">
-						Update Username:
-						<input type="text" value={username} onChange={(e) => setUsername(e.target.value)} />
-					</label>
-				</form>
-				<button className="button-modified-username" type="submit">Update Username</button>
+			<div className='bloc-change-username'>
+				<div className="change-username">
+					<form onSubmit={handleUsernameSubmit} className='form-username'>
+						<label className="form-change-username">
+							<input className="input-username" type="text" value={username} onChange={(e) => setUsername(e.target.value)} />
+						</label>
+					</form>
+					<button className="button-modified-username" type="submit">Update Username</button>
+				</div>
 			</div>
 		</div>
 	);
