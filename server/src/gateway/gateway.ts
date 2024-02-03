@@ -364,6 +364,19 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		this.server.to(roomName).emit('refreshChannelList');
 	}
 
+	@SubscribeMessage('refreshHeader')
+	@UseGuards(GatewayGuard)
+	handleRefreshheader() {
+		this.server.emit('refreshHeaderNotif');
+	}
+
+	@SubscribeMessage('refreshUserList')
+	@UseGuards(GatewayGuard)
+	handleRefreshUserlList() {
+		this.server.emit('refreshFriends');
+		this.server.emit('refreshGlobalUserList');
+	}
+
 	@SubscribeMessage('emitNotification')
 	@UseGuards(GatewayGuard)
 	async handleNotif(@MessageBody() data: { channel: string, content: string, channelID: string }) {

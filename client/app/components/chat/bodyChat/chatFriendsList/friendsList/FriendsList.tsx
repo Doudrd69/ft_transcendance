@@ -35,9 +35,6 @@ const FriendsListComponent: React.FC = () => {
 	const [allList, setAllList] = useState<FriendShip[]>([]);
 
 	const disableTabFriendsList = () => setTabFriendsList(false);
-	useEffect(() => {
-		loadAllList();
-	},[]);
 
 	const activateTabFriendsList = (index: number, all:boolean) => {
 		if (!all) {
@@ -116,6 +113,10 @@ const FriendsListComponent: React.FC = () => {
 	}, [chatState.refreshFriendsList]);
 
 	useEffect(() => {
+		loadAllList();
+	},[]);
+
+	useEffect(() => {
 
 		globalState.userSocket?.on('newUser', () => {
 			loadAllList();
@@ -136,6 +137,10 @@ const FriendsListComponent: React.FC = () => {
 		globalState.userSocket?.on('newDeconnection', (notif: string) => {
 			loadFriendList();
 		})
+
+		globalState.userSocket?.on('refreshGlobalUserList', () => {
+			loadAllList();
+		});
 
 		return () => {
 			globalState.userSocket?.off('friendRequestAcceptedNotif');
