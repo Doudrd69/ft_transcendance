@@ -7,7 +7,7 @@
 	height: 100%;
 	width: calc(33% - 10px);
 	border-top: none;
-	background-color: var(--fourth);
+	background-color: #848288;
 	color: #f0f0f0;
 	transition: background-color 0.3s ease;
 	text-transform: uppercase;
@@ -32,10 +32,10 @@
 
 .main-button-chat:hover {
 	/* Nouvelle couleur de fond lorsque vous survolez le bouton */
-	background-color: var(--fifth);
+	background-color: #302f30;
 	}
 
 .main-button-chat.clicked {
 	/* Nouvelle couleur de fond lorsque vous survolez le bouton */
-	background-color: var(--second);
+	background-color: #aa1359;
 	}

@@ -1,6 +1,5 @@
-/* Styles pour le fond du jeu */
 
-
+  
 .slider-thumb {
 	display: flex;
 	justify-content: center; /* Centers horizontally */
@@ -11,15 +10,15 @@
 
   }
 .slider-thumb::before {
-  z-index: 50;
-  /* position: absolute; */
+  /* z-index: 50; */
+  position: absolute;
   content: "";
-  left: 30%;
-  top: 20%;
   width: 50vmin;
   height: 50vmin;
   aspect-ratio: 1/1;
   background: #848288;
+
+
   border-radius: 62% 47% 82% 35% / 45% 45% 80% 66%;
   will-change: border-radius, transform, opacity;
   animation: sliderShape 5s linear infinite;
@@ -60,23 +59,27 @@
   .titleClass {
 	font-size: 2em;
 	margin-bottom: 20px;
+	color: #fff;
   }
   
   /* Styles pour les boutons */
   .buttonclass {
 	display: flex;
-	background-color: #3498db; /* Couleur de fond par défaut */
+	background-color: transparent; /* Couleur de fond par défaut */
 	color: #fff; /* Couleur du texte par défaut */
 	padding: 10px 20px;
 	margin: 10px;
 	border: none;
 	border-radius: 5px;
 	cursor: pointer;
-	font-size: 1em;
+	font-size: 20px;
+	font-weight: bold;
+	font-family: 'Gill Sans' , sans-serif;
   }
   
-  .buttonclass.clicked {
-	background-color: #2ecc71; /* Couleur de fond lorsque le bouton est cliqué */
+  .buttonclass:hover {
+	transform: scale(1.3);
+	transition: transform 0.7s ease;
   }
   
   /* Ajoutez du style spécifique pour les deux boutons dans le cas où startGame est true */

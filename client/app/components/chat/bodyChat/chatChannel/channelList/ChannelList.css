@@ -13,7 +13,7 @@
 	backdrop-filter: blur(30px);
 	height: 100vh;
 	width: 100vw;
-	z-index: 1;
+	z-index: 70;
   }
   .bloc-add-create {
 	font-size: 26px;
@@ -31,7 +31,7 @@
 	transform: translate(-50%, -50%);
 	flex-direction: column;
 	display: flex;
-	z-index: 2; /* Assurez-vous que le bloc est au-dessus de la div flou */
+	z-index: 700; /* Assurez-vous que le bloc est au-dessus de la div flou */
   }
   .button-add{
 	font-family: 'Gill Sans' , sans-serif;
@@ -50,7 +50,7 @@
   }
   .button-channel-list-add {
 	background-color: whitesmoke;
-	border: var(--fourth);
+	border: #848288;
 	border: 5px solid gray; 
 	flex-basis: calc(33% - 20px);
 	margin: 10px;
@@ -69,7 +69,7 @@
 	position: relative;
   }
   .button-channel-list-add:hover {
-	background-color: rgb(54, 190, 82);
+	background-color: #aa1359;
   }
   
   .button-channel-list-add span {
@@ -85,7 +85,7 @@
 
 }
 .button-channel-list {
-	background-color: var(--fourth);
+	background-color: #848288;
 	border: none;
 	flex-basis: calc(33% - 20px);
 	margin: 10px;
@@ -139,11 +139,11 @@
 } 
   .button-channel-list:hover {
 
-	background-color: var(--fifth);
+	background-color: #a09ea3;
   }
   
 .button-channel-list:hover{
-	background-color: var(--fifth);
+	background-color: #a09ea3;
 }
 
 .bloc-contain{

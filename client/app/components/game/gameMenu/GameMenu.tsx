@@ -25,16 +25,6 @@ const Menu = () => {
 		scoreTwo: number;
 	}
 
-	const defaultGame: Game = {
-		gameId: 1234,
-		playerOneID: "Mattheo",
-		playerTwoID: "Edouard",
-		playerOneLogin: "Mattheo",
-		playerTwoLogin: "Edouard",
-		scoreOne: 0,
-		scoreTwo: 0,
-	};
-
 	useEffect(() => {
 		globalState.gameSocket?.on('gameNotInProgress', () => {
 			console.log(`DISPATCH`);
@@ -109,7 +99,7 @@ const Menu = () => {
 	return (
 		<div className="slider-thumb">
 		{/* <div className="background-game"> */}
-				{/* <h1 className='titleClass'>PINGPON GAME</h1> */}
+				<h1 className='titleClass'>PINGPON GAME</h1>
 				{!startGame ? 
 
 					<button className={`buttonclass ${state.showGameMatchmaking ? 'clicked' : ''}`} onClick={() => {
@@ -126,9 +116,9 @@ const Menu = () => {
 					</>
 			}
 		{/* </div> */}
-
-
 		</div>
+
+
 	);
 };
 
