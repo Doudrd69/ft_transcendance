@@ -398,12 +398,12 @@ export class ChatService {
 			const isMatch = await bcrypt.compare(checkPasswordDto.userInput, conversation.password);
 			if (isMatch) {
 
-				const addUserToConversationDto ={
+				const addUserToConversationDto = {
 					userToAdd: checkPasswordDto.username,
 					conversationID: conversation.id,
 				}
 
-				const conversationToAdd = await this.addUserToConversation(addUserToConversationDto, userID);
+				const conversationToAdd = await this.addUserToConversation(addUserToConversationDto.conversationID, userID);
 				if (conversationToAdd)
 					return true;
 				else
@@ -978,7 +978,7 @@ export class ChatService {
 		throw new HttpException('Fatal error', HttpStatus.BAD_REQUEST);
 	}
 	
-	async addUserToConversation(addUserToConversationDto: AddUserToConversationDto, userID: number): Promise<Conversation> {
+	async addUserToConversation(conversationToAddId: number, userID: number): Promise<Conversation> {
 		
 		const userToAdd = await this.usersRepository.findOne({
 			where: { id: userID },
@@ -986,7 +986,7 @@ export class ChatService {
 		});
 		
 		const conversationToAdd = await this.conversationRepository.findOne({
-			where: {id: addUserToConversationDto.conversationID}
+			where: { id: conversationToAddId },
 		});
 
 		if (userToAdd && conversationToAdd) {

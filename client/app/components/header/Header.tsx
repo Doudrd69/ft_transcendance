@@ -1,11 +1,9 @@
 import { useGlobal } from '@/app/GlobalContext';
-import './Header.css'
-import React, { useState, useEffect } from 'react';
-import { ToastContainer, toast } from 'react-toastify';
+import React, { useEffect } from 'react';
 import 'react-toastify/dist/ReactToastify.css';
-import AvatarImageComponent from '../Avatar/Avatar';
-import { validate, validateOrReject } from 'class-validator';
 import { useChat } from '../chat/ChatContext';
+import './Header.css';
+import { useRouter } from 'next/router';
 
 
 interface FriendShip {
@@ -16,15 +14,25 @@ interface FriendShip {
 }
 
 const HeaderComponent: React.FC = () => {
+
 	const {chatDispatch} = useChat();
 	const { globalState, dispatch } = useGlobal();
 	const timestmp = new Date();
 	const [notify, setNotify] = useState<FriendShip[]>([]);
 	const [showActivateNotif, setShowActivateNotif] = useState(false);
+
 	const uploadAvatar =  () => {
 		dispatch({ type: 'ACTIVATE', payload: 'showUploadAvatar' });
 	}
 	const [newNotifications, setNewNotifications] = useState(false);
+
+	const handleLogout = () => {
+
+		localStorage.clear();
+		sessionStorage.clear();
+		window.history.replaceState(null, '', '/');
+		window.location.reload();
+	}
 
 	useEffect(() => {
 		uploadAvatar();
@@ -91,6 +99,10 @@ const HeaderComponent: React.FC = () => {
 					{/* {renderComponent(<AvatarImageComponent className="profils" refresh={globalState.showRefresh}/>, globalState.showUploadAvatar)} */}
 				</button>
 			</div>
+		<div className="bloc-pong">PING PON</div>
+		<div className="bloc-logout">
+			<button className="button-logout" onClick={() => handleLogout()}></button>
+		</div>
 		<div className="bloc-pong">PINGPON</div>
 		<button className="button-notifications" onClick={() => {activateNotif(); disableNotif();}}>
 				<div className="notification-icon-container">

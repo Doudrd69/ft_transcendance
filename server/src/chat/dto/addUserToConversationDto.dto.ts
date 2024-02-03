@@ -1,6 +1,7 @@
 import {
 	IsNotEmpty,
 	IsString,
+	IsOptional,
 	IsPositive,
 	IsInt,
 	Max,
@@ -8,9 +9,12 @@ import {
 
 export class AddUserToConversationDto {
 
+	@IsOptional()
 	@IsNotEmpty()
-	@IsString()
-	userToAdd: string;
+	@IsPositive()
+	@IsInt()
+	@Max(1000)
+	userToAdd?: number;
 
 	@IsNotEmpty()
 	@IsPositive()
