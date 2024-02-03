@@ -9,8 +9,10 @@ import {
 export class AddUserToConversationDto {
 
 	@IsNotEmpty()
-	@IsString()
-	userToAdd: string;
+	@IsPositive()
+	@IsInt()
+	@Max(1000)
+	userToAdd?: number;
 
 	@IsNotEmpty()
 	@IsPositive()

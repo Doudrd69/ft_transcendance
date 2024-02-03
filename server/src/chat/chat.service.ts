@@ -398,16 +398,16 @@ export class ChatService {
 			const isMatch = await bcrypt.compare(checkPasswordDto.userInput, conversation.password);
 			if (isMatch) {
 
-				const addUserToConversationDto ={
+				const addUserToConversationDto = {
 					userToAdd: checkPasswordDto.username,
 					conversationID: conversation.id,
 				}
 
-				const conversationToAdd = await this.addUserToConversation(addUserToConversationDto, userID);
-				if (conversationToAdd)
-					return true;
-				else
-					throw new HttpException('Fatal error', HttpStatus.BAD_REQUEST);
+				// const conversationToAdd = await this.addUserToConversation(addUserToConversationDto, userID);
+				// if (conversationToAdd)
+				// 	return true;
+				// else
+				// 	throw new HttpException('Fatal error', HttpStatus.BAD_REQUEST);
 			}
 
 			throw new HttpException('Wrong password', HttpStatus.BAD_REQUEST);

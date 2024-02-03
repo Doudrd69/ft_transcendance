@@ -25,9 +25,7 @@ const ListMyChannelComponent: React.FC<ListMyChannelComponentProps> = ({ user, f
 	const { globalState } = useGlobal();
 
 	const [conversations, setConversations] = useState<Conversation[]>([]);
-	const userID = sessionStorage.getItem("currentUserID");
 	const userLogin = sessionStorage.getItem("currentUserLogin") || 'no-user';
-	const [showPassword, setShowPassword] = useState<boolean>(false);
 	const [password, setPassword] = useState('');
 
 	const handlePasswordSubmit = (password: string) => {
@@ -68,6 +66,7 @@ const ListMyChannelComponent: React.FC<ListMyChannelComponentProps> = ({ user, f
 			console.error(error);
 		}
 	};
+
 	const loadDiscussionsPublic = async () => {
 		try {
 			const response = await fetch(`${process.env.API_URL}/chat/getConversationsPublic`, {
@@ -94,13 +93,15 @@ const ListMyChannelComponent: React.FC<ListMyChannelComponentProps> = ({ user, f
 		}
 	};
 
-	const addUserToConversation = async (convID: number, friend: string) => {
+	const addUserToConversation = async (convID: number, friendID: any) => {
+
 		try {
 
 			const addUserToConversationDto = {
-				userToAdd: friend,
+				userToAdd: Number(friendID),
 				conversationID: convID,
 			}
+
 			const response = await fetch(`${process.env.API_URL}/chat/addUserToConversation`, {
 				method: 'POST',
 				headers: {
@@ -115,7 +116,7 @@ const ListMyChannelComponent: React.FC<ListMyChannelComponentProps> = ({ user, f
 				const conversation = await response.json();
 
 				if (globalState.userSocket?.connected) {
-					// on utilise la meme pour inviter et rejoindre --> probleme
+
 					globalState.userSocket?.emit('addUserToRoom', {
 						convID: conversation.id,
 						convName: conversation.name,
@@ -123,7 +124,63 @@ const ListMyChannelComponent: React.FC<ListMyChannelComponentProps> = ({ user, f
 					});
 					// refresh channel list
 					globalState.userSocket?.emit('refreshUserChannelList', {
-						userToRefresh: friend, 
+						userToRefresh: user, 
+					});
+
+					// refresh userList in channel for user arrival update
+					globalState.userSocket?.emit('refreshChannel', {
+						channel: conversation.name + conversation.id,
+					});
+
+					chatDispatch({ type: 'TOGGLEX', payload: 'showAddCreateChannel' });
+					chatDispatch({ type: 'TOGGLEX', payload: 'showAddChannel' });
+					chatDispatch({ type: 'DISABLE', payload: 'showListChannelAdd' });
+				}
+			}
+			else {
+				const error = await response.json();
+				if (Array.isArray(error.message))
+					toast.warn(error.message[0]);
+				else
+					toast.warn(error.message);
+			}
+		}
+		catch (error) {
+			console.error(error);
+		}
+	}
+
+	const addMyselfToConversation = async (convID: number) => {
+
+		try {
+
+			const addUserToConversationDto = {
+				conversationID: convID,
+			}
+
+			const response = await fetch(`${process.env.API_URL}/chat/addUserToConversation`, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`
+				},
+				body: JSON.stringify(addUserToConversationDto),
+			});
+
+			if (response.ok) {
+
+				const conversation = await response.json();
+
+				if (globalState.userSocket?.connected) {
+
+					globalState.userSocket?.emit('joinRoom', {
+						roomName: conversation.name,
+						roomID: conversation.id,
+					});
+
+					// refresh channel list
+					globalState.userSocket?.emit('refreshUserChannelList', {
+						userToRefresh: userLogin, 
 					});
 
 					// refresh userList in channel for user arrival update
@@ -191,7 +248,10 @@ const ListMyChannelComponent: React.FC<ListMyChannelComponentProps> = ({ user, f
 										chatDispatch({ type: 'DISABLE', payload: 'showAddCreateChannel' });
 									}
 									else
-										addUserToConversation(Number(conversation.id), user || 'no-user');
+										{isAdd ? 
+											(addUserToConversation(Number(conversation.id), friendID))
+											:
+											(addMyselfToConversation(Number(conversation.id)))};
 								}}>
 								{conversation.isProtected && <img className="icon-password-channel" src='./password.png' alt="private" />}
 								<span>{`${conversation.name}#${conversation.id}`}</span>
