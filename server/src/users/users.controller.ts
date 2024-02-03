@@ -1,28 +1,23 @@
-import { Req, Controller, Post, HttpCode, HttpStatus, Body, Get, UploadedFile, UseInterceptors, Param, Res, UseGuards, HttpException } from '@nestjs/common';
-import { UsersService } from './users.service';
-import { FriendRequestDto } from './dto/FriendRequestDto.dto';
+import { Body, Controller, Get, HttpCode, HttpException, HttpStatus, Param, Post, Req, Res, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { Friendship } from './entities/friendship.entity';
-import { Express } from 'express';
-import { diskStorage } from 'multer';
 import { Response as ExpressResponse } from 'express';
-import {Readable} from 'stream'
-import { StreamableFile } from '@nestjs/common';
-import imageType from 'image-type';
-import * as fs from 'fs';
-import { join } from 'path';
 import { randomBytes } from 'crypto';
+import { diskStorage } from 'multer';
+import Jimp from 'jimp';
 import * as path from 'path';
 import { extname } from 'path';
-import Jimp from 'jimp';
-import { User } from './entities/users.entity';
-import { UpdateUsernameDto } from './dto/UpdateUsernameDto.dto';
-import { BlockUserDto } from './dto/BlockUserDto.dto';
-import { validate, validateOrReject } from 'class-validator'
+
 import { AuthGuard } from 'src/auth/auth.guard';
+
 import { Conversation } from 'src/chat/entities/conversation.entity';
-import { createBrotliCompress } from 'zlib';
-// import * as sharp from 'sharp';
+import { Friendship } from './entities/friendship.entity';
+
+import { UsersService } from './users.service';
+
+import { FriendRequestDto } from './dto/FriendRequestDto.dto';
+import { UpdateUsernameDto } from './dto/UpdateUsernameDto.dto';
+import { DeleteFriendRequestDto } from './dto/DeleteFriendRequestDto.dto';
+import { BlockUserDto } from './dto/BlockUserDto.dto';
 
 @Controller('users')
 export class UsersController {
@@ -181,10 +176,10 @@ export class UsersController {
 
 	@UseGuards(AuthGuard)
 	@HttpCode(HttpStatus.OK)
-	@Post('removeFriend')
-	removeFriend(@Req() req, @Body() blockUserDto: BlockUserDto): Promise<Conversation | Friendship> {
+	@Post('deleteFriendRequest')
+	handleDeleteFriendRequest(@Req() req, @Body() deleteFriendRequestDto: DeleteFriendRequestDto) {
 		const { user } = req; 
-		return this.usersService.removeFriend(blockUserDto, user.sub);
+		return this.usersService.deleteFriendRequest(deleteFriendRequestDto, user.sub);
 	}
 
 	@UseGuards(AuthGuard)

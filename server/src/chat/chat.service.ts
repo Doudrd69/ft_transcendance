@@ -929,7 +929,6 @@ export class ChatService {
 	
 					if (isOwnerStatus) {
 						const status = await this.promoteNewOwner(conversation);
-						console.log("Promote status: ", status);
 					}
 	
 					return true;
@@ -1206,7 +1205,6 @@ export class ChatService {
 
 	async getAllPublicConversations(): Promise<Conversation[]> {
 
-		console.log("Getting all public conversations");
 		const publicConversations = await this.conversationRepository.find({
 			where: {isPublic: true},
 		});

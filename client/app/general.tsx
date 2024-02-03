@@ -24,7 +24,6 @@ interface Game {
 }
 
 interface FriendRequestDto {
-	recipientID: number,
 	recipientLogin: string;
 	initiatorLogin: string;
 }
@@ -97,8 +96,6 @@ const GeneralComponent = () => {
 		</div>
 	)
 
-	// if accept envoye un emit depuis le front pour l'autre user et si rien recu disco 
-
 	// FRIEND REQUEST
 	const friendRequestValidation = async (friendRequestDto: FriendRequestDto) => {
 
@@ -128,6 +125,36 @@ const GeneralComponent = () => {
 		}
 	};
 
+	const friendRequestDeny = async (friendRequestDto: FriendRequestDto) => {
+
+		const deleteFriendRequestDto = {
+			friendID: 0,
+		}
+
+		const response = await fetch(`${process.env.API_URL}/users/deleteFriendRequest`, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`
+			},
+			body: JSON.stringify(deleteFriendRequestDto),
+		});
+
+		if (response.ok) {
+			console.log("Friend request denied");
+		}
+		else {
+			const error = await response.json();
+			if (Array.isArray(error.message))
+				toast.warn(error.message[0]);
+			else
+				toast.warn(error.message);
+		}
+		return ;
+	};
+
+
+	// sinon on peut deny que dans la notif
 	const FriendRequestReceived = ({ closeToast, toastProps, friendRequestDto }: any) => (
 		<div>
 			You received a friend request from  {friendRequestDto.initiatorLogin}
@@ -137,7 +164,12 @@ const GeneralComponent = () => {
 			}}>
 				Accept
 			</button>
-			<button style={{ padding: '5px ' }} onClick={closeToast}>Deny</button>
+			{/* <button style={{ padding: '5px ' }} onClick={() => {
+				friendRequestDeny(friendRequestDto)
+				closeToast();
+			}}>
+				Deny
+			</button> */}
 		</div>
 	)
 

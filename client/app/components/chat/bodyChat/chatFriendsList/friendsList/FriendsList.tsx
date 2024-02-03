@@ -38,6 +38,7 @@ const FriendsListComponent: React.FC = () => {
 	useEffect(() => {
 		loadAllList();
 	},[]);
+
 	const activateTabFriendsList = (index: number, all:boolean) => {
 		if (!all) {
 			if (activeIndex === index) {

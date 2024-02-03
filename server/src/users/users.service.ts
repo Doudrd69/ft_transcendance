@@ -1,23 +1,19 @@
-import { Injectable, NotFoundException, Res, Inject, forwardRef, HttpException, HttpStatus } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm'
-import { Repository, UpdateResult } from 'typeorm'
-import * as bcrypt from 'bcrypt'
-import { User } from './entities/users.entity'
-import { Friendship } from './entities/friendship.entity'
-import { speakeasy } from 'speakeasy'
-import { QRCode } from 'qrcode'
-import { join } from 'path';
-import { FriendRequestDto } from './dto/FriendRequestDto.dto';
-import { ChatService } from '../chat/chat.service';
-import { UpdateUsernameDto } from './dto/UpdateUsernameDto.dto';
+import { HttpException, HttpStatus, Inject, Injectable, forwardRef } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import * as fs from 'fs';
 import { existsSync, unlinkSync } from 'fs';
-import { BlockUserDto } from './dto/BlockUserDto.dto';
+import { join } from 'path';
 import { Conversation } from 'src/chat/entities/conversation.entity';
 import { GroupMember } from 'src/chat/entities/group_member.entity';
 import { Game } from 'src/game/entities/games.entity';
-import * as Jimp from 'jimp';
-import { promisify } from 'util';
-import * as fs from 'fs';
+import { Repository, UpdateResult } from 'typeorm';
+import { ChatService } from '../chat/chat.service';
+import { BlockUserDto } from './dto/BlockUserDto.dto';
+import { FriendRequestDto } from './dto/FriendRequestDto.dto';
+import { UpdateUsernameDto } from './dto/UpdateUsernameDto.dto';
+import { Friendship } from './entities/friendship.entity';
+import { User } from './entities/users.entity';
+import { DeleteFriendRequestDto } from './dto/DeleteFriendRequestDto.dto';
 
 @Injectable()
 export class UsersService {
@@ -432,60 +428,54 @@ export class UsersService {
 			}
 		}
 
-		throw new HttpException('Fatal error', HttpStatus.BAD_REQUEST);
+		throw new HttpException('User not found', HttpStatus.NOT_FOUND);
 	}
 
-	async updateFriendshipToFalse(friendRequestDto: FriendRequestDto, userID: number): Promise<Conversation | Friendship> {
+	async deleteFriendRequest(dto: DeleteFriendRequestDto, userID: number) {
 
-		const initiator = await this.usersRepository.findOne({
+		const user : User = await this.usersRepository.findOne({
 			where: { id: userID },
-			relations: ["initiatedFriendships", "acceptedFriendships", "groups", "groups.conversation"],
+			relations: ["initiatedFriendships", "acceptedFriendships"],
 		});
 
-		const friend = await this.usersRepository.findOne({
-			where: { username: friendRequestDto.recipientLogin },
-			relations: ["initiatedFriendships", "acceptedFriendships", "groups", "groups.conversation"],
+		const friend : User = await this.usersRepository.findOne({
+			where: { id: dto.friendID },
+			relations: ["initiatedFriendships", "acceptedFriendships"],
 		});
 
-		if (initiator && friend) {
+		if (user && friend) {
 
-			const friendshipToUpdate = await this.friendshipRepository
-				.createQueryBuilder('friendship')
-				.where('(friendship.initiator.id = :initiatorId AND friendship.friend.id = :friendId) OR (friendship.initiator.id = :friendId AND friendship.friend.id = :initiatorId)', {
-					initiatorId: initiator.id,
-					friendId: friend.id,
-				})
-				.getOne();
+			const friendshipToDelete = await this.friendshipRepository
+			.createQueryBuilder('friendship')
+			.where('(friendship.initiator.id = :initiatorId AND friendship.friend.id = :friendId) OR (friendship.initiator.id = :friendId AND friendship.friend.id = :initiatorId)', {
+				initiatorId: friend.id,
+				friendId: user.id,
+			})
+			.getOne();
 
-			if (friendshipToUpdate) {
+			if (friendshipToDelete) {
+				
+				await this.friendshipRepository
+					.createQueryBuilder()
+					.delete()
+					.from(Friendship)
+					   .where("id = :id", { id: friendshipToDelete.id })
+					.execute();
 
-				friendshipToUpdate.isAccepted = false;
-				await this.friendshipRepository.save(friendshipToUpdate);
-
-				return friendshipToUpdate;
+				return ;
 			}
+
+			throw new HttpException('Users are not friends', HttpStatus.NOT_FOUND);
 		}
 
-		throw new HttpException('Fatal error', HttpStatus.BAD_REQUEST);
+		throw new HttpException('User not found', HttpStatus.NOT_FOUND);
 	}
 
 	async acceptFriendship(friendRequestDto: FriendRequestDto, userID: number): Promise<Conversation | Friendship> {
 
-		console.log("Add friend: ", friendRequestDto);
 		const newConversationBetweenFriends = await this.updateFriendshipToTrue(friendRequestDto, userID);
 		if (newConversationBetweenFriends) {
 			return newConversationBetweenFriends;
-		}
-
-		throw new HttpException('Fatal error', HttpStatus.BAD_REQUEST);
-	}
-
-	async removeFriend(blockUserDto: BlockUserDto, userID: number): Promise<Conversation | Friendship> {
-
-		console.log("Remove friend: ", blockUserDto);
-		const friendshipToUpdate = await this.updateFriendshipToFalse(blockUserDto, userID);
-		if (friendshipToUpdate) {
-			return friendshipToUpdate;
 		}
 
 		throw new HttpException('Fatal error', HttpStatus.BAD_REQUEST);
@@ -636,14 +626,6 @@ export class UsersService {
 		const user: User = await this.usersRepository.findOne({ where: { id: userID } });
 
 		if (user) {
-
-			const initiatedFriends = await this.friendshipRepository
-				.createQueryBuilder('friendship')
-				.innerJoinAndSelect('friendship.friend', 'friend')
-				.where('friendship.initiator = :userId', { userId: user.id })
-				.andWhere('friendship.isAccepted != true')
-				.getMany();
-		  
 	
 			const acceptedFriends = await this.friendshipRepository
 				.createQueryBuilder('friendship')
@@ -653,19 +635,18 @@ export class UsersService {
 				.getMany();
 	
 			let array = [];
-			const friendships = [...initiatedFriends, ...acceptedFriends];
-			friendships.forEach((element: Friendship) => {
+			acceptedFriends.forEach((element: Friendship) => {
 				let blockStatus = false;
 				user.blockedUsers.forEach((blockedFriend: string) => {
-					if (blockedFriend == (element.friend ? element.friend.username : element.initiator ? element.initiator.username : '')) {
+					if (blockedFriend == (element.initiator.username)) {
 						blockStatus = true;
 					}
 				});
 				array.push({
-					id: element.friend ? element.friend.id : element.initiator ? element.initiator.id : -1,
-					username: element.friend ? element.friend.username : element.initiator ? element.initiator.username : 'unknown user',
+					id: element.initiator.id,
+					username: element.initiator.username,
 					isBlocked: blockStatus,
-					onlineStatus:  element.friend ? element.friend.isActive : element.initiator ? element.initiator.isActive : false,
+					onlineStatus:  element.initiator.isActive,
 				});
 			});
 		
