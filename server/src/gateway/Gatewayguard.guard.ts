@@ -22,7 +22,6 @@ export class  GatewayGuard implements CanActivate {
 				token: token,
 				user: payload,
 			}
-			console.log("IN GATEWAY GUARD: ", client.handshake.auth.user);
 			return true;
 		} catch (error) {
 			throw new UnauthorizedException();

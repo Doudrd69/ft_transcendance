@@ -1,14 +1,11 @@
-import './FriendsListTab.css'
-import React, { use, useState, useEffect } from 'react';
-import ConfirmationComponent from '../../confirmation/Confirmation';
+import { useGlobal } from '@/app/GlobalContext';
 import { useChat } from '@/app/components/chat/ChatContext';
+import React, { useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
+import { Socket, io } from 'socket.io-client';
 import ListMyChannelComponent from '../../../listMyChannel/ListMyChannel';
-import { io, Socket } from 'socket.io-client';
-import { handleWebpackExternalForEdgeRuntime } from 'next/dist/build/webpack/plugins/middleware-plugin';
-import { setGameSocket, useGlobal } from '@/app/GlobalContext';
-import { ToastContainer, toast } from 'react-toastify';
-import { globalAgent } from 'http';
-import AddFriendComponent from '../../../addConversation/AddFriends';
+import ConfirmationComponent from '../../confirmation/Confirmation';
+import './FriendsListTab.css';
 
 interface User {
 	id: number;
@@ -23,14 +20,11 @@ interface FriendsListTabComponentProps {
 
 const FriendsListTabComponent: React.FC<FriendsListTabComponentProps> = ({ user, all }) => {
 
-	// let gameInviteValidation: boolean = false;
-	const [gameSocketConnected, setgameSocketConnected] = useState<boolean>(false);
-	const [gameInviteCalled, setGameInviteCalled] = useState(false);
-	const [gameInviteValidation, setgameInviteValidation] = useState<boolean>(false);
 	const { chatState, chatDispatch } = useChat();
 	const { globalState, dispatch } = useGlobal();
+	const [gameSocketConnected, setgameSocketConnected] = useState<boolean>(false);
+	const [gameInviteValidation, setgameInviteValidation] = useState<boolean>(false);
 	const [confirmationText, setConfirmationText] = useState('');
-	const [showConfirmation, setShowConfirmation] = useState(false);
 	const [funtionToExecute, setFunctionToExecute] = useState<() => void>(() => { });
 	const [accepted, setAccepted] = useState(false);
 
@@ -151,13 +145,94 @@ const FriendsListTabComponent: React.FC<FriendsListTabComponentProps> = ({ user,
 	// stock une fois a chaque fois, recoi
 	// si je suis inMatchmaking tt va bien, par contre si j'invite mais que en meme temps je lance un matchmaking? le matchmaking check si je suis ingame 
 
+	const removeFriends = async () => {
+
+		try {
+			const removeFriendDto = {
+				friendID: user.id,
+			}
+
+			const response = await fetch(`${process.env.API_URL}/users/deleteFriendRequest`, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`
+				},
+				body: JSON.stringify(removeFriendDto),
+			})
+
+			if (response.ok) {
+				chatDispatch({ type: 'TOGGLEX', payload: 'refreshFriendsList' });
+				chatDispatch({ type: 'DISABLE', payload: 'showConfirmation' });
+
+				globalState.userSocket?.emit('refreshUser', { userToRefresh: user.username, target: 'refreshFriends', status: true});
+
+			}
+			else {
+				const error = await response.json();
+				if (Array.isArray(error.message))
+					toast.warn(error.message[0]);
+				else
+					toast.warn(error.message);
+			}
+		}
+		catch (error) {
+			console.error(error);
+		}
+	}
+
+	const handlFriendRequest = async (user: string) => {
+		try {
+
+			const friendRequestDto = {
+				initiatorLogin: sessionStorage.getItem("currentUserLogin"),
+				recipientLogin: user,
+			};
+
+			const response = await fetch(`${process.env.API_URL}/users/addfriend`, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
+				},
+				body: JSON.stringify(friendRequestDto),
+			});
+
+			if (response.ok) {
+				
+				const data = await response.json();
+				if (!data) {
+					return;
+				}
+				
+				chatDispatch({ type: 'TOGGLEX', payload: 'refreshFriendsList' });
+				chatDispatch({ type: 'DISABLE', payload: 'showAddChannel' });
+				chatDispatch({ type: 'DISABLE', payload: 'showAddUser' });
+				chatDispatch({ type: 'DISABLE', payload: 'showAddFriend' });
+
+				if (globalState.userSocket?.connected) {
+					globalState.userSocket?.emit('joinRoom', { roomName: data.name, roomID: data.id });
+					globalState.userSocket?.emit('addFriend', friendRequestDto);
+				}
+			} else {
+				const error = await response.json();
+				if (Array.isArray(error.message))
+					toast.warn(error.message[0]);
+				else
+					toast.warn(error.message);
+			}
+		} catch (error) {
+			console.log(error);
+		}
+	};
+
 	useEffect(() => {
 		console.log("UseEffect gameSocketConnected :", gameSocketConnected)
 	}, [gameSocketConnected, gameInviteValidation]);
 
 
 	useEffect(() => {
-		console.log("useEfeccts trigged")
+
 		if (typeof globalState.gameSocket !== "undefined") {
 			globalState.gameSocket.on('acceptInvitation', () => {
 				console.log("VALIDATION");
@@ -204,94 +279,6 @@ const FriendsListTabComponent: React.FC<FriendsListTabComponentProps> = ({ user,
 			globalState.gameSocket?.off('disconnect');
 		};
 	}, [globalState?.gameSocket, gameInviteValidation, globalState?.userSocket, gameSocketConnected]);
-
-	const removeFriends = async () => {
-
-		try {
-			const blockUserDto = {
-				initiatorLogin: sessionStorage.getItem("currentUserLogin"),
-				recipientLogin: user.username,
-			}
-
-			const response = await fetch(`${process.env.API_URL}/users/removeFriend`, {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-					'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`
-				},
-				body: JSON.stringify(blockUserDto),
-			})
-
-			if (response.ok) {
-				const data = await response.json();
-				if (data.accepted)
-					setAccepted(data.accepted);
-				chatDispatch({ type: 'TOGGLEX', payload: 'refreshFriendsList' });
-				chatDispatch({ type: 'DISABLE', payload: 'showConfirmation' });
-
-
-				globalState.userSocket?.emit('refreshUser', {
-					userToRefresh: user.username,
-					target: 'refreshFriends',
-					status: true
-				});
-			}
-			else {
-				const error = await response.json();
-				if (Array.isArray(error.message))
-					toast.warn(error.message[0]);
-				else
-					toast.warn(error.message);
-			}
-		}
-		catch (error) {
-			console.error(error);
-		}
-	}
-
-	const handlFriendRequest = async (user: string) => {
-		try {
-			const friendRequestDto = {
-				initiatorLogin: sessionStorage.getItem("currentUserLogin"),
-				recipientLogin: user,
-			};
-
-			const response = await fetch(`${process.env.API_URL}/users/addfriend`, {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-					'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
-				},
-				body: JSON.stringify(friendRequestDto),
-			});
-
-			if (response.ok) {
-				
-				const data = await response.json();
-				if (!data) {
-					return;
-				}
-				
-				chatDispatch({ type: 'TOGGLEX', payload: 'refreshFriendsList' });
-				chatDispatch({ type: 'DISABLE', payload: 'showAddChannel' });
-				chatDispatch({ type: 'DISABLE', payload: 'showAddUser' });
-				chatDispatch({ type: 'DISABLE', payload: 'showAddFriend' });
-
-				if (globalState.userSocket?.connected) {
-					globalState.userSocket?.emit('joinRoom', { roomName: data.name, roomID: data.id });
-					globalState.userSocket?.emit('addFriend', friendRequestDto);
-				}
-			} else {
-				const error = await response.json();
-				if (Array.isArray(error.message))
-					toast.warn(error.message[0]);
-				else
-					toast.warn(error.message);
-			}
-		} catch (error) {
-			console.log(error);
-		}
-	};
 
 	return (
 		<>

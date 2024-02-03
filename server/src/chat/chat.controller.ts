@@ -137,7 +137,6 @@ export class ChatController {
 	@Post('promoteAdminUser')
 	promoteadminUserFromConversation(@Req() req, @Body() userOptionsDto: UserOptionsDto): Promise<boolean> {
 		const { user } = req;
-		console.log("CONTROLLER", user);
 		return this.chatService.updateUserAdminStatusFromConversationTrue(userOptionsDto, user.sub);
 	}
 
