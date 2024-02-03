@@ -214,7 +214,7 @@ export class UsersController {
 
 	@UseGuards(AuthGuard)
 	@Get('getUserList')
-	getUserList(@Req() req, ): Promise<Friendship[]> {
+	getUserList(@Req() req, ) {
 		const { user } = req;
 		return this.usersService.getUserList(user.sub);
 	}

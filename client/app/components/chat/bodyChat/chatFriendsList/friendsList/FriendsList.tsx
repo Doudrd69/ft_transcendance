@@ -216,7 +216,6 @@ const FriendsListComponent: React.FC = () => {
 					)
 					
 				))}
-				
 				</div>
 			</div>
 			
