@@ -4,6 +4,7 @@
 	align-items: center;
 	justify-content: center;
 	height: 100%;
+	width: 30%;
 }
 
 .activate2fa {
@@ -18,6 +19,8 @@
 	margin-bottom: 10px;
 	cursor: pointer;
 	border-radius: 5px;
+	margin: 20px;
+	width: 100%;
 }
 
 .desactivate2fa {
@@ -31,7 +34,10 @@
 	font-size: 16px;
 	margin-bottom: 10px;
 	cursor: pointer;
+	margin: 20px;
 	border-radius: 5px;
+	width: 100%;
+
 }
 
 .input-field-2fa {
@@ -43,7 +49,7 @@
 }
 
 .check-authenticator-btn {
-	background-color: #3498db;
+	background-color: #800e43;
 	color: white;
 	border: none;
 	padding: 10px 20px;
@@ -51,8 +57,10 @@
 	text-decoration: none;
 	display: inline-block;
 	font-size: 16px;
+	margin: 20px;
 	cursor: pointer;
 	border-radius: 5px;
+	width: 100%;
 }
 .sans-qrcode {
 	width: 200px;

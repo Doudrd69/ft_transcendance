@@ -3,7 +3,10 @@
 .bloc-history-title {
 	display: flex;
 	flex-direction: column;
-	height: 60vh;
+	height: 100%;
+    width: 50%;
+	justify-content: center;
+	align-items: center;
 	overflow: hidden;
 }
 .bloc-history {
@@ -12,7 +15,7 @@
 	border-radius: 10px;
 	height: 100%;
 	border: 3px solid #6e6e6e;
-
+    width: 50%;
 	overflow-y: auto; /* Enable vertical scrolling */
 }
 .title-game{

@@ -1,6 +1,7 @@
 .bloc-stats{
 	display: flex;
 	flex-direction: column;
+	width: 30%;
 
 }
 
@@ -13,27 +14,30 @@
 
 .victory{
 	display: flex;
-	justify-content: space-between;
 	border: 3px solid #1d9512;
 	border-radius: 5px;
 	margin : 10px;
 	padding: 10px;
+	justify-content: center;
+	width: 30%;
 }
 
 .defeat{
 	display: flex;
-	justify-content: space-between;
 	border: 3px solid #a01919;
 	border-radius: 5px;
 	margin : 10px;
+	width: 30%;
+	justify-content: center;
 	padding: 10px;
 }
 
 .winrate{
 	display: flex;
-	justify-content: space-between;
+	justify-content: center;
 	border: 3px solid #ccc;
 	border-radius: 5px;
 	margin : 10px;
 	padding: 10px;
+	width: 30%;
 }
