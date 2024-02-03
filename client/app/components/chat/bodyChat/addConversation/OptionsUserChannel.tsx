@@ -50,7 +50,6 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 	
 
 	const blockUser = async() => {
-
 		const BlockUserDto = {
 			initiatorLogin: sessionStorage.getItem("currentUserLogin"),
 			recipientLogin: user.login,

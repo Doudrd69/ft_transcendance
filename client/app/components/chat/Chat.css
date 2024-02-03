@@ -4,11 +4,12 @@
 	flex-direction: column;
 	justify-content: space-between;
 	width: 35%;
+	z-index: 90;
 }
 
 @media only screen and (max-width: 800px) {
     .left-half {
-		height: 50%;
+		height: 45vh;
 	  width: 100%;
     }
   }
