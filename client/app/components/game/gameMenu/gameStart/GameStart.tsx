@@ -19,19 +19,17 @@ const MatchMaking = () => {
     useEffect(() => {
 
         globalState.gameSocket?.on('leave-game', () => {
-            
-            globalState.gameSocket?.disconnect();
-            // globalState.gameSocket = undefined;
             dispatchGame({ type: 'TOGGLE', payload: 'showGameMenu'});
             state.showGameMenu = true;
+            globalState.gameSocket?.disconnect();
         });
 
-        globalState.gameSocket?.on('gameNotInProgress', (gameMode: string) => {
-			console.log(`DISPATCH`);
-			// dispatchGame({ type: 'TOGGLE', payload: 'showGameMatchmaking' });
-			console.log(`[gameNotInProgress] : ${sessionStorage.getItem("currentUserLogin")}`)
-			globalState.gameSocket?.emit('join-matchmaking', { playerLogin: sessionStorage.getItem("currentUserLogin"), gameMode: gameMode, userId: Number(sessionStorage.getItem("currentUserID")) });
-		});
+        // globalState.gameSocket?.on('gameNotInProgress', (gameMode: string) => {
+		// 	console.log(`DISPATCH`);
+		// 	// dispatchGame({ type: 'TOGGLE', payload: 'showGameMatchmaking' });
+		// 	console.log(`[gameNotInProgress] : ${sessionStorage.getItem("currentUserLogin")}`)
+		// 	globalState.gameSocket?.emit('join-matchmaking', { playerLogin: sessionStorage.getItem("currentUserLogin"), gameMode: gameMode, userId: Number(sessionStorage.getItem("currentUserID")) });
+		// });
 
             
         globalState.gameSocket?.on('setgame', () => {

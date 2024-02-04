@@ -36,6 +36,8 @@ export class MatchmakingService {
 
     async joinQueue(playerID: string, userId: number, gameMode: string) {
         const newUser: User = await this.usersRepository.findOne({ where: { id: userId } })
+        if (!newUser)
+            throw new Error(`new user undefined`)
         if (gameMode === "NORMAL")
             this.playersNormalQueue.push(playerID);
         else if (gameMode === "SPEED") {
@@ -49,15 +51,17 @@ export class MatchmakingService {
         await this.usersRepository.save(newUser);
     }
 
-    async leaveQueue(playerID: string, gameMode: string, userId: number) {
+    async leaveQueue(playerID: string, userId: number) {
         const newUser: User = await this.usersRepository.findOne({ where: { id: userId } })
-        if (gameMode === "NORMAL") {
+        newUser.inMatchmaking = false;
+        if (newUser.inSpeedQueue == false) {
             this.playersNormalQueue.splice(this.playersNormalQueue.indexOf(playerID), 1);
         }
-        else if (gameMode === "SPEED") {
+        else {
             newUser.inSpeedQueue = false;
             this.playersSpeedQueue.splice(this.playersSpeedQueue.indexOf(playerID), 1);
         }
+        await this.usersRepository.save(newUser);
         console.log(`quitSpeedQueue: ${this.playersSpeedQueue}`)
         console.log(`quitNormalQueue: ${this.playersNormalQueue}`)
         return;
@@ -72,4 +76,3 @@ export class MatchmakingService {
         return false;
     }
 }
-

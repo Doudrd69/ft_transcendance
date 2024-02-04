@@ -8,6 +8,7 @@ import { User } from 'src/users/entities/users.entity';
 import { Paddle } from './entities/paddle.entity';
 import { GameEngineService } from './gameEngine.service';
 import { game_instance } from 'src/game_gateway/game.gateway';
+import { MatchmakingService } from './matchmaking/matchmaking.service';
 
 interface GameInfoDto {
 	userOneId: number;
@@ -80,6 +81,7 @@ export class GameService {
 		@InjectRepository(User)
 		private usersRepository: Repository<User>,
 		private readonly GameEngineService: GameEngineService,
+		private readonly MatchmakingService: MatchmakingService,
 
 	) {
 
@@ -373,10 +375,12 @@ export class GameService {
 		this.userGameSockets[userId] = null;
 	}
 
-	async deconnectUserMatchmaking(user: User, userId: number) {
+	async deconnectUserMatchmaking(user: User, userId: number, playerId: string) {
 		console.log(`userGameSocket : ${this.userGameSockets[userId]}, userId: ${userId}`);
 		user.inMatchmaking = false;
 		this.userGameSockets[userId] = null;
+		await this.MatchmakingService.leaveQueue(playerId, userId)
+		// appeler une fonction qui l'enleve de matchmaking queue hophop
 		await this.usersRepository.save(user);
 	}
 
