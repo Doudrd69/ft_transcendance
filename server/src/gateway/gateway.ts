@@ -137,7 +137,6 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 					client.leave(personnalRoom);
 					console.log("Client ", client.id, " has left ", personnalRoom, " room");
 					this.userLeavesRooms(client, userID);
-					this.userService.updateUserStatus(userID, false);
 				})
 
 			});
