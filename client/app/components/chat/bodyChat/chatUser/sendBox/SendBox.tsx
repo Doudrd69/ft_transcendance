@@ -16,13 +16,13 @@ const SendBoxComponent: React.FC = () => {
 	};
 	
 	const handleMessage = async (e: React.FormEvent) => {
+
 		const messageDto = {
-			from: sessionStorage.getItem("currentUserLogin"),
 			content: messageValue,
 			post_datetime: new Date(),
 			conversationID: chatState.currentConversationID,
 		}
-		// console.log("messageDto", messageDto);
+
 		try {
 			e.preventDefault();
 	
@@ -58,7 +58,7 @@ const SendBoxComponent: React.FC = () => {
 	return (
 			<div className="bloc-chat-enter">
 				<form className="bloc-send-chat" onSubmit={handleMessage}>
-					<input className="input-chat" placeholder="message..." value={messageValue} onChange={handleMessageInput}></input>
+					<input className="input-chat" placeholder="whasup..." value={messageValue} onChange={handleMessageInput}></input>
 					{/* <button className="button-send" type="submit"></button> */}
 				</form>
 			</div>

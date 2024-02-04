@@ -6,21 +6,11 @@ import { Socket } from 'socket.io-client';
 import PasswordChangeComponent from './PasswordChange';
 import { useGlobal } from '@/app/GlobalContext';
 
-interface User {
-	id: number;
-	login: string;
-	avatarURL: string;
-	isAdmin: boolean;
-	isMute: boolean;
-	isBan: boolean;
-	isOwner: boolean;
-}
 
 const IdDiscussionComponent: React.FC = () => {
 
 	const { chatState, chatDispatch } = useChat();
-	const { globalState } = useGlobal();
-	const [me, setMe] = useState<User>();
+	const { globalState } = useGlobal();;
 	var id;
 
 	useEffect(() => {

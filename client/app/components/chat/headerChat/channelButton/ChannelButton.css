@@ -1,30 +1,39 @@
 .main-button-channel {
-	/* border: 3px solid #333; */
-	border:none;
+	border: none;
 	text-align: center;
-	overflow: hidden; 
+	overflow: hidden;
 	white-space: nowrap;
 	text-overflow: ellipsis;
-	height: 50px;
-	width: calc(33% - 10px);
+	height: 100%;
+	    width: calc(100% * (1 / 3));
 	border-top: none;
-	background-color: #848288 ;
+	background-color: #69686c;
 	color: #f0f0f0;
 	transition: background-color 0.3s ease;
 	text-transform: uppercase;
 	font-weight: bold;
-	border-radius:10px;
+	/* border-radius: 0px 0px 15px 15px; */
+
+
+
+
+
+	position: relative;
 	font-weight: bold;
 	font-size: 20px;
-    font-family: 'Gill Sans' , sans-serif;
+	font-family: 'Gill Sans' , sans-serif;
 }
 
 .main-button-channel:hover {
 	/* Nouvelle couleur de fond lorsque vous survolez le bouton */
 	background-color: #800e43;
+	box-shadow: 0 0 10px rgba(41, 41, 41, 0.756);
+
 	}
 
 .main-button-channel.clicked {
 	/* Nouvelle couleur de fond lorsque vous survolez le bouton */
 	background-color: #aa1359;
+	box-shadow: 0 0 10px rgba(41, 41, 41, 0.756);
+
 	}

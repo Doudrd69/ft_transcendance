@@ -270,7 +270,6 @@ export class UsersService {
 				user.username = updateUsernameDto.newUsername;
 				await this.usersRepository.save(user);
 				return { newUsername: user.username };
-
 			}
 
 			throw new HttpException('Username is already used', HttpStatus.BAD_REQUEST);
@@ -561,6 +560,16 @@ export class UsersService {
 	/***					GETTERS						***/
 	/**************************************************************/
 
+	async getUsername(userID: number): Promise<string> {
+
+		const user = await this.usersRepository.findOne({ where: { id: userID } });
+		if (user) {
+			return user.username;
+		}
+
+		throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+	}
+
 	async getUserByID(userID: number): Promise<User> {
 		return await this.usersRepository.findOne({ where: { id: userID } });
 	}
@@ -578,14 +587,15 @@ export class UsersService {
 
 		throw new HttpException('User not found', HttpStatus.BAD_REQUEST);
 	}
+
 	async getUserList(userId: number) {
 		const user = await this.usersRepository.findOne({ where: { id: userId } });
 
 		if (user) {
 			const users = await this.usersRepository.find();
-
-			if (users && users.length > 0) { // Vérifiez s'il y a des utilisateurs dans la liste
-
+		
+			if (users && users.length > 0) {
+		
 				const array = users
 					.filter((user_) => user_.id !== userId)
 					.sort((a, b) => a.username.localeCompare(b.username))

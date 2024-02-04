@@ -45,7 +45,6 @@ const Authentificationcomponent = () => {
 				{/* <a href="https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-77244422b0e064ebfb68bf425fab3531b60791a6465cb2ce6712b5d3ad208935&redirect_uri=http%3A%2F%2F10.12.8.2%3A3000&response_type=code"> */}
 					<button className= "button-auth">SIGN IN WITH 42</button>
 				</a>
-
 				{/* <form onSubmit={userRegister}>
 					<label>
 					Pseudo:

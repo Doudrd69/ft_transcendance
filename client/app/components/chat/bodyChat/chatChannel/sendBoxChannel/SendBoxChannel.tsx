@@ -22,7 +22,6 @@ const SendBoxChannelComponent: React.FC = () => {
 			e.preventDefault();
 
 			const messageDto = {
-				from: sessionStorage.getItem("currentUserLogin"),
 				content: messageValue,
 				post_datetime: new Date(),
 				conversationID: chatState.currentConversationID,

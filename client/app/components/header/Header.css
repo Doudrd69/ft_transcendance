@@ -34,8 +34,22 @@ align-items: center;
     align-items: center;
 	/* border-radius: 50px; */
 }
+
+.button-logout{
+	width: 90%;
+	max-width: 50px;
+	height: auto;
+	object-fit: contain;
+}
+.button-logout:hover{
+	transition: transform 0.3s ease; /* Ajoutez une transition pour une animation fluide */
+	transform: scale(1.3);
+}
+
+
 .bloc-pong,
 .bloc-profils,
+.bloc-logout,
 .bloc-settings {
 	display: flex;
 	align-items: center;
@@ -53,7 +67,7 @@ align-items: center;
 }
 
 .bloc-pong{
-	width: 65vw;
+	width: 70vw;
 	font-weight: bold;
 	font-size: 34px;
     font-family: 'Gill Sans' , sans-serif;
@@ -64,7 +78,10 @@ align-items: center;
 	width: 15vw;
 }
 .bloc-settings{
-	width: 10vw;
+	width: 5vw;
+}
+.bloc-logout{
+	width: 5vw;
 }
 .profils {
     height: 70%;
@@ -74,11 +91,13 @@ align-items: center;
     border-radius: 10px;
 }
 .settings{
-	height: 50%; /* Ajustez la hauteur selon vos besoins */
-	width: auto;
+	width: 90%;
+    max-width: 50px;
+    height: auto;
 	object-fit: contain;
 	
 }
+
 .button-settings:hover .settings {
 	transform: rotate(80deg) scale(1.15);;
 	transition: transform 0.3s ease; /* Ajoutez une transition pour une animation fluide */
@@ -104,15 +123,20 @@ align-items: center;
     background-color: transparent;
     border: none;
     cursor: pointer;
-    width: 10vw;
+	width: 5vw;
     height: 100%;
 	justify-content: center;
   }
   
   .notifications-icon {
-	  height: 70%;
-	  width: auto; 
+	width: 90%;
+    max-width: 50px;
+    height: auto;
 	  aspect-ratio: 1 / 1;
+  }
+  .notifications-icon:hover {
+	transform: scale(1.2);
+	transition: transform 0.3s ease;
   }
 
   .notification-icon-container {
@@ -136,14 +160,14 @@ align-items: center;
 }
 
 .notif-window {
-	position: fixed;
+	position: absolute;
 	top: 9vh;
-	right: 15vw;
+	right: 10vw;
 	width: 300px;
 	background-color: #a6a6a6;
 	box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-	z-index: 200;
 	border-radius: 5px;
+	z-index: 1000;
   }
   
   .notif {

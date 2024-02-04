@@ -48,8 +48,8 @@ const FileDropZoneComponent: React.FC<FileDropZoneProps> = ({ onChange }) => {
 
 			// Créez un canvas pour la découpe et le redimensionnement
 			const canvas = document.createElement('canvas');
-			canvas.width = 200;
-			canvas.height = 200;
+			canvas.width = 400;
+			canvas.height = 400;
 			const ctx = canvas.getContext('2d');
 
 			// Découpez et redimensionnez l'image en carré
@@ -63,8 +63,8 @@ const FileDropZoneComponent: React.FC<FileDropZoneProps> = ({ onChange }) => {
 				size,
 				0,
 				0,
-				200,
-				200
+				400,
+				400
 				);
 			}
 
