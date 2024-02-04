@@ -32,6 +32,8 @@ const HeaderComponent: React.FC = () => {
 
 		localStorage.clear();
 		sessionStorage.clear();
+		globalState.userSocket?.disconnect();
+		globalState.gameSocket?.disconnect();
 		window.history.replaceState(null, '', '/');
 		window.location.reload();
 	}
@@ -143,6 +145,7 @@ const HeaderComponent: React.FC = () => {
 		uploadAvatar();
 	}, [globalState.showRefresh]);
 
+	// reload sur changement de username
 	useEffect(() => {
 		loadNotifications();
 	}, [reloadNotifications]);

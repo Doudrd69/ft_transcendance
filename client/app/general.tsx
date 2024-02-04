@@ -253,8 +253,21 @@ const GeneralComponent = () => {
 		return false;
 	}
 
-	// Multi-purpose useEffect for socket handling
+	// UserSocket multi-purpose useEffect
 	useEffect(() => {
+
+		// Works on both connection and reconnection
+		globalState.userSocket?.on('connect', () => {
+			const personnalRoom = sessionStorage.getItem("currentUserLogin");
+			globalState.userSocket?.emit('joinPersonnalRoom', personnalRoom, sessionStorage.getItem("currentUserID"));
+		})
+
+		globalState.userSocket?.on('disconnect', () => {})
+
+		globalState.userSocket?.on('refreshUserOnlineState', (notif: string) => {
+			console.log("Friend online status event (general.tsx) --> ", notif);
+			toast.info(notif);
+		});
 
 		globalState.userSocket?.on('friendRequest', (friendRequestDto: FriendRequestDto) => {
 			toast(<FriendRequestReceived friendRequestDto={friendRequestDto} />, {
@@ -311,6 +324,9 @@ const GeneralComponent = () => {
 		});
 
 		return () => {
+			globalState.userSocket?.off('connect');
+			globalState.userSocket?.off('disconnect');
+			globalState.userSocket?.off('refreshUserOnlineState');
 			globalState.userSocket?.off('friendRequest');
 			globalState.userSocket?.off('friendRequestAcceptedNotif');
 			globalState.userSocket?.off('userJoinedRoom');
@@ -322,35 +338,6 @@ const GeneralComponent = () => {
 		}
 
 	}, [globalState?.userSocket]);
-
-	// Connection - Deconnection useEffect
-	useEffect(() => {
-
-		// Works on both connection and reconnection
-		globalState.userSocket?.on('connect', () => {
-			const personnalRoom = sessionStorage.getItem("currentUserLogin");
-			globalState.userSocket?.emit('joinPersonnalRoom', personnalRoom, sessionStorage.getItem("currentUserID"));
-		})
-
-		globalState.userSocket?.on('disconnect', () => {
-		})
-
-		globalState.userSocket?.on('newConnection', (notif: string) => {
-			toast(notif);
-		})
-
-		globalState.userSocket?.on('newDeconnection', (notif: string) => {
-			toast(notif);
-		})
-
-		return () => {
-			globalState.userSocket?.off('connect');
-			globalState.userSocket?.off('disconnect');
-			globalState.userSocket?.off('newConnection');
-			globalState.userSocket?.off('newDeconnection');
-		}
-
-	}, [globalState?.userSocket])
 
 	// Game socket handler
 	useEffect(() => {

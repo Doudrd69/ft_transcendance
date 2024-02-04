@@ -234,9 +234,7 @@ const FriendsListTabComponent: React.FC<FriendsListTabComponentProps> = ({ user,
 				setgameSocketConnected(false);
 			});
 		}
-		else {
-			console.log("gameSocket undefined");
-		}
+
 		return () => {
 			globalState.gameSocket?.off('acceptInvitation');
 			globalState.userSocket?.off('closedInvitation');
