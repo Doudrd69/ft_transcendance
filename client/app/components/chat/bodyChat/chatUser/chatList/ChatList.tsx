@@ -59,18 +59,14 @@ const ChatListComponent: React.FC = () => {
 			loadDMs();
 		});
 		
-		globalState.userSocket?.on('newConnection', (notif: string) => {
+		globalState.userSocket?.on('refreshUserOnlineState', (notif: string) => {
+			console.log("Friend online status event (Chatlist.tsx) --> ", notif);
 			loadDMs();
-		})
-
-		globalState.userSocket?.on('newDeconnection', (notif: string) => {
-			loadDMs();
-		})
+		});
 
 		return () => {
 			globalState.userSocket?.off('refreshDmList');
-			globalState.userSocket?.off('newConnection');
-			globalState.userSocket?.off('newDeconnection');
+			globalState.userSocket?.off('refreshUserOnlineState');
 		}
 
 	}, [globalState?.userSocket]);

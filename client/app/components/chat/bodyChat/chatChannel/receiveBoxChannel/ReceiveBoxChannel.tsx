@@ -129,7 +129,6 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 
 		globalState.userSocket?.on('userJoinedRoom', (notification: Message) => {
 			loadUserList();
-			// setMessages((prevMessages: Message[]) => [...prevMessages, notification])
 		});
 
 		globalState.userSocket?.on('userIsBan', () => {
@@ -190,7 +189,7 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 	const handleGameInvite = () => {
 		globalState.gameTargetId = chatState.currentTarget.id;
 		globalState.targetUsername = chatState.currentTarget.login;
-		globalState.gameInvite = !globalState.gameInvite;
+		globalState.gameInvite = true;
 	}
 
 	const timestamp = new Date().getTime();

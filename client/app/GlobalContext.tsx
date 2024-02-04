@@ -26,7 +26,7 @@ interface GlobalState {
 	showGeneralSettings:boolean;
 	showGame: boolean;
 	showChat:boolean;
-showAvatar:boolean;
+	showAvatar:boolean;
 	showHeader:boolean;
 	showUploadAvatar:boolean;
 	showRefresh:boolean;
@@ -42,6 +42,8 @@ showAvatar:boolean;
 	isConnected: boolean;
 	showAuth: boolean;
 	activate2FA: boolean;
+	gameInviteValidation: boolean;
+	gameSocketConnected: boolean;
 
 	[key: string]: boolean | string | Socket | undefined | number | null;
 }
@@ -70,6 +72,8 @@ const initialState: GlobalState = {
 	activate2FA: false,
 	isConnected: false,
 	showAuth: false,
+	gameInviteValidation: false,
+	gameSocketConnected: false,
 };
 
 // Réducteur
