@@ -63,7 +63,7 @@ const GeneralComponent = () => {
 			});
 			gameSocket.connect();
 			dispatch({ type: 'SET_GAME_SOCKET', payload: gameSocket });
-			globalState.userSocket.emit('inviteAccepted', {
+			globalState.userSocket?.emit('inviteAccepted', {
 				userTwoId: gameInviteDto.senderUserID, // il est null ce connard
 				playerOneLogin: sessionStorage.getItem("currentUserLogin"),
 				playerTwoLogin: gameInviteDto.senderUsername,
