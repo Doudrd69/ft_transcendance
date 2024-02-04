@@ -332,7 +332,7 @@ export class GameService {
 		return gametab.find(instance => instance.gameID === gameID);
 	}
 
-	userHasAlreadyGameSockets(userId: number) {
+	userHasAlreadyGameSockets(userId: number, gameSocketId: string) {
 		if (typeof (this.userGameSockets[userId]) === "undefined") {
 			console.log(`"undefined"`)
 			return false;
@@ -345,6 +345,8 @@ export class GameService {
 			console.log(`null`)
 			return false;
 		}
+		if (this.userGameSockets[userId] === gameSocketId)
+			return false;
 		console.log(`user ${userId} has already game socket : ${this.userGameSockets[userId]}`);
 		return true;
 	}

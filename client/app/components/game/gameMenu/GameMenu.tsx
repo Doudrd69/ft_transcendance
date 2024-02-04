@@ -48,21 +48,29 @@ const Menu = () => {
 		}
 	}, [globalState?.gameSocket])
 
-	const handleStartClick = () => {
+	const handleStartClick = async () => {
 
 		try {
+			dispatchGame({ type: 'TOGGLE', payload: 'showGameMatchmaking' });
 			setGameMode("NORMAL");
-			const gameSocket = io(`${process.env.API_URL}/game`, {
-				autoConnect: false,
-				auth: {
-					token: sessionStorage.getItem("jwt"),
-				}
-			});
-			gameSocket.connect();
-			gameSocket.on('connect', () => {
-				dispatch({ type: 'SET_GAME_SOCKET', payload: gameSocket });
-				gameSocket.emit('linkSocketWithUser', { playerLogin: sessionStorage.getItem("currentUserLogin"), userId: sessionStorage.getItem("currentUserID") });
-			});
+			// if (typeof globalState.gameSocket !== undefined) {
+				console.log("gameSocket start", globalState.gameSocket);
+				// console.log("gameSocket start", globalState.gameSocket.connected);
+				// console.log("gameSocket start", globalState.gameSocket.disconnected);
+			// }
+			// if (!globalState.gameSocket?.connected) {
+				const gameSocket = io(`${process.env.API_URL}/game`, {
+					autoConnect: false,
+					auth: {
+						token: sessionStorage.getItem("jwt"),
+					}
+				});
+				gameSocket.connect();
+				gameSocket.on('connect', () => {
+					dispatch({ type: 'SET_GAME_SOCKET', payload: gameSocket });
+					gameSocket.emit('linkSocketWithUser', { playerLogin: sessionStorage.getItem("currentUserLogin"), userId: sessionStorage.getItem("currentUserID"), gameMode: gameMode });
+				});
+			// }
 			// dispatchGame({ type: 'TOGGLE', payload: 'showGameMatchmaking' });
 			// console.log("After Dispatch: ", globalState?.gameSocket);
 
@@ -71,9 +79,12 @@ const Menu = () => {
 		}
 	};
 
+// je peux peut etre passer sur le matchmaking composant puis apres je fais le reste?
+
 	const handleSpeedClick = () => {
 
 		try {
+			dispatchGame({ type: 'TOGGLE', payload: 'showGameMatchmaking' });
 			setGameMode("SPEED");
 			const gameSocket = io(`${process.env.API_URL}/game`, {
 				autoConnect: false,
@@ -98,23 +109,23 @@ const Menu = () => {
 
 	return (
 		<div className="slider-thumb">
-		{/* <div className="background-game"> */}
-				<h1 className='titleClass'>PINGPON GAME</h1>
-				{startGame ?
+			{/* <div className="background-game"> */}
+			<h1 className='titleClass'>PINGPON GAME</h1>
+			{!startGame ?
+				<button className={`buttonclass ${state.showGameMatchmaking ? 'clicked' : ''}`} onClick={() => {
+					setStartGame(true);
+				}}>PLAY A GAME</button>
+				:
+				<>
 					<button className={`buttonclass ${state.showGameMatchmaking ? 'clicked' : ''}`} onClick={() => {
-						setStartGame(true);
-					}}>PLAY A GAME</button>
-					:
-					<>
-						<button className={`buttonclass ${state.showGameMatchmaking ? 'clicked' : ''}`} onClick={() => {
-							handleStartClick();
-						}}>START GAME: NORMAL MODE</button>
-						<button className={`buttonclass ${state.showGameMatchmaking ? 'clicked' : ''}`} onClick={() => {
-							handleSpeedClick();
-						}}>START GAME: SPEED MODE</button>
-					</>
+						handleStartClick();
+					}}>START GAME: NORMAL MODE</button>
+					<button className={`buttonclass ${state.showGameMatchmaking ? 'clicked' : ''}`} onClick={() => {
+						handleSpeedClick();
+					}}>START GAME: SPEED MODE</button>
+				</>
 			}
-		{/* </div> */}
+			{/* </div> */}
 		</div>
 	);
 };
