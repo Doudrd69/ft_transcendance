@@ -145,6 +145,12 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		}
 	}
 
+	async handleException(error: Error, client: Socket) {
+        console.log(`[GAME_ERROR]: ${error.stack}`)
+        console.log(`[GAME_ERROR] ${error.name}, ${error.message}`)
+        client.emit("exception", { error: error.message })
+    }
+
 	handleDisconnect(client: Socket) {
 		console.log(`== GeneralGtw ---> USERSOCKET client disconnected: ${client.id}`);
 		delete this.connectedUsers[client.id];
@@ -204,36 +210,96 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		});
 	}
 
-	@SubscribeMessage('checkSenderInMatch')
+	@SubscribeMessage('inviteAccepted')
 	@UseGuards(GatewayGuard)
-	async checkIfSendInMatch(@MessageBody() data: { senderUsername: string, senderUserId: number }) {
+	async inviteAccepted(@ConnectedSocket() client: Socket, @MessageBody() data: { }) {
 		try {
-			if (await this.userService.userToInviteGameIsAlreadyInGame(data.senderUserId)) {
-				console.log(`sender already inGame`);
-				this.server.to(data.senderUsername).emit('senderInGame');
-				return;
-			}
-			this.server.to(data.senderUsername).emit('senderNotInGame');
+			const user = client.handshake.auth.user;
 		} catch (error) {
 			console.log(`[GAME INVITE ERROR]: ${error.stack}`)
 		}
 	}
 
-	@SubscribeMessage('inviteToGame')
+	@SubscribeMessage('checkUsersInGame')
 	@UseGuards(GatewayGuard)
-	async inviteUserToGame(@ConnectedSocket() client: Socket, @MessageBody() data: { usernameToInvite: string, userIdToInvite: number, senderID: string, senderUsername: string }) {
-		console.log(`inviteUserToGame:  ${data.userIdToInvite}`);
+	async checkIfUsersInGame(@MessageBody() data: { senderUsername: string, senderUserId: number, oposantUserId: number }) {
 		try {
-			const { usernameToInvite, userIdToInvite, senderID, senderUsername } = data;
-			const user = client.handshake.auth.user;
-			if (await this.userService.userToInviteGameIsAlreadyInGame(userIdToInvite)) {
-				this.server.to(client.id).emit('userToInviteAlreadyInGame');
+			if (await this.userService.usersInGame(data.senderUserId, data.oposantUserId)) {
+				console.log(`users already inGame`);
+				this.server.to(data.senderUsername).emit('usersInGame');
 				return;
 			}
+			// if (await this.userService.userToInviteGameIsAlreadyInGame(data.userIdToInv)
+			this.server.to(data.senderUsername).emit('usersNotInGame');
+		} catch (error) {
+			console.log(`[GAME INVITE ERROR]: ${error.stack}`)
+		}
+	}
 
+	@SubscribeMessage('checkAndsetInGame')
+	@UseGuards(GatewayGuard)
+	async checkAndSetInGame(@ConnectedSocket() client: Socket, @MessageBody() data: { oposantUserId: number }) {
+		try {
+			const user = client.handshake.auth.user;
+			if (await this.userService.usersInGame(user.sub, data.oposantUserId)) {
+				console.log(`users already inGame`);
+				this.server.to(client.id).emit('usersInGame');
+				return;
+			}
+			await this.userService.setUserInGame(user.sub)
+			await this.userService.setUserInGame(data.oposantUserId)
+			this.server.to(client.id).emit('usersNotInGame');
+		} catch (error) {
+			console.log(`[GAME INVITE ERROR]: ${error.stack}`)
+		}
+	}
+
+	@SubscribeMessage('checkUserInMatch')
+	@UseGuards(GatewayGuard)
+	async checkIfUserInMatch(@MessageBody() data: { senderUsername: string, senderUserId: number }) {
+		try {
+			if (await this.userService.userInGame(data.senderUserId)) {
+				console.log(`sender already inGame`);
+				this.server.to(data.senderUsername).emit('userInGame');
+				return;
+			}
+			this.server.to(data.senderUsername).emit('userNotInGame');
+		} catch (error) {
+			console.log(`[GAME INVITE ERROR]: ${error.stack}`)
+		}
+	}
+
+	@SubscribeMessage('checkAndSetUserInMatchmaking')
+    @UseGuards(GatewayGuard)
+    async handleSetUserInMatchmaking(@ConnectedSocket() client: Socket, @MessageBody() data: {userId: number }) {
+        try {
+			if (await this.userService.userInGame(data.userId)) {
+				console.log(`sender already inGame`);
+				this.server.to(client.id).emit('userInGame');
+				return;
+			}
+			await this.userService.setUserInMatchmaking(data.userId);
+            this.server.to(client.id).emit('gameNotInProgress');
+        }
+        catch (error) {
+            await this.handleException(error, client)
+        }
+    }
+
+	@SubscribeMessage('checkAndInviteToGame')
+	@UseGuards(GatewayGuard)
+	async inviteUserToGame(@ConnectedSocket() client: Socket, @MessageBody() data: { usernameToInvite: string, userIdToInvite: number, senderUsername: string }) {
+		console.log(`inviteUserToGame:  ${data.userIdToInvite}`);
+		try {
+			const { usernameToInvite, userIdToInvite, senderUsername } = data;
+			const user = client.handshake.auth.user;
+			if (await this.userService.usersInGame(user.sub, userIdToInvite)) {
+				console.log(`users already inGame`);
+				this.server.to(data.senderUsername).emit('usersInGame');
+				return;
+			}
 			this.server.to(usernameToInvite).emit('gameInvite', {
 				senderUserID: user.sub,
-				senderID: senderID,
 				senderUsername: senderUsername,
 			});
 		} 

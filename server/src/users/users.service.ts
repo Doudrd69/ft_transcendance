@@ -29,7 +29,7 @@ export class UsersService {
 	) { }
 
 	private async isUsernameValid(usernameToFInd: string): Promise<boolean> {
-		
+
 		const usernameMatch = await this.usersRepository.findOne({ where: { username: usernameToFInd } });
 
 		if (usernameMatch) {
@@ -37,18 +37,55 @@ export class UsersService {
 		}
 		return true;
 	}
-	async userToInviteGameIsAlreadyInGame(userIdToInvite: number) {
-		const userToInvite: User = await this.usersRepository.findOne({ where: { id: userIdToInvite } })
-		if (!userToInvite)
+	async userInGame(userId: number) {
+		const user: User = await this.usersRepository.findOne({ where: { id: userId } })
+		if (!user)
 			throw new Error("userToInvite undefined")
 		// userToInvite.inGame = false;
 		// await this.usersRepository.save(userToInvite);
-		if (userToInvite.inGame === true || userToInvite.inMatchmaking === true) {
-			console.log(`usernametoinvite : game: ${userToInvite.inGame} match: ${userToInvite.inMatchmaking}`);
+		if (user.inGame === true || user.inMatchmaking === true) {
+			console.log(`usernametoinvite : game: ${user.inGame} match: ${user.inMatchmaking}`);
 			return true;
 		}
 		return false;
-}
+	}
+
+	async usersInGame(user1Id: number, user2Id: number) {
+		const user1: User = await this.usersRepository.findOne({ where: { id: user1Id } })
+		if (!user1)
+			throw new Error("user1 undefined")
+		// userToInvite.inGame = false;
+		// await this.usersRepository.save(userToInvite);
+		if (user1.inGame === true || user1.inMatchmaking === true) {
+			console.log(`usernametoinvite : game: ${user1.inGame} match: ${user1.inMatchmaking}`);
+			return true;
+		}
+		const user2: User = await this.usersRepository.findOne({ where: { id: user2Id } })
+		if (!user2)
+			throw new Error("userToInvite undefined")
+		// userToInvite.inGame = false;
+		// await this.usersRepository.save(userToInvite);
+		if (user2.inGame === true || user2.inMatchmaking === true) {
+			console.log(`usernametoinvite : game: ${user2.inGame} match: ${user2.inMatchmaking}`);
+			return true;
+		}
+		return false;
+	}
+
+	async setUserInMatchmaking(userId: number) {
+		const user: User = await this.usersRepository.findOne({ where: { id: userId } })
+		if (!user)
+			throw new Error("user undefined")
+		user.inMatchmaking = true;
+		await this.usersRepository.save(user);
+	}
+	async setUserInGame(userId: number) {
+		const user: User = await this.usersRepository.findOne({ where: { id: userId } })
+		if (!user)
+			throw new Error("user undefined")
+		user.inGame = true;
+		await this.usersRepository.save(user);
+	}
 
 	/**************************************************************/
 	/***							2FA							***/
@@ -81,7 +118,7 @@ export class UsersService {
 
 	async get2faSecret(userID: number) {
 
-		const user : User = await this.usersRepository.findOne({ where: { id: userID } });
+		const user: User = await this.usersRepository.findOne({ where: { id: userID } });
 		if (user) {
 			return user.TFA_secret;
 		}
@@ -124,7 +161,7 @@ export class UsersService {
 	}
 
 	async getAvatar(userId: number): Promise<string | null> {
-		const user = await this.usersRepository.findOne({ where: { id: userId }});
+		const user = await this.usersRepository.findOne({ where: { id: userId } });
 		if (!user || !user.avatarURL) {
 			console.log("Avatar not found");
 			return null;
@@ -225,19 +262,19 @@ export class UsersService {
 		const user: User = await this.usersRepository.findOne({ where: { id: userID } });
 
 		if (user) {
-			
+
 			const usernameValidation = await this.isUsernameValid(updateUsernameDto.newUsername);
-	
+
 			if (usernameValidation) {
-	
+
 				user.username = updateUsernameDto.newUsername;
 				await this.usersRepository.save(user);
 				return { newUsername: user.username };
 			}
-			
+
 			throw new HttpException('Username is already used', HttpStatus.BAD_REQUEST);
 		}
-		
+
 		throw new HttpException('User not found', HttpStatus.BAD_REQUEST);
 	}
 
@@ -276,7 +313,7 @@ export class UsersService {
 
 	async getUserGames(userID: number) {
 
-		const user : User = await this.usersRepository.findOne({
+		const user: User = await this.usersRepository.findOne({
 			where: { id: userID },
 		});
 
@@ -308,17 +345,17 @@ export class UsersService {
 
 		throw new HttpException('Fatal error', HttpStatus.BAD_REQUEST);
 	}
-	
+
 	async getUsersStats(userId: number) {
 
-		const user : User = await this.usersRepository.findOne({ where: { id: userId } });
+		const user: User = await this.usersRepository.findOne({ where: { id: userId } });
 
 		if (user) {
 			console.log(`[getUsersStats] userVictory: ${user.victory}`);
 			let object = {
 				victory: user.victory,
 				defeat: user.defeat,
-				ratio: user.defeat ? (user.victory / (user.defeat + user.victory) * 100): 0,
+				ratio: user.defeat ? (user.victory / (user.defeat + user.victory) * 100) : 0,
 			};
 
 			return object;
@@ -347,7 +384,7 @@ export class UsersService {
 
 			if (initiator.id == recipient.id)
 				throw new HttpException('Seriously?', HttpStatus.BAD_REQUEST);
-	
+
 			const friendshipAlreadyExists = await this.friendshipRepository
 				.createQueryBuilder('friendship')
 				.where('(friendship.initiator.id = :initiatorId AND friendship.friend.id = :friendId) OR (friendship.initiator.id = :friendId AND friendship.friend.id = :initiatorId)', {
@@ -357,7 +394,7 @@ export class UsersService {
 				.getOne();
 
 			if (!friendshipAlreadyExists) {
-	
+
 				let newFriendship = new Friendship();
 				newFriendship.initiator = initiator;
 				newFriendship.friend = recipient;
@@ -381,10 +418,10 @@ export class UsersService {
 			user2.groups.forEach((userTwoGroup: GroupMember) => {
 				if ((userOneGroup.conversation.id == userTwoGroup.conversation.id) &&
 					(!userOneGroup.conversation.is_channel && !userTwoGroup.conversation.is_channel)) {
-						console.log("== found common DM ==");
-						console.log(userOneGroup.conversation);
-						conversation = userOneGroup.conversation;
-						return;
+					console.log("== found common DM ==");
+					console.log(userOneGroup.conversation);
+					conversation = userOneGroup.conversation;
+					return;
 				}
 			});
 		});
@@ -435,12 +472,12 @@ export class UsersService {
 
 	async deleteFriendRequest(dto: DeleteFriendRequestDto, userID: number) {
 
-		const user : User = await this.usersRepository.findOne({
+		const user: User = await this.usersRepository.findOne({
 			where: { id: userID },
 			relations: ["initiatedFriendships", "acceptedFriendships"],
 		});
 
-		const friend : User = await this.usersRepository.findOne({
+		const friend: User = await this.usersRepository.findOne({
 			where: { id: dto.friendID },
 			relations: ["initiatedFriendships", "acceptedFriendships"],
 		});
@@ -448,23 +485,23 @@ export class UsersService {
 		if (user && friend) {
 
 			const friendshipToDelete = await this.friendshipRepository
-			.createQueryBuilder('friendship')
-			.where('(friendship.initiator.id = :initiatorId AND friendship.friend.id = :friendId) OR (friendship.initiator.id = :friendId AND friendship.friend.id = :initiatorId)', {
-				initiatorId: friend.id,
-				friendId: user.id,
-			})
-			.getOne();
+				.createQueryBuilder('friendship')
+				.where('(friendship.initiator.id = :initiatorId AND friendship.friend.id = :friendId) OR (friendship.initiator.id = :friendId AND friendship.friend.id = :initiatorId)', {
+					initiatorId: friend.id,
+					friendId: user.id,
+				})
+				.getOne();
 
 			if (friendshipToDelete) {
-				
+
 				await this.friendshipRepository
 					.createQueryBuilder()
 					.delete()
 					.from(Friendship)
-					   .where("id = :id", { id: friendshipToDelete.id })
+					.where("id = :id", { id: friendshipToDelete.id })
 					.execute();
 
-				return ;
+				return;
 			}
 
 			throw new HttpException('Users are not friends', HttpStatus.NOT_FOUND);
@@ -489,7 +526,7 @@ export class UsersService {
 		const userToBlock: User = await this.usersRepository.findOne({ where: { username: blockUserDto.recipientLogin } });
 
 		if (user && userToBlock) {
-	
+
 			user.blockedUsers.forEach((username: string) => {
 				if (username === userToBlock.username) {
 					throw new HttpException('User already blocked', HttpStatus.BAD_REQUEST);
@@ -506,7 +543,7 @@ export class UsersService {
 
 	async unblockUser(blockUserDto: BlockUserDto, userID: number): Promise<boolean> {
 
-		const user: User = await this.usersRepository.findOne({ where: { id: userID} });
+		const user: User = await this.usersRepository.findOne({ where: { id: userID } });
 		const userToUnblock: User = await this.usersRepository.findOne({ where: { username: blockUserDto.recipientLogin } });
 
 		if (user && userToUnblock) {
@@ -553,7 +590,7 @@ export class UsersService {
 
 	async getUserList(userId: number) {
 		const user = await this.usersRepository.findOne({ where: { id: userId } });
-		
+
 		if (user) {
 			const users = await this.usersRepository.find();
 		
@@ -564,13 +601,13 @@ export class UsersService {
 					.sort((a, b) => a.username.localeCompare(b.username))
 					.map((user_: User) => {
 						let blockStatus = false;
-				
+
 						user.blockedUsers.forEach((blockedFriend: string) => {
 							if (blockedFriend === user_.username) {
-							blockStatus = true;
+								blockStatus = true;
 							}
 						});
-				
+
 						return {
 							id: user_.id,
 							username: user_.username,
@@ -578,17 +615,17 @@ export class UsersService {
 							isBlocked: blockStatus,
 						};
 					});
-			
+
 				return array;
-		
+
 			} else {
 				throw new HttpException('User list is empty', HttpStatus.BAD_REQUEST);
 			}
 		} else {
 			throw new HttpException('User not found', HttpStatus.BAD_REQUEST);
 		}
-	}	  
-		
+	}
+
 
 	async getFriendships(userID: number): Promise<Friendship[]> {
 
@@ -602,15 +639,15 @@ export class UsersService {
 				.where('friendship.initiator = :userId', { userId: user.id })
 				.andWhere('friendship.isAccepted = true')
 				.getMany();
-		  
-	
+
+
 			const acceptedFriends = await this.friendshipRepository
 				.createQueryBuilder('friendship')
 				.innerJoinAndSelect('friendship.initiator', 'initiator')
 				.where('friendship.friend = :userId', { userId: user.id })
 				.andWhere('friendship.isAccepted = true')
 				.getMany();
-	
+
 			let array = [];
 			const friendships = [...initiatedFriends, ...acceptedFriends];
 			friendships.forEach((element: Friendship) => {
@@ -624,10 +661,10 @@ export class UsersService {
 					id: element.friend ? element.friend.id : element.initiator ? element.initiator.id : -1,
 					username: element.friend ? element.friend.username : element.initiator ? element.initiator.username : 'unknown user',
 					isBlocked: blockStatus,
-					onlineStatus:  element.friend ? element.friend.isActive : element.initiator ? element.initiator.isActive : false,
+					onlineStatus: element.friend ? element.friend.isActive : element.initiator ? element.initiator.isActive : false,
 				});
 			});
-	
+
 			return array;
 		}
 
@@ -639,14 +676,14 @@ export class UsersService {
 		const user: User = await this.usersRepository.findOne({ where: { id: userID } });
 
 		if (user) {
-	
+
 			const acceptedFriends = await this.friendshipRepository
 				.createQueryBuilder('friendship')
 				.innerJoinAndSelect('friendship.initiator', 'initiator')
 				.where('friendship.friend = :userId', { userId: user.id })
 				.andWhere('friendship.isAccepted != true')
 				.getMany();
-	
+
 			let array = [];
 			acceptedFriends.forEach((element: Friendship) => {
 				let blockStatus = false;
@@ -659,10 +696,10 @@ export class UsersService {
 					id: element.initiator.id,
 					username: element.initiator.username,
 					isBlocked: blockStatus,
-					onlineStatus:  element.initiator.isActive,
+					onlineStatus: element.initiator.isActive,
 				});
 			});
-		
+
 			return array;
 		}
 
