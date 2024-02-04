@@ -128,7 +128,7 @@ const ProfilsSettingsComponent: React.FC = () => {
 							<input className="input-username" type="text" value={username} onChange={(e) => setUsername(e.target.value)} />
 						</label>
 					</form>
-					<button className="button-modified-username" type="submit">Update Username</button>
+					<button className="button-modified-username" type="submit" onClick= {handleUsernameSubmit}>Update Username</button>
 				</div>
 			</div>
 		</div>
