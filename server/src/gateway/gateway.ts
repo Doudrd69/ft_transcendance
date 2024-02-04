@@ -86,9 +86,15 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		}
 	}
 
-	private async notifyFriendList(userID: number, personnalRoom: string, event: string, status: string) {
-
-		const user = await this.userService.getUserByID(userID);
+	private async notifyFriendList(userID: number, personnalRoom: string, status: string) {
+		
+		let user;
+		if (status === 'online')
+			user = await this.userService.updateUserStatus(userID, true);
+		else if (status === 'offline')
+			user = await this.userService.updateUserStatus(userID, false);
+		else
+			throw new HttpException('Fatal error', HttpStatus.BAD_REQUEST);
 
 		if (user) {
 
@@ -96,8 +102,8 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 			if (friends) {
 
 				friends.forEach((friend: any) => {
-					console.log("Notifying ", friend.username, " on event ", event);
-					this.server.except(personnalRoom).to(friend.username).emit(event, `${personnalRoom} is ${status}`);
+					console.log("-- Notifying connection/deconnction of ", friend.username," --");
+					this.server.except(personnalRoom).to(friend.username).emit('refreshUserOnlineState', `${personnalRoom} is ${status}`);
 				});
 
 				return;
@@ -107,25 +113,24 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		throw new HttpException('User not found', HttpStatus.NOT_FOUND);
 	}
 
-	handleConnection(client: Socket) {
+	async handleConnection(client: Socket) {
 
 		try {
 
-			console.log(`---> GeneralGtw client connected    : ${client.id}`);
+			console.log(`== GeneralGtw ---> USERSOCKET client connected: ${client.id}`);
 			this.connectedUsers[client.id] = client;
 
 			client.on('joinPersonnalRoom', (personnalRoom: string, userID: number) => {
 
 				client.join(personnalRoom);
-				console.log("Client ", client.id, " has joined ", personnalRoom, " room");
+				console.log("== Client ", client.id, " has joined ", personnalRoom, " room");
 				this.userRejoinsRooms(client, userID);
-				this.userService.updateUserStatus(userID, true);
-				this.notifyFriendList(userID, personnalRoom, 'newConnection', 'online');
+				this.notifyFriendList(userID, personnalRoom, 'online');
 				this.server.emit('newUser');
 
 				client.on('disconnect', () => {
 					console.log("===> Disconnecting user ", personnalRoom, " with ID ", userID);
-					this.notifyFriendList(userID, personnalRoom, 'newDeconnection', 'offline');
+					this.notifyFriendList(userID, personnalRoom, 'offline');
 					client.leave(personnalRoom);
 					console.log("Client ", client.id, " has left ", personnalRoom, " room");
 					this.userLeavesRooms(client, userID);
@@ -139,7 +144,7 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	}
 
 	handleDisconnect(client: Socket) {
-		console.log(`===> GeneralGtw client disconnected : ${client.id}`);
+		console.log(`== GeneralGtw ---> USERSOCKET client disconnected: ${client.id}`);
 		delete this.connectedUsers[client.id];
 	}
 
