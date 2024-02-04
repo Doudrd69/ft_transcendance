@@ -106,6 +106,9 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 					this.server.except(personnalRoom).to(friend.username).emit('refreshUserOnlineState', `${personnalRoom} is ${status}`);
 				});
 
+				// Emit to refresh DM list for user who are not friends
+				this.server.except(personnalRoom).emit('refreshUserOnlineState');
+
 				return;
 			}
 		}
