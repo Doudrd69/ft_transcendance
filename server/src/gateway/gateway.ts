@@ -152,41 +152,43 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 
 	@SubscribeMessage('joinRoom')
 	@UseGuards(GatewayGuard)
-	addUserToRoom(@ConnectedSocket() client: Socket, @MessageBody() data: { roomName: string, roomID: string }) {
+	async addUserToRoom(@ConnectedSocket() client: Socket, @MessageBody() data: { roomName: string, roomID: string }) {
 
-		const { roomName, roomID } = data;
-		console.log("==== joinRoom Event ====");
-		console.log("Add ", client.id, " to room : ", roomName + roomID);
-
-		if (roomID)
-			client.join(roomName + roomID);
-		else
-			client.join(roomName);
-
-		const notif = {
-			from: 'Server',
-			content: `${client.id} has joined the conversation!`,
-			post_datetime: new Date(),
-			conversationID: roomID,
+		// verifier que le user peut join? (est dans la conversation)
+		try {
+			const { roomName, roomID } = data;
+			const user = client.handshake.auth.user;
+			console.log("==== joinRoom Event ====");
+			console.log("Add ", "[", client.id,"]", " to room : ", roomName + roomID);
+	
+			if (roomID && await this.chatService.isUserInConversation(user.sub, Number(roomID)))
+				client.join(roomName + roomID);
+			else
+				client.join(roomName);
+	
+			this.server.to(roomName + roomID).emit('refresh_channel');
+	
+			return;
+		} catch (error) {
+			throw error;
 		}
-
-		this.server.to(roomName + roomID).emit('userJoinedRoom', notif);
-
-		return;
 	}
 
 	@SubscribeMessage('leaveRoom')
 	@UseGuards(GatewayGuard)
-	leaveRoom(@ConnectedSocket() client: Socket, @MessageBody() data: { roomName: string, roomID: string }) {
+	async leaveRoom(@ConnectedSocket() client: Socket, @MessageBody() data: { roomName: string, roomID: string }) {
 
 		const { roomName, roomID } = data;
 		console.log("==== leaveRoom Event ====");
-		console.log("Remove ", client.id, " from room : ", roomName + roomID);
+		console.log("Remove ", "[", client.id,"]", " to room : ", roomName + roomID);
 
 		if (roomID)
 			client.leave(roomName + roomID);
 		else
 			client.leave(roomName);
+
+		this.server.to(roomName + roomID).emit('refresh_channel');
+		
 		return;
 	}
 
@@ -229,15 +231,11 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 				return;
 			}
 
-			console.log("-------------------> ", usernameToInvite, user.sub, senderID, senderUsername);
 			this.server.to(usernameToInvite).emit('gameInvite', {
 				senderUserID: user.sub,
 				senderID: senderID,
 				senderUsername: senderUsername,
 			});
-			// senderUserID: number;
-			// senderID: string,
-			// senderUsername: string;
 		} 
 		catch (error) {
 			console.log(`[GAME INVITE ERROR]: ${error.stack}`)
@@ -265,15 +263,23 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		const { dto, conversationName } = data;
 		const user = client.handshake.auth.user;
 
-		// The room's name is not the conversation's name in DB
-		this.server.to(conversationName + dto.conversationID).except(`whoblocked${dto.from}`).emit('onMessage', {
-			from: dto.from,
-			senderId: user.sub,
-			content: dto.content,
-			post_datetime: dto.post_datetime,
-			conversationID: dto.conversationID,
-			conversationName: conversationName,
-		});
+		const verifyUser = await this.chatService.isUserInConversation(user.sub, dto.conversationID);
+		if (verifyUser) {
+
+			// The room's name is not the conversation's name in DB
+			this.server.to(conversationName + dto.conversationID).except(`whoblocked${verifyUser.username}`).emit('onMessage', {
+				from: verifyUser.username,
+				senderId: user.sub,
+				content: dto.content,
+				post_datetime: dto.post_datetime,
+				conversationID: dto.conversationID,
+				conversationName: conversationName,
+			});
+
+			return ;
+		}
+
+		throw new HttpException("User not found", HttpStatus.NOT_FOUND);
 	}
 
 	@SubscribeMessage('addFriend')
