@@ -1,15 +1,11 @@
-import './ReceiveBoxChannel.css';
-import React, { useState, useEffect, useRef, use } from 'react';
-import { Socket } from 'socket.io-client';
+import { useGlobal } from '@/app/GlobalContext';
+import React, { useEffect, useRef, useState } from 'react';
+import { toast } from 'react-toastify';
 import { useChat } from '../../../ChatContext';
 import OptionsUserChannel from '../../addConversation/OptionsUserChannel';
-import { useGlobal } from '@/app/GlobalContext';
-import { toast } from 'react-toastify';
-import { setCurrentUserList } from '../../../ChatContext';
 import TimerComponent from '../../addConversation/Timer';
 import ConfirmationComponent from '../../chatFriendsList/confirmation/Confirmation';
-import { io } from 'socket.io-client';
-
+import './ReceiveBoxChannel.css';
 
 interface Message {
 	from: string;
@@ -30,7 +26,6 @@ interface User {
 	blockList: string[];
 }
 
-
 const ReceiveBoxChannelComponent: React.FC = () => {
 
 	const { chatState, chatDispatch } = useChat();
@@ -40,12 +35,6 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 	const [userList, setUserList] = useState<User[]>();
 	const [ownerUser, setOwnerUser] = useState<User>();
 	const [currentUser, setCurrentUser] = useState<User>();
-	const [gameSocketConnected, setgameSocketConnected] = useState<boolean>(false);
-	const [gameInviteValidation, setgameInviteValidation] = useState<boolean>(false);
-	const [gameInviteCalled, setGameInviteCalled] = useState<boolean>(false);
-
-	const { dispatch } = useGlobal();
-
 
 	const isMyMessage = (message: Message): boolean => {
 		return message.from === sessionStorage.getItem("currentUserLogin");

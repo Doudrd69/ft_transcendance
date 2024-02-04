@@ -154,36 +154,33 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	@UseGuards(GatewayGuard)
 	async addUserToRoom(@ConnectedSocket() client: Socket, @MessageBody() data: { roomName: string, roomID: string }) {
 
-		const { roomName, roomID } = data;
-		const user = client.handshake.auth.user;
-		const verifyUser = await this.userService.getUserByID(user.sub);
-		console.log("==== joinRoom Event ====");
-		console.log("Add ", verifyUser.username, " [", client.id,"]", " to room : ", roomName + roomID);
-
-		if (roomID)
-			client.join(roomName + roomID);
-		else
-			client.join(roomName);
-
-		const notif = {
-			from: 'Server',
-			content: `${client.id} has joined the conversation!`,
-			post_datetime: new Date(),
-			conversationID: roomID,
+		// verifier que le user peut join? (est dans la conversation)
+		try {
+			const { roomName, roomID } = data;
+			const user = client.handshake.auth.user;
+			console.log("==== joinRoom Event ====");
+			console.log("Add ", "[", client.id,"]", " to room : ", roomName + roomID);
+	
+			if (roomID && await this.chatService.isUserInConversation(user.sub, Number(roomID)))
+				client.join(roomName + roomID);
+			else
+				client.join(roomName);
+	
+			this.server.to(roomName + roomID).emit('refresh_channel');
+	
+			return;
+		} catch (error) {
+			throw error;
 		}
-
-		this.server.to(roomName + roomID).emit('refresh_channel');
-
-		return;
 	}
 
 	@SubscribeMessage('leaveRoom')
 	@UseGuards(GatewayGuard)
-	leaveRoom(@ConnectedSocket() client: Socket, @MessageBody() data: { roomName: string, roomID: string }) {
+	async leaveRoom(@ConnectedSocket() client: Socket, @MessageBody() data: { roomName: string, roomID: string }) {
 
 		const { roomName, roomID } = data;
 		console.log("==== leaveRoom Event ====");
-		console.log("Remove ", client.id, " from room : ", roomName + roomID);
+		console.log("Remove ", "[", client.id,"]", " to room : ", roomName + roomID);
 
 		if (roomID)
 			client.leave(roomName + roomID);
@@ -266,7 +263,7 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		const { dto, conversationName } = data;
 		const user = client.handshake.auth.user;
 
-		const verifyUser = await this.userService.getUserByID(user.sub);
+		const verifyUser = await this.chatService.isUserInConversation(user.sub, dto.conversationID);
 		if (verifyUser) {
 
 			// The room's name is not the conversation's name in DB
@@ -278,6 +275,8 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 				conversationID: dto.conversationID,
 				conversationName: conversationName,
 			});
+
+			return ;
 		}
 
 		throw new HttpException("User not found", HttpStatus.NOT_FOUND);

@@ -523,6 +523,16 @@ export class UsersService {
 	/***					GETTERS						***/
 	/**************************************************************/
 
+	async getUsername(userID: number): Promise<string> {
+
+		const user = await this.usersRepository.findOne({ where: { id: userID } });
+		if (user) {
+			return user.username;
+		}
+
+		throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+	}
+
 	async getUserByID(userID: number): Promise<User> {
 		return await this.usersRepository.findOne({ where: { id: userID } });
 	}
@@ -540,43 +550,44 @@ export class UsersService {
 
 		throw new HttpException('User not found', HttpStatus.BAD_REQUEST);
 	}
+
 	async getUserList(userId: number) {
 		const user = await this.usersRepository.findOne({ where: { id: userId } });
 		
 		if (user) {
 			const users = await this.usersRepository.find();
 		
-			if (users && users.length > 0) { // Vérifiez s'il y a des utilisateurs dans la liste
+			if (users && users.length > 0) {
 		
-			const array = users
-				.filter((user_) => user_.id !== userId)
-				.sort((a, b) => a.username.localeCompare(b.username))
-				.map((user_: User) => {
-				let blockStatus = false;
-		
-				user.blockedUsers.forEach((blockedFriend: string) => {
-					if (blockedFriend === user_.username) {
-					blockStatus = true;
-					}
-				});
-		
-				return {
-					id: user_.id,
-					username: user_.username,
-					avatar: user_.avatarURL,
-					isBlocked: blockStatus,
-				};
-				});
-		
-			return array;
+				const array = users
+					.filter((user_) => user_.id !== userId)
+					.sort((a, b) => a.username.localeCompare(b.username))
+					.map((user_: User) => {
+						let blockStatus = false;
+				
+						user.blockedUsers.forEach((blockedFriend: string) => {
+							if (blockedFriend === user_.username) {
+							blockStatus = true;
+							}
+						});
+				
+						return {
+							id: user_.id,
+							username: user_.username,
+							avatar: user_.avatarURL,
+							isBlocked: blockStatus,
+						};
+					});
+			
+				return array;
 		
 			} else {
-			throw new HttpException('User list is empty', HttpStatus.BAD_REQUEST);
+				throw new HttpException('User list is empty', HttpStatus.BAD_REQUEST);
 			}
 		} else {
 			throw new HttpException('User not found', HttpStatus.BAD_REQUEST);
 		}
-		}	  
+	}	  
 		
 
 	async getFriendships(userID: number): Promise<Friendship[]> {
