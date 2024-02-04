@@ -293,8 +293,6 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 			const username = await this.userService.getUsername(user.sub);
 			if (!username)
 				throw new HttpException('User not foud', HttpStatus.NOT_FOUND);
-			console.log("recipient: ", recipientLogin);
-			console.log("initiator: ", username);
 			this.server.to(recipientLogin).except(`whoblocked${username}`).emit('friendRequest', {
 				recipientLogin: recipientLogin,
 				initiatorID: Number(user.sub),

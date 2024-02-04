@@ -348,7 +348,7 @@ export class UsersService {
 
 			if (initiator.id == recipient.id)
 				throw new HttpException('Seriously?', HttpStatus.BAD_REQUEST);
-	
+
 			const friendshipAlreadyExists = await this.friendshipRepository
 				.createQueryBuilder('friendship')
 				.where('(friendship.initiator.id = :initiatorId AND friendship.friend.id = :friendId) OR (friendship.initiator.id = :friendId AND friendship.friend.id = :initiatorId)', {

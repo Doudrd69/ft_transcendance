@@ -71,12 +71,15 @@ const HeaderComponent: React.FC = () => {
 		}
 	}
 
-	const handleFriendshipAccept = async (friendUsername: string) => {
+	const handleFriendshipAccept = async (initiatorID: number, initiatorUsername: string) => {
 	
+		// friendUsername == initiator
 		const friendRequestDto = {
-			recipientLogin: friendUsername,
+			initiatorID: initiatorID,
+			recipientLogin: sessionStorage.getItem("currentUserLogin"),
 		}
 
+	
 		const response = await fetch(`${process.env.API_URL}/users/acceptFriendRequest`, {
 			method: 'POST',
 			headers: {
@@ -92,7 +95,7 @@ const HeaderComponent: React.FC = () => {
 				globalState.userSocket?.emit('friendRequestAccepted', {
 					roomName: data.name,
 					roomID: data.id,
-					initiator:  friendUsername,
+					initiator:  initiatorUsername,
 					recipient: sessionStorage.getItem("currentUserLogin"),
 				});
 				globalState.userSocket?.emit('joinRoom', {
@@ -203,7 +206,7 @@ const HeaderComponent: React.FC = () => {
 					{notify.map((notif: FriendShip) => (
 						<div className='notif' key={notif.id}>
 						<div className='notif-username'>{notif.username} veut être ton ami </div>
-						<button className='notif-accept' onClick={() => {handleFriendshipAccept(notif.username)}}>Accept</button>
+						<button className='notif-accept' onClick={() => {handleFriendshipAccept(notif.id, notif.username)}}>Accept</button>
 						<button className='notif-decline' onClick={() => {handleFriendshipDeny(notif.id, notif.username)}}>Decline</button>
 						</div>
 					))}

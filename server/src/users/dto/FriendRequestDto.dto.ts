@@ -12,7 +12,6 @@ import {
 
 export class FriendRequestDto {
 
-	// PRENDRE UN ID
 	@IsOptional()
 	@IsNotEmpty()
 	@IsPositive()
