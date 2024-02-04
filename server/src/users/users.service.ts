@@ -233,7 +233,6 @@ export class UsersService {
 				user.username = updateUsernameDto.newUsername;
 				await this.usersRepository.save(user);
 				return { newUsername: user.username };
-	
 			}
 			
 			throw new HttpException('Username is already used', HttpStatus.BAD_REQUEST);

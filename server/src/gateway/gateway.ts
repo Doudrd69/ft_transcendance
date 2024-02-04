@@ -152,11 +152,13 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 
 	@SubscribeMessage('joinRoom')
 	@UseGuards(GatewayGuard)
-	addUserToRoom(@ConnectedSocket() client: Socket, @MessageBody() data: { roomName: string, roomID: string }) {
+	async addUserToRoom(@ConnectedSocket() client: Socket, @MessageBody() data: { roomName: string, roomID: string }) {
 
 		const { roomName, roomID } = data;
+		const user = client.handshake.auth.user;
+		const verifyUser = await this.userService.getUserByID(user.sub);
 		console.log("==== joinRoom Event ====");
-		console.log("Add ", client.id, " to room : ", roomName + roomID);
+		console.log("Add ", verifyUser.username, " [", client.id,"]", " to room : ", roomName + roomID);
 
 		if (roomID)
 			client.join(roomName + roomID);
@@ -170,7 +172,7 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 			conversationID: roomID,
 		}
 
-		this.server.to(roomName + roomID).emit('userJoinedRoom', notif);
+		this.server.to(roomName + roomID).emit('refresh_channel');
 
 		return;
 	}
@@ -187,6 +189,9 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 			client.leave(roomName + roomID);
 		else
 			client.leave(roomName);
+
+		this.server.to(roomName + roomID).emit('refresh_channel');
+		
 		return;
 	}
 
@@ -229,15 +234,11 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 				return;
 			}
 
-			console.log("-------------------> ", usernameToInvite, user.sub, senderID, senderUsername);
 			this.server.to(usernameToInvite).emit('gameInvite', {
 				senderUserID: user.sub,
 				senderID: senderID,
 				senderUsername: senderUsername,
 			});
-			// senderUserID: number;
-			// senderID: string,
-			// senderUsername: string;
 		} 
 		catch (error) {
 			console.log(`[GAME INVITE ERROR]: ${error.stack}`)
@@ -265,15 +266,21 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		const { dto, conversationName } = data;
 		const user = client.handshake.auth.user;
 
-		// The room's name is not the conversation's name in DB
-		this.server.to(conversationName + dto.conversationID).except(`whoblocked${dto.from}`).emit('onMessage', {
-			from: dto.from,
-			senderId: user.sub,
-			content: dto.content,
-			post_datetime: dto.post_datetime,
-			conversationID: dto.conversationID,
-			conversationName: conversationName,
-		});
+		const verifyUser = await this.userService.getUserByID(user.sub);
+		if (verifyUser) {
+
+			// The room's name is not the conversation's name in DB
+			this.server.to(conversationName + dto.conversationID).except(`whoblocked${verifyUser.username}`).emit('onMessage', {
+				from: verifyUser.username,
+				senderId: user.sub,
+				content: dto.content,
+				post_datetime: dto.post_datetime,
+				conversationID: dto.conversationID,
+				conversationName: conversationName,
+			});
+		}
+
+		throw new HttpException("User not found", HttpStatus.NOT_FOUND);
 	}
 
 	@SubscribeMessage('addFriend')

@@ -127,10 +127,6 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 
 	useEffect(() => {
 
-		globalState.userSocket?.on('userJoinedRoom', (notification: Message) => {
-			loadUserList();
-		});
-
 		globalState.userSocket?.on('userIsBan', () => {
 			chatDispatch({ type: 'DISABLE', payload: 'showChannel' });
 			chatDispatch({ type: 'ACTIVATE', payload: 'showChannelList' });
@@ -162,7 +158,6 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 		});
 
 		return () => {
-			globalState.userSocket?.off('userJoinedRoom');
 			globalState.userSocket?.off('onMessage');
 			globalState.userSocket?.off('refresh_channel');
 			globalState.userSocket?.off('kickUser');

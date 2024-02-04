@@ -1171,7 +1171,7 @@ export class ChatService {
 				throw new HttpException(`user is ban`, HttpStatus.BAD_REQUEST);
 	
 			const newMessage = new Message();
-			newMessage.from = messageDto.from;
+			newMessage.from = sender.username;
 			newMessage.senderId = sender.id;
 			newMessage.content = messageDto.content;
 			newMessage.post_datetime = messageDto.post_datetime;

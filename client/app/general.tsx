@@ -283,9 +283,6 @@ const GeneralComponent = () => {
 			globalState.userSocket?.emit('joinRoom', { roomName: roomName, roomID: roomID });
 		})
 
-		globalState.userSocket?.on('userJoinedRoom', (notification: string) => {
-		});
-
 		globalState.userSocket?.on('userIsBan', (data: { roomName: string, roomID: string }) => {
 			const { roomName, roomID } = data;
 			if (roomName && roomID) {
@@ -329,7 +326,6 @@ const GeneralComponent = () => {
 			globalState.userSocket?.off('refreshUserOnlineState');
 			globalState.userSocket?.off('friendRequest');
 			globalState.userSocket?.off('friendRequestAcceptedNotif');
-			globalState.userSocket?.off('userJoinedRoom');
 			globalState.userSocket?.off('userIsUnban');
 			globalState.userSocket?.off('userIsBan');
 			globalState.userSocket?.off('kickUser');
@@ -408,19 +404,9 @@ const GeneralComponent = () => {
 		globalState.userSocket?.on('disconnect', () => {
 		})
 
-		globalState.userSocket?.on('newConnection', (notif: string) => {
-			toast(notif);
-		})
-
-		globalState.userSocket?.on('newDeconnection', (notif: string) => {
-			toast(notif);
-		})
-
 		return () => {
 			globalState.userSocket?.off('connect');
 			globalState.userSocket?.off('disconnect');
-			globalState.userSocket?.off('newConnection');
-			globalState.userSocket?.off('newDeconnection');
 		}
 
 	}, [globalState?.userSocket])

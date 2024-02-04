@@ -69,6 +69,19 @@ export class AuthService {
 		}
 	}
 
+	async generateJWT(user: User) {
+
+		const payload = {
+			sub: user.id,
+			login: user.login,
+			username: user.username,
+			tfa_enabled: user.TFA_isEnabled,
+		};
+
+		const accessToken = await this.jwtService.signAsync(payload);
+		return { access_token: accessToken };
+	}
+
 	async getAccessToken(code: any) {
 
 		const data = new URLSearchParams();
@@ -90,24 +103,10 @@ export class AuthService {
 				const responseContent = await response.json();
 
 				const userData = await this.getUserInfo(responseContent);
-				if (userData) {
-
-					// payload for JWT
-					const payload = {
-						sub: userData.id,
-						login: userData.login,
-						username: userData.username,
-						tfa_enabled: userData.TFA_isEnabled,
-						pp: userData.officialProfileImage,
-					};
-
-					const accessToken = await this.jwtService.signAsync(payload);
-					return { access_token: accessToken };
-				}
+				if (userData)
+					return await this.generateJWT(userData);
 				else 
-				{
 					throw "Cannot retrieve user information";
-				}
 			}
 			else {
 				throw (`Fatal error: 42 API request failed, ${response.status}, ${response.statusText}`);
@@ -117,7 +116,6 @@ export class AuthService {
 			throw new HttpException(error, HttpStatus.BAD_REQUEST);
 		}
 	}
-
 
 	// async login(username: string, password: any) {
 	// 	const user = await this.usersService.findOne(username);
