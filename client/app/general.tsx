@@ -339,6 +339,92 @@ const GeneralComponent = () => {
 
 	}, [globalState?.userSocket]);
 
+	// GAME INVITE
+	useEffect(() => {
+
+		console.log("useEfects triggerd")
+
+		if (typeof globalState.gameSocket !== "undefined") {
+
+			console.log("Enter events in use-effect");
+
+			globalState.gameSocket.on('acceptInvitation', () => {
+				console.log("VALIDATION");
+				globalState.gameInviteValidation = true;
+				globalState.gameSocketConnected = false;
+			});
+			globalState.userSocket?.on('deniedInvitation', () => {
+				console.log("DENIED :", globalState.gameSocket?.id)
+				globalState.gameSocketConnected = false;
+				globalState.gameSocket?.emit('gameInviteRejected')
+				// enlever le userGameSockets
+				globalState.gameSocket?.disconnect();
+
+			});
+			globalState.userSocket?.on('userToInviteAlreadyInGame', () => {
+				globalState.gameSocketConnected = false;
+				// enlever le userGameSockets
+				globalState.gameSocket?.emit('gameInviteRejected')
+				globalState.gameSocket?.disconnect();
+
+			});
+			globalState.userSocket?.on('senderInGame', () => {
+				globalState.gameSocketConnected = false;
+			})
+			globalState.userSocket?.on('closedInvitation', () => {
+				console.log("CLOSED :", globalState.gameSocket?.id)
+				if (globalState.gameInviteValidation == false) {
+					// enlever le userGameSockets
+					console.log("CLOSED DENY :", globalState.gameSocket?.id)
+					globalState.gameSocketConnected = false;
+					globalState.gameSocket?.emit('gameInviteRejected')
+					globalState.gameSocket?.disconnect();
+				}
+				globalState.gameSocketConnected = false;
+			});
+		}
+		else {
+			console.log(`gameSocket not connected, can't retrieve .on`)
+		}
+
+		return () => {
+			globalState.gameSocket?.off('acceptInvitation');
+			globalState.userSocket?.off('closedInvitation');
+			globalState.userSocket?.off('deniedInvitation');
+			globalState.gameSocket?.off('disconnect');
+		};
+
+	}, [globalState?.gameSocket, globalState.gameInviteValidation, globalState?.userSocket, globalState.gameSocketConnected]);
+
+	// Connection - Deconnection useEffect
+	useEffect(() => {
+
+		// Works on both connection and reconnection
+		globalState.userSocket?.on('connect', () => {
+			const personnalRoom = sessionStorage.getItem("currentUserLogin");
+			globalState.userSocket?.emit('joinPersonnalRoom', personnalRoom, sessionStorage.getItem("currentUserID"));
+		})
+
+		globalState.userSocket?.on('disconnect', () => {
+		})
+
+		globalState.userSocket?.on('newConnection', (notif: string) => {
+			toast(notif);
+		})
+
+		globalState.userSocket?.on('newDeconnection', (notif: string) => {
+			toast(notif);
+		})
+
+		return () => {
+			globalState.userSocket?.off('connect');
+			globalState.userSocket?.off('disconnect');
+			globalState.userSocket?.off('newConnection');
+			globalState.userSocket?.off('newDeconnection');
+		}
+
+	}, [globalState?.userSocket])
+
 	// Game socket handler
 	useEffect(() => {
 

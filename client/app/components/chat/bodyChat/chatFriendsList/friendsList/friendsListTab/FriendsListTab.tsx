@@ -107,7 +107,7 @@ const FriendsListTabComponent: React.FC<FriendsListTabComponentProps> = ({ user,
 	const handleGameInvite = () => {
 		globalState.gameTargetId = user.id;
 		globalState.targetUsername = user.username;
-		globalState.gameInvite = !globalState.gameInvite;
+		globalState.gameInvite = true;
 	}
 
 	const removeFriends = async () => {
@@ -190,58 +190,6 @@ const FriendsListTabComponent: React.FC<FriendsListTabComponentProps> = ({ user,
 			console.log(error);
 		}
 	};
-
-	useEffect(() => {
-		console.log("UseEffect gameSocketConnected :", gameSocketConnected)
-	}, [gameSocketConnected, gameInviteValidation]);
-
-
-	useEffect(() => {
-
-		if (typeof globalState.gameSocket !== "undefined") {
-			globalState.gameSocket.on('acceptInvitation', () => {
-				console.log("VALIDATION");
-				setgameInviteValidation(true);
-				setgameSocketConnected(false);
-			});
-			globalState.userSocket?.on('deniedInvitation', () => {
-				console.log("DENIED :", globalState.gameSocket?.id)
-				setgameSocketConnected(false);
-				globalState.gameSocket?.emit('gameInviteRejected')
-				// enlever le userGameSockets
-				globalState.gameSocket?.disconnect();
-
-			});
-			globalState.userSocket?.on('userToInviteAlreadyInGame', () => {
-				setgameSocketConnected(false);
-				// enlever le userGameSockets
-				globalState.gameSocket?.emit('gameInviteRejected')
-				globalState.gameSocket?.disconnect();
-
-			});
-			globalState.userSocket?.on('senderInGame', () => {
-				setgameSocketConnected(false);
-			})
-			globalState.userSocket?.on('closedInvitation', () => {
-				console.log("CLOSED :", globalState.gameSocket?.id)
-				if (gameInviteValidation == false) {
-					// enlever le userGameSockets
-					console.log("CLOSED DENY :", globalState.gameSocket?.id)
-					setgameSocketConnected(false);
-					globalState.gameSocket?.emit('gameInviteRejected')
-					globalState.gameSocket?.disconnect();
-				}
-				setgameSocketConnected(false);
-			});
-		}
-
-		return () => {
-			globalState.gameSocket?.off('acceptInvitation');
-			globalState.userSocket?.off('closedInvitation');
-			globalState.userSocket?.off('deniedInvitation');
-			globalState.gameSocket?.off('disconnect');
-		};
-	}, [globalState?.gameSocket, gameInviteValidation, globalState?.userSocket, gameSocketConnected]);
 
 	return (
 		<>

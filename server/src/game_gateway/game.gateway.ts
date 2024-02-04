@@ -190,20 +190,20 @@ export class GameGateway {
 
     @SubscribeMessage('linkSocketWithUser')
     @UseGuards(GatewayGuard)
-    async handleLinkSocketWithUser(@ConnectedSocket() client: Socket, @MessageBody() data: { playerLogin: string, userId: number }) {
+    async handleLinkSocketWithUser(@ConnectedSocket() client: Socket, @MessageBody() data: { playerLogin: string, userId: number, gameMode: string }) {
         try {
             console.log(`[linkSocketWithUser]`);
-            if (this.GameService.userHasAlreadyGameSockets(data.userId)) {
+            if (this.GameService.userHasAlreadyGameSockets(data.userId, client.id)) {
                 this.server.to(client.id).emit('gameInProgress');
                 console.log(`Game or Matchmaking In Progress for this User`);
                 return;
             }
-            this.GameService.createNewGameSockets(data.userId);
+            // this.GameService.createNewGameSockets(data.userId);
             this.GameService.addGameSocket(client.id, data.userId);
             await this.GameService.linkSocketIDWithUser(client.id, data.userId);
             // creating a personnal room so we can emit to the user
             client.join(data.playerLogin);
-            this.server.to(client.id).emit('gameNotInProgress');
+            this.server.to(client.id).emit('gameNotInProgress', {gameMode: data.gameMode});
         }
         catch (error) {
             await this.handleException(error, client)
