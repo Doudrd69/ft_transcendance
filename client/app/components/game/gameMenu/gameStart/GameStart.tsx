@@ -22,7 +22,7 @@ const MatchMaking = () => {
             dispatchGame({ type: 'TOGGLE', payload: 'showGameMenu'});
             state.showGameMenu = true;
             globalState.gameSocket?.disconnect();
-
+		});
 			
 		globalState.gameSocket?.on('setgame', () => {
 			dispatchGame({
