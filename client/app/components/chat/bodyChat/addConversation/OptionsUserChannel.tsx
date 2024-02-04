@@ -572,37 +572,37 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 					{user.id !== Number(sessionStorage.getItem("currentUserID")) && (
 						<div>
 							<img className='option-image' src="ping-pong.png" onClick={() => handleTabClick(user)}/>
-							<img className="option-image" src="chat.png" onClick={handleDms}/>
+							<img className="option-image" src="bulle.png" onClick={handleDms}/>
 							{me.isAdmin && !user.isOwner &&
 									<>
 									{admin ? (
-										<img className="option-image" src="crown.png" onClick={demoteAdminUser}/>
+										<img className="option-image" src="couronne.png" onClick={demoteAdminUser}/>
 									) : (
-										<img className="option-image-opacity" src="crown.png" onClick={promoteAdminUser}/>
+										<img className="option-image-opacity" src="couronne.png" onClick={promoteAdminUser}/>
 									)}
 									{mute ? (
-										<img className="option-image" src="volume-mute.png" onClick={unmuteUser}/>
+										<img className="option-image" src="bouton-de-sourdine3.png" onClick={unmuteUser}/>
 									) : (
-											<img className="option-image" src="unmute.png" onClick={muteUser}/>
+											<img className="option-image-opacity" src="bouton-de-sourdine3.png" onClick={muteUser}/>
 									)}
 									{ban ? (
-										<img className="option-image" src="interdit.png" onClick={unbanUser}/>
+										<img className="option-image" src="interdire.png" onClick={unbanUser}/>
 										) : (
-										<img className="option-image-opacity" src="interdit.png" onClick={banUser}/>
+										<img className="option-image-opacity" src="interdire.png" onClick={banUser}/>
 										)}
 									</>
 							}
 							{block ? (
-								<img className="option-image" src="block.png" onClick={unblockUser}/>
+								<img className="option-image" src="bloquer-un-utilisateur1.png" onClick={unblockUser}/>
 								) : (
-									<img className="option-image-opacity" src="block.png" onClick={blockUser}/>
+									<img className="option-image-opacity" src="bloquer-un-utilisateur1.png" onClick={blockUser}/>
 								)}
 						</div>
 					)}
 					{user.id !== me.id && !user.isOwner &&
-						<img className="option-image" src="logoutred.png" onClick={handleKickChannel}/>}
+						<img className="option-image" src="se-deconnecter1.png" onClick={handleKickChannel}/>}
 					{user.id === me.id  &&
-						<img className="option-image" src="logoutred.png" onClick={handleLeaveChannel}/>
+						<img className="option-image" src="se-deconnecter1.png" onClick={handleLeaveChannel}/>
 					}
 				</div>
 			</div>
