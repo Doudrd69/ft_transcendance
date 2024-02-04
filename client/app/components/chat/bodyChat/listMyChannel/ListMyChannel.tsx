@@ -234,31 +234,36 @@ const ListMyChannelComponent: React.FC<ListMyChannelComponentProps> = ({ user, f
 			<div className='juste-pour-englober'>
 				<p className="title-list-channel-component">{title}</p>
 				<div className="bloc-add-channel-list">
-					{conversations.map((conversation, index) => (
+					{conversations.length === 0 ? (
+						<div> aucun channel existant</div>
+					) : (
+						conversations.map((conversation, index) => (
 						conversation.is_channel && (
 							<button
-								key={index}
-								className="button-add-channel-list"
-								onClick={() => {
-									if (conversation.isProtected && isAdd) {
-										chatDispatch({ type: 'SET_CURRENT_CONVERSATION_ID', payload: conversation.id });
-										chatDispatch({ type: 'SET_CURRENT_CONVERSATION', payload: conversation.name });
-										chatDispatch({ type: 'SET_CURRENT_FRIEND', payload: userLogin });
-										chatDispatch({ type: 'ACTIVATE', payload: 'showPassword' });
-										chatDispatch({ type: 'DISABLE', payload: 'showAddChannel' });
-										chatDispatch({ type: 'DISABLE', payload: 'showAddCreateChannel' });
-									}
-									else
-										{!isAdd ? 
-											(addUserToConversation(Number(conversation.id), friendID))
-											:
-											(addMyselfToConversation(Number(conversation.id)))};
-								}}>
-								{conversation.isProtected && <img className="icon-password-channel" src='./password.png' alt="private" />}
-								<span>{`${conversation.name}#${conversation.id}`}</span>
+							key={index}
+							className="button-add-channel-list"
+							onClick={() => {
+								if (conversation.isProtected && isAdd) {
+								chatDispatch({ type: 'SET_CURRENT_CONVERSATION_ID', payload: conversation.id });
+								chatDispatch({ type: 'SET_CURRENT_CONVERSATION', payload: conversation.name });
+								chatDispatch({ type: 'SET_CURRENT_FRIEND', payload: userLogin });
+								chatDispatch({ type: 'ACTIVATE', payload: 'showPassword' });
+								chatDispatch({ type: 'DISABLE', payload: 'showAddChannel' });
+								chatDispatch({ type: 'DISABLE', payload: 'showAddCreateChannel' });
+								} else {
+								!isAdd
+									? addUserToConversation(Number(conversation.id), friendID)
+									: addMyselfToConversation(Number(conversation.id));
+								}
+							}}
+							>
+							{conversation.isProtected && <img className="icon-password-channel" src='./password.png' alt="private" />}
+							<span>{`${conversation.name}#${conversation.id}`}</span>
 							</button>
-						)))}
-				</div>
+						)
+						))
+					)}
+					</div>
 			</div>
 		</div>
 	);

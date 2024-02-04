@@ -1,0 +1,3426 @@
+/*!**********************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[5].oneOf[12].use[2]!./node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[5].oneOf[12].use[3]!./node_modules/react-toastify/dist/ReactToastify.css ***!
+  \**********************************************************************************************************************************************************************************************************************************************************************************************/
+:root {
+  --toastify-color-light: #fff;
+  --toastify-color-dark: #121212;
+  --toastify-color-info: #3498db;
+  --toastify-color-success: #07bc0c;
+  --toastify-color-warning: #f1c40f;
+  --toastify-color-error: #e74c3c;
+  --toastify-color-transparent: rgba(255, 255, 255, 0.7);
+  --toastify-icon-color-info: var(--toastify-color-info);
+  --toastify-icon-color-success: var(--toastify-color-success);
+  --toastify-icon-color-warning: var(--toastify-color-warning);
+  --toastify-icon-color-error: var(--toastify-color-error);
+  --toastify-toast-width: 320px;
+  --toastify-toast-offset: 16px;
+  --toastify-toast-top: max(var(--toastify-toast-offset), env(safe-area-inset-top));
+  --toastify-toast-right: max(var(--toastify-toast-offset), env(safe-area-inset-right));
+  --toastify-toast-left: max(var(--toastify-toast-offset), env(safe-area-inset-left));
+  --toastify-toast-bottom: max(var(--toastify-toast-offset), env(safe-area-inset-bottom));
+  --toastify-toast-background: #fff;
+  --toastify-toast-min-height: 64px;
+  --toastify-toast-max-height: 800px;
+  --toastify-toast-bd-radius: 6px;
+  --toastify-font-family: sans-serif;
+  --toastify-z-index: 9999;
+  --toastify-text-color-light: #757575;
+  --toastify-text-color-dark: #fff;
+  --toastify-text-color-info: #fff;
+  --toastify-text-color-success: #fff;
+  --toastify-text-color-warning: #fff;
+  --toastify-text-color-error: #fff;
+  --toastify-spinner-color: #616161;
+  --toastify-spinner-color-empty-area: #e0e0e0;
+  --toastify-color-progress-light: linear-gradient(
+    to right,
+    #4cd964,
+    #5ac8fa,
+    #007aff,
+    #34aadc,
+    #5856d6,
+    #ff2d55
+  );
+  --toastify-color-progress-dark: #bb86fc;
+  --toastify-color-progress-info: var(--toastify-color-info);
+  --toastify-color-progress-success: var(--toastify-color-success);
+  --toastify-color-progress-warning: var(--toastify-color-warning);
+  --toastify-color-progress-error: var(--toastify-color-error);
+  --toastify-color-progress-bgo: 0.2;
+}
+
+.Toastify__toast-container {
+  z-index: var(--toastify-z-index);
+  -webkit-transform: translate3d(0, 0, var(--toastify-z-index));
+  position: fixed;
+  padding: 4px;
+  width: var(--toastify-toast-width);
+  box-sizing: border-box;
+  color: #fff;
+}
+.Toastify__toast-container--top-left {
+  top: var(--toastify-toast-top);
+  left: var(--toastify-toast-left);
+}
+.Toastify__toast-container--top-center {
+  top: var(--toastify-toast-top);
+  left: 50%;
+  transform: translateX(-50%);
+}
+.Toastify__toast-container--top-right {
+  top: var(--toastify-toast-top);
+  right: var(--toastify-toast-right);
+}
+.Toastify__toast-container--bottom-left {
+  bottom: var(--toastify-toast-bottom);
+  left: var(--toastify-toast-left);
+}
+.Toastify__toast-container--bottom-center {
+  bottom: var(--toastify-toast-bottom);
+  left: 50%;
+  transform: translateX(-50%);
+}
+.Toastify__toast-container--bottom-right {
+  bottom: var(--toastify-toast-bottom);
+  right: var(--toastify-toast-right);
+}
+
+@media only screen and (max-width : 480px) {
+  .Toastify__toast-container {
+    width: 100vw;
+    padding: 0;
+    left: env(safe-area-inset-left);
+    margin: 0;
+  }
+  .Toastify__toast-container--top-left, .Toastify__toast-container--top-center, .Toastify__toast-container--top-right {
+    top: env(safe-area-inset-top);
+    transform: translateX(0);
+  }
+  .Toastify__toast-container--bottom-left, .Toastify__toast-container--bottom-center, .Toastify__toast-container--bottom-right {
+    bottom: env(safe-area-inset-bottom);
+    transform: translateX(0);
+  }
+  .Toastify__toast-container--rtl {
+    right: env(safe-area-inset-right);
+    left: initial;
+  }
+}
+.Toastify__toast {
+  --y: 0;
+  position: relative;
+  touch-action: none;
+  min-height: var(--toastify-toast-min-height);
+  box-sizing: border-box;
+  margin-bottom: 1rem;
+  padding: 8px;
+  border-radius: var(--toastify-toast-bd-radius);
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: space-between;
+  max-height: var(--toastify-toast-max-height);
+  font-family: var(--toastify-font-family);
+  cursor: default;
+  direction: ltr;
+  /* webkit only issue #791 */
+  z-index: 0;
+  overflow: hidden;
+}
+.Toastify__toast--stacked {
+  position: absolute;
+  width: 100%;
+  transform: translate3d(0, var(--y), 0) scale(var(--s));
+  transition: transform 0.3s;
+}
+.Toastify__toast--stacked[data-collapsed] .Toastify__toast-body, .Toastify__toast--stacked[data-collapsed] .Toastify__close-button {
+  transition: opacity 0.1s;
+}
+.Toastify__toast--stacked[data-collapsed=false] {
+  overflow: visible;
+}
+.Toastify__toast--stacked[data-collapsed=true]:not(:last-child) > * {
+  opacity: 0;
+}
+.Toastify__toast--stacked:after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: calc(var(--g) * 1px);
+  bottom: 100%;
+}
+.Toastify__toast--stacked[data-pos=top] {
+  top: 0;
+}
+.Toastify__toast--stacked[data-pos=bot] {
+  bottom: 0;
+}
+.Toastify__toast--stacked[data-pos=bot].Toastify__toast--stacked:before {
+  transform-origin: top;
+}
+.Toastify__toast--stacked[data-pos=top].Toastify__toast--stacked:before {
+  transform-origin: bottom;
+}
+.Toastify__toast--stacked:before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 100%;
+  transform: scaleY(3);
+  z-index: -1;
+}
+.Toastify__toast--rtl {
+  direction: rtl;
+}
+.Toastify__toast--close-on-click {
+  cursor: pointer;
+}
+.Toastify__toast-body {
+  margin: auto 0;
+  flex: 1 1 auto;
+  padding: 6px;
+  display: flex;
+  align-items: center;
+}
+.Toastify__toast-body > div:last-child {
+  word-break: break-word;
+  flex: 1 1;
+}
+.Toastify__toast-icon {
+  -webkit-margin-end: 10px;
+          margin-inline-end: 10px;
+  width: 20px;
+  flex-shrink: 0;
+  display: flex;
+}
+
+.Toastify--animate {
+  animation-fill-mode: both;
+  animation-duration: 0.5s;
+}
+
+.Toastify--animate-icon {
+  animation-fill-mode: both;
+  animation-duration: 0.3s;
+}
+
+@media only screen and (max-width : 480px) {
+  .Toastify__toast {
+    margin-bottom: 0;
+    border-radius: 0;
+  }
+}
+.Toastify__toast-theme--dark {
+  background: var(--toastify-color-dark);
+  color: var(--toastify-text-color-dark);
+}
+.Toastify__toast-theme--light {
+  background: var(--toastify-color-light);
+  color: var(--toastify-text-color-light);
+}
+.Toastify__toast-theme--colored.Toastify__toast--default {
+  background: var(--toastify-color-light);
+  color: var(--toastify-text-color-light);
+}
+.Toastify__toast-theme--colored.Toastify__toast--info {
+  color: var(--toastify-text-color-info);
+  background: var(--toastify-color-info);
+}
+.Toastify__toast-theme--colored.Toastify__toast--success {
+  color: var(--toastify-text-color-success);
+  background: var(--toastify-color-success);
+}
+.Toastify__toast-theme--colored.Toastify__toast--warning {
+  color: var(--toastify-text-color-warning);
+  background: var(--toastify-color-warning);
+}
+.Toastify__toast-theme--colored.Toastify__toast--error {
+  color: var(--toastify-text-color-error);
+  background: var(--toastify-color-error);
+}
+
+.Toastify__progress-bar-theme--light {
+  background: var(--toastify-color-progress-light);
+}
+.Toastify__progress-bar-theme--dark {
+  background: var(--toastify-color-progress-dark);
+}
+.Toastify__progress-bar--info {
+  background: var(--toastify-color-progress-info);
+}
+.Toastify__progress-bar--success {
+  background: var(--toastify-color-progress-success);
+}
+.Toastify__progress-bar--warning {
+  background: var(--toastify-color-progress-warning);
+}
+.Toastify__progress-bar--error {
+  background: var(--toastify-color-progress-error);
+}
+.Toastify__progress-bar-theme--colored.Toastify__progress-bar--info, .Toastify__progress-bar-theme--colored.Toastify__progress-bar--success, .Toastify__progress-bar-theme--colored.Toastify__progress-bar--warning, .Toastify__progress-bar-theme--colored.Toastify__progress-bar--error {
+  background: var(--toastify-color-transparent);
+}
+
+.Toastify__close-button {
+  color: #fff;
+  background: transparent;
+  outline: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: 0.3s ease;
+  align-self: flex-start;
+  z-index: 1;
+}
+.Toastify__close-button--light {
+  color: #000;
+  opacity: 0.3;
+}
+.Toastify__close-button > svg {
+  fill: currentColor;
+  height: 16px;
+  width: 14px;
+}
+.Toastify__close-button:hover, .Toastify__close-button:focus {
+  opacity: 1;
+}
+
+@keyframes Toastify__trackProgress {
+  0% {
+    transform: scaleX(1);
+  }
+  100% {
+    transform: scaleX(0);
+  }
+}
+.Toastify__progress-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: var(--toastify-z-index);
+  opacity: 0.7;
+  transform-origin: left;
+  border-bottom-left-radius: var(--toastify-toast-bd-radius);
+}
+.Toastify__progress-bar--animated {
+  animation: Toastify__trackProgress linear 1 forwards;
+}
+.Toastify__progress-bar--controlled {
+  transition: transform 0.2s;
+}
+.Toastify__progress-bar--rtl {
+  right: 0;
+  left: initial;
+  transform-origin: right;
+  border-bottom-left-radius: initial;
+  border-bottom-right-radius: var(--toastify-toast-bd-radius);
+}
+.Toastify__progress-bar--wrp {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 5px;
+  border-bottom-left-radius: var(--toastify-toast-bd-radius);
+}
+.Toastify__progress-bar--wrp[data-hidden=true] {
+  opacity: 0;
+}
+.Toastify__progress-bar--bg {
+  opacity: var(--toastify-color-progress-bgo);
+  width: 100%;
+  height: 100%;
+}
+
+.Toastify__spinner {
+  width: 20px;
+  height: 20px;
+  box-sizing: border-box;
+  border: 2px solid;
+  border-radius: 100%;
+  border-color: var(--toastify-spinner-color-empty-area);
+  border-right-color: var(--toastify-spinner-color);
+  animation: Toastify__spin 0.65s linear infinite;
+}
+
+@keyframes Toastify__bounceInRight {
+  from, 60%, 75%, 90%, to {
+    animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
+  }
+  from {
+    opacity: 0;
+    transform: translate3d(3000px, 0, 0);
+  }
+  60% {
+    opacity: 1;
+    transform: translate3d(-25px, 0, 0);
+  }
+  75% {
+    transform: translate3d(10px, 0, 0);
+  }
+  90% {
+    transform: translate3d(-5px, 0, 0);
+  }
+  to {
+    transform: none;
+  }
+}
+@keyframes Toastify__bounceOutRight {
+  20% {
+    opacity: 1;
+    transform: translate3d(-20px, var(--y), 0);
+  }
+  to {
+    opacity: 0;
+    transform: translate3d(2000px, var(--y), 0);
+  }
+}
+@keyframes Toastify__bounceInLeft {
+  from, 60%, 75%, 90%, to {
+    animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
+  }
+  0% {
+    opacity: 0;
+    transform: translate3d(-3000px, 0, 0);
+  }
+  60% {
+    opacity: 1;
+    transform: translate3d(25px, 0, 0);
+  }
+  75% {
+    transform: translate3d(-10px, 0, 0);
+  }
+  90% {
+    transform: translate3d(5px, 0, 0);
+  }
+  to {
+    transform: none;
+  }
+}
+@keyframes Toastify__bounceOutLeft {
+  20% {
+    opacity: 1;
+    transform: translate3d(20px, var(--y), 0);
+  }
+  to {
+    opacity: 0;
+    transform: translate3d(-2000px, var(--y), 0);
+  }
+}
+@keyframes Toastify__bounceInUp {
+  from, 60%, 75%, 90%, to {
+    animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
+  }
+  from {
+    opacity: 0;
+    transform: translate3d(0, 3000px, 0);
+  }
+  60% {
+    opacity: 1;
+    transform: translate3d(0, -20px, 0);
+  }
+  75% {
+    transform: translate3d(0, 10px, 0);
+  }
+  90% {
+    transform: translate3d(0, -5px, 0);
+  }
+  to {
+    transform: translate3d(0, 0, 0);
+  }
+}
+@keyframes Toastify__bounceOutUp {
+  20% {
+    transform: translate3d(0, calc(var(--y) - 10px), 0);
+  }
+  40%, 45% {
+    opacity: 1;
+    transform: translate3d(0, calc(var(--y) + 20px), 0);
+  }
+  to {
+    opacity: 0;
+    transform: translate3d(0, -2000px, 0);
+  }
+}
+@keyframes Toastify__bounceInDown {
+  from, 60%, 75%, 90%, to {
+    animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
+  }
+  0% {
+    opacity: 0;
+    transform: translate3d(0, -3000px, 0);
+  }
+  60% {
+    opacity: 1;
+    transform: translate3d(0, 25px, 0);
+  }
+  75% {
+    transform: translate3d(0, -10px, 0);
+  }
+  90% {
+    transform: translate3d(0, 5px, 0);
+  }
+  to {
+    transform: none;
+  }
+}
+@keyframes Toastify__bounceOutDown {
+  20% {
+    transform: translate3d(0, calc(var(--y) - 10px), 0);
+  }
+  40%, 45% {
+    opacity: 1;
+    transform: translate3d(0, calc(var(--y) + 20px), 0);
+  }
+  to {
+    opacity: 0;
+    transform: translate3d(0, 2000px, 0);
+  }
+}
+.Toastify__bounce-enter--top-left, .Toastify__bounce-enter--bottom-left {
+  animation-name: Toastify__bounceInLeft;
+}
+.Toastify__bounce-enter--top-right, .Toastify__bounce-enter--bottom-right {
+  animation-name: Toastify__bounceInRight;
+}
+.Toastify__bounce-enter--top-center {
+  animation-name: Toastify__bounceInDown;
+}
+.Toastify__bounce-enter--bottom-center {
+  animation-name: Toastify__bounceInUp;
+}
+
+.Toastify__bounce-exit--top-left, .Toastify__bounce-exit--bottom-left {
+  animation-name: Toastify__bounceOutLeft;
+}
+.Toastify__bounce-exit--top-right, .Toastify__bounce-exit--bottom-right {
+  animation-name: Toastify__bounceOutRight;
+}
+.Toastify__bounce-exit--top-center {
+  animation-name: Toastify__bounceOutUp;
+}
+.Toastify__bounce-exit--bottom-center {
+  animation-name: Toastify__bounceOutDown;
+}
+
+@keyframes Toastify__zoomIn {
+  from {
+    opacity: 0;
+    transform: scale3d(0.3, 0.3, 0.3);
+  }
+  50% {
+    opacity: 1;
+  }
+}
+@keyframes Toastify__zoomOut {
+  from {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+    transform: translate3d(0, var(--y), 0) scale3d(0.3, 0.3, 0.3);
+  }
+  to {
+    opacity: 0;
+  }
+}
+.Toastify__zoom-enter {
+  animation-name: Toastify__zoomIn;
+}
+
+.Toastify__zoom-exit {
+  animation-name: Toastify__zoomOut;
+}
+
+@keyframes Toastify__flipIn {
+  from {
+    transform: perspective(400px) rotate3d(1, 0, 0, 90deg);
+    animation-timing-function: ease-in;
+    opacity: 0;
+  }
+  40% {
+    transform: perspective(400px) rotate3d(1, 0, 0, -20deg);
+    animation-timing-function: ease-in;
+  }
+  60% {
+    transform: perspective(400px) rotate3d(1, 0, 0, 10deg);
+    opacity: 1;
+  }
+  80% {
+    transform: perspective(400px) rotate3d(1, 0, 0, -5deg);
+  }
+  to {
+    transform: perspective(400px);
+  }
+}
+@keyframes Toastify__flipOut {
+  from {
+    transform: translate3d(0, var(--y), 0) perspective(400px);
+  }
+  30% {
+    transform: translate3d(0, var(--y), 0) perspective(400px) rotate3d(1, 0, 0, -20deg);
+    opacity: 1;
+  }
+  to {
+    transform: translate3d(0, var(--y), 0) perspective(400px) rotate3d(1, 0, 0, 90deg);
+    opacity: 0;
+  }
+}
+.Toastify__flip-enter {
+  animation-name: Toastify__flipIn;
+}
+
+.Toastify__flip-exit {
+  animation-name: Toastify__flipOut;
+}
+
+@keyframes Toastify__slideInRight {
+  from {
+    transform: translate3d(110%, 0, 0);
+    visibility: visible;
+  }
+  to {
+    transform: translate3d(0, var(--y), 0);
+  }
+}
+@keyframes Toastify__slideInLeft {
+  from {
+    transform: translate3d(-110%, 0, 0);
+    visibility: visible;
+  }
+  to {
+    transform: translate3d(0, var(--y), 0);
+  }
+}
+@keyframes Toastify__slideInUp {
+  from {
+    transform: translate3d(0, 110%, 0);
+    visibility: visible;
+  }
+  to {
+    transform: translate3d(0, var(--y), 0);
+  }
+}
+@keyframes Toastify__slideInDown {
+  from {
+    transform: translate3d(0, -110%, 0);
+    visibility: visible;
+  }
+  to {
+    transform: translate3d(0, var(--y), 0);
+  }
+}
+@keyframes Toastify__slideOutRight {
+  from {
+    transform: translate3d(0, var(--y), 0);
+  }
+  to {
+    visibility: hidden;
+    transform: translate3d(110%, var(--y), 0);
+  }
+}
+@keyframes Toastify__slideOutLeft {
+  from {
+    transform: translate3d(0, var(--y), 0);
+  }
+  to {
+    visibility: hidden;
+    transform: translate3d(-110%, var(--y), 0);
+  }
+}
+@keyframes Toastify__slideOutDown {
+  from {
+    transform: translate3d(0, var(--y), 0);
+  }
+  to {
+    visibility: hidden;
+    transform: translate3d(0, 500px, 0);
+  }
+}
+@keyframes Toastify__slideOutUp {
+  from {
+    transform: translate3d(0, var(--y), 0);
+  }
+  to {
+    visibility: hidden;
+    transform: translate3d(0, -500px, 0);
+  }
+}
+.Toastify__slide-enter--top-left, .Toastify__slide-enter--bottom-left {
+  animation-name: Toastify__slideInLeft;
+}
+.Toastify__slide-enter--top-right, .Toastify__slide-enter--bottom-right {
+  animation-name: Toastify__slideInRight;
+}
+.Toastify__slide-enter--top-center {
+  animation-name: Toastify__slideInDown;
+}
+.Toastify__slide-enter--bottom-center {
+  animation-name: Toastify__slideInUp;
+}
+
+.Toastify__slide-exit--top-left, .Toastify__slide-exit--bottom-left {
+  animation-name: Toastify__slideOutLeft;
+  animation-timing-function: ease-in;
+  animation-duration: 0.3s;
+}
+.Toastify__slide-exit--top-right, .Toastify__slide-exit--bottom-right {
+  animation-name: Toastify__slideOutRight;
+  animation-timing-function: ease-in;
+  animation-duration: 0.3s;
+}
+.Toastify__slide-exit--top-center {
+  animation-name: Toastify__slideOutUp;
+  animation-timing-function: ease-in;
+  animation-duration: 0.3s;
+}
+.Toastify__slide-exit--bottom-center {
+  animation-name: Toastify__slideOutDown;
+  animation-timing-function: ease-in;
+  animation-duration: 0.3s;
+}
+
+@keyframes Toastify__spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/*# sourceMappingURL=ReactToastify.css.map */
+/*!*****************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[5].oneOf[12].use[2]!./node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[5].oneOf[12].use[3]!./app/components/chat/auth/Authentification.css ***!
+  \*****************************************************************************************************************************************************************************************************************************************************************************************/
+.block-auth{
+    display: flex;
+
+	background: url(/_next/static/media/accueil.59af9ef6.webp) no-repeat center center fixed;
+	background-size: cover;
+	width: 100vw;
+    height: 100vh;
+}
+
+  .button-auth {
+	position: absolute;
+	top: 15px;
+	right: 15px;
+	background-color: #c1c1c1;
+	color: #fff;
+	padding: 10px;
+	border: none;
+	border-radius: 5px;
+	cursor: pointer;
+	font-size: 16px;
+	transition: 0.3s ease; 
+  }
+  
+  .button-auth:hover {
+	background-color: #9871a7;
+  }
+.button-auth:hover{
+    transform: scale(1.1);
+}
+/*!********************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[5].oneOf[12].use[2]!./node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[5].oneOf[12].use[3]!./app/components/settings/Settings.css ***!
+  \********************************************************************************************************************************************************************************************************************************************************************************/
+.window-settings{
+	display: flex;
+	flex-direction: column;
+	background-color: transparent;
+	position: relative;
+	top: 45%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	height: 70vh;
+	width: 70vw; 
+	z-index: 500;
+}
+
+.back-settings{
+	position: fixed;
+	top: 0;
+	left: 0;
+	background-color: rgba(171, 171, 171, 0.1);
+	-webkit-backdrop-filter: blur(30px);
+	        backdrop-filter: blur(30px);
+	height: 100vh;
+	width: 100vw;
+	z-index: 700;
+}
+
+
+/*!*****************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[5].oneOf[12].use[2]!./node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[5].oneOf[12].use[3]!./app/components/settings/headerSettings/HeaderSettings.css ***!
+  \*****************************************************************************************************************************************************************************************************************************************************************************************************/
+.bloc-header-settings {
+	display: flex;
+	flex-direction: row;
+	height: 7%;
+	justify-content: space-between;
+	text-align: center;
+	position: relative;
+	align-items: center;
+  }
+  
+  .header-settings-button {
+	padding: 10px 15px;
+	background-color: transparent;
+	color: #fff;
+	border: none;
+	border-radius: 4px;
+	cursor: pointer;
+	font-family: 'Gill Sans' , sans-serif;
+	font-size: 26px;
+	transition: transform 0.3s, background-color 0.3s;
+	flex:1 1;
+  }
+  
+  .header-settings-button:hover {
+	font-family: 'Gill Sans' , sans-serif;
+	transform: scale(1.4);
+	font-weight: bold;
+	
+}
+
+.header-settings-button.clicked {
+	font-family: 'Gill Sans' , sans-serif;
+	transform: scale(1.4);
+	font-weight: bold;
+
+  }
+  
+/*!*************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[5].oneOf[12].use[2]!./node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[5].oneOf[12].use[3]!./app/components/settings/bodySettings/BodySettings.css ***!
+  \*************************************************************************************************************************************************************************************************************************************************************************************************/
+.bloc-body-settings {
+	flex-direction: column;
+	height: 93%;
+	width: 100%;
+	text-align: center;
+	display: flex;
+	position: initial;
+	align-items: center;
+	background-color: rgba(255, 255, 255, 0.8);
+    font-family: 'Gill Sans' , sans-serif;
+	border-radius: 10px;
+
+
+}
+
+.close-settings {
+	position: fixed;
+	top: 10px;
+	right: 10px;
+	cursor: pointer;
+	font-size: 20px;
+	color: #999;
+  }
+  
+  .close-settings:hover {
+	color: #333;
+  }
+/*!********************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[5].oneOf[12].use[2]!./node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[5].oneOf[12].use[3]!./app/components/settings/bodySettings/profilsSettings/ProfilsSettings.css ***!
+  \********************************************************************************************************************************************************************************************************************************************************************************************************************/
+.bloc-profils-settings {
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+	height: 100%;
+  }
+  .upload-image {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+	margin: 20px;
+	height: 60%;
+	border-bottom: 2px solid #ccc; 
+  }
+  @media only screen and (max-width: 600px) {
+	  .upload-image {
+		  flex-direction: column;
+		}
+	}
+	
+	.profil-image {
+		width: 33%;
+		height: auto;
+		aspect-ratio: 1/1;
+		margin: 10px;
+	}
+	
+	.file-drop-zone {
+		width: 33%;
+		margin: 10px;
+	}
+	
+	.button-modified-image {
+		width: 15vw;
+		height: 15vw;
+		margin: 10px;
+		padding: 10px 15px;
+		font-size: 16px;
+		background-color: #aa1359;
+		color: #fff;
+		border: none;;
+		border-radius: 4px;
+		cursor: pointer;
+		transition: background-color 0.3s;
+	}
+	
+	.button-modified-image:hover {
+		background-color: #800e43;
+	}
+	
+	.change-username {
+		display: flex;
+		flex-direction: row; 
+		justify-content: center;
+		align-items: center;
+		margin: 20px;
+		width: 100%;
+		
+	}
+	
+	.input-username{
+	  padding: 10px;;
+	}
+  @media only screen and (max-width: 600px) {
+	.change-username {
+	  flex-direction: column;
+	  width: 100%;
+	  height: auto; /* Ajustez la hauteur à votre convenance */
+	}
+  }
+  
+  .form-change-username {
+	width: 33%;
+	padding: 10px;
+  }
+  .bloc-change-username {
+	height: 40%;
+	width: 100%;
+	display: flex;
+	align-items: center;
+  }
+  .button-modified-username {
+	width: 33%;
+	margin: 10px;
+	padding: 10px 15px;
+	font-size: 16px;
+	background-color: #aa1359;
+	color: #fff;
+	border: none;
+	height: 60px;
+	border-radius: 4px;
+	cursor: pointer;
+	transition: background-color 0.3s;
+  }
+  .form-username{
+	display: flex;
+	flex-direction: row;
+	background-color: #848288;
+	border-radius: 5px;
+	align-items: center;
+	box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
+  }
+  .username-profil {
+	margin: 10px;
+  }
+  .button-modified-username:hover {
+	background-color: #800e43;
+  }
+  
+/*!******************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[5].oneOf[12].use[2]!./node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[5].oneOf[12].use[3]!./app/components/settings/bodySettings/profilsSettings/fileDropZone/FileDropZone.css ***!
+  \******************************************************************************************************************************************************************************************************************************************************************************************************************************/
+.file-drop-zone {
+	border: 4px dashed #ccc;
+    padding: 10px;
+    text-align: center;
+    background-color: #848288;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+	aspect-ratio: 1/1;
+    width: 15vw;
+    height: 15vw;
+}
+
+.dragging {
+	border-color: #aa1359; /* Changez la couleur de la bordure en vert pendant le glissement */
+	background-color: #f0faff;
+}
+.drag-and-drop {
+	font-size: 20px;
+	margin: 10px;
+	color: #000000; /* Texte blanc */
+}
+.bloc-drag-avatar {
+	display: flex;
+	flex-direction: column;
+	width: 33%;
+	height: auto;
+	align-items: center;
+	aspect-ratio: 1 / 1;
+  }
+/*!******************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[5].oneOf[12].use[2]!./node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[5].oneOf[12].use[3]!./app/components/settings/bodySettings/globalSettings/GlobalSettings.css ***!
+  \******************************************************************************************************************************************************************************************************************************************************************************************************************/
+.bloc-global-settings {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	height: 100%;
+	width: 30%;
+}
+
+.activate2fa {
+	background-color: #4caf50;
+	color: white;
+	border: none;
+	padding: 10px 20px;
+	text-align: center;
+	text-decoration: none;
+	display: inline-block;
+	font-size: 16px;
+	margin-bottom: 10px;
+	cursor: pointer;
+	border-radius: 5px;
+	margin: 20px;
+	width: 100%;
+}
+
+.desactivate2fa {
+	background-color: #af4c4c;
+	color: white;
+	border: none;
+	padding: 10px 20px;
+	text-align: center;
+	text-decoration: none;
+	display: inline-block;
+	font-size: 16px;
+	margin-bottom: 10px;
+	cursor: pointer;
+	margin: 20px;
+	border-radius: 5px;
+	width: 100%;
+
+}
+
+.input-field-2fa {
+	height: 20px;
+	width: calc(100% - 20px);
+	padding: 10px;
+	margin-bottom: 10px;
+	margin: 10px;
+}
+
+.check-authenticator-btn {
+	background-color: #800e43;
+	color: white;
+	border: none;
+	padding: 10px 20px;
+	text-align: center;
+	text-decoration: none;
+	display: inline-block;
+	font-size: 16px;
+	margin: 20px;
+	cursor: pointer;
+	border-radius: 5px;
+	width: 100%;
+}
+.sans-qrcode {
+	width: 200px;
+	height: auto;
+	margin-top: 20px;
+	margin-bottom: 20px;
+	background-color: #929292;
+	height: 200px;
+}
+.qr-code-img {
+	width: 200px;
+	height: auto;
+	margin-top: 20px;
+	margin-bottom: 20px;
+}
+
+.qr-code-img-blur {
+	filter: blur(5px);
+	width: 200px;
+	height: auto;
+	margin-top: 20px;
+	margin-bottom: 20px;
+}
+
+/*!**************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[5].oneOf[12].use[2]!./node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[5].oneOf[12].use[3]!./app/components/settings/bodySettings/gameSettings/GameSettings.css ***!
+  \**************************************************************************************************************************************************************************************************************************************************************************************************************/
+.bloc-game-settings {
+	display: flex;
+	flex-direction: row;
+	width: 100%;
+	height: 100%;
+	justify-content: center;
+	align-items: center;
+
+}
+.bloc-history{
+	display: flex;
+    flex-direction: column;
+    height: 100%;
+	width: 100%;
+    overflow: hidden;
+}
+
+.bloc-stats{
+	display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 50%;
+	align-items: center;
+    justify-content: center;
+}
+/*!*****************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[5].oneOf[12].use[2]!./node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[5].oneOf[12].use[3]!./app/components/settings/bodySettings/gameSettings/history/History.css ***!
+  \*****************************************************************************************************************************************************************************************************************************************************************************************************************/
+
+
+.bloc-history-title {
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+    width: 50%;
+	justify-content: center;
+	align-items: center;
+	overflow: hidden;
+}
+.bloc-history {
+	margin: 10px;
+	padding: 20px;
+	border-radius: 10px;
+	height: 100%;
+	border: 3px solid #6e6e6e;
+    width: 50%;
+	overflow-y: auto; /* Enable vertical scrolling */
+}
+.title-game{
+	margin: 10px 10px 10px 10px;
+	font-size: 20px;
+	font-weight: bold;
+	font-family: 'Gill Sans' , sans-serif;
+}
+.game-history {
+	display: flex;
+	justify-content: space-between;
+	border: 1px solid #ccc;
+	margin : 10px;
+	padding: 10px;
+	}
+
+.green-text {
+	color: rgb(22, 103, 22);
+	}
+
+.red-text {
+	color: rgb(182, 37, 37);
+	}
+
+.img-history {
+	width: 40px;
+	height: auto;
+	}
+.game-history-player {
+	flex: 1 1;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	margin: 10px;
+	}
+
+.game-history-player-name {
+	font-weight: bold;
+	margin-bottom: 5px;
+	}
+
+.game-history-player-score {
+	color: #555;
+	}
+
+.color-palette {
+	display: flex;
+	justify-content: space-around;
+	margin-top: 20px;
+	}
+	
+	.color-option {
+	width: 30px;
+	height: 30px;
+	border-radius: 50%;
+	cursor: pointer;
+	transition: transform 0.2s;
+	}
+	
+	.color-option:hover {
+	transform: scale(1.1);
+	}
+/*!*************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[5].oneOf[12].use[2]!./node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[5].oneOf[12].use[3]!./app/components/settings/bodySettings/gameSettings/stats/Stats.css ***!
+  \*************************************************************************************************************************************************************************************************************************************************************************************************************/
+.bloc-stats{
+	display: flex;
+	flex-direction: column;
+	width: 30%;
+
+}
+
+.title-stats {
+	margin: 10px 10px 10px 10px;
+	font-size: 20px;
+	font-weight: bold;
+	font-family: 'Gill Sans' , sans-serif;
+}
+
+.victory{
+	display: flex;
+	border: 3px solid #1d9512;
+	border-radius: 5px;
+	margin : 10px;
+	padding: 10px;
+	justify-content: center;
+	width: 30%;
+}
+
+.defeat{
+	display: flex;
+	border: 3px solid #a01919;
+	border-radius: 5px;
+	margin : 10px;
+	width: 30%;
+	justify-content: center;
+	padding: 10px;
+}
+
+.winrate{
+	display: flex;
+	justify-content: center;
+	border: 3px solid #ccc;
+	border-radius: 5px;
+	margin : 10px;
+	padding: 10px;
+	width: 30%;
+}
+/*!************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[5].oneOf[12].use[2]!./node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[5].oneOf[12].use[3]!./app/components/chat/Chat.css ***!
+  \************************************************************************************************************************************************************************************************************************************************************************/
+.left-half {
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	width: 35%;
+	z-index: 90;
+	height: 90vh;
+}
+
+@media only screen and (max-width: 800px) {
+    .left-half {
+		height: 45vh;
+	  width: 100%;
+    }
+  }
+
+.header-body{
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+}
+/*!*****************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[5].oneOf[12].use[2]!./node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[5].oneOf[12].use[3]!./app/components/chat/headerChat/HeaderChat.css ***!
+  \*****************************************************************************************************************************************************************************************************************************************************************************************/
+.bloc-btn {
+    flex-direction: row;
+    height: 7%;
+    justify-content: space-between;
+    text-align: center;
+    display: flex;
+    align-items: center;
+	
+}
+/*!******************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[5].oneOf[12].use[2]!./node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[5].oneOf[12].use[3]!./app/components/chat/headerChat/friendslistButton/FriendsListButton.css ***!
+  \******************************************************************************************************************************************************************************************************************************************************************************************************************/
+.main-button-friendslist {
+	/* border: 3px solid #333; */
+	border:none;
+	text-align: center;
+	overflow: hidden; 
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	height: 100%;
+	width: calc(100% * (1 / 3));
+	border-top: none;
+	background-color:#848288 ;
+	color: #f0f0f0;
+	transition: background-color 0.3s ease;
+	text-transform: uppercase;
+	font-weight: bold;
+	/* border-radius: 0px 0px 15px 15px; */
+	border-top: none;
+	font-weight: bold;
+	font-size: 20px;
+	font-family: 'Gill Sans' , sans-serif;
+}
+
+.main-button-friendslist:hover {
+	/* Nouvelle couleur de fond lorsque vous survolez le bouton */
+	background-color: #800e43;
+	box-shadow: 0 0 10px rgba(41, 41, 41, 0.756);
+
+  }
+
+.main-button-friendslist.clicked {
+	/* Nouvelle couleur de fond lorsque vous survolez le bouton */
+	background-color: #aa1359;
+	box-shadow: 0 0 10px rgba(41, 41, 41, 0.756);
+
+  }
+/*!****************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[5].oneOf[12].use[2]!./node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[5].oneOf[12].use[3]!./app/components/chat/headerChat/backButton/BackButton.css ***!
+  \****************************************************************************************************************************************************************************************************************************************************************************************************/
+.back-button{
+    scroll-behavior: auto;
+    box-sizing: border-box;
+    aspect-ratio: 1/1;
+    margin: 10px 10px 10px 10px;
+    width: 40px;
+    height: auto;
+    background-color: transparent;
+    color: #000000;
+    border: none;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center center;
+    transition: transform 0.2s ease;
+}
+.back-button:hover {
+    transform: scale(1.4);
+}
+/*!**********************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[5].oneOf[12].use[2]!./node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[5].oneOf[12].use[3]!./app/components/chat/headerChat/id-discussion/Id-discussion.css ***!
+  \**********************************************************************************************************************************************************************************************************************************************************************************************************/
+.bloc-id{
+    display: flex;
+    background-color: #aa1359;
+    height: 100%;
+	width: 100%;
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.image-id{
+	width: 25px;
+	height: auto;
+	background-color: transparent;
+	position: absolute;
+  	right: 10px;
+}
+
+.image-id:hover {
+	transform: rotate(80deg) scale(1.20);;
+	transition: transform 0.3s ease; /* Ajoutez une transition pour une animation fluide */
+  }
+
+.id {
+	/* border: 3px solid #333; */
+	/* border:none; */
+	margin: 10px ;
+	overflow: hidden;
+	text-overflow: ellipsis; 
+	display :flex;
+	overflow: hidden; 
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	/* border-top: none; */
+	color: #f0f0f0;
+	text-transform: uppercase;
+    font-family: 'Gill Sans' , sans-serif;
+	font-size: 26px;
+	font-weight: bold;
+}
+/*!************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[5].oneOf[12].use[2]!./node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[5].oneOf[12].use[3]!./app/components/chat/bodyChat/addConversation/AddConversation.css ***!
+  \************************************************************************************************************************************************************************************************************************************************************************************************************/
+.blur-background {
+	/* position: fixed; */
+	top: 0;
+	left: 0;
+	background-color: rgba(171, 171, 171,1);
+	/* backdrop-filter: blur(30px); */
+	height: 100vh;
+	width: 100vw;
+	z-index: 100;
+  }
+
+  .bloc-add-conversation {
+	background-color: rgba(255, 255, 255, 0.8);
+	border-radius: 10px;
+	box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+	padding: 20px;
+	z-index: 700; 
+  }
+  .add__buttons {
+	display: flex;
+	justify-content: space-between;
+	z-index: 200;
+  }
+  
+  .add__header {
+	text-align: center;
+	margin-bottom: 15px;
+	z-index: 200;
+  }
+  
+  .add__form {
+	text-align: center;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	z-index: 200;
+
+  }
+  
+  .add__input {
+	margin: 10px;
+	padding: 8px;
+	border: 1px solid #ccc;
+	border-radius: 4px;
+	z-index: 200;
+  }
+  .add_button_cancel {
+	position: fixed;
+	top: 30px;
+	right: 30px;
+	z-index: 700;
+	cursor: pointer;
+	width: 30px; /* Ajustez la largeur selon vos besoins */
+ 	 height: auto;
+	transition: font-size 0.3s ease; 
+	z-index: 200;
+  }
+  .add_button_cancel:hover {
+	transform: scale(1.2);
+	z-index: 200;
+  }
+  .add__button {
+	background-color: #9cc89e;
+	color: white;
+	border: none;
+	padding: 10px;
+	border-radius: 4px;
+	cursor: pointer;
+	margin: 10px;
+	z-index: 200;
+  }
+  
+  .add__button:hover {
+	background-color: #45a049;
+	z-index: 200;
+  }
+
+  .add_container {
+	display: flex;
+    position: fixed;
+    transform: translate(-50%, -50%);
+    top: 50%;
+    left: 50%;
+    z-index: 700;
+
+    align-items: center;
+    flex-direction: column;
+	z-index: 200;
+  }
+  .add__title{
+	z-index: 700;
+	text-align: center;
+	color: white;
+	white-space: nowrap;
+  }
+
+  .privated-public {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	z-index: 200;
+  }
+
+  .password-img {
+	width: 50px;
+	height: auto;
+	margin: 10px;
+	z-index: 200;
+  }
+  .public-img {
+	width: 50px;
+	height: auto;
+	margin: 10px;
+	z-index: 200;
+  }
+
+  
+  .option-image:hover{
+	  transform: scale(1.2);
+	  transition: transform 0.3s ease;
+	  z-index: 200;
+	}
+	.option-image-opacity{
+		width: 50px;
+		height: auto;
+		margin: 10px;
+		opacity: 0.5;
+		z-index: 200;
+	}
+	.option-image-opacity:hover{
+		transform: scale(1.2);
+		transition: transform 0.3s ease;
+		z-index: 200;
+	}
+	.option-image-opacity{
+		width: 50px;
+		height: auto;
+		margin: 10px;
+		opacity: 0.5;
+		z-index: 200;
+	}
+
+.option-block {
+	display: flex;
+	background-color: #848288;
+	border-radius: 10px;
+	flex-wrap: wrap;
+	justify-content: space-between;
+	align-items: center; 
+	z-index: 200;
+	}
+	
+.option-image {
+	width: 50px;
+	height: auto;
+	margin: 10px;
+	z-index: 700;
+}
+.special-cadenas-image {
+	width: 30px;
+	height: auto;
+	margin: 10px;
+}
+.img-enter-conversation{
+	width: 50px;
+	height: auto;
+}
+
+.img-enter-conversation:hover{
+	transition: transform 0.2s ease;
+	transform: scale(1.2);
+}
+/*!***********************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[5].oneOf[12].use[2]!./node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[5].oneOf[12].use[3]!./app/components/chat/headerChat/id-discussion/PasswordChange.css ***!
+  \***********************************************************************************************************************************************************************************************************************************************************************************************************/
+.blur-background-password{
+	position: fixed;
+	top: 0;
+	left: 0;
+	background-color: rgba(171, 171, 171, 0.1);
+	-webkit-backdrop-filter: blur(30px);
+	        backdrop-filter: blur(30px);
+	height: 100vh;
+	width: 100vw;
+	z-index: 100;
+  }
+  .password-form {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	background-color: white;
+	padding: 20px;
+	border-radius: 10px;
+	box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+	z-index: 700;
+  }
+  .text-password {
+	font-family: 'Gill Sans' , sans-serif;
+  }
+  
+  .password-form form {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+  }
+  
+  .password-form input {
+	padding: 10px;
+	margin-bottom: 10px;
+	width: 100%;
+	box-sizing: border-box;
+	border: 1px solid #ccc;
+	border-radius: 5px;
+	font-size: 16px;
+  }
+  
+  .password-form button {
+	padding: 10px 20px;
+	background-color: #2980b9;
+	color: white;
+	border: none;
+	border-radius: 5px;
+	cursor: pointer;
+	font-size: 18px;
+	transition: background-color 0.3s;
+  }
+  
+  .password-form button:hover {
+	background-color: #216795;
+  }
+/*!**********************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[5].oneOf[12].use[2]!./node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[5].oneOf[12].use[3]!./app/components/chat/headerChat/channelButton/ChannelButton.css ***!
+  \**********************************************************************************************************************************************************************************************************************************************************************************************************/
+.main-button-channel {
+	border: none;
+	text-align: center;
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	height: 100%;
+	    width: calc(100% * (1 / 3));
+	border-top: none;
+	background-color: #69686c;
+	color: #f0f0f0;
+	transition: background-color 0.3s ease;
+	text-transform: uppercase;
+	font-weight: bold;
+	/* border-radius: 0px 0px 15px 15px; */
+
+
+
+
+
+	position: relative;
+	font-weight: bold;
+	font-size: 20px;
+	font-family: 'Gill Sans' , sans-serif;
+}
+
+.main-button-channel:hover {
+	/* Nouvelle couleur de fond lorsque vous survolez le bouton */
+	background-color: #800e43;
+	box-shadow: 0 0 10px rgba(41, 41, 41, 0.756);
+
+	}
+
+.main-button-channel.clicked {
+	/* Nouvelle couleur de fond lorsque vous survolez le bouton */
+	background-color: #aa1359;
+	box-shadow: 0 0 10px rgba(41, 41, 41, 0.756);
+
+	}
+/*!****************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[5].oneOf[12].use[2]!./node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[5].oneOf[12].use[3]!./app/components/chat/headerChat/chatButton/ChatButton.css ***!
+  \****************************************************************************************************************************************************************************************************************************************************************************************************/
+.main-button-chat {
+	border: none;
+	text-align: center;
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	height: 100%;
+	    width: calc(100% * (1 / 3));
+	border-top: none;
+	background-color: #848288;
+	color: #f0f0f0;
+	transition: background-color 0.3s ease;
+	text-transform: uppercase;
+	font-weight: bold;
+	/* border-radius: 0px 0px 15px 15px; */
+
+
+
+
+
+	position: relative;
+	font-weight: bold;
+	font-size: 20px;
+	font-family: 'Gill Sans' , sans-serif;
+}
+.image-main-button-chat {
+  background-image: url(/_next/static/media/chat.678de91d.png);
+  background-repeat: no-repeat;
+
+  background-position: center center;
+  background-color: transparent;
+}
+
+.logo-class {
+	filter: brightness(0) invert(1);
+  }
+
+.main-button-chat:hover {
+	/* Nouvelle couleur de fond lorsque vous survolez le bouton */
+	background-color: #800e43;
+	box-shadow: 0 0 10px rgba(41, 41, 41, 0.756);
+
+	}
+
+.main-button-chat.clicked {
+	/* Nouvelle couleur de fond lorsque vous survolez le bouton */
+	background-color: #aa1359;
+	box-shadow: 0 0 10px rgba(41, 41, 41, 0.756);
+
+	}
+/*!*************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[5].oneOf[12].use[2]!./node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[5].oneOf[12].use[3]!./app/components/chat/bodyChat/BodyChat.css ***!
+  \*************************************************************************************************************************************************************************************************************************************************************************************/
+.powerlifter{
+	display: flex;
+	flex-direction: column;
+	height: 93%;
+}
+/*!**********************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[5].oneOf[12].use[2]!./node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[5].oneOf[12].use[3]!./app/components/chat/bodyChat/chatUser/ChatUser.css ***!
+  \**********************************************************************************************************************************************************************************************************************************************************************************************/
+.chat-user{
+	display:flex;
+	flex-direction: column;
+	height: 100%;
+}
+/*!***********************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[5].oneOf[12].use[2]!./node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[5].oneOf[12].use[3]!./app/components/chat/bodyChat/chatUser/receiveBox/ReceiveBox.css ***!
+  \***********************************************************************************************************************************************************************************************************************************************************************************************************/
+.bloc-discussion-chat {
+    scroll-behavior: auto;
+    box-sizing: border-box;
+    /* background-color: #848288; */
+    margin: 0px 10px 0px 10px;
+    width: calc(100% - 20px);
+    height: 93%;
+    overflow: scroll;
+    color: var(--first);
+}
+
+.receive-chat {
+    margin: 10px;
+    width: -moz-fit-content;
+    width: fit-content;
+}
+
+.my-message, .other-message {
+    width: 70%;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    padding: 5px;
+    margin-top: 10px;
+	margin-bottom: 10px;
+    white-space: pre-wrap;
+    max-width: 100%;
+}
+
+.my-message {
+    background-color: #1bb418;
+    border-radius: 15px 15px 0px 15px;
+    margin-left: auto;
+    align-self: flex-end;
+}
+
+.other-message {
+	background-color: #69686c;
+
+
+    border-radius: 15px 15px 15px 0px;
+    margin-right: auto;
+    align-self: flex-start;
+}
+
+.discussion-chat-content {
+    font-family: 'Gill Sans' , sans-serif;
+    color: white;
+    margin: 5px;
+    max-width: 80%; 
+	font-size: 23px;
+    width: -moz-fit-content;
+    width: fit-content;
+}
+
+.discussion-chat-date {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: small;
+    margin: 5px;
+    width: -moz-fit-content;
+    width: fit-content;
+	color: #ffffff;
+
+}
+
+  
+/*!*****************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[5].oneOf[12].use[2]!./node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[5].oneOf[12].use[3]!./app/components/chat/bodyChat/chatUser/sendBox/SendBox.css ***!
+  \*****************************************************************************************************************************************************************************************************************************************************************************************************/
+.bloc-send-chat{
+	display: flex;
+	justify-content: space-between;
+	resize: none;
+	width: 100%;
+
+	
+}
+.input-chat{
+    box-sizing: border-box;
+    background-color: #848288;
+    font-family: 'Gill Sans' , sans-serif;
+    font-size: 20px;
+    width: 100%;
+	border: none;
+	padding: 10px;
+    width: 100%;
+	color: white;
+    /* height: 100%; */
+    resize: none;
+}
+.button-send{
+		/* scroll-behavior: auto; */
+		box-sizing: border-box;
+		/* border: 3px solid #333; */
+		margin: 0px 10px 10px 0px;
+		width: 10%;
+		border-radius:10px;
+		background-color: transparent;
+		overflow: scroll;
+		color: #000000;
+		background-image: url(/_next/static/media/send.4a69a85d.png);
+		border: none;
+		background-size: contain;
+		background-repeat: no-repeat;
+		background-position: center center;
+		transition: transform 0.2s ease;
+}
+.button-send:hover {
+	transform: scale(1.2);
+}
+
+.img-enter{
+	width: 50px;
+	height: auto;
+	margin: 0px 10px 10px 0px;
+}
+.img-enter:hover{
+	transition: transform 0.2s ease;
+	transform: scale(1.2);
+}
+.bloc-chat-enter{
+	display: flex;
+	flex-direction: row;
+	height: 7%;
+}
+/*!*******************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[5].oneOf[12].use[2]!./node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[5].oneOf[12].use[3]!./app/components/chat/bodyChat/chatUser/chatList/ChatList.css ***!
+  \*******************************************************************************************************************************************************************************************************************************************************************************************************/
+.bloc-discussion-list{
+	/* scroll-behavior: auto; */
+	box-sizing: border-box;
+	/* background-color:#a1a1a1 ; */
+	/* border: 3px solid #333; */
+	width: 100%;
+	height: 100%;
+	border-radius:10px;
+	overflow: scroll;
+	color: #000000;
+	display : flex;
+	flex-direction: column;
+}
+.bloc-button-discussion-list{
+	display: flex;
+
+	justify-content: center;
+	align-items: center;
+	border-radius: 10px;
+	margin: 10px 0px;
+	justify-content: space-between;
+}
+
+
+.amies{
+	display: flex;
+	justify-content: center;
+	position:relative;
+	height: 100%;
+	align-items: center;
+	color: aliceblue;
+	margin: 0px 10px 0px 0px;
+	font-size: 20px; /* Exemple de taille de police */
+	font-family: 'Gill Sans' , sans-serif;
+	flex: 1 1;
+	background-color: #848288;
+}
+.amies:hover{
+	background-color: #a09ea3;
+}
+
+.online {
+	width: 15px;
+	height: 15px;
+	background-color: #35b93a; /* Couleur verte, tu peux changer cela selon tes préférences */
+	border-radius: 50%; /* Pour obtenir une forme de cercle */
+	position: absolute;
+    left: 10px;
+	
+}
+.offline {
+	width: 15px;
+	height: 15px;
+	background-color: #9c0d0d; /* Couleur verte, tu peux changer cela selon tes préférences */
+	border-radius: 50%; /* Pour obtenir une forme de cercle */
+	position: absolute;
+    left: 10px;
+  }
+/*avatar du profil*/
+.on-off {
+	width: 20px;
+	height: 20px;
+	border-radius: 50%;
+	margin-right: 8px;
+	display: inline-block;
+	margin: 15px;
+	border-color: #aa1359;
+  }
+.profil-discussion.on{
+	background-color: green;
+	box-shadow: 0 0 10px green;
+}
+
+.profil-discussion.off{
+	background-color: red;
+	box-shadow: 0 0 10px red;
+}
+.profil-discussion-list{
+	width: 35px;
+	height: 35px;
+	padding: 5px;
+	background-color: #7c7c7c;
+	margin: 0px 0px 0px 20px;
+}
+/*!****************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[5].oneOf[12].use[2]!./node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[5].oneOf[12].use[3]!./app/components/chat/bodyChat/chatChannel/ChatChannel.css ***!
+  \****************************************************************************************************************************************************************************************************************************************************************************************************/
+.chat-channel{
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+/*!****************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[5].oneOf[12].use[2]!./node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[5].oneOf[12].use[3]!./app/components/chat/bodyChat/chatChannel/channelList/ChannelList.css ***!
+  \****************************************************************************************************************************************************************************************************************************************************************************************************************/
+.bloc-channel-list {
+	display: flex;
+	flex-wrap: wrap;
+	max-height: 100%;
+	overflow-y: auto; /* Activer le défilement vertical si nécessaire */
+  }
+
+  .blur {
+	position: fixed;
+	top: 0;
+	left: 0;
+	background-color: rgba(171, 171, 171, 0.1);
+	-webkit-backdrop-filter: blur(30px);
+	        backdrop-filter: blur(30px);
+	height: 100vh;
+	width: 100vw;
+	z-index: 70;
+  }
+  .bloc-add-create {
+	font-size: 26px;
+	background-color: transparent;
+	height: 100vh;
+	align-items: center;
+ 	 justify-content: center;
+	/* box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); */
+	padding: 20px;
+	border: none;
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	flex-direction: column;
+	display: flex;
+	z-index: 700; /* Assurez-vous que le bloc est au-dessus de la div flou */
+  }
+  .button-add{
+	font-family: 'Gill Sans' , sans-serif;
+	font-size: 40px;
+	color: whitesmoke;
+	font-weight: bold;
+	border: none;
+	margin: 10px;
+	background-color: transparent;
+	transition: transform 0.3s ease;
+}
+.button-add:hover{
+	transform: scale(1.4);
+	font-family: 'Gill Sans' , sans-serif;
+	font-size: 50px;
+  }
+  .button-channel-list-add {
+	background-color: whitesmoke;
+	border: #848288;
+	border: 5px solid gray; 
+	flex-basis: calc(33% - 20px);
+	margin: 10px;
+	padding: 10px; 
+	color: black;
+    font-family: 'Gill Sans' , sans-serif;
+
+	font-size: 20px;
+	border-radius: 10px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-direction: column;
+	box-sizing: border-box;
+	aspect-ratio: 1 / 1;
+	position: relative;
+  }
+  .button-channel-list-add:hover {
+	background-color: #aa1359;
+  }
+  
+  .button-channel-list-add span {
+	max-height: 50px;
+	overflow: hidden;
+	text-overflow: ellipsis; 
+	white-space: nowrap;
+	position: absolute;
+	top: 50%;
+	left: 0;
+	right: 0;
+	margin: 5px;
+
+}
+.button-channel-list {
+	background-color: #848288;
+	box-shadow: 0 0 10px rgba(41, 41, 41, 0.756);
+	border: none;
+	flex-basis: calc(33% - 20px);
+	margin: 10px;
+	padding: 10px;
+	color: aliceblue;
+	text-transform: uppercase;
+	font-weight: bold;
+	font-size: 20px;
+    font-family: 'Gill Sans' , sans-serif;
+	
+	border-radius: 10px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-direction: column;
+	box-sizing: border-box;
+	aspect-ratio: 1 / 1;
+	overflow: hidden; 
+	position: relative;
+	transition: font-size 0.3s ease;
+	opacity: 1;
+	transition: opacity 0.3s ease;
+}
+.button-channel-list span {
+	max-height: 50px;
+	white-space: nowrap;
+	position: absolute;
+	margin: 5px;
+	top: calc(50% - 5px);
+	left: 0;
+	right: 0;
+	transform: translateY(-50%);
+	
+}
+@keyframes marquee {
+	0% {
+		transform: translateY(-50%) translateX(100%);
+	  }
+	  100% {
+		transform: translateY(-50%) translateX(-100%);
+	  }
+}
+.button-channel-list:hover span {
+	/* overflow: hidden; */
+	opacity: 0.5; 
+	font-size: 60px;
+	animation: marquee 3s linear infinite;
+	white-space: nowrap; /* Assurez-vous que le texte ne se casse pas sur plusieurs lignes */
+	display: inline-block;
+	
+} 
+  .button-channel-list:hover {
+
+	background-color: #a09ea3;
+  }
+  
+.button-channel-list:hover{
+	background-color: #a09ea3;
+}
+
+.bloc-contain{
+	margin: 5px;
+}
+
+.icon-private-channel{
+	position: absolute;
+	top: 0;
+	right: 0;
+	width: 20%;
+	height: auto;
+	margin: 5px;
+}
+
+.icon-admin-channel{
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 20%;
+	height: auto;
+	margin: 5px;
+}
+
+.icon-password-channel{
+	position: absolute;
+	top: 0;
+	width: 20%;
+	height: auto;
+	margin: 5px;
+}
+/*!********************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[5].oneOf[12].use[2]!./node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[5].oneOf[12].use[3]!./app/components/chat/bodyChat/listMyChannel/ListMyChannel.css ***!
+  \********************************************************************************************************************************************************************************************************************************************************************************************************/
+
+.bloc-add-channel-list {
+	display: flex;
+	flex-wrap: wrap;
+	max-width: 50vw;
+	max-height: 50vh;
+	overflow-y: auto;
+	align-items: center; 
+	justify-content: center;
+	 /* top: 50%;
+	left: 50%;
+	transform: translate(50%, 50%); */
+	background-color: rgba(255, 255, 255, 0.8);
+	border-radius: 10px; 
+  }
+  
+  .button-add-channel-list {
+	background-color: #848288;
+	border: none;
+	flex-basis: calc(50% - 20px);
+	margin: 10px;
+	padding: 10px;
+	color: aliceblue;
+	font-size: 20px;
+	font-family: 'Gill Sans' , sans-serif;
+	border-radius: 10px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-direction: column;
+	box-sizing: border-box;
+	aspect-ratio: 1 / 1;
+	position: relative;
+  }
+  
+  .button-add-channel-list span {
+	max-height: 50px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	position: absolute;
+	top: 50%;
+	left: 0;
+	right: 0;
+	transform: translateY(-50%);
+  }
+  
+  .button-add-channel-list:hover {
+	background-color: #a09ea3;
+  }
+
+  .title-list-channel-component {
+	font-size: 28px;
+	color: #ffffff;
+	font-weight: bold;
+	margin-bottom: 20px;
+
+  }
+
+  .juste-pour-englober {
+	max-width: 50vw; /* Ajout pour occuper la moitié de la largeur de l'écran */
+	max-height: 50vh;
+	top: 50%;
+	left: 50%;
+	transform: translate(50%, 50%);
+	background-color: transparent;
+	border-radius: 10px;
+	align-items: center;
+	justify-content: center;
+	text-align: center;
+	}
+
+	.close-button {
+		position: absolute;
+		top: -10px; /* Ajustez la valeur en fonction de votre mise en page */
+		right: -10px; /* Ajustez la valeur en fonction de votre mise en page */
+		cursor: pointer;
+		font-size: 24px;
+		background: none;
+		border: none;
+		color: #fff;
+		outline: none;
+		padding: 0;
+	  }
+/*!***************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[5].oneOf[12].use[2]!./node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[5].oneOf[12].use[3]!./app/components/chat/bodyChat/listMyChannel/Password.css ***!
+  \***************************************************************************************************************************************************************************************************************************************************************************************************/
+.blur-background-password{
+	position: fixed;
+	top: 0;
+	left: 0;
+	background-color: rgba(171, 171, 171, 0.1);
+	-webkit-backdrop-filter: blur(30px);
+	        backdrop-filter: blur(30px);
+	height: 100vh;
+	width: 100vw;
+	z-index: 100;
+  }
+  .password-form {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	background-color: white;
+	padding: 20px;
+	border-radius: 10px;
+	box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+	z-index: 700;
+  }
+  .text-password {
+	font-family: 'Gill Sans' , sans-serif;
+  }
+  
+  .password-form form {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+  }
+  
+  .password-form input {
+	padding: 10px;
+	margin-bottom: 10px;
+	width: 100%;
+	box-sizing: border-box;
+	border: 1px solid #ccc;
+	border-radius: 5px;
+	font-size: 16px;
+  }
+  
+  .password-form button {
+	padding: 10px 20px;
+	background-color: #2980b9;
+	color: white;
+	border: none;
+	border-radius: 5px;
+	cursor: pointer;
+	font-size: 18px;
+	transition: background-color 0.3s;
+  }
+  
+  .password-form button:hover {
+	background-color: #216795;
+  }
+/*!**********************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[5].oneOf[12].use[2]!./node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[5].oneOf[12].use[3]!./app/components/chat/bodyChat/chatFriendsList/confirmation/Confirmation.css ***!
+  \**********************************************************************************************************************************************************************************************************************************************************************************************************************/
+.bloc-confirmation{
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	background-color: var(--first);
+	padding: 10px;
+	border-radius: 10px;
+	z-index: 500;
+
+}
+.blur-background {
+	position: fixed;
+	top: 0;
+	left: 0;
+	background-color: rgba(171, 171, 171, 0.1);
+	-webkit-backdrop-filter: blur(30px);
+	        backdrop-filter: blur(30px);
+	height: 100vh;
+	width: 100vw;
+	z-index: 100;
+  }
+  
+.yes-no{
+	display: flex;
+	justify-content: center; 
+	width: 100%; 
+}
+
+.img-enter{
+	width: 50px;
+	height: auto;
+	margin: 0px 10px 10px 0px;
+}
+
+.add_button_cancel {
+	position: fixed;
+	top: 30px;
+	right: 30px;
+	z-index: 700;
+	cursor: pointer;
+	width: 30px; /* Ajustez la largeur selon vos besoins */
+ 	 height: auto;
+	transition: font-size 0.3s ease; 
+  }
+  .add_button_cancel:hover {
+	transform: scale(1.2);
+  }
+
+  .button-ok {
+	background-color: #4CAF50; /* Couleur de fond verte (peut être modifiée) */
+	border: none;
+	color: white; /* Couleur du texte (peut être modifiée) */
+	padding: 10px 20px; /* Marge intérieure (ajustez selon vos besoins) */
+	text-align: center;
+	text-decoration: none;
+	display: inline-block;
+	font-size: 16px; /* Taille de la police (ajustez selon vos besoins) */
+	margin: 10px;
+	cursor: pointer;
+	border-radius: 5px; /* Coins arrondis (ajustez selon vos besoins) */
+  }
+
+  .button-ok:hover {
+	background-color: #45a049; /* Changement de couleur au survol (peut être modifié) */
+  }
+/*!****************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[5].oneOf[12].use[2]!./node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[5].oneOf[12].use[3]!./app/components/chat/bodyChat/chatChannel/receiveBoxChannel/ReceiveBoxChannel.css ***!
+  \****************************************************************************************************************************************************************************************************************************************************************************************************************************/
+.bloc-channel-chat {
+    scroll-behavior: auto;
+    box-sizing: border-box;
+    width: 100%;
+    height: 100%;
+    border-radius: 10px;
+    overflow: scroll;
+	color: white;
+}
+
+.receive-chat {
+    margin: 10px;
+    width: -moz-fit-content;
+    width: fit-content;
+}
+
+.my-message-channel, .other-message-channel {
+    width: calc(100% - 20px);
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    padding: 5px;
+    margin: 5px;
+    white-space: pre-wrap;
+    max-width: 100%;
+}
+
+.my-message-channel {
+    background-color: #1bb418;
+    border-radius: 15px 15px 15px 15px;
+    margin-left: auto;
+}
+
+.bloc-avatar-username {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	margin-left: 5px;
+	margin-right: 5px;
+	width: calc(100% - 10px);
+	text-align: center;
+}
+.other-message-channel {
+    background-color: #1bb418;
+
+	border-radius: 15px 15px 15px 15px;
+}
+
+.user-name{
+	font-family: 'Gill Sans' , sans-serif;
+	color: black;
+	margin: 5px;
+	width: 100%; 
+	font-size: 15px;
+	width: -moz-fit-content;
+	width: fit-content;
+	display: block;
+	text-align: center;
+}
+.channel-chat-content {
+	font-family: 'Gill Sans' , sans-serif;
+	margin: 10px;
+	max-width: calc(100% - 10px); 
+	font-size: 20px;
+	width: -moz-fit-content;
+	width: fit-content;
+}
+
+.channel-chat-date {
+	font-family: 'Gill Sans' , sans-serif;
+	font-size: small;
+	margin: 10px;
+	width: -moz-fit-content;
+	width: fit-content;
+}
+.avatar-channel{
+	flex: 0 0 40px; /* Taille fixe pour l'avatar, ajustez selon vos besoins */
+	max-width: 40px; /* Garantit que l'avatar ne dépasse pas cette largeur */
+	height: auto; /* Ajustez la hauteur en conséquence ou utilisez une valeur fixe */
+	align-items: center;
+	justify-content: center;
+}
+.bloc-contain {
+	display: flex; 
+	flex-direction: column;
+	align-items: center;
+  }
+
+.list-users-channel{
+	background-color: #848288;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	width: 100%;
+}
+
+.list-users-channel-owner{
+	background-color: #403e45;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+}
+
+
+.img-list-users-channel-admin{
+	width: 40px;
+	height: auto;
+	margin: 10px;
+	margin-top: 0px;
+	overflow-x: scroll;
+}
+.img-list-users-channel{
+	width: 40px;
+	height: auto;
+	margin: 10px;
+}
+.img-list-users-channel:hover{
+	transform: scale(1.2);
+	transition: transform 0.3s ease;
+}
+.avatar-container {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+}
+
+.admin-user {
+	width: 15px;
+	margin-top: 10px;
+}
+.avatar-container:hover {
+	transform: scale(1.2);
+	transition: transform 0.3s ease;
+}
+
+.bloc-owner-user{
+	background-color: transparent;
+	display: flex;
+	flex-direction: row;
+}
+/*!**********************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[5].oneOf[12].use[2]!./node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[5].oneOf[12].use[3]!./app/components/chat/bodyChat/chatChannel/sendBoxChannel/SendBoxChannel.css ***!
+  \**********************************************************************************************************************************************************************************************************************************************************************************************************************/
+.bloc-send-chat-channel{
+	display: flex;
+	justify-content: space-between;
+	resize: none;
+	width: 100%;
+	
+}
+.input-chat-channel{
+    box-sizing: border-box;
+    background-color: #848288;
+    font-family: 'Gill Sans' , sans-serif;
+    font-size: 20px;
+    width: 100%;
+	border: none;
+	padding: 10px;
+    width: 100%;
+	color: white;
+    /* height: 100%; */
+    resize: none;
+}
+
+.img-enter{
+	width: 50px;
+	height: auto;
+	margin: 0px 10px 10px 0px;
+}
+.img-enter:hover{
+	transition: transform 0.2s ease;
+	transform: scale(1.2);
+}
+.bloc-chat-enter{
+	display: flex;
+	flex-direction: row;
+	height: 7%;
+}
+/*!************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[5].oneOf[12].use[2]!./node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[5].oneOf[12].use[3]!./app/components/chat/bodyChat/chatFriendsList/ChatFriendsList.css ***!
+  \************************************************************************************************************************************************************************************************************************************************************************************************************/
+.chat-friends-list{
+	display:flex;
+	height: 100%;
+}
+/*!********************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[5].oneOf[12].use[2]!./node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[5].oneOf[12].use[3]!./app/components/chat/bodyChat/chatFriendsList/friendsList/FriendsList.css ***!
+  \********************************************************************************************************************************************************************************************************************************************************************************************************************/
+.bloc-friendslist-all{
+	/* scroll-behavior: auto; */
+	box-sizing: border-box;
+	/* background-color:#a1a1a1 ; */
+	/* border: 3px solid #333; */
+	width: 100%;
+	height: 100%;
+	border-radius:10px;
+	overflow: scroll;
+	color: #000000;
+	display : flex;
+	flex-direction: column;
+}
+.search-bar {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	border-radius: 10px;
+	padding: 10px;
+	width: 100%;
+	margin: 10px 0px;
+	justify-content: space-between;
+	background-color: #f0f0f0; /* Couleur de fond */
+}
+
+.search-input {
+	flex: 1 1; /* Le champ de recherche occupe tout l'espace disponible */
+	padding: 8px;
+	border: none;
+	border-radius: 5px;
+	margin-right: 10px;
+	font-size: 16px;
+	outline: none;
+}
+
+.search-icon {
+	color: white; /* Couleur du texte du bouton */
+	border: none;
+	border-radius: 5px;
+	padding: 8px 15px;
+	cursor: pointer;
+	font-size: 16px;
+	height: 30px;
+	width: auto;
+	outline: none;
+  }
+
+.bloc-all{
+	box-sizing: border-box;
+	width: 100%;
+	height: 50%;
+	border-radius: 10px;
+	color: #000000;
+	display: flex;
+	flex-direction: column;
+}
+
+.scroll-all{
+	flex-direction: column;
+	display: flex;
+	overflow-y: scroll;
+}
+.bloc-friendslist{
+	box-sizing: border-box;
+	width: 100%;
+	height: 50%;
+	border-radius:10px;
+	overflow-y: scroll;
+	color: #000000;
+	display : flex;
+	flex-direction: column;
+}
+.bloc-button-friendslist{
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	justify-content: space-between;
+}
+
+.button-friends-list-add {
+	width: (100% - 10px);
+	margin: 10px;
+	border: 5px solid #848288; /* Remplacez var(--border-color) par votre couleur de bordure souhaitée */
+	border-radius: 10px;
+	height: 40px;
+  }
+
+  .button-friends-list-add:hover {
+	background-color: #aa1359;
+  }
+
+.amies{
+	display: flex;
+	position:relative;
+	justify-content: center;
+	height: 100%;
+	align-items: center;
+	color: aliceblue;
+	font-size: 20px; /* Exemple de taille de police */
+	font-family: 'Gill Sans' , sans-serif;
+	flex: 1 1;
+	background-color: #a09ea3;
+
+}
+.amies:hover{
+	background-color: rgb(170, 19, 89);
+
+
+	box-shadow: 0 0 10px rgba(41, 41, 41, 0.756);
+
+}
+
+.on-off {
+	width: 20px;
+	height: 20px;
+	border-radius: 50%;
+	margin-right: 8px;
+	display: inline-block;
+	margin: 15px;
+	border-color: #aa1359;
+  }
+/* .profil-friendslist.on{
+	 background-color: green;
+	box-shadow: 0 0 10px green;
+} 
+
+.profil-friendslist.off{
+	background-color: red;
+	box-shadow: 0 0 10px red;
+}  */
+.profil-friendslist{
+	width: 35px;
+	height: 35px;
+	padding: 5px;
+	background-color: #7c7c7c;
+	margin: 0px 0px 0px 10px;
+}
+.onlineAndAvatar{
+	display: flex;
+	position: relative;
+}
+.online {
+	width: 15px;
+	height: 15px;
+	background-color: #35b93a; /* Couleur verte, tu peux changer cela selon tes préférences */
+	border-radius: 50%; /* Pour obtenir une forme de cercle */
+	position: absolute;
+    right: 10px;
+	
+}
+.offline {
+	width: 15px;
+	height: 15px;
+	background-color: #9c0d0d; /* Couleur verte, tu peux changer cela selon tes préférences */
+	border-radius: 50%; /* Pour obtenir une forme de cercle */
+	position: absolute;
+    right: 10px;
+  }
+/*++++++++ de friendlist*/
+
+.tab-and-userclicked{
+
+
+	display: flex;
+	flex-direction: column;
+}
+.amies.active{
+	background-color: rgb(170, 19, 89);
+	box-shadow: 0 0 10px rgba(41, 41, 41, 0.756);
+}
+
+/*!**************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[5].oneOf[12].use[2]!./node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[5].oneOf[12].use[3]!./app/components/chat/bodyChat/chatFriendsList/friendsList/friendsListTab/FriendsListTab.css ***!
+  \**************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+.bloc-tab{
+	height: 100%;
+    width: calc(100% - 20px);
+    display: flex;
+    margin: 0px 10px;
+    flex-direction: row;
+	align-items: center;
+	justify-content: center;
+	
+}
+.bloc-tab-img1{
+	background-color: #aa1359;
+	border-radius: 0px 0px 0px 10px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: calc(20% - 20px);
+	height: 40px;
+	padding: 10px;
+
+}
+
+.bloc-tab-img8{
+	background-color: #aa1359;
+
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: calc(20% - 20px);
+	height: 40px;
+	padding: 10px;
+	border-radius: 0px 0px 10px 0px;
+
+}
+.bloc-tab-img8:hover{
+	transform: scale(1.1);
+	transition: transform 0.2s ease;
+	box-shadow: 0 0 10px rgba(41, 41, 41, 0.756);
+}
+
+.bloc-tab-img1:hover{
+	transform: scale(1.1);
+	transition: transform 0.2s ease;
+	box-shadow: 0 0 10px rgba(41, 41, 41, 0.756);
+}
+
+.bloc-tab-img:hover{
+	transform: scale(1.1);
+	transition: transform 0.2s ease;
+	box-shadow: 0 0 10px rgba(41, 41, 41, 0.756);
+}
+
+.bloc-tab-img {
+	background-color: #aa1359;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: calc(20% - 20px);
+	height: 40px;
+	padding: 10px;
+
+}
+
+.image-tab {
+	width: 100%;
+	max-width: 40px;
+	height: auto;
+  }
+
+.image-tab-opacity {
+	align-items: center;
+	justify-content: center;
+	width: 100%;
+	max-width: 40px; 
+	height: auto;
+	opacity: 0.5;
+  }
+
+.image-tab-opacity:hover{
+	transform: scale(1.2);
+	transition: transform 0.2s ease;
+}
+
+/*!************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[5].oneOf[12].use[2]!./node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[5].oneOf[12].use[3]!./app/components/game/Game.css ***!
+  \************************************************************************************************************************************************************************************************************************************************************************/
+.right-half {
+	height: 90vh;
+    width: 75vw;
+	background: linear-gradient(180deg,hsl(330, 17%, 2%),#3e1284);
+	z-index: 7;
+	/* background-color: #8d7fa4; */
+    }
+
+@media only screen and (max-width: 800px) {
+	.right-half {
+		height: 45vh;
+		width: 100vw;
+	}
+	}
+
+	/* linear-gradient(180deg,hsl(267, 8%, 5%), */
+/*!*************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[5].oneOf[12].use[2]!./node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[5].oneOf[12].use[3]!./app/components/game/gameMenu/GameMenu.css ***!
+  \*************************************************************************************************************************************************************************************************************************************************************************************/
+
+  
+.slider-thumb {
+	display: flex;
+	justify-content: center; /* Centers horizontally */
+	flex-direction: column;
+	align-items: center; /* Centers vertically */
+	/* Ensure the div has a specified height or takes up the full height of its parent if not already defined */
+	height: 100%; /* Adjust based on your layout's needs */
+
+  }
+.slider-thumb::before {
+  /* z-index: 50; */
+  position: absolute;
+  content: "";
+  width: 50vmin;
+  height: 50vmin;
+  aspect-ratio: 1/1;
+  background: #848288;
+
+
+  border-radius: 62% 47% 82% 35% / 45% 45% 80% 66%;
+  will-change: border-radius, transform, opacity;
+  animation: sliderShape 5s linear infinite;
+  display: block;
+  z-index: -1;
+  -webkit-animation: sliderShape 5s linear infinite;
+}
+@keyframes sliderShape{
+  0%,100%{
+  border-radius: 42% 58% 70% 30% / 45% 45% 55% 55%;
+    transform: translate3d(0,0,0) rotateZ(0.01deg);
+  }
+  34%{
+      border-radius: 70% 30% 46% 54% / 30% 29% 71% 70%;
+    transform:  translate3d(0,5px,0) rotateZ(0.01deg);
+  }
+  50%{
+    transform: translate3d(0,0,0) rotateZ(0.01deg);
+  }
+  67%{
+    border-radius: 100% 60% 60% 100% / 100% 100% 60% 60% ;
+    transform: translate3d(0,-3px,0) rotateZ(0.01deg);
+  }
+}
+
+
+.background-game {
+	color: #fff; /* Couleur du texte principale */
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	aspect-ratio: 1/1;
+	height: 100vh; /* Hauteur de l'écran */
+  }
+  
+  /* Styles pour le titre du jeu */
+  .titleClass {
+	font-size: 2em;
+	margin-bottom: 20px;
+	color: #fff;
+  }
+  
+  /* Styles pour les boutons */
+  .buttonclass {
+	display: flex;
+	background-color: transparent; /* Couleur de fond par défaut */
+	color: #fff; /* Couleur du texte par défaut */
+	padding: 10px 20px;
+	margin: 10px;
+	border: none;
+	border-radius: 5px;
+	cursor: pointer;
+	font-size: 20px;
+	font-weight: bold;
+	font-family: 'Gill Sans' , sans-serif;
+  }
+  
+  .buttonclass:hover {
+	transform: scale(1.3);
+	transition: transform 0.7s ease;
+  }
+  
+  /* Ajoutez du style spécifique pour les deux boutons dans le cas où startGame est true */
+  .buttonclass + .buttonclass {
+	margin-top: 5px;
+  }
+  
+/*!************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[5].oneOf[12].use[2]!./node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[5].oneOf[12].use[3]!./app/components/game/gameMenu/gameStart/GameStart.css ***!
+  \************************************************************************************************************************************************************************************************************************************************************************************************/
+  .matchmakingClass {
+      block-size: 10%;
+      writing-mode: horizontal-tb;
+      justify-content: center;
+      align-items: center;
+      background-color: rgb(194, 194, 194);
+      height: 20%;
+      width: 40%;
+      margin: 0 auto;
+      margin-top: 25%;
+      border-radius: 20px;
+      padding: 1% 2%;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      position: relative;
+      display: flex;
+  }
+
+  .cancel-button {
+    padding: 1% 2%;
+    background-color: #6b0f1a;
+    color: rgb(255, 255, 255);
+    cursor: pointer;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    position: relative;
+    border: none;
+    border-radius: 20px;
+    /* top: 70%;
+    width: 20%; */
+    left: 40%;
+    top: 30%;
+    max-width: 400px;
+    font-size: 1vw;
+    display: flex;
+  }
+
+  .cancel-button:active {
+    animation: push 0.5s;
+ }
+
+ @keyframes push {
+    0% {
+          font-size: 1vw;
+       }
+       25% {
+          font-size: 0.80vw;
+       }
+       50% {
+          font-size: 1.4vw;
+       }
+       75% {
+          font-size: 0.94vw;
+       }
+       100% {
+          font-size: 1vw;
+       }
+ }
+
+  @keyframes textAnimation {
+      0% {
+          content: "MATCHMAKING";
+      }
+      25% {
+          content: "MATCHMAKING.";
+      }
+      50% {
+          content: "MATCHMAKING..";
+      }
+      75% {
+          content: "MATCHMAKING...";
+      }
+      100% {
+          content: "MATCHMAKING";
+      }
+  }
+
+  .matchmakingClass::after {
+      font-size: 1vw;
+      content: "MATCHMAKING";
+      animation: textAnimation 3s infinite;
+      width: 100%;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
+  }
+  
+  .cs-loader {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+  }
+
+  .cs-loader-inner {
+    position: relative;
+    /* transform: translateY(-50%); */
+    max-width: 400px;
+    width: calc(100% - 200px);
+    color: #FFF;
+    text-align: center;
+    /* padding: 0 100px; */
+    font-size: 2vw;
+  }
+  
+  .cs-loader-inner label {
+    font-size: 2vw;
+    opacity: 0;
+    display:inline-block;
+    margin-right: -120px;
+  }
+    
+    @keyframes lol {
+      0% {
+        opacity: 0;
+        transform: translateX(-10vw);
+      }
+      33% {
+        opacity: 1;
+        transform: translateX(0%);
+      }
+      66% {
+        opacity: 1;
+        transform: translateX(0%);
+      }
+      100% {
+        opacity: 0;
+        transform: translateX(10vw);
+      }
+    }
+    
+    .cs-loader-inner label:nth-child(6) {
+      animation: lol 4s infinite ease-in-out;
+    }
+    
+    .cs-loader-inner label:nth-child(5) {
+      animation: lol 4s 100ms infinite ease-in-out;
+    }
+    
+    .cs-loader-inner label:nth-child(4) {
+      animation: lol 4s 200ms infinite ease-in-out;
+    }
+    
+    .cs-loader-inner label:nth-child(3) {
+      animation: lol 4s 300ms infinite ease-in-out;
+    }
+    
+    .cs-loader-inner label:nth-child(2) {
+      animation: lol 4s 400ms infinite ease-in-out;
+    }
+    
+    .cs-loader-inner label:nth-child(1) {
+      animation: lol 4s 500ms infinite ease-in-out;
+    }
+/*!*************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[5].oneOf[12].use[2]!./node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[5].oneOf[12].use[3]!./app/components/game/gamePong/GamePong.css ***!
+  \*************************************************************************************************************************************************************************************************************************************************************************************/
+.pong-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background-color: #453232;
+    overflow: hidden;
+    display: flex;
+    /* align-self: center; */
+    justify-content: center; 
+}
+  
+.scoreboard
+{
+  width: 20%;
+  height: 15%;
+  background: #332122;
+  border-radius: 12px;
+  border: 3px solid white;
+  justify-content: space-around;
+  align-items: flex-start; 
+  color: white;
+  padding: 68px 82px;
+  gap: 100px;
+  box-shadow: 0px 0px 3px black;
+  flex-direction: column;
+}
+
+  .ball
+  {
+    position: absolute;
+    background-color: #000;
+    border-radius: 100%;
+  }
+  
+  .pongpaddle {
+    position: absolute;
+    background-color: #000;
+    border-radius: clamp(10px, 5vw, 25px);
+  }
+
+  .col-heading h1 {
+    font-family: "Verdana";
+    font-style: normal;
+    font-weight: 300%;
+    font-size: 150%;
+    line-height: 50%;
+    text-align: center;
+    color: rgb(252, 252, 252);
+  }
+  .col-display {
+    background: #010000;
+    margin: 0 auto; 
+    border-radius: 20px;
+    font-family: "Silkscreen", cursive;
+    height: 50%;
+    width: 40%;
+    text-align: center;
+    color: #998a8a;
+  }
+  
+
+  @media only screen and (max-width: 600px) {
+    body {
+      padding:20px 0px;
+      height:100%;
+    }
+    .container {
+      margin: auto auto;
+      padding-block: 30px;
+      flex-direction: column;
+      gap: 10px;
+      max-height: 100%;
+    }
+  }
+  
+  .game-blur {
+    filter: blur(5px); /* Ajustez la quantité de flou selon vos préférences */
+  }
+  
+  .countdown-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 48px;
+    color: white;
+    animation: gameCountdown 3s linear forwards; /* Animation de 3 secondes */
+}
+
+@keyframes gameCountdown {
+    0% { opacity: 1; } /* Début de l'animation */
+    100% { opacity: 0; } /* Fin de l'animation */
+}
+
+.no-blur-game {
+  filter: none;
+}
+/*!************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[5].oneOf[12].use[2]!./node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[5].oneOf[12].use[3]!./app/components/body/Body.css ***!
+  \************************************************************************************************************************************************************************************************************************************************************************/
+	.container-bloc {
+		display: flex;
+		flex-direction: row;
+		height: 93%;
+		width: 100%;
+}
+
+@media only screen and (max-width: 800px) {
+    .container-bloc {
+      flex-direction: column;
+      height: 93%;
+	  width: 100%;
+    }
+  }
+/*!****************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[5].oneOf[12].use[2]!./node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[5].oneOf[12].use[3]!./app/components/header/Header.css ***!
+  \****************************************************************************************************************************************************************************************************************************************************************************/
+.username{
+	font-family: 'Gill Sans' , sans-serif;
+	font-size: 15px;
+	color: white;
+	margin:5px;
+	font-weight: 700;
+	text-align: center;
+}
+.header {
+    width: 100vw;
+    height: 10%;
+	background: hsl(267, 8%, 5%);
+    color: #fff;
+    display: flex;
+align-items: center;
+	justify-content: center;
+	text-align: center;
+}
+.button-settings{
+	height: 100%;
+	width: 100%;
+	background-color: transparent;
+	border: none; 
+}
+.button-profils{
+	height: 75%;
+    width: 75%;
+    aspect-ratio: 1 / 1;
+    background-color: transparent;
+    border: none;
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    align-items: center;
+	/* border-radius: 50px; */
+}
+
+.button-logout{
+	width: 90%;
+	max-width: 50px;
+	height: auto;
+	object-fit: contain;
+}
+.button-logout:hover{
+	transition: transform 0.3s ease; /* Ajoutez une transition pour une animation fluide */
+	transform: scale(1.3);
+}
+
+
+.bloc-pong,
+.bloc-profils,
+.bloc-logout,
+.bloc-settings {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	height: 100%;
+}
+
+.bloc-username{
+	width: 80vw;
+	font-family: 'Gill Sans' , sans-serif;
+	font-size: 10px;
+	margin:10px;
+	font-weight: 700;
+	text-align: center;
+}
+
+.bloc-pong{
+	width: 70vw;
+	font-weight: bold;
+	font-size: 34px;
+    font-family: 'Gill Sans' , sans-serif;
+	font-weight: 700;
+	
+}
+.bloc-profils{
+	width: 15vw;
+}
+.bloc-settings{
+	width: 5vw;
+}
+.bloc-logout{
+	width: 5vw;
+}
+.profils {
+    height: 70%;
+    width: auto;
+    aspect-ratio: 1 / 1;
+    object-fit: contain;
+    border-radius: 10px;
+}
+.settings{
+	width: 90%;
+	max-width: 50px;
+	height: auto; /* Ajustez la hauteur selon vos besoins */
+	object-fit: contain;
+	
+}
+
+.button-settings:hover .settings {
+	transform: rotate(80deg) scale(1.15);;
+	transition: transform 0.3s ease; /* Ajoutez une transition pour une animation fluide */
+  }
+
+  .button-profils:hover {
+	transform: scale(1.15);
+	transition: transform 0.3s ease; /* Ajoutez une transition pour une animation fluide */
+}
+
+.bloc-notifications {
+    width: 10vw;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+	transform: scale(1.15);
+	transition: transform 0.3s ease;
+  }
+
+
+  .button-notifications {
+	display: flex;
+    align-items: center;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+	width: 5vw;
+    height: 100%;
+	justify-content: center;
+  }
+  
+  .notifications-icon {
+	  height: 70%;
+	  width: auto; 
+	  aspect-ratio: 1 / 1;
+  }
+
+  .notification-icon-container {
+	height: 70%;
+	width: auto; 
+	aspect-ratio: 1 / 1;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+  @keyframes shake {
+  0% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  50% { transform: translateX(5px); }
+  75% { transform: translateX(-5px); }
+  100% { transform: translateX(0); }
+}
+
+.button-notifications.shake {
+  animation: shake 0.5s ease-in-out;
+}
+
+.notif-window {
+	position: fixed;
+	top: 9vh;
+	right: 15vw;
+	width: 300px;
+	background-color: #a6a6a6;
+	box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+	z-index: 200;
+	border-radius: 5px;
+  }
+  
+  .notif {
+	padding: 10px;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+  }
+  
+  .notif-username {
+	font-weight: bold;
+	margin-right: 10px;
+  }
+  
+  .notif-accept,
+  .notif-decline {
+	background-color: #3498db;
+	color: #fff;
+	border: none;
+	padding: 5px 10px;
+	margin-left: 10px;
+	cursor: pointer;
+	border-radius: 3px;
+  }
+  
+  /* Styles pour le bouton de fermeture */
+  .notif-header {
+	padding: 10px;
+	background-color: #3498db;
+	color: #fff;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+  }
+  
+  .close-btn {
+	background-color: transparent;
+	border: none;
+	color: #fff;
+	cursor: pointer;
+	font-size: 14px;
+  }
+  
+  .notification-badge {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	position: relative;
+	/* top: 0; */
+	right: 5px;
+	background-color: #58140d;
+	color: #fff;
+	font-size: 12px;
+	padding: 5px;
+	border-radius: 50%;
+  }
+/*!***********************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[5].oneOf[12].use[2]!./node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[5].oneOf[12].use[3]!./app/globals.css ***!
+  \***********************************************************************************************************************************************************************************************************************************************************/
+.container {
+	display: flex;
+	height: 90%;
+}
+
+:root {
+	--first: #8ecae6ff;
+	--second: #2671bcff;
+	--third: #e97700ff;
+	--fourth: #ffb703ff;
+	--fifth: #d1470bff;
+  }
+body, html {
+	margin: 0;
+	padding: 0;
+}
+body{
+	position: fixed;
+  height: 100vh;
+  font-size: 20px; /* Exemple de taille de police */
+  font-family: 'Gill Sans', sans-serif;
+}
+
+/*
+d1470b
+e97700
+ffb703
+8ecae6
+2671bc
+*/

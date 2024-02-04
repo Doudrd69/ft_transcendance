@@ -186,12 +186,6 @@ const FriendsListComponent: React.FC = () => {
 
 			<div className="bloc-all">
 				<div className="search-bar">
-					{/* <img
-					src="chercher.png"
-					alt="Search Icon"
-					className="search-icon"
-
-					/> */}
 					<input
 						type="text"
 						placeholder="Rechercher des amis..."
