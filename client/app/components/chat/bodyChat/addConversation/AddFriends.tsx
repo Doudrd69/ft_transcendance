@@ -17,11 +17,12 @@ const AddFriendComponent: React.FC<AddFriendComponentProps> = ({ updateFriends, 
 	const { globalState } = useGlobal();
 
 	const handleFriendRequest = async (e: React.FormEvent) => {
+
+		e.preventDefault();
+
 		try {
-			e.preventDefault();
 
 			const friendRequestDto = {
-				initiatorLogin: sessionStorage.getItem("currentUserLogin"),
 				recipientLogin: formValue,
 			};
 
@@ -48,7 +49,7 @@ const AddFriendComponent: React.FC<AddFriendComponentProps> = ({ updateFriends, 
 
 				if (globalState.userSocket?.connected) {
 					globalState.userSocket?.emit('joinRoom', { roomName: data.name, roomID: data.id });
-					globalState.userSocket?.emit('addFriend', friendRequestDto);
+					globalState.userSocket?.emit('addFriend',  { recipient: friendRequestDto.recipientLogin } );
 				}
 			} else {
 				const error = await response.json();

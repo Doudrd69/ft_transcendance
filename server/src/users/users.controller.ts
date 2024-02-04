@@ -154,6 +154,7 @@ export class UsersController {
 	@HttpCode(HttpStatus.OK)
 	@Post('addfriend')
 	createFriendship(@Req() req, @Body() friendRequestDto: FriendRequestDto): Promise<boolean> {
+		// user is the initiator
 		const { user } = req; 
 		return this.usersService.createFriendship(friendRequestDto, user.sub);
 	}

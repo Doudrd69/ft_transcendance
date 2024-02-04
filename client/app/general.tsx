@@ -25,6 +25,7 @@ interface Game {
 
 interface FriendRequestDto {
 	recipientLogin: string;
+	initiatorID: number;
 	initiatorLogin: string;
 }
 
@@ -111,8 +112,12 @@ const GeneralComponent = () => {
 		if (response.ok) {
 			const conversationData = await response.json();
 			if (globalState.userSocket?.connected) {
-				console.log("Accepted friendrequest");
-				globalState.userSocket?.emit('friendRequestAccepted', { roomName: conversationData.name, roomID: conversationData.id, initiator: friendRequestDto.initiatorLogin, recipient: friendRequestDto.recipientLogin });
+				globalState.userSocket?.emit('friendRequestAccepted', {
+					roomName: conversationData.name,
+					roomID: conversationData.id,
+					initiator: friendRequestDto.initiatorLogin,
+					recipient: friendRequestDto.recipientLogin,
+				});
 				globalState.userSocket?.emit('joinRoom', { roomName: conversationData.name, roomID: conversationData.id });
 			}
 		}
@@ -275,8 +280,8 @@ const GeneralComponent = () => {
 			});
 		});
 
-		globalState.userSocket?.on('friendRequestAcceptedNotif', (data: { roomName: string, roomID: string, initiator: string, recipient: string }) => {
-			const { roomName, roomID, initiator, recipient } = data;
+		globalState.userSocket?.on('friendRequestAcceptedNotif', (data: { roomName: string, roomID: string, recipient: string }) => {
+			const { roomName, roomID, recipient } = data;
 			toast(<FriendRequestAccepted friend={recipient} />, {
 				pauseOnFocusLoss: false,
 			});
