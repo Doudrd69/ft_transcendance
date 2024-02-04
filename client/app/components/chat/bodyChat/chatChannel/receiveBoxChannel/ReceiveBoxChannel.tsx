@@ -129,7 +129,6 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 
 		globalState.userSocket?.on('userJoinedRoom', (notification: Message) => {
 			loadUserList();
-			// setMessages((prevMessages: Message[]) => [...prevMessages, notification])
 		});
 
 		globalState.userSocket?.on('userIsBan', () => {

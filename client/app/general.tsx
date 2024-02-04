@@ -253,8 +253,21 @@ const GeneralComponent = () => {
 		return false;
 	}
 
-	// Multi-purpose useEffect for socket handling
+	// UserSocket multi-purpose useEffect
 	useEffect(() => {
+
+		// Works on both connection and reconnection
+		globalState.userSocket?.on('connect', () => {
+			const personnalRoom = sessionStorage.getItem("currentUserLogin");
+			globalState.userSocket?.emit('joinPersonnalRoom', personnalRoom, sessionStorage.getItem("currentUserID"));
+		})
+
+		globalState.userSocket?.on('disconnect', () => {})
+
+		globalState.userSocket?.on('refreshUserOnlineState', (notif: string) => {
+			console.log("Friend online status event (general.tsx) --> ", notif);
+			toast.info(notif);
+		});
 
 		globalState.userSocket?.on('friendRequest', (friendRequestDto: FriendRequestDto) => {
 			toast(<FriendRequestReceived friendRequestDto={friendRequestDto} />, {
@@ -311,6 +324,9 @@ const GeneralComponent = () => {
 		});
 
 		return () => {
+			globalState.userSocket?.off('connect');
+			globalState.userSocket?.off('disconnect');
+			globalState.userSocket?.off('refreshUserOnlineState');
 			globalState.userSocket?.off('friendRequest');
 			globalState.userSocket?.off('friendRequestAcceptedNotif');
 			globalState.userSocket?.off('userJoinedRoom');
@@ -322,7 +338,6 @@ const GeneralComponent = () => {
 		}
 
 	}, [globalState?.userSocket]);
-
 
 	// GAME INVITE
 	useEffect(() => {
