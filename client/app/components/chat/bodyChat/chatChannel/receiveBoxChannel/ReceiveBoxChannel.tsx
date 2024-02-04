@@ -227,7 +227,6 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 											src={`${process.env.API_URL}${user.avatarURL}`}
 											onClick={() => {
 												chatDispatch({ type: 'ACTIVATE', payload: 'dontcandcel' });
-												chatDispatch({ type: 'ACTIVATE', payload: 'dontcandcel' });
 												chatDispatch({ type: 'ACTIVATE', payload: 'showOptionsUserChannel' });
 												chatDispatch({ type: 'SET_CURRENT_OPTION_CHANNEL_NAME', payload: user.login });
 												chatDispatch({ type: 'SET_CURRENT_USER', payload: user });

@@ -17,6 +17,7 @@
 	align-items: center;
 	border-radius: 10px;
 	padding: 10px;
+	width: 100%;
 	margin: 10px 0px;
 	justify-content: space-between;
 	background-color: #f0f0f0; /* Couleur de fond */
@@ -49,7 +50,7 @@
 	width: calc(100% - 20px);
 	height: 50%;
 	border-radius: 10px;
-	margin: 10px;
+
 	color: #000000;
 	display: flex;
 	flex-direction: column;
@@ -98,15 +99,18 @@
 	height: 100%;
 	align-items: center;
 	color: aliceblue;
-	margin: 0px 10px 0px 0px;
 	font-size: 20px; /* Exemple de taille de police */
 	font-family: 'Gill Sans' , sans-serif;
 	flex: 1;
-	border-radius: 10px;
-	background-color: #aa1359;
+	background-color: #a09ea3;
+
 }
 .amies:hover{
-	background-color: #a09ea3;
+	background-color: rgb(170, 19, 89);
+
+
+	box-shadow: 0 0 10px rgba(41, 41, 41, 0.756);
+
 }
 
 .on-off {
@@ -142,7 +146,7 @@
 	background-color: #35b93a; /* Couleur verte, tu peux changer cela selon tes préférences */
 	border-radius: 50%; /* Pour obtenir une forme de cercle */
 	position: absolute;
-    left: 10px;
+    right: 10px;
 	
 }
 .offline {
@@ -151,7 +155,7 @@
 	background-color: #9c0d0d; /* Couleur verte, tu peux changer cela selon tes préférences */
 	border-radius: 50%; /* Pour obtenir une forme de cercle */
 	position: absolute;
-    left: 10px;
+    right: 10px;
   }
 /*++++++++ de friendlist*/
 
@@ -160,5 +164,6 @@
 	flex-direction: column;
 }
 .amies.active{
-	background-color: #aa1359;
+	background-color: rgb(170, 19, 89);
+	box-shadow: 0 0 10px rgba(41, 41, 41, 0.756);
 }

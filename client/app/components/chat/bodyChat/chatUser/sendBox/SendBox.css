@@ -7,17 +7,17 @@
 	
 }
 .input-chat{
-	/* border: 3px solid #333; */
-	box-sizing: border-box;
-	background-color:#a1a1a1 ;
-	font-family: 'Gill Sans' , sans-serif;
-	font-size: 20px;
-	margin: 0px 10px 10px 10px;
-	width: 100%;
-	border-radius:10px;
-	width: 100%;
+    box-sizing: border-box;
+    background-color: #848288;
+    font-family: 'Gill Sans' , sans-serif;
+    font-size: 20px;
+    width: 100%;
+	border: none;
 	padding: 10px;
-	resize: none;
+    width: 100%;
+	color: white;
+    /* height: 100%; */
+    resize: none;
 }
 .button-send{
 		/* scroll-behavior: auto; */
@@ -52,5 +52,5 @@
 .bloc-chat-enter{
 	display: flex;
 	flex-direction: row;
-	flex:1;
+	height: 7%;
 }

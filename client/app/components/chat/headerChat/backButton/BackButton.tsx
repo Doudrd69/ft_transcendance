@@ -28,14 +28,15 @@ const BackButtonComponent: React.FC = () => {
 	}, []);
 
 	return  (
-		<img
-		  className="back-button"
-		  src="./closeblack.png"
-		  onClick={() => {
-			handleCancel();
-		  }}
-		  alt="Back Button"
-		/>
+		null
+		// <img
+		//   className="back-button"
+		//   src="./closeblack.png"
+		//   onClick={() => {
+		// 	handleCancel();
+		//   }}
+		//   alt="Back Button"
+		// />
 	  );
 };
 export default BackButtonComponent;

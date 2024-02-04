@@ -1,11 +1,10 @@
 .bloc-discussion-chat {
     scroll-behavior: auto;
     box-sizing: border-box;
-    background-color: #848288;
-    margin: 0px 10px 10px 10px;
+    /* background-color: #848288; */
+    margin: 0px 10px 0px 10px;
     width: calc(100% - 20px);
-    height: 100%;
-    border-radius: 10px;
+    height: 93%;
     overflow: scroll;
     color: var(--first);
 }
@@ -20,20 +19,23 @@
     word-wrap: break-word;
     overflow-wrap: break-word;
     padding: 5px;
-    margin: 5px;
+    margin-top: 10px;
+	margin-bottom: 10px;
     white-space: pre-wrap;
     max-width: 100%;
 }
 
 .my-message {
-    background-color: #332122;
+    background-color: #1bb418;
     border-radius: 15px 15px 0px 15px;
     margin-left: auto;
     align-self: flex-end;
 }
 
 .other-message {
-    background-color: #70504d;
+	background-color: #69686c;
+
+
     border-radius: 15px 15px 15px 0px;
     margin-right: auto;
     align-self: flex-start;
@@ -44,7 +46,7 @@
     color: white;
     margin: 5px;
     max-width: 80%; 
-	font-size: 20px;
+	font-size: 23px;
     width: fit-content;
 }
 
@@ -53,6 +55,8 @@
     font-size: small;
     margin: 5px;
     width: fit-content;
+	color: #ffffff;
+
 }
 
   
