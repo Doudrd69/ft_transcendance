@@ -1,9 +1,9 @@
 .bloc-btn {
-	flex-direction: row;
-	height: 50px;
-	margin: 10px;
-	justify-content: space-between;
-	text-align: center;
-	display: flex;
+    flex-direction: row;
+    height: 7%;
+    justify-content: space-between;
+    text-align: center;
+    display: flex;
     align-items: center;
+	
 }

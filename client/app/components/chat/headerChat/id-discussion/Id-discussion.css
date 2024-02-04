@@ -1,13 +1,12 @@
 .bloc-id{
-	display: flex;
-	background-color:#aa1359 ;
-	height: 100%;
-	width: 90%;
-	text-align: center;
-	align-items: center;
-	border-radius:10px;
-	justify-content: center;
-	position: relative;
+    display: flex;
+    background-color: #aa1359;
+    height: 100%;
+	width: 100%;
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+    position: relative;
 }
 
 .image-id{

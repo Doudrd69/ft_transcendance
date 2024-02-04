@@ -58,7 +58,7 @@ const SendBoxComponent: React.FC = () => {
 	return (
 			<div className="bloc-chat-enter">
 				<form className="bloc-send-chat" onSubmit={handleMessage}>
-					<input className="input-chat" placeholder="message..." value={messageValue} onChange={handleMessageInput}></input>
+					<input className="input-chat" placeholder="whasup..." value={messageValue} onChange={handleMessageInput}></input>
 					{/* <button className="button-send" type="submit"></button> */}
 				</form>
 			</div>

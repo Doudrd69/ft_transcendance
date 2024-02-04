@@ -1,13 +1,11 @@
 .bloc-channel-chat {
     scroll-behavior: auto;
     box-sizing: border-box;
-    background-color: #848288;
-    margin: 0px 10px 10px 10px;
-    width: calc(100% - 20px);
+    width: 100%;
     height: 100%;
     border-radius: 10px;
     overflow: scroll;
-    color: var(--first);
+	color: white;
 }
 
 .receive-chat {
@@ -26,7 +24,7 @@
 }
 
 .my-message-channel {
-    background-color: #332122;
+    background-color: #1bb418;
     border-radius: 15px 15px 15px 15px;
     margin-left: auto;
 }
@@ -41,12 +39,14 @@
 	text-align: center;
 }
 .other-message-channel {
-	background-color: #70504d;
+    background-color: #1bb418;
+
 	border-radius: 15px 15px 15px 15px;
 }
 
 .user-name{
 	font-family: 'Gill Sans' , sans-serif;
+	color: black;
 	margin: 5px;
 	width: 100%; 
 	font-size: 15px;
@@ -83,10 +83,6 @@
 
 .list-users-channel{
 	background-color: #848288;
-
-	margin: 10px;
-	margin-top: 0px;
-	border-radius: 10px;
 	display: flex;
 	flex-direction: row;
 	align-items: center;
@@ -94,12 +90,7 @@
 }
 
 .list-users-channel-owner{
-	background-color: #848288;
-	width: 70px;
-	margin: 10px;
-	margin-top: 0px;
-	margin-right: 0px;
-	border-radius: 10px;
+	background-color: #403e45;
 	display: flex;
 	flex-direction: row;
 	align-items: center;
@@ -139,6 +130,7 @@
 }
 
 .bloc-owner-user{
+	background-color: transparent;
 	display: flex;
 	flex-direction: row;
 }

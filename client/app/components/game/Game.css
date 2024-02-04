@@ -1,7 +1,7 @@
 .right-half {
 	height: 90vh;
     width: 75vw;
-	background: #2671bcff;
+	background: linear-gradient(180deg,hsl(330, 17%, 2%),#3e1284);
 	z-index: 7;
 	/* background-color: #8d7fa4; */
     }

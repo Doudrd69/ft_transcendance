@@ -1,5 +1,5 @@
 import './ChannelList.css';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, use } from 'react';
 import { useChat } from '../../../ChatContext';
 import AddConversationComponent from '../../addConversation/AddConversation';
 import { Socket } from 'socket.io-client';
@@ -59,7 +59,10 @@ const ChannelListComponent: React.FC = () => {
 					setIsAdmin([...isAdmin]);
 				if (usersList ) {
 					setUserList([...usersList]);
-				}	
+				}
+				console.log(conversationList);
+				console.log(usersList);
+				console.log(isAdmin);
 			}
 			else {
 				const error = await response.json();
@@ -145,11 +148,13 @@ const ChannelListComponent: React.FC = () => {
 		chatDispatch({ type: 'SET_CURRENT_CONVERSATION_IS_PROTECTED', payload: conversation.isProtected });
 		chatDispatch({ type: 'ACTIVATE', payload: 'currentChannelBool' });
 		chatDispatch({ type: 'ACTIVATE', payload: 'dontcancel' });
-		if(isAdmin[index])
-		{
-			chatDispatch({ type: 'ACTIVATE', payload: 'showAdmin' });
-			chatDispatch({ type: 'ACTIVATE', payload: 'isAdmin' });
-		}
+		// if(isAdmin[index])
+		// {
+		// console.log('jysuisaps');
+
+		// 	chatDispatch({ type: 'ACTIVATE', payload: 'showAdmin' });
+		// 	chatDispatch({ type: 'ACTIVATE', payload: 'isAdmin' });
+		// }
 		const me = user.filter((user: User) => user.login === sessionStorage.getItem("currentUserLogin"));
 
 		if(me[0].isOwner)
