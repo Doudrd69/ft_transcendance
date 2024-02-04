@@ -16,13 +16,13 @@ const SendBoxComponent: React.FC = () => {
 	};
 	
 	const handleMessage = async (e: React.FormEvent) => {
+
 		const messageDto = {
-			from: sessionStorage.getItem("currentUserLogin"),
 			content: messageValue,
 			post_datetime: new Date(),
 			conversationID: chatState.currentConversationID,
 		}
-		// console.log("messageDto", messageDto);
+
 		try {
 			e.preventDefault();
 	

@@ -808,6 +808,27 @@ export class ChatService {
 	/***					CONVERSATION						***/
 	/**************************************************************/
 	
+	async isUserInConversation(userID: number, conversationID: number): Promise<User> {
+
+		const conversation: Conversation = await this.conversationRepository.findOne({ where: { id: conversationID } });
+
+		const user : User = await this.usersRepository.findOne({
+			where: { id: userID },
+			relations: ['groups', 'groups.conversation'],
+		});
+
+		if (user && conversation) {
+
+			const group = await this.getRelatedGroup(user, conversation);
+			if (group)
+				return user;
+
+			throw new HttpException('User is not in conversation', HttpStatus.NOT_FOUND);
+		}
+
+		throw new HttpException('User or Channel cannot be loaded', HttpStatus.NOT_FOUND);
+	}
+
 	async deleteConversation(deleteConversationDto: DeleteConversationDto, userID: number): Promise<boolean> {
 
 		const conversationToDelete: Conversation = await this.conversationRepository.findOne({ where: { id: deleteConversationDto.conversationID } });
@@ -1171,7 +1192,7 @@ export class ChatService {
 				throw new HttpException(`user is ban`, HttpStatus.BAD_REQUEST);
 	
 			const newMessage = new Message();
-			newMessage.from = messageDto.from;
+			newMessage.from = sender.username;
 			newMessage.senderId = sender.id;
 			newMessage.content = messageDto.content;
 			newMessage.post_datetime = messageDto.post_datetime;

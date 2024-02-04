@@ -43,6 +43,9 @@ const ProfilsSettingsComponent: React.FC = () => {
 				sessionStorage.setItem("currentUserLogin", newUsername);
 				globalState.userSocket?.emit('joinRoom',  { roomName: sessionStorage.getItem("currentUserLogin"), roomID: '' });
 				globalState.userSocket?.emit('refreshUserChannelList', { userToRefresh: newUsername });
+				// globalState.userSocket?.emit('refreshGlobalList');
+				globalState.userSocket?.emit('refreshUserList');
+				globalState.userSocket?.emit('refreshHeader');
 				toast.success('Username has been updated');
 			} else {
 				const error = await response.json();
