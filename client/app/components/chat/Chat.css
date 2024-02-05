@@ -5,6 +5,7 @@
 	width: 35%;
 	z-index: 90;
 	height: 90vh;
+	background-color: aliceblue
 }
 
 @media only screen and (max-width: 800px) {
