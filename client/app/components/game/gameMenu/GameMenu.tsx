@@ -65,50 +65,18 @@ const Menu = () => {
 
 		try {
 				globalState.gameMode = "NORMAL";
-				globalState.userSocket?.emit('checkAndSetUserInMatchmaking', { userId: sessionStorage.getItem("currentUserID")});
+				globalState.userSocket?.emit('checkAndSetUserInMatchmaking');
 
 		} catch (error) {
 			console.error(error);
 		}
 	};
 
-	//     GameGtw client connected : cQ264ZpyzQgo2rlAAAAF
-// server         | == wmonacho, userID= 1 JOINS MATCHMAKING ==
-// server         | gameMode ==== NORMAL
-// server         | Search for userID  1
-// server         | Search for playerID  cQ264ZpyzQgo2rlAAAAF
-// server         | User game : false
-// server         | joinSpeedQueue: 
-// server         | joinNormalQueue: cQ264ZpyzQgo2rlAAAAF
-// server         | Ready to start:  false
-// server         | emit leave-matchmaking : cQ264ZpyzQgo2rlAAAAF
-// server         | quitSpeedQueue: 
-// server         | quitNormalQueue: 
-// server         | [handleDisconnect] ONE DISCONNECT
-// server         | [handleDisconnect] User 1 retrieved by socketId
-// server         | [handleDisconnect] Retrieved disconnected user : wmonacho
-// server         | user ingame : false, user inmatchmaking: false
-// server         | [cQ264ZpyzQgo2rlAAAAF] GameGtw client disconnected : cQ264ZpyzQgo2rlAAAAF
-
-
-
-
 	const handleSpeedClick = () => {
 
 		try {
-			dispatchGame({ type: 'TOGGLE', payload: 'showGameMatchmaking' });
 			globalState.gameMode = "SPEED";
-			const gameSocket = io(`${process.env.API_URL}/game`, {
-				autoConnect: false,
-				auth: {
-					token: sessionStorage.getItem("jwt"),
-				}
-			});
-			gameSocket.connect();
-			gameSocket.on('connect', () => {
-				dispatch({ type: 'SET_GAME_SOCKET', payload: gameSocket });
-				gameSocket.emit('linkSocketWithUser', { playerLogin: sessionStorage.getItem("currentUserLogin"), userId: sessionStorage.getItem("currentUserID") });
-			});
+			globalState.userSocket?.emit('checkAndSetUserInMatchmaking');
 
 		} catch (error) {
 			console.error(error);

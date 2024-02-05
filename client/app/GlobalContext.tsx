@@ -45,6 +45,8 @@ interface GlobalState {
 	gameInviteValidation: boolean;
 	gameSocketConnected: boolean;
 	gameMode: string;
+	userTwoIdGame: number;
+	userTwoGameSocketId: string;
 
 	[key: string]: boolean | string | Socket | undefined | number | null;
 }
@@ -76,6 +78,8 @@ const initialState: GlobalState = {
 	gameInviteValidation: false,
 	gameSocketConnected: false,
 	gameMode: "NORMAL",
+	userTwoIdGame: 0,
+	userTwoGameSocketId: "",
 };
 
 // Réducteur

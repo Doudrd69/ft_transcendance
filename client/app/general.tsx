@@ -2,7 +2,7 @@ import { useSearchParams } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { io } from 'socket.io-client';
+import { Socket, io } from 'socket.io-client';
 import { useGlobal } from './GlobalContext';
 import AccessComponent from './access';
 import BodyComponent from './components/body/Body';
@@ -33,6 +33,11 @@ interface GameInviteDto {
 	senderUsername: string;
 }
 
+interface GameInviteUserTwoDto {
+	userTwoId: number;
+	userTwoGameId: string
+}
+
 const GeneralComponent = () => {
 
 	const { globalState, dispatch } = useGlobal();
@@ -52,8 +57,9 @@ const GeneralComponent = () => {
 		globalState.userSocket?.emit('checkAndsetInGame', {
 			oposantUserId: gameInviteDto.senderUserID,
 		})
-		globalState.userSocket?.on('usersNotInGame', () => {
+		globalState.userSocket?.on('usersNotInGame', (userId: number) => {
 			console.log(`USER CREATE GAMESOCKET`);
+			// set globalstate userTwoId
 			globalState.userSocket?.off('usersNotInGame');
 			const gameSocket = io(`${process.env.API_URL}/game`, {
 				autoConnect: false,
@@ -63,10 +69,13 @@ const GeneralComponent = () => {
 			});
 			gameSocket.connect();
 			dispatch({ type: 'SET_GAME_SOCKET', payload: gameSocket });
-			globalState.userSocket?.emit('inviteAccepted', {
-				userTwoId: gameInviteDto.senderUserID, // il est null ce connard
-				playerOneLogin: sessionStorage.getItem("currentUserLogin"),
-				playerTwoLogin: gameInviteDto.senderUsername,
+			gameSocket.on('connect', () => {
+				console.log("GAMESOCKET CONNECT USERTWO")
+				// set globalstate game id
+				globalState.userSocket?.emit('inviteAccepted', {
+					otherUserId: gameInviteDto.senderUserID,
+					userGameSocketId: gameSocket.id,
+				});
 			});
 			return;
 		})
@@ -342,21 +351,41 @@ const GeneralComponent = () => {
 	}, [globalState?.userSocket]);
 
 	// GAME INVITE
+
+	useEffect(() => {
+		globalState.userSocket?.on('createGameInviteSocket', (GameInviteUserTwoDto: GameInviteUserTwoDto) => {
+			console.log(`before emit luaunch : ${GameInviteUserTwoDto.userTwoId}, ${GameInviteUserTwoDto.userTwoGameId}`);
+			globalState.gameSocket?.emit('launchGameInvite', {userTwoId: GameInviteUserTwoDto.userTwoId, userTwoGameId: GameInviteUserTwoDto.userTwoGameId});
+		});
+		return () => {
+			globalState.userSocket?.off('createGameInviteSocket');
+		};
+	}, [globalState?.userSocket, globalState?.gameSocket]);
+
 	useEffect(() => {
 
 		console.log("useEfects triggerd")
 
 		console.log("Enter events in use-effect");
 
-		// globalState.userSocket.on('acceptInvitation', () => {
-		// 	console.log("VALIDATION");
-		// 	globalState.gameInviteValidation = true;
-		// 	globalState.gameSocketConnected = false;
-		// });
+		globalState.userSocket?.on('acceptInvitation', (GameInviteUserTwoDto: GameInviteUserTwoDto) => {
+			console.log("VALIDATION");
+			globalState.gameInviteValidation = true;
+			globalState.gameSocketConnected = false;
+			// console.log(` before setgameinvite : ${userTwoID}, ${userTwoId} | ${userTwoGameID}, ${userTwoGameId} `)
+			const gameSocket: Socket = io(`${process.env.API_URL}/game`, {
+				autoConnect: false,
+				auth: {
+					token: sessionStorage.getItem("jwt"),
+				}
+			});
+			gameSocket.connect();
+			dispatch({ type: 'SET_GAME_SOCKET', payload: gameSocket });
+			globalState.userSocket?.emit('setGameInvite', {userTwoId: GameInviteUserTwoDto.userTwoId, userTwoGameId: GameInviteUserTwoDto.userTwoGameId});
+		});
 		globalState.userSocket?.on('deniedInvitation', () => {
 			console.log("DENIED :", globalState.gameSocket?.id)
 			globalState.gameSocketConnected = false;
-
 		});
 		globalState.userSocket?.on('userToInviteAlreadyInGame', () => {
 			globalState.gameSocketConnected = false;
@@ -381,10 +410,9 @@ const GeneralComponent = () => {
 			// globalState.gameSocket?.off('acceptInvitation');
 			globalState.userSocket?.off('closedInvitation');
 			globalState.userSocket?.off('deniedInvitation');
-			globalState.gameSocket?.off('disconnect');
 		};
 
-	}, [globalState?.gameSocket, globalState.gameInviteValidation, globalState?.userSocket, globalState.gameSocketConnected]);
+	}, [globalState?.gameSocket, globalState.gameInviteValidation, globalState?.userSocket, globalState.gameSocketConnected, globalState.userTwoIdGame, globalState.userTwoGameSocketId]);
 
 	// Connection - Deconnection useEffect
 	useEffect(() => {
@@ -413,6 +441,7 @@ const GeneralComponent = () => {
 
 		globalState.gameSocket?.on('disconnect', () => {
 			console.log('GameSocket? disconnected from the server : ', globalState.gameSocket?.id);
+			globalState.gameSocketConnected = false;
 		})
 
 		globalState.gameSocket?.on('joinGame', (game: Game) => {

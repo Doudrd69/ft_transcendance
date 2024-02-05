@@ -76,6 +76,23 @@ const GameInviteComponent: React.FC = () => {
 			// faire un return off des on
 		}, [globalState.gameInvite]);
 
+		// useEffect(() => {
+		// 	globalState.gameSocket?.on('createGameSocketInvite') {
+		// 		const gameSocket: Socket = io(`${process.env.API_URL}/game`, {
+		// 			autoConnect: false,
+		// 			auth: {
+		// 				token: sessionStorage.getItem("jwt"),
+		// 			},
+		// 		});
+		// 		gameSocket.connect();
+		// 		gameSocket.on('connect', () => {
+		// 			// emit le gameInvite
+		// 		});
+
+		// 	}
+
+		// });
+
 	return (
 		<div></div>
 	);
