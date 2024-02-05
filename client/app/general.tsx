@@ -31,7 +31,6 @@ interface FriendRequestDto {
 
 interface GameInviteDto {
 	senderUserID: number;
-	senderUsername: string;
 }
 
 interface GameInviteUserTwoDto {
@@ -46,6 +45,7 @@ const GeneralComponent = () => {
 	const [show2FAForm, setShow2FAForm] = useState(false);
 	const [authValidated, setAuthValidated] = useState(false);
 	const [Game, setGame] = useState<Game>();
+	const [listSendUserIdToPlayGame, setListSendUserIdToPlayGame] = useState<GameInviteDto[]>([]);
 
 	const searchParams = useSearchParams();
 	const code = searchParams.get('code');
@@ -59,9 +59,6 @@ const GeneralComponent = () => {
 			oposantUserId: gameInviteDto.senderUserID,
 		})
 		globalState.userSocket?.on('usersNotInGame', (userId: number) => {
-			console.log(`USER CREATE GAMESOCKET`);
-			// set globalstate userTwoId
-			globalState.userSocket?.off('usersNotInGame');
 			const gameSocket = io(`${process.env.API_URL}/game`, {
 				autoConnect: false,
 				auth: {
@@ -71,8 +68,6 @@ const GeneralComponent = () => {
 			gameSocket.connect();
 			dispatch({ type: 'SET_GAME_SOCKET', payload: gameSocket });
 			gameSocket.on('connect', () => {
-				console.log("GAMESOCKET CONNECT USERTWO")
-				// set globalstate game id
 				globalState.userSocket?.emit('inviteAccepted', {
 					otherUserId: gameInviteDto.senderUserID,
 					userGameSocketId: gameSocket.id,
@@ -83,20 +78,23 @@ const GeneralComponent = () => {
 	}
 
 	const gameInviteClosed = (gameInviteDto: GameInviteDto) => {
+		console.log("lololo")
+		unfillListUserId(gameInviteDto);
 		setTimeout(() => {
 			globalState.userSocket?.emit('inviteClosed', {
-				senderUsername: gameInviteDto.senderUsername,
+				senderUserId: gameInviteDto.senderUserID,
 			})
 		}, 200);
 	}
 
 	const gameInviteDeny = (gameInviteDto: GameInviteDto) => {
 		globalState.userSocket?.emit('inviteDenied', {
-			senderUsername: gameInviteDto.senderUsername,
+			senderUserId: gameInviteDto.senderUserID,
 		});
 	}
 
 	const GameInviteNotification = ({ closeToast, toastProps, gameInviteDto }: any) => (
+
 		<div>
 			You received a game invite from  {gameInviteDto.senderUsername}
 			<button style={{ padding: '5px ' }} onClick={() => {
@@ -273,6 +271,28 @@ const GeneralComponent = () => {
 		return false;
 	}
 
+	const fillListUserId = (newInviteDto: GameInviteDto) => {
+		const exists = listSendUserIdToPlayGame.find(invite => invite.senderUserID === newInviteDto.senderUserID);
+		// console.log('[exists]', exists);
+		if (!exists || exists == undefined) {
+			// console.log("salut!");
+			setListSendUserIdToPlayGame([...listSendUserIdToPlayGame, newInviteDto]);
+			return true;
+		}
+		return false;
+		console.log('============>', listSendUserIdToPlayGame)
+	}
+
+	const unfillListUserId = (newInviteDto: GameInviteDto) => {
+		const exists = listSendUserIdToPlayGame.find(invite => invite.senderUserID === newInviteDto.senderUserID);
+		console.log('[exists]', exists);
+		if (exists) {
+			console.log("salut!");
+			setListSendUserIdToPlayGame(listSendUserIdToPlayGame.filter(invite => invite.senderUserID !== newInviteDto.senderUserID));
+		}
+		console.log('============>', listSendUserIdToPlayGame)
+	}
+
 	// UserSocket multi-purpose useEffect
 	useEffect(() => {
 
@@ -331,13 +351,16 @@ const GeneralComponent = () => {
 
 		globalState.userSocket?.on('gameInvite', (gameInviteDto: GameInviteDto) => {
 
+
 			console.log("REACT GAME INVITE");
-			toast(<GameInviteNotification gameInviteDto={gameInviteDto} />,
-				{
-					pauseOnFocusLoss: false,
-					autoClose: 5000,
-					onClose: props => gameInviteClosed(gameInviteDto),
-				});
+			if (fillListUserId(gameInviteDto)) {
+				toast(<GameInviteNotification gameInviteDto={gameInviteDto} />,
+					{
+						pauseOnFocusLoss: false,
+						autoClose: 5000,
+						onClose: props => gameInviteClosed(gameInviteDto),
+					});
+			}
 		});
 
 		return () => {
@@ -359,8 +382,7 @@ const GeneralComponent = () => {
 
 	useEffect(() => {
 		globalState.userSocket?.on('createGameInviteSocket', (GameInviteUserTwoDto: GameInviteUserTwoDto) => {
-			console.log(`before emit luaunch : ${GameInviteUserTwoDto.userTwoId}, ${GameInviteUserTwoDto.userTwoGameId}`);
-			globalState.gameSocket?.emit('launchGameInvite', {userTwoId: GameInviteUserTwoDto.userTwoId, userTwoGameId: GameInviteUserTwoDto.userTwoGameId});
+			globalState.gameSocket?.emit('launchGameInvite', { userTwoId: GameInviteUserTwoDto.userTwoId, userTwoGameId: GameInviteUserTwoDto.userTwoGameId });
 		});
 		return () => {
 			globalState.userSocket?.off('createGameInviteSocket');
@@ -374,10 +396,9 @@ const GeneralComponent = () => {
 		console.log("Enter events in use-effect");
 
 		globalState.userSocket?.on('acceptInvitation', (GameInviteUserTwoDto: GameInviteUserTwoDto) => {
-			console.log("VALIDATION");
+			console.log("[acceptInvitation] VALIDATION");
 			globalState.gameInviteValidation = true;
 			globalState.gameSocketConnected = false;
-			// console.log(` before setgameinvite : ${userTwoID}, ${userTwoId} | ${userTwoGameID}, ${userTwoGameId} `)
 			const gameSocket: Socket = io(`${process.env.API_URL}/game`, {
 				autoConnect: false,
 				auth: {
@@ -386,10 +407,10 @@ const GeneralComponent = () => {
 			});
 			gameSocket.connect();
 			dispatch({ type: 'SET_GAME_SOCKET', payload: gameSocket });
-			globalState.userSocket?.emit('setGameInvite', {userTwoId: GameInviteUserTwoDto.userTwoId, userTwoGameId: GameInviteUserTwoDto.userTwoGameId});
+			globalState.userSocket?.emit('setGameInvite', { userTwoId: GameInviteUserTwoDto.userTwoId, userTwoGameId: GameInviteUserTwoDto.userTwoGameId });
 		});
 		globalState.userSocket?.on('deniedInvitation', () => {
-			console.log("DENIED :", globalState.gameSocket?.id)
+			console.log("[deniedInvitation] DENIED :")
 			globalState.gameSocketConnected = false;
 		});
 		globalState.userSocket?.on('userToInviteAlreadyInGame', () => {
@@ -403,18 +424,21 @@ const GeneralComponent = () => {
 			globalState.gameSocketConnected = false;
 		})
 		globalState.userSocket?.on('closedInvitation', () => {
-			console.log("CLOSED :", globalState.gameSocket?.id)
+			console.log("[closedInvitation] CLOSED :")
 			if (globalState.gameInviteValidation == false) {
-				console.log("CLOSED DENY :", globalState.gameSocket?.id)
+				console.log("[closedInvitation] CLOSED AND don't Accept :")
 				globalState.gameSocketConnected = false;
 			}
 			globalState.gameSocketConnected = false;
 		});
 
 		return () => {
-			// globalState.gameSocket?.off('acceptInvitation');
+			globalState.userSocket?.off('acceptInvitation');
 			globalState.userSocket?.off('closedInvitation');
 			globalState.userSocket?.off('deniedInvitation');
+			globalState.userSocket?.off('userInGame');
+			globalState.userSocket?.off('usersInGame');
+			globalState.userSocket?.off('userToInviteAlreadyInGame');
 		};
 
 	}, [globalState?.gameSocket, globalState.gameInviteValidation, globalState?.userSocket, globalState.gameSocketConnected, globalState.userTwoIdGame, globalState.userTwoGameSocketId]);

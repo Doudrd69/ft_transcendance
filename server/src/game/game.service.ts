@@ -126,57 +126,6 @@ export class GameService {
 		return (user.login);
 	}
 
-	// async gameInvite(server: any, client: any, gameInfoDto: GameInfoDto ) {
-	// 		const playerTwoLogin = await this.getLoginByUserId(gameInfoDto.userTwoId)
-	// 		const playerOneLogin = await this.getLoginByUserId(gameInfoDto.userOneId)
-	//         server.to([gameInfoDto.playerTwoId]).emit('acceptInvitation');
-	//         if (!this.userHasAlreadyGameSockets(gameInfoDto.userOneId)) {
-	//             if (!this.userHasAlreadyGameSockets(gameInfoDto.userTwoId)) {
-	// 				this.addGameInviteSocket(client.id, gameInfoDto.userOneId, gameInfoDto.playerTwoId, gameInfoDto.userTwoId);
-	//                 await this.linkSocketIDWithUser(client.id, gameInfoDto.userOneId);
-	//                 await this.linkSocketIDWithUser(gameInfoDto.playerTwoId, gameInfoDto.userTwoId);
-	//                 // creating a personnal room so we can emit to the user
-	//                 client.join(playerOneLogin);
-	//                 client.join(playerTwoLogin);
-	//                 let game = await this.createGame(client.id, gameInfoDto.playerTwoId, "NORMAL");
-	//                 if (!game)
-	// 				throw new Error("Fatal error");
-	// 			const gameInstance: game_instance = this.GameEngineService.createGameInstance(game);
-	// 			this.game_instance.push(gameInstance);
-	// 			server.to([client.id, gameInfoDto.playerTwoId]).emit('setGameInvited');
-	// 			server.to([client.id, gameInfoDto.playerTwoId]).emit('joinGame', {
-	//                     gameId: game.gameId,
-	//                     playerOneID: game.playerOneID,
-	//                     playerTwoID: game.playerTwoID,
-	//                     playerOneLogin: game.playerOneLogin,
-	//                     playerTwoLogin: game.playerTwoLogin,
-	//                     scoreOne: game.scoreOne,
-	//                     scoreTwo: game.scoreTwo,
-	//                 });
-	//                 setTimeout(() => {
-	// 					console.log("OUINOUIN");
-	//                     server.to([client.id, gameInfoDto.playerTwoId]).emit('gameStart', {
-	//                         gameId: game.gameId,
-	//                         playerOneID: game.playerOneID,
-	//                         playerTwoID: game.playerTwoID,
-	//                         playerOneLogin: game.playerOneLogin,
-	//                         playerTwoLogin: game.playerTwoLogin,
-	//                         scoreOne: game.scoreOne,
-	//                         scoreTwo: game.scoreTwo,
-	//                     });
-	//                 }, 1000);
-	//             }
-	//             else {
-	//                 console.log(`User have already socket : ${playerTwoLogin}`)
-	//                 server.to([client.id, gameInfoDto.playerTwoId]).emit('gameInProgress');
-	//             }
-	//         }
-	//         else {
-	//             console.log(`User have already socket : ${playerOneLogin}`)
-	//             server.to([client.id, gameInfoDto.playerTwoId]).emit('gameInProgress');
-	//         }
-	// }
-
 	async createGame(player1ID: string, player2ID: string, gameMode: string): Promise<Game> {
 		const usersId: [number, number] = await this.getUserIdByIDpairStartGame(player1ID, player2ID);
 		const playersLogin: [string, string] = await this.getLoginByUserIdStartGame(usersId[0], usersId[1]);
