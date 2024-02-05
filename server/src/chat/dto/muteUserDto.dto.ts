@@ -20,7 +20,7 @@ export class MuteUserDto {
 	conversationID: number;
 
 	@IsNotEmpty()
-	@Length(6, 20)
+	@Length(4, 20)
 	@IsAscii()
 	@IsAlpha()
 	@IsString()

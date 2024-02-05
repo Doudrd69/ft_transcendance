@@ -393,17 +393,12 @@ export class ChatService {
 	// attention userID soit le bon user
 	async compareChannelPassword(checkPasswordDto: CheckPasswordDto, userID: number): Promise<boolean> {
 
-		const conversation : Conversation = await this.conversationRepository.findOne({ where: {id: checkPasswordDto.conversationID} });
-		if (conversation) {
+		const conversation : Conversation = await this.conversationRepository.findOne({ where: { id: checkPasswordDto.conversationID} });
+		if (conversation && conversation.isProtected) {
 			const isMatch = await bcrypt.compare(checkPasswordDto.userInput, conversation.password);
 			if (isMatch) {
 
-				const addUserToConversationDto = {
-					userToAdd: checkPasswordDto.username,
-					conversationID: conversation.id,
-				}
-
-				const conversationToAdd = await this.addUserToConversation(addUserToConversationDto.conversationID, userID);
+				const conversationToAdd = await this.addUserToConversation(conversation.id, userID, true);
 				if (conversationToAdd)
 					return true;
 				else
@@ -522,7 +517,7 @@ export class ChatService {
 			throw new HttpException(`${user.username} is not admin`, HttpStatus.BAD_REQUEST);
 		}
 
-		throw new HttpException('Fatal error', HttpStatus.BAD_REQUEST);
+		throw new HttpException('Data cannot be loaded', HttpStatus.BAD_REQUEST);
 	}
 
 	async updateChannelIsProtectedStatusToFalse( updateProtectFalseDto: UpdateProtectFalseDto, userID: number): Promise<boolean> {
@@ -997,8 +992,8 @@ export class ChatService {
 
 		throw new HttpException('Fatal error', HttpStatus.BAD_REQUEST);
 	}
-	
-	async addUserToConversation(conversationToAddId: number, userID: number): Promise<Conversation> {
+
+	async addUserToConversation(conversationToAddId: number, userID: number, inviteFlag: boolean): Promise<Conversation> {
 		
 		const userToAdd = await this.usersRepository.findOne({
 			where: { id: userID },
@@ -1009,6 +1004,9 @@ export class ChatService {
 			where: { id: conversationToAddId },
 		});
 
+		if (!conversationToAdd.isPublic && !inviteFlag)
+			throw new HttpException(`Channel is private: you need an invitation`, HttpStatus.BAD_REQUEST);
+
 		if (userToAdd && conversationToAdd) {
 
 			const isGroupInUsersArray = await this.getRelatedGroup(userToAdd, conversationToAdd);
@@ -1017,7 +1015,7 @@ export class ChatService {
 	
 			if (await this.getGroupIsBanStatus(userToAdd, conversationToAdd))
 				throw new HttpException(`User is ban from this channel`, HttpStatus.BAD_REQUEST);
-				
+
 			const group = new GroupMember();
 			group.isAdmin = false;
 			group.joined_datetime = new Date();

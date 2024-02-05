@@ -3,13 +3,15 @@ import {
 	IsNotEmpty,
 	IsPositive,
 	Length,
-	Max
+	Max,
+	IsInt,
 } from 'class-validator';
 
 export class AuthenticatorCodeDto {
 
 	@IsNotEmpty()
 	@IsPositive()
+	@IsInt()
 	@Max(1000)
 	userID: number;
 

@@ -4,6 +4,7 @@ import {
 	IsBoolean,
 	IsInt,
 	IsNotEmpty,
+	IsOptional,
 	IsPositive,
 	IsString,
 	Length,
@@ -20,21 +21,15 @@ export class ChannelOptionsDto {
 	conversationID: number;
 
 	@IsNotEmpty()
-	@IsPositive()
-	@Max(1000)
-	@IsInt()
-	userID: number;
-
-	@IsNotEmpty()
 	@IsBoolean()
 	state: boolean;
 
-	// @IsNotEmpty()
-	// @Length(6, 20)
-	// @IsAscii()
-	// @IsAlphanumeric()
-	// @IsString()
+	@IsNotEmpty()
+	@Length(6, 20)
+	@IsAscii()
+	@IsAlphanumeric()
+	@IsString()
 	@Matches(/^[^"';%()|<>\\]*$/)
-	password?: string;
+	password: string;
 }
 

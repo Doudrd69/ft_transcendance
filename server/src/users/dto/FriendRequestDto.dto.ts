@@ -7,7 +7,9 @@ import {
 	Matches,
 	IsInt,
 	IsPositive,
-	Max
+	Max,
+	IsAlpha,
+	IsString,
 } from 'class-validator';
 
 export class FriendRequestDto {
@@ -20,9 +22,10 @@ export class FriendRequestDto {
 	initiatorID: number;
 
 	@IsNotEmpty()
-	@Length(6, 20)
+	@Length(4, 20)
 	@IsAscii()
-	@IsAlphanumeric()
+	@IsAlpha()
+	@IsString()
 	@Matches(/^[^"';%()|<>\\]*$/)
 	recipientLogin: string;
 }

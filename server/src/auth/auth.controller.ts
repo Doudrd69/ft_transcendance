@@ -25,17 +25,16 @@ export class AuthController {
 	// 	return this.authService.login(signInDto.username, signInDto.password);
 	// }
 
-	// @HttpCode(HttpStatus.OK)
 	@UseGuards(AuthGuard)
 	@Post('request2fa')
-	activate2FA(@Req() req, @Body() requestTfaDto: RequestTfaDto) {
+	activate2FA(@Req() req) {
 		const { user } = req;
 		return this.authService.activate2FA(user.sub);
 	}
 
 	@UseGuards(AuthGuard)
 	@Post('desactivate2fa')
-	desactivate2FA(@Req() req, @Body() requestTfaDto: RequestTfaDto) {
+	desactivate2FA(@Req() req) {
 		const { user } = req;
 		return this.authService.desactivate2FA(user.sub);
 	}
@@ -54,16 +53,9 @@ export class AuthController {
 		return this.authService.verifyCode(authenticatorCodeDto, user.sub);
 	}
 
-	// class-validator
 	@Post('access')
 	getAccessToken(@Body() requestBody: { code: string } ) {
 		const { code } = requestBody;
 		return this.authService.getAccessToken(code);
-	}
-
-	@UseGuards(AuthGuard)
-	@Get('profile')
-	getProfile(@Request() req) {
-		return req.user;
 	}
 }
