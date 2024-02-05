@@ -38,6 +38,19 @@
 	width: calc(100% - 10px);
 	text-align: center;
 }
+.message-container-bot {
+	background-color: #757575;
+    border-radius: 15px 15px 15px 15px;
+    margin-left: auto;
+    width: calc(100% - 20px);
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    padding: 5px;
+    margin: 5px;
+    white-space: pre-wrap;
+    max-width: 100%;
+
+}
 .other-message-channel {
     background-color: #1bb418;
 
@@ -59,6 +72,19 @@
 	margin: 10px;
 	max-width: calc(100% - 10px); 
 	font-size: 20px;
+	width: fit-content;
+}
+.channel-chat-content-bot {
+	font-family: 'Gill Sans' , sans-serif;
+	margin: 10px;
+	max-width: calc(100% - 10px); 
+	font-size: 20px;
+	width: fit-content;
+}
+.channel-chat-date-bot {
+	font-family: 'Gill Sans' , sans-serif;
+	font-size: small;
+	margin: 10px;
 	width: fit-content;
 }
 

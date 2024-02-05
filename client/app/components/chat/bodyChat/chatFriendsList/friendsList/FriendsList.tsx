@@ -153,14 +153,7 @@ const FriendsListComponent: React.FC = () => {
 	return (
 		<div className='bloc-friendslist-all'>
 			<div className="bloc-friendslist">
-				<button
-					className="button-friends-list-add"
-					onClick={() => {
-					chatDispatch({ type: 'ACTIVATE', payload: 'showAddFriend' });
-				}}
-				>
-				+
-				</button>
+				<div className="button-friends-list-add"/>
 				{chatState.showAddFriend && <AddFriendComponent updateFriends={loadFriendList} title="ADD NEW FRIEND"/>}
 				{friendList.map((friend: FriendShip, id: number) => (
 					<div className="tab-and-userclicked" key={id}>

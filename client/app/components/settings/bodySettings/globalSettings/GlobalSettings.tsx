@@ -4,6 +4,7 @@ import { toast } from 'react-toastify';
 
 const GlobalSettingsComponent: React.FC = () => {
 
+
 	const [authenticatorCodeInput, setAuthenticatorCodeInput] = useState('');
 	const [urlQrCode, setUrlQrCode] = useState('');
 	const handleAuthenticatorCodeInput = (e: React.ChangeEvent<HTMLInputElement>) => {

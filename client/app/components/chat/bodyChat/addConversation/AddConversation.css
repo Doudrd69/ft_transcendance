@@ -132,13 +132,6 @@
 		transition: transform 0.3s ease;
 		z-index: 200;
 	}
-	.option-image-opacity{
-		width: 50px;
-		height: auto;
-		margin: 10px;
-		opacity: 0.5;
-		z-index: 200;
-	}
 
 .option-block {
 	display: flex;
