@@ -153,14 +153,7 @@ const FriendsListComponent: React.FC = () => {
 	return (
 		<div className='bloc-friendslist-all'>
 			<div className="bloc-friendslist">
-				<button
-					className="button-friends-list-add"
-					onClick={() => {
-					chatDispatch({ type: 'ACTIVATE', payload: 'showAddFriend' });
-				}}
-				>
-				+
-				</button>
+				<div className="button-friends-list-add"/>
 				{chatState.showAddFriend && <AddFriendComponent updateFriends={loadFriendList} title="ADD NEW FRIEND"/>}
 				{friendList.map((friend: FriendShip, id: number) => (
 					<div className="tab-and-userclicked" key={id}>
@@ -186,12 +179,6 @@ const FriendsListComponent: React.FC = () => {
 
 			<div className="bloc-all">
 				<div className="search-bar">
-					{/* <img
-					src="chercher.png"
-					alt="Search Icon"
-					className="search-icon"
-
-					/> */}
 					<input
 						type="text"
 						placeholder="Rechercher des amis..."

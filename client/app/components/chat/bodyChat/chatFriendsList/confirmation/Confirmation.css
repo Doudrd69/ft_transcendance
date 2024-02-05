@@ -3,7 +3,7 @@
 	top: 50%;
 	left: 50%;
 	transform: translate(-50%, -50%);
-	background-color: var(--first);
+	background-color: rgba(255, 255, 255, 0.8);
 	padding: 10px;
 	border-radius: 10px;
 	z-index: 500;
@@ -55,7 +55,7 @@
 	text-decoration: none;
 	display: inline-block;
 	font-size: 16px; /* Taille de la police (ajustez selon vos besoins) */
-	margin: 4px 2px;
+	margin: 10px;
 	cursor: pointer;
 	border-radius: 5px; /* Coins arrondis (ajustez selon vos besoins) */
   }

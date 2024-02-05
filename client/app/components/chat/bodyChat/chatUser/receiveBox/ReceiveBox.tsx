@@ -100,6 +100,7 @@ const ReceiveBoxComponent: React.FC = () => {
 		<div ref={messagesContainerRef} className="bloc-discussion-chat">
 			{messages.map((message: Message, index: number) => (
 			<div key={index} className={`message-container ${isMyMessage(message) ? 'my-message' : 'other-message'}`}>
+				
 				<p className="discussion-chat-content">{message.content}</p>
 				<p className="discussion-chat-date">{formatDateTime(message.post_datetime)}</p>
 			</div>

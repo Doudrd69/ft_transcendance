@@ -188,22 +188,21 @@ const HeaderComponent: React.FC = () => {
 					}}}>
 					<img className='profils' src={`${process.env.API_URL}/users/getAvatar/${sessionStorage.getItem("currentUserID")}/${timestmp}`}/>
 					<div className='username'>{sessionStorage.getItem("currentUserLogin")}</div>
-
-					{/* {renderComponent(<AvatarImageComponent className="profils" refresh={globalState.showRefresh}/>, globalState.showUploadAvatar)} */}
 				</button>
 			</div>
-		<div className="bloc-logout">
-			<button className="button-logout" onClick={() => handleLogout()}></button>
-		</div>
 		<div className="bloc-pong">PINGPON</div>
 		<button className="button-notifications" onClick={() => {activateNotif(); disableNotif();}}>
-				<div className="notification-icon-container">
-					<img className="notifications-icon" src='./notification.png' alt="Notifications" />
-					{newNotifications && <div className="notification-badge">{notify.length}</div>}
-				</div>
-				{showActivateNotif && (
+			<div className="notification-icon-container">
+				<img className="notifications-icon" src='./notification.png' alt="Notifications" />
+				{newNotifications && <div className="notification-badge">{notify.length}</div>}
+				{showActivateNotif &&
 					<div className='notif-window'>
-					{notify.map((notif: FriendShip) => (
+						{notify.length === 0 &&
+							<div className='notif'>
+							<div className='notif-username'>Aucune notif </div>
+							</div>
+						}
+            {notify.map((notif: FriendShip) => (
 						<div className='notif' key={notif.id}>
 						<div className='notif-username'>{notif.username} veut être ton ami </div>
 						<button className='notif-accept' onClick={() => {handleFriendshipAccept(notif.id, notif.username)}}>Accept</button>
@@ -211,10 +210,11 @@ const HeaderComponent: React.FC = () => {
 						</div>
 					))}
 					</div>
-				)}
+				}
+			</div>
 		</button>
 		<div className="bloc-settings">
-			<button
+			<div
 				className="button-settings"
 				onClick={() => {
 				if (!globalState.showSettings) {
@@ -231,7 +231,10 @@ const HeaderComponent: React.FC = () => {
 				}
 			}}>
 				<img className="settings" src='./settings.png' alt="Settings" />
-			</button>
+			</div>
+		</div>
+		<div className="bloc-logout">
+			<img className="button-logout" src="se-deconnecter.png" onClick={() => handleLogout()}/>
 		</div>
 	</div>
 	);

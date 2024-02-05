@@ -26,12 +26,25 @@ const Menu = () => {
 	}
 
 	useEffect(() => {
-		globalState.gameSocket?.on('gameNotInProgress', () => {
-			console.log(`DISPATCH`);
-			dispatchGame({ type: 'TOGGLE', payload: 'showGameMatchmaking' });
-			console.log(`[gameNotInProgress] : ${sessionStorage.getItem("currentUserLogin")}`)
-			globalState.gameSocket?.emit('join-matchmaking', { playerLogin: sessionStorage.getItem("currentUserLogin"), gameMode: gameMode, userId: Number(sessionStorage.getItem("currentUserID")) });
+
+		globalState.userSocket?.on('gameNotInProgress', () => {
+			if (!globalState.gameSocket?.connected) {
+				console.log(`[gameNotInProgress] : ${sessionStorage.getItem("currentUserLogin")}`)
+				const gameSocket = io(`${process.env.API_URL}/game`, {
+					autoConnect: false,
+					auth: {
+						token: sessionStorage.getItem("jwt"),
+					}
+				});
+				gameSocket.connect();
+				dispatch({ type: 'SET_GAME_SOCKET', payload: gameSocket });
+				gameSocket.on('connect', () => {
+					dispatchGame({ type: 'TOGGLE', payload: 'showGameMatchmaking' });
+					gameSocket.emit('join-matchmaking', { playerLogin: sessionStorage.getItem("currentUserLogin"), gameMode: globalState.gameMode, userId: Number(sessionStorage.getItem("currentUserID")) });
+				});
+			}
 		});
+
 
 		globalState.gameSocket?.on('setGameInvited', () => {
 			console.log("SET GAME");
@@ -43,49 +56,48 @@ const Menu = () => {
 		});
 
 		return () => {
-			globalState.gameSocket?.off('gameNotInProgress');
+			globalState.userSocket?.off('gameNotInProgress');
 			globalState.gameSocket?.off('setGameInvited');
 		}
-	}, [globalState?.gameSocket])
+	}, [globalState?.gameSocket, globalState?.userSocket])
 
 	const handleStartClick = async () => {
 
 		try {
-			dispatchGame({ type: 'TOGGLE', payload: 'showGameMatchmaking' });
-			setGameMode("NORMAL");
-			// if (typeof globalState.gameSocket !== undefined) {
-				console.log("gameSocket start", globalState.gameSocket);
-				// console.log("gameSocket start", globalState.gameSocket.connected);
-				// console.log("gameSocket start", globalState.gameSocket.disconnected);
-			// }
-			// if (!globalState.gameSocket?.connected) {
-				const gameSocket = io(`${process.env.API_URL}/game`, {
-					autoConnect: false,
-					auth: {
-						token: sessionStorage.getItem("jwt"),
-					}
-				});
-				gameSocket.connect();
-				gameSocket.on('connect', () => {
-					dispatch({ type: 'SET_GAME_SOCKET', payload: gameSocket });
-					gameSocket.emit('linkSocketWithUser', { playerLogin: sessionStorage.getItem("currentUserLogin"), userId: sessionStorage.getItem("currentUserID"), gameMode: gameMode });
-				});
-			// }
-			// dispatchGame({ type: 'TOGGLE', payload: 'showGameMatchmaking' });
-			// console.log("After Dispatch: ", globalState?.gameSocket);
+				globalState.gameMode = "NORMAL";
+				globalState.userSocket?.emit('checkAndSetUserInMatchmaking', { userId: sessionStorage.getItem("currentUserID")});
 
 		} catch (error) {
 			console.error(error);
 		}
 	};
 
-// je peux peut etre passer sur le matchmaking composant puis apres je fais le reste?
+	//     GameGtw client connected : cQ264ZpyzQgo2rlAAAAF
+// server         | == wmonacho, userID= 1 JOINS MATCHMAKING ==
+// server         | gameMode ==== NORMAL
+// server         | Search for userID  1
+// server         | Search for playerID  cQ264ZpyzQgo2rlAAAAF
+// server         | User game : false
+// server         | joinSpeedQueue: 
+// server         | joinNormalQueue: cQ264ZpyzQgo2rlAAAAF
+// server         | Ready to start:  false
+// server         | emit leave-matchmaking : cQ264ZpyzQgo2rlAAAAF
+// server         | quitSpeedQueue: 
+// server         | quitNormalQueue: 
+// server         | [handleDisconnect] ONE DISCONNECT
+// server         | [handleDisconnect] User 1 retrieved by socketId
+// server         | [handleDisconnect] Retrieved disconnected user : wmonacho
+// server         | user ingame : false, user inmatchmaking: false
+// server         | [cQ264ZpyzQgo2rlAAAAF] GameGtw client disconnected : cQ264ZpyzQgo2rlAAAAF
+
+
+
 
 	const handleSpeedClick = () => {
 
 		try {
 			dispatchGame({ type: 'TOGGLE', payload: 'showGameMatchmaking' });
-			setGameMode("SPEED");
+			globalState.gameMode = "SPEED";
 			const gameSocket = io(`${process.env.API_URL}/game`, {
 				autoConnect: false,
 				auth: {
@@ -97,9 +109,6 @@ const Menu = () => {
 				dispatch({ type: 'SET_GAME_SOCKET', payload: gameSocket });
 				gameSocket.emit('linkSocketWithUser', { playerLogin: sessionStorage.getItem("currentUserLogin"), userId: sessionStorage.getItem("currentUserID") });
 			});
-			// dispatchGame({ type: 'TOGGLE', payload: 'showGameMatchmaking' });
-
-			// console.log("After Dispatch: ", globalState?.gameSocket);
 
 		} catch (error) {
 			console.error(error);

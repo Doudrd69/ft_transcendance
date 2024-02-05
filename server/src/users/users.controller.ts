@@ -64,7 +64,7 @@ export class UsersController {
 
 			await image
 				.crop(xOffset, yOffset, taille, taille)
-				.resize(200, 200)
+				.resize(400, 400)
 				.writeAsync(cheminImageSortie);
 
 			const avatarURL = `/avatars/carredanslaxe_${avatar.filename}`;

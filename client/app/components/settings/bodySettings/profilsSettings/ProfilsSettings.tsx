@@ -1,4 +1,3 @@
-// ProfilsSettingsComponent.tsx
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import React, { useState, useEffect } from 'react';
@@ -130,7 +129,7 @@ const ProfilsSettingsComponent: React.FC = () => {
 							<input className="input-username" type="text" value={username} onChange={(e) => setUsername(e.target.value)} />
 						</label>
 					</form>
-					<button className="button-modified-username" type="submit">Update Username</button>
+					<button className="button-modified-username" type="submit" onClick={handleUsernameSubmit}>Update Username</button>
 				</div>
 			</div>
 		</div>

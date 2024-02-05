@@ -44,6 +44,7 @@ interface GlobalState {
 	activate2FA: boolean;
 	gameInviteValidation: boolean;
 	gameSocketConnected: boolean;
+	gameMode: string;
 
 	[key: string]: boolean | string | Socket | undefined | number | null;
 }
@@ -74,6 +75,7 @@ const initialState: GlobalState = {
 	showAuth: false,
 	gameInviteValidation: false,
 	gameSocketConnected: false,
+	gameMode: "NORMAL",
 };
 
 // Réducteur
