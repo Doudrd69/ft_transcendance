@@ -84,6 +84,7 @@ export class GameGateway {
         this.game_instance = [];
     }
 
+    @UseGuards(GatewayGuard)
     async handleConnection(@ConnectedSocket() client: Socket) {
         console.log(`GameGtw client connected : ${client.id}`);
     }
@@ -131,28 +132,22 @@ export class GameGateway {
 
     @SubscribeMessage('launchGameInvite')
     @UseGuards(GatewayGuard)
-    async handleCheckGameInvite(@ConnectedSocket() client: Socket, @MessageBody() data: { userOneId: number, userTwoId: number, playerTwoId: string, playerOneLogin: string, playerTwoLogin: string }) {
-        //     // du coup en amont il faut creer des sockets pour les deux users. si pas bon supprimer les deux sockets
-        // envoyer un emit accept a lautre user
+    async handleCheckGameInvite(@ConnectedSocket() client: Socket, @MessageBody() data : {userTwoId: number, userTwoGameId: string}) {
         try {
-            // this.GameService.gameInvite(this.server, client, {userOneId: data.userOneId, userTwoId: data.userTwoId, playerOneId: client.id, playerTwoId: data.playerTwoId})
-            console.log(`invite accpeted :=====> ${data.playerTwoId}`);
-            this.server.to([data.playerTwoId]).emit('acceptInvitation');
-            // if (!this.GameService.userHasAlreadyGameSockets(data.userOneId)) {
-            //     if (!this.GameService.userHasAlreadyGameSockets(data.userTwoId)) {
-            this.GameService.addGameInviteSocket(client.id, data.userOneId, data.playerTwoId, data.userTwoId);
-            await this.GameService.linkSocketIDWithUser(client.id, data.userOneId);
-            await this.GameService.linkSocketIDWithUser(data.playerTwoId, data.userTwoId);
-            //             // creating a personnal room so we can emit to the user
-            // client.join(data.playerOneLogin);
-            // client.join(data.playerTwoLogin);
-            let game = await this.GameService.createGame(client.id, data.playerTwoId, "NORMAL");
+            const userOne = client.handshake.auth.user;
+            console.log(`invite accpeted :=====> ${data.userTwoGameId}`);
+            console.log(`invite accpeted :=====> ${data.userTwoId}`);
+            const userTwo: User = await this.GameService.getUserWithUserId(data.userTwoId); 
+            this.GameService.addGameInviteSocket(client.id, userOne.sub, data.userTwoGameId, data.userTwoId);
+            await this.GameService.linkSocketIDWithUser(client.id, userOne.sub);
+            await this.GameService.linkSocketIDWithUser(data.userTwoGameId, data.userTwoId);
+            let game = await this.GameService.createGame(client.id, data.userTwoGameId, "NORMAL");
             if (!game)
                 throw new Error("Fatal error");
             const gameInstance: game_instance = this.GameEngineceService.createGameInstance(game);
             this.game_instance.push(gameInstance);
-            this.server.to([client.id, data.playerTwoId]).emit('setGameInvited');
-            this.server.to([client.id, data.playerTwoId]).emit('joinGame', {
+            this.server.to([client.id, data.userTwoGameId]).emit('setGameInvited');
+            this.server.to([client.id, data.userTwoGameId]).emit('joinGame', {
                 gameId: game.gameId,
                 playerOneID: game.playerOneID,
                 playerTwoID: game.playerTwoID,
@@ -162,7 +157,7 @@ export class GameGateway {
                 scoreTwo: game.scoreTwo,
             });
             setTimeout(() => {
-                this.server.to([client.id, data.playerTwoId]).emit('gameStart', {
+                this.server.to([client.id, data.userTwoGameId]).emit('gameStart', {
                     gameId: game.gameId,
                     playerOneID: game.playerOneID,
                     playerTwoID: game.playerTwoID,
@@ -172,16 +167,6 @@ export class GameGateway {
                     scoreTwo: game.scoreTwo,
                 });
             }, 1000);
-            // }
-            //     else {
-            //         console.log(`User have already socket : ${data.playerTwoLogin}`)
-            //         this.server.to([client.id, data.playerTwoId]).emit('gameInProgress');
-            //     }
-            // }
-            // else {
-            //     console.log(`User have already socket : ${data.playerOneLogin}`)
-            //     this.server.to([client.id, data.playerTwoId]).emit('gameInProgress');
-            // }
         }
         catch (error) {
             await this.handleException(error, client)

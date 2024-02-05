@@ -572,7 +572,10 @@ export class UsersService {
 	}
 
 	async getUserByID(userID: number): Promise<User> {
-		return await this.usersRepository.findOne({ where: { id: userID } });
+		const user = await this.usersRepository.findOne({ where: { id: userID } });
+		if (!user)
+			throw new HttpException('User not found', HttpStatus.BAD_REQUEST);
+		return (user);
 	}
 
 	async getUserByLogin(loginToSearch: string): Promise<User> {

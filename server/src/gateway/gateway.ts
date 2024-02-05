@@ -213,9 +213,12 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 
 	@SubscribeMessage('inviteAccepted')
 	@UseGuards(GatewayGuard)
-	async inviteAccepted(@ConnectedSocket() client: Socket, @MessageBody() data: { }) {
+	async inviteAccepted(@ConnectedSocket() client: Socket, @MessageBody() data: { otherUserId: number, userGameSocketId: string}) {
 		try {
 			const user = client.handshake.auth.user;
+			const otherUser = await this.userService.getUserByID(data.otherUserId);
+			this.server.to(otherUser.username).emit('acceptInvitation', {userTwoId: user.sub, userTwoGameId: data.userGameSocketId});
+			// remplacer au front par un Dto, like gameInviteLaunchInfo
 		} catch (error) {
 			console.log(`[GAME INVITE ERROR]: ${error.stack}`)
 		}
@@ -272,20 +275,27 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 
 	@SubscribeMessage('checkAndSetUserInMatchmaking')
     @UseGuards(GatewayGuard)
-    async handleSetUserInMatchmaking(@ConnectedSocket() client: Socket, @MessageBody() data: {userId: number }) {
+    async handleSetUserInMatchmaking(@ConnectedSocket() client: Socket) {
         try {
-			if (await this.userService.userInGame(data.userId)) {
+			const user = client.handshake.auth.user;
+			if (await this.userService.userInGame(user.sub)) {
 				console.log(`sender already inGame`);
 				this.server.to(client.id).emit('userInGame');
 				return;
 			}
-			await this.userService.setUserInMatchmaking(data.userId);
+			await this.userService.setUserInMatchmaking(user.sub);
             this.server.to(client.id).emit('gameNotInProgress');
         }
         catch (error) {
             await this.handleException(error, client)
         }
     }
+
+	@SubscribeMessage('setGameInvite')
+	handleEvent(@ConnectedSocket() client: Socket, @MessageBody() data : {userTwoId: number, userTwoGameId: string}){
+		// faire un check des ID et peut etre socket
+	  this.server.to(client.id).emit('createGameInviteSocket', {userTwoId: data.userTwoId, userTwoGameId: data.userTwoGameId});
+	}
 
 	@SubscribeMessage('checkAndInviteToGame')
 	@UseGuards(GatewayGuard)

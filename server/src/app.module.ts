@@ -46,6 +46,7 @@ imports: [
 	database: dbName,
 	entities: [User, Message, Conversation, Friendship],
 	synchronize: true,
+	dropSchema: true,
 	autoLoadEntities: true,
 	}),
 

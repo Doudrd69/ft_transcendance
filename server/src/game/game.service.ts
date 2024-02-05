@@ -238,6 +238,8 @@ export class GameService {
 
 	async getUserWithUserId(userId: number): Promise<User> {
 		const user: User = await this.usersRepository.findOne({ where: { id: userId } });
+		if (!user)
+			throw new Error(`getUserWithUSerId undefined`);
 		return (user);
 	}
 
