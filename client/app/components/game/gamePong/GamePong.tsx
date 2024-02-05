@@ -191,7 +191,6 @@ const PongComponent = () => {
 				paddleOne: { x: gameState.paddleOne!.x * containerSize, y: gameState.paddleOne!.y * containerSize, width: containerSize * gameState.paddleOne!.width, height: containerSize * gameState.paddleOne!.height },
 				paddleTwo: { x: gameState.paddleTwo!.x * containerSize, y: gameState.paddleTwo!.y * containerSize, width: containerSize * gameState.paddleTwo!.width, height: containerSize * gameState.paddleTwo!.height },
 			}
-			console.log("GAME GOOOOOOAAAAL")
 			setGameState(newGameState);
 			setGame((prevState) => ({
 				...prevState,
