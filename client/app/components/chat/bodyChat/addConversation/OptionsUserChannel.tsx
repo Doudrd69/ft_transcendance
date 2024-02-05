@@ -502,8 +502,6 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 				chatDispatch({ type: 'SET_CURRENT_ROOM', payload: conversation.name });
 				chatDispatch({ type: 'SET_CURRENT_CONVERSATION_ID', payload: conversation.id });
 				globalState.userSocket?.emit('joinRoom', { roomName: conversation.name, roomID: conversation.id } );
-				// Emit to the targeted user so he joins the room
-				// user.login == mauvais username
 				globalState.userSocket?.emit('addUserToRoom', {
 					convID: conversation.id,
 					convName: conversation.name,

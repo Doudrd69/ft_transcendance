@@ -350,22 +350,34 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 
 	@SubscribeMessage('addFriend')
 	@UseGuards(GatewayGuard)
-	handleFriendRequest(@MessageBody() dto: any) {
-		this.server.to(dto.recipientLogin).except(`whoblocked${dto.initiatorLogin}`).emit('friendRequest', {
-			recipientLogin: dto.recipientLogin,
-			initiatorLogin: dto.initiatorLogin,
-		});
-		this.server.to(dto.recipientLogin).except(`whoblocked${dto.initiatorLogin}`).emit('refreshHeaderNotif');
+	async handleFriendRequest(@ConnectedSocket() client: Socket,  @MessageBody() data : { recipientLogin: string } ) {
+
+		try {
+			const { recipientLogin } = data;
+			// user is the initiator of the friend request
+			const user = client.handshake.auth.user;
+			const username = await this.userService.getUsername(user.sub);
+			if (!username)
+				throw new HttpException('User not foud', HttpStatus.NOT_FOUND);
+			this.server.to(recipientLogin).except(`whoblocked${username}`).emit('friendRequest', {
+				recipientLogin: recipientLogin,
+				initiatorID: Number(user.sub),
+				initiatorLogin: username,
+			});
+			this.server.to(recipientLogin).except(`whoblocked${username}`).emit('refreshHeaderNotif');
+		} catch (error) {
+			throw error;
+		}
 	}
 
 	@SubscribeMessage('friendRequestAccepted')
 	@UseGuards(GatewayGuard)
 	handleAcceptedFriendRequest(@MessageBody() data: { roomName: string, roomID: string, initiator: string, recipient: string }) {
+
 		const { roomName, roomID, initiator, recipient } = data;
 		this.server.to(initiator).emit('friendRequestAcceptedNotif', {
 			roomName: roomName,
 			roomID: roomID,
-			initiator: initiator,
 			recipient: recipient,
 		})
 		this.server.to(recipient).emit('refreshFriends');
@@ -454,6 +466,7 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	handleRefreshUserlList() {
 		this.server.emit('refreshFriends');
 		this.server.emit('refreshGlobalUserList');
+		this.server.emit('refreshDmList');
 	}
 
 	@SubscribeMessage('emitNotification')

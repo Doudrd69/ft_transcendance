@@ -370,6 +370,7 @@ export class UsersService {
 
 	async createFriendship(friendRequestDto: FriendRequestDto, userID: number): Promise<boolean> {
 
+		// userID is the id of the initiator
 		const initiator = await this.usersRepository.findOne({
 			where: { id: userID },
 			relations: ["initiatedFriendships"],
@@ -432,7 +433,7 @@ export class UsersService {
 	async updateFriendshipToTrue(friendRequestDto: FriendRequestDto, userID: number): Promise<Conversation | Friendship> {
 
 		const initiator = await this.usersRepository.findOne({
-			where: { username: friendRequestDto.initiatorLogin },
+			where: { id: friendRequestDto.initiatorID },
 			relations: ["initiatedFriendships", "acceptedFriendships", "groups", "groups.conversation"],
 		});
 

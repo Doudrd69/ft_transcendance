@@ -150,7 +150,6 @@ const FriendsListTabComponent: React.FC<FriendsListTabComponentProps> = ({ user,
 		try {
 
 			const friendRequestDto = {
-				initiatorLogin: sessionStorage.getItem("currentUserLogin"),
 				recipientLogin: user,
 			};
 
@@ -177,7 +176,7 @@ const FriendsListTabComponent: React.FC<FriendsListTabComponentProps> = ({ user,
 
 				if (globalState.userSocket?.connected) {
 					globalState.userSocket?.emit('joinRoom', { roomName: data.name, roomID: data.id });
-					globalState.userSocket?.emit('addFriend', friendRequestDto);
+					globalState.userSocket?.emit('addFriend',  { recipientLogin: friendRequestDto.recipientLogin } );
 				}
 			} else {
 				const error = await response.json();

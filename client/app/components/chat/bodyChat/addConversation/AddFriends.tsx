@@ -17,11 +17,12 @@ const AddFriendComponent: React.FC<AddFriendComponentProps> = ({ updateFriends, 
 	const { globalState } = useGlobal();
 
 	const handleFriendRequest = async (e: React.FormEvent) => {
+
+		e.preventDefault();
+
 		try {
-			e.preventDefault();
 
 			const friendRequestDto = {
-				initiatorLogin: sessionStorage.getItem("currentUserLogin"),
 				recipientLogin: formValue,
 			};
 
@@ -47,8 +48,9 @@ const AddFriendComponent: React.FC<AddFriendComponentProps> = ({ updateFriends, 
 				chatDispatch({ type: 'DISABLE', payload: 'showAddFriend' });
 
 				if (globalState.userSocket?.connected) {
+					console.log(data);
 					globalState.userSocket?.emit('joinRoom', { roomName: data.name, roomID: data.id });
-					globalState.userSocket?.emit('addFriend', friendRequestDto);
+					globalState.userSocket?.emit('addFriend',  { recipientLogin: friendRequestDto.recipientLogin } );
 				}
 			} else {
 				const error = await response.json();

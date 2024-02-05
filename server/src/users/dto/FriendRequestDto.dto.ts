@@ -4,18 +4,20 @@ import {
 	IsNotEmpty,
 	IsOptional,
 	Length,
-	Matches
+	Matches,
+	IsInt,
+	IsPositive,
+	Max
 } from 'class-validator';
 
 export class FriendRequestDto {
 
 	@IsOptional()
 	@IsNotEmpty()
-	@Length(6, 20)
-	@IsAscii()
-	@IsAlphanumeric()
-	@Matches(/^[^"';%()|<>\\]*$/)
-	initiatorLogin?: string;
+	@IsPositive()
+	@IsInt()
+	@Max(1000)
+	initiatorID: number;
 
 	@IsNotEmpty()
 	@Length(6, 20)
