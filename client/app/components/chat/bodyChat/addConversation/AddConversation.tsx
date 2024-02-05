@@ -32,9 +32,10 @@ const AddConversationComponent: React.FC<AddConversationComponentProps> = ({ loa
 				is_channel: isChannel,
 				isPublic: isPublic,
 				isProtected: isPassword,
-				password: !isPassword ? '' : passwordValue,
+				password: passwordValue ? passwordValue : null,
 			}
 
+			console.log(conversationDto);
 			const response = await fetch(`${process.env.API_URL}/chat/newConversation`, {
 				method: 'POST',
 				headers: {

@@ -211,14 +211,19 @@ export class GameGateway {
 
     @SubscribeMessage('join-matchmaking')
     @UseGuards(GatewayGuard)
-    async handleJoinMatchmaking(@ConnectedSocket() client: Socket, @MessageBody() data: { playerLogin: string, gameMode: string, userId: number }) {
+    async handleJoinMatchmaking(@ConnectedSocket() client: Socket, @MessageBody() data: {gameMode: string}) {
         try {
-            console.log(`== ${data.playerLogin}, userID= ${data.userId} JOINS MATCHMAKING ==`);
-            console.log(`gameMode ==== ${data.gameMode}`);
-            this.GameService.createNewGameSockets(data.userId);
-            this.GameService.addGameSocket(client.id, data.userId);
-            await this.MatchmakingService.joinQueue(client.id, data.userId, data.gameMode);
-            await this.GameService.linkSocketIDWithUser(client.id, data.userId);
+            // faire un check si c'est bien une string
+            // peut etre check si gameMode est pas NORMAL OU SPEED
+            if (data.gameMode === undefined || (data.gameMode !== "NORMAL" && data.gameMode !== "SPEED"))
+                data.gameMode = "NORMAL";
+            const userId = client.handshake.auth.user.sub;
+            const user: User = await this.GameService.getUserWithUserId(userId);
+            console.log(`== ${user.login}, userID= ${user.id} JOINS MATCHMAKING ==`);
+            this.GameService.createNewGameSockets(user.id);
+            this.GameService.addGameSocket(client.id, user.id);
+            await this.MatchmakingService.joinQueue(client.id, user.id, data.gameMode);
+            await this.GameService.linkSocketIDWithUser(client.id, user.id);
             const enoughPlayers = await this.MatchmakingService.IsThereEnoughPairs(data.gameMode);
 
             console.log("Ready to start: ", enoughPlayers);
@@ -267,6 +272,7 @@ export class GameGateway {
     @UseGuards(GatewayGuard)
     async handleStartGame(@ConnectedSocket() client: Socket, @MessageBody() data: { gameId: number }) {
         try {
+            // check la gameId si biend celle du user co
             const gameInstance: game_instance = this.GameService.getGameInstance(this.game_instance, data.gameId);
             if (gameInstance) {
                 this.GameService.playerJoined(client.id, gameInstance)
@@ -386,6 +392,7 @@ export class GameGateway {
     @UseGuards(GatewayGuard)
     async handleLeaveMatchmaking(@ConnectedSocket() client: Socket, @MessageBody() data: { playerLogin: string, userId: number }) {
         try {
+            // check
             console.log("emit leave-matchmaking :", client.id);
             const user: User = await this.GameService.getUserWithUserId(data.userId);
             await this.MatchmakingService.leaveQueue(client.id, data.userId);
@@ -401,6 +408,7 @@ export class GameGateway {
     @UseGuards(GatewayGuard)
     async handlePaddleMove(@ConnectedSocket() client: Socket, @MessageBody() data: { input: string, gameID: number }) {
         try {
+            // check input bien string, check GameID bien number et voir pour check game
             const gameInstance: game_instance = this.GameService.getGameInstance(this.game_instance, data.gameID);
             if (gameInstance) {
                 if (gameInstance.pause !== true) {
@@ -417,6 +425,7 @@ export class GameGateway {
     @UseGuards(GatewayGuard)
     async handlePaddleStop(@ConnectedSocket() client: Socket, @MessageBody() data: { input: string, gameID: number }) {
         try {
+            // check input bien string, check GameID bien number et voir pour check game
             const gameInstance: game_instance = this.GameService.getGameInstance(this.game_instance, data.gameID);
             if (gameInstance) {
                 this.GameEngineceService.switchInputUp(data.input, gameInstance, client.id);

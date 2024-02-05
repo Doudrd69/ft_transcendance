@@ -10,12 +10,13 @@ import {
 	Matches,
 	Max,
 	IsInt,
+	IsOptional,
 } from 'class-validator';
 
 export class ConversationDto {
 
 	@IsNotEmpty()
-	@Length(6, 20)
+	@Length(4, 20)
 	@IsAscii()
 	@IsAlpha()
 	@IsString()
@@ -40,9 +41,12 @@ export class ConversationDto {
 	@IsBoolean()
 	isProtected: boolean;
 
-	// @Length(6, 20)
-	// @IsAscii()
-	// @IsAlphanumeric()
+	@IsOptional()
+	@IsNotEmpty()
+	@Length(6, 20)
+	@IsAscii()
+	@IsAlphanumeric()
+	@IsString()
 	@Matches(/^[^"';%()|<>\\]*$/)
 	password?: string;
 }

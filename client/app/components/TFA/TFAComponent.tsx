@@ -1,8 +1,7 @@
 import React, { use, useEffect, useState } from 'react';
 import { useGlobal } from '../../GlobalContext';
 import { toast } from 'react-toastify';
-
-
+import './TFAComponent.css'
 
 const TFAComponent: React.FC  = () => {
 
@@ -27,6 +26,7 @@ const TFAComponent: React.FC  = () => {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
+					'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
 				},
 				body: JSON.stringify(dto),
 			});
@@ -49,9 +49,10 @@ const TFAComponent: React.FC  = () => {
 
 	return (
 		<div className="tfaClass">
-			<form onSubmit={checkAuthenticatorCode}>
-				<input type="text" placeholder="Authenticator code..." value={authenticatorCodeInput} onChange={handleAuthenticatorCodeInput}></input>
-				<button type="submit" >CHECK CODE</button>
+			{/* <img className="tfa-img" src="./terrifiant.webp"></img> */}
+			<form className="tfa-form" onSubmit={checkAuthenticatorCode}>
+				<input className="tfa-form-input" type="text" placeholder="Authenticator code..." value={authenticatorCodeInput} onChange={handleAuthenticatorCodeInput}></input>
+				<button className="tfa-form-button" type="submit" >Validate</button>
 			</form>
 		</div>
 	);

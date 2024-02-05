@@ -7,6 +7,8 @@ import {
 	Matches,
 	Max,
 	IsInt,
+	IsAlpha,
+	IsString,
 } from 'class-validator';
 
 export class UpdateUsernameDto {
@@ -18,9 +20,10 @@ export class UpdateUsernameDto {
 	userID: number;
 
 	@IsNotEmpty()
-	@Length(6, 20)
+	@Length(4, 20)
 	@IsAscii()
-	@IsAlphanumeric()
+	@IsAlpha()
+	@IsString()
 	@Matches(/^[^"';%()|<>\\]*$/)
 	newUsername: string;
 }

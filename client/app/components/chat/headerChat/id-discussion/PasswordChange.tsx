@@ -23,7 +23,6 @@ const PasswordChangeComponent: React.FC = () => {
 		try {
 				const channelOptionDto = {
 					conversationID: Number(chatState.currentConversationID),
-					userID: Number(sessionStorage.getItem("currentUserID")),
 					state: chatState.currentConversationIsProtected,
 					password: password,
 				}

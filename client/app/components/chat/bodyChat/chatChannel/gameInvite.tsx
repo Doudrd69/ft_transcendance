@@ -13,24 +13,18 @@ const GameInviteComponent: React.FC = () => {
 	// const [gameSocketConnected, globalState.gameSocketConnected = =] = useState<boolean>(false);
 	// const [gameInviteValidation, globalState.gameInviteValidation =] = useState<boolean>(false);
 	const { chatState, chatDispatch } = useChat();
-
-	console.log("===> GLOBALSTATE GAME INVITE: ", globalState.gameInvite);
-	console.log(`[GameInviteComponent]: globalstate{userID, targetId}: {${globalState.gameUserId}, ${globalState.gameTargetId}}`)
-
-
+	
 	const gameInvite = () => {
+
 		console.log("Enter game invite");
 		globalState.gameInvite = false;
-		if (globalState.gameSocketConnected === false) {
 			globalState.gameInviteValidation = false;
-			console.log(`===============>INVITATION: ${globalState.userSocket?.id}`);
+			console.log(`INVITATION: ${globalState.userSocket?.id}`);
+			globalState.gameSocketConnected = true;
 			globalState.userSocket?.emit('checkAndInviteToGame', {
 				usernameToInvite: globalState.targetUsername,
 				userIdToInvite: globalState.gameTargetId,
-				senderUsername: sessionStorage.getItem("currentUserLogin"),
 			});
-			globalState.gameSocketConnected = true;
-		}
 	}
 
 		useEffect(() => {

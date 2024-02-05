@@ -18,11 +18,12 @@ const PasswordComponent: React.FC = () => {
 
 	const handlePasswordSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		try {
+
 			e.preventDefault();
+
 			const checkPasswordDto = {
 				conversationID: chatState.currentConversationID,
 				userInput: password,
-				username: sessionStorage.getItem("currentUserLogin"),
 			}
 		
 			const response = await fetch(`${process.env.API_URL}/chat/checkPassword`, {
