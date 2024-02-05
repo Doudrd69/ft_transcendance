@@ -194,6 +194,7 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 			client.leave(roomName);
 
 		this.server.to(roomName + roomID).emit('refresh_channel');
+		this.server.emit('refreshChannelList');
 		
 		return;
 	}
