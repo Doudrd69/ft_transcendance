@@ -194,11 +194,14 @@ const FriendsListTabComponent: React.FC<FriendsListTabComponentProps> = ({ user,
 	return (
 		<>
 			<div className="bloc-tab">
-				<div className='bloc-tab-img1'  onClick={() => handleTabClick(`Etes vous sur de vouloir défier ${user.username} ?`, handleGameInvite)}>
+				<div className='bloc-tab-img1'  onClick={() => handleTabClick(`Êtes vous sur de vouloir défier ${user.username.toUpperCase()} ?`, handleGameInvite)}>
 					<img className='image-tab' src="ping-pong.png" />
 				</div>
+				<div className='bloc-tab-img'>
+					<img className='image-tab' src="bulle.png" />
+				</div>
 				{all &&
-					<div className='bloc-tab-img' onClick={() => handleTabClick(`Etes vous sur de vouloir ajouter à de votre liste d'amies ${user.username} ?`, () => handlFriendRequest(user.username))}>
+					<div className='bloc-tab-img' onClick={() => handleTabClick(`Êtes vous sur de vouloir ajouter ${user.username.toUpperCase()} à de votre liste d'amies ?`, () => handlFriendRequest(user.username))}>
 						<img className='image-tab' src="ajouter-un-ami.png"  />
 					</div>
 				}
@@ -210,27 +213,27 @@ const FriendsListTabComponent: React.FC<FriendsListTabComponentProps> = ({ user,
 				</div>
 				{!all ? (
 					user.isBlocked ? (
-						<div className='bloc-tab-img' onClick={() => handleTabClick(`Etes vous sur de vouloir bloquer ${user.username} ?`, unblockUser)}>
+						<div className='bloc-tab-img' onClick={() => handleTabClick(`Êtes vous sur de vouloir débloquer ${user.username.toUpperCase()} ?`, unblockUser)}>
 							<img className='image-tab' src="bloquer-un-utilisateur1.png" />
 						</div>
 					) : (
-						<div className='bloc-tab-img' onClick={() => handleTabClick(`Etes vous sur de vouloir bloquer ${user.username} ?`, blockUser)}>
+						<div className='bloc-tab-img' onClick={() => handleTabClick(`Êtes vous sur de vouloir bloquer ${user.username.toUpperCase()} ?`, blockUser)}>
 							<img className='image-tab-opacity' src="bloquer-un-utilisateur1.png" />
 						</div>
 					)
 				) : (
 					user.isBlocked ? (
-						<div className='bloc-tab-img8' onClick={() => handleTabClick(`Etes vous sur de vouloir bloquer ${user.username} ?`, unblockUser)}>
+						<div className='bloc-tab-img8' onClick={() => handleTabClick(`Êtes vous sur de vouloir bloquer ${user.username.toUpperCase()} ?`, unblockUser)}>
 							<img className='image-tab' src="bloquer-un-utilisateur1.png" />
 						</div>
 					) : (
-						<div className='bloc-tab-img8' onClick={() => handleTabClick(`Etes vous sur de vouloir bloquer ${user.username} ?`, blockUser)}>
+						<div className='bloc-tab-img8' onClick={() => handleTabClick(`Êtes vous sur de vouloir bloquer ${user.username.toUpperCase()} ?`, blockUser)}>
 							<img className='image-tab-opacity' src="bloquer-un-utilisateur1.png" />
 						</div>
 					)
 				)}
 				{!all &&
-					<div className='bloc-tab-img8' onClick={() => handleTabClick(`Etes vous sur de vouloir supprimer de votre liste d'amies ${user.username} ?`, removeFriends)}>
+					<div className='bloc-tab-img8' onClick={() => handleTabClick(`Êtes vous sur de vouloir supprimer de votre liste d'amies ${user.username.toUpperCase()} ?`, removeFriends)}>
 						<img className='image-tab' src="corbeille1.png"  />
 					</div>
 				}
@@ -239,7 +242,7 @@ const FriendsListTabComponent: React.FC<FriendsListTabComponentProps> = ({ user,
 				<ConfirmationComponent phrase={confirmationText} functionToExecute={funtionToExecute} />
 			)}
 			{chatState.showListChannelAdd && (
-				<ListMyChannelComponent user={user.username} friendID={user.id} isAdd={false} title={`INVITE ${user.username} TO MY CHANNEL`} />
+				<ListMyChannelComponent user={user.username} friendID={user.id} isAdd={false} title={`INVITE ${user.username.toUpperCase()} TO MY CHANNEL`} />
 			)}
 		</>
 	);

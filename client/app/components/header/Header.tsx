@@ -185,8 +185,6 @@ const HeaderComponent: React.FC = () => {
 					}}}>
 					<img className='profils' src={`${process.env.API_URL}/users/getAvatar/${sessionStorage.getItem("currentUserID")}/${timestmp}`}/>
 					<div className='username'>{sessionStorage.getItem("currentUserLogin")}</div>
-
-					{/* {renderComponent(<AvatarImageComponent className="profils" refresh={globalState.showRefresh}/>, globalState.showUploadAvatar)} */}
 				</button>
 			</div>
 		<div className="bloc-pong">PINGPON</div>
@@ -213,7 +211,7 @@ const HeaderComponent: React.FC = () => {
 			</div>
 		</button>
 		<div className="bloc-settings">
-			<button
+			<div
 				className="button-settings"
 				onClick={() => {
 				if (!globalState.showSettings) {
@@ -230,7 +228,7 @@ const HeaderComponent: React.FC = () => {
 				}
 			}}>
 				<img className="settings" src='./settings.png' alt="Settings" />
-			</button>
+			</div>
 		</div>
 		<div className="bloc-logout">
 			<img className="button-logout" src="se-deconnecter.png" onClick={() => handleLogout()}/>

@@ -57,9 +57,9 @@ const MatchMaking = () => {
 					<label>●</label>
 				</div>
 			</div>
-					<button className={`cancel-button ${state.showGameMenu ? 'clicked' : ''}`} onClick={() => {
-						handleLeave();
-					}}>Cancel</button>
+			<button className={`cancel-button ${state.showGameMenu ? 'clicked' : ''}`} onClick={() => {
+				handleLeave();
+			}}>CANCEL</button>
 		</div>
 	);
 };

@@ -20,19 +20,21 @@ align-items: center;
 	height: 100%;
 	width: 100%;
 	background-color: transparent;
-	border: none; 
+	border: none;
+	display: flex;
+	justify-content: center;
+	align-items: center;
 }
 .button-profils{
 	height: 75%;
-    width: 75%;
-    aspect-ratio: 1 / 1;
-    background-color: transparent;
-    border: none;
-    display: flex;
-    flex-direction: column;
-    text-align: center;
-    align-items: center;
-	/* border-radius: 50px; */
+	width: 75%;
+	aspect-ratio: 1 / 1;
+	background-color: transparent;
+	border: none;
+	display: flex;
+	flex-direction: column;
+	text-align: center;
+	align-items: center;
 }
 
 .button-logout{
@@ -130,9 +132,9 @@ align-items: center;
   
   .notifications-icon {
 	width: 90%;
-    max-width: 50px;
-    height: auto;
-	  aspect-ratio: 1 / 1;
+	max-width: 50px;
+	height: auto;
+	object-fit: contain;
   }
   .notifications-icon:hover {
 	transform: scale(1.2);
@@ -140,12 +142,13 @@ align-items: center;
   }
 
   .notification-icon-container {
-	height: 70%;
-	width: auto; 
-	aspect-ratio: 1 / 1;
-	display: flex;
-	justify-content: center;
-	align-items: center;
+    height: 100%;
+    width: 100%;
+    background-color: transparent;
+    border: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
   @keyframes shake {
   0% { transform: translateX(0); }
@@ -217,8 +220,9 @@ align-items: center;
 	align-items: center;
 	position: relative;
 	/* top: 0; */
-	right: 5px;
-	background-color: #58140d;
+    right: 10px;
+    bottom: 10px;
+	background-color: #a51707;
 	color: #fff;
 	font-size: 12px;
 	padding: 5px;

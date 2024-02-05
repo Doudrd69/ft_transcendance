@@ -3,7 +3,7 @@
 	top: 50%;
 	left: 50%;
 	transform: translate(-50%, -50%);
-	background-color: var(--first);
+	background-color: rgba(255, 255, 255, 0.8);
 	padding: 10px;
 	border-radius: 10px;
 	z-index: 500;

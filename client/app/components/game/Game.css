@@ -3,6 +3,9 @@
     width: 75vw;
 	background: linear-gradient(180deg,hsl(330, 17%, 2%),#3e1284);
 	z-index: 7;
+	display: flex;
+    justify-content: center;
+    align-items: center;
 	/* background-color: #8d7fa4; */
     }
 

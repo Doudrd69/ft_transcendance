@@ -10,6 +10,10 @@ const BackButtonComponent: React.FC = () => {
 			chatDispatch({ type: 'DISABLE', payload: 'showChannel' });
 			chatDispatch({ type: 'DISABLE', payload: 'showOptionsUserChannel' });
 			chatDispatch({ type: 'DISABLE', payload: 'showOptionsChannel' });
+			chatDispatch({ type: 'DISABLE', payload: 'showAdmin' });
+			chatDispatch({ type: 'DISABLE', payload: 'isAdmin' });
+			chatDispatch({ type: 'DISABLE', payload: 'isOwner' });
+
 			chatDispatch({ type: 'ACTIVATE', payload: chatState.currentComponent });
 	};
 

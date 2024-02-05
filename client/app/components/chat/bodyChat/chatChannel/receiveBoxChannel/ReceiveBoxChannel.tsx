@@ -262,10 +262,17 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 								</>
 							}
 						</div>
-						<div className={`message-container ${isMyMessage(message) ? 'my-message-channel' : 'other-message-channel'}`}>
-							<p className="channel-chat-content">{message.content}</p>
-							<p className="channel-chat-date">{formatDateTime(message.post_datetime)}</p>
-						</div>
+						{message.from === 'Bot' ?
+							<div className={`message-container-bot`}>
+								<p className="channel-chat-content-bot">{message.content}</p>
+								<p className="channel-chat-date-bot">{formatDateTime(message.post_datetime)}</p>
+							</div>
+							:
+							<div className={`message-container ${isMyMessage(message) ? 'my-message-channel' : 'other-message-channel'}`}>
+								<p className="channel-chat-content">{message.content}</p>
+								<p className="channel-chat-date">{formatDateTime(message.post_datetime)}</p>
+							</div>
+						}
 					</div>
 				))}
 			</div>

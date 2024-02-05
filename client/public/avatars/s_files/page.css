@@ -3301,18 +3301,20 @@ align-items: center;
   }
   
   .notifications-icon {
-	  height: 70%;
-	  width: auto; 
-	  aspect-ratio: 1 / 1;
+    width: 90%;
+    max-width: 50px;
+    height: auto;
+    object-fit: contain;
   }
 
   .notification-icon-container {
-	height: 70%;
-	width: auto; 
-	aspect-ratio: 1 / 1;
-	display: flex;
-	justify-content: center;
-	align-items: center;
+    height: 100%;
+    width: 100%;
+    background-color: transparent;
+    border: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
   @keyframes shake {
   0% { transform: translateX(0); }

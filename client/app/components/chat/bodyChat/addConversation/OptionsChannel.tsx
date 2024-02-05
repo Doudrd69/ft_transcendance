@@ -220,21 +220,21 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 					{chatState.isAdmin ?
 						<>
 							{chatState.currentConversationIsPrivate ?
-								<img className="option-image" src="private.png"  onClick={updateIsPublicFalse}/>
+								<img className="option-image-opacity" src="oeil.png"  onClick={updateIsPublicFalse}/>
 								:
-								<img className="option-image" src="public.png" onClick={updateIsPublicTrue}/>
+								<img className="option-image" src="oeil.png" onClick={updateIsPublicTrue}/>
 							}
 							{chatState.currentConversationIsProtected &&
-								<img className="option-image" src="upload-password.png"  onClick={() => { 
+								<img className="option-image" src="changer-le-mot-de-passe.png"  onClick={() => { 
 									if (chatState.currentConversationIsProtected)
 										chatDispatch({ type: 'ACTIVATE', payload: 'showPasswordChange' });
 										chatDispatch({ type: 'DISABLE', payload: 'showOptionChannel' });
 								}}/>
 							}
 							{chatState.currentConversationIsProtected ?
-								<img className="option-image" src="password.png" onClick={updateIsProtectedFalse}/>
+								<img className="option-image" src="cadenas-verrouille1.png" onClick={updateIsProtectedFalse}/>
 								:
-								<img className="option-image" src="no-password.png"
+								<img className="option-image-opacity" src="cadenas-verrouille1.png"
 								onClick={() => { 
 										chatDispatch({ type: 'ACTIVATE', payload: 'showPasswordChange' });
 										chatDispatch({ type: 'DISABLE', payload: 'showOptionChannel' });
@@ -245,7 +245,7 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 					}
 					
 					{chatState.isOwner &&
-						<img className="option-image" src="closered.png" onClick={() => deleteChannel() }/>}
+						<img className="option-image" src="corbeille1.png" onClick={() => deleteChannel() }/>}
 				</div>
 			</div>
 		</>
