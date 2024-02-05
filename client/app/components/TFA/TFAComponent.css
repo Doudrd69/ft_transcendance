@@ -1,0 +1,19 @@
+.tfaClass {
+    position: absolute;
+    display: flex;
+    height: 100%;
+    width: 100%;
+    align-content: center;
+    align-items: center;
+    justify-content: center;
+}
+
+.tfa-img {
+    position: relative;
+}
+
+.tfa-form {
+    display: flex;
+    align-content: center;
+    justify-content: right;
+}

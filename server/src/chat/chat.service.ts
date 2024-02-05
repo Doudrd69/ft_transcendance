@@ -1139,6 +1139,9 @@ export class ChatService {
 			conv.is_channel = conversationDto.is_channel;
 			conv.isPublic = conversationDto.isPublic;
 			conv.isProtected = conversationDto.isProtected;
+
+			if (!conversationDto.password && conversationDto.isProtected)
+				throw new HttpException('Please enter a password', HttpStatus.BAD_REQUEST);
 			if (conversationDto.password) {
 				conv.password = await this.hashChannelPassword(conversationDto.password);
 			}

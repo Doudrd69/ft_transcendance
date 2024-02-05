@@ -16,7 +16,7 @@ const AddConversationComponent: React.FC<AddConversationComponentProps> = ({ loa
 	const { globalState } = useGlobal();
 
 	const [formValue, setFormValue] = useState('');
-	const [passwordValue, setPasswordValue] = useState(null);
+	const [passwordValue, setPasswordValue] = useState('');
 	const { chatState, chatDispatch } = useChat();
 	const [isPassword, setIsPassowrd] = useState(false);
 	const [isPublic, setIsPublic] = useState(true);
@@ -32,7 +32,7 @@ const AddConversationComponent: React.FC<AddConversationComponentProps> = ({ loa
 				is_channel: isChannel,
 				isPublic: isPublic,
 				isProtected: isPassword,
-				password: passwordValue,
+				password: passwordValue ? passwordValue : null,
 			}
 
 			console.log(conversationDto);
