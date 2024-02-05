@@ -51,10 +51,6 @@ const GlobalSettingsComponent: React.FC = () => {
 	const activate2FA = async () => {
 
 		try {
-
-			const tfaDto = {
-				userID: Number(sessionStorage.getItem("currentUserID")),
-			}
 	
 			const response = await fetch(`${process.env.API_URL}/auth/request2fa`, {
 				method: 'POST',
@@ -62,7 +58,6 @@ const GlobalSettingsComponent: React.FC = () => {
 					'Content-Type': 'application/json',
 					'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
 				},
-				body: JSON.stringify(tfaDto),
 			});
 	
 			if (response.ok) {
@@ -93,12 +88,12 @@ const GlobalSettingsComponent: React.FC = () => {
 				userID: Number(sessionStorage.getItem("currentUserID")),
 				code: authenticatorCodeInput,
 			}
-	
+
 			const response = await fetch(`${process.env.API_URL}/auth/checkAuthenticatorCode`, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
-				// 'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
+				'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
 			},
 			body: JSON.stringify(dto),
 			});

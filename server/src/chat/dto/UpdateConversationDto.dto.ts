@@ -9,6 +9,7 @@ import {
 	Matches,
 	Max,
 	IsInt,
+	IsOptional,
 } from 'class-validator';
 
 export class UpdateConversationDto {
@@ -33,9 +34,12 @@ export class UpdateConversationDto {
 	@IsBoolean()
 	isProtected: boolean;
 
+	@IsOptional()
+	@IsNotEmpty()
+	@Length(6, 20)
 	@IsAscii()
 	@IsAlpha()
 	@IsString()
 	@Matches(/^[^"';%()|<>\\]*$/)
-	newPassword?: string;
+	newPassword: string;
 }

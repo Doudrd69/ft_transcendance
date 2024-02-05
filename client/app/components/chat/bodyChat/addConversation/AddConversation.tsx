@@ -16,7 +16,7 @@ const AddConversationComponent: React.FC<AddConversationComponentProps> = ({ loa
 	const { globalState } = useGlobal();
 
 	const [formValue, setFormValue] = useState('');
-	const [passwordValue, setPasswordValue] = useState('');
+	const [passwordValue, setPasswordValue] = useState(null);
 	const { chatState, chatDispatch } = useChat();
 	const [isPassword, setIsPassowrd] = useState(false);
 	const [isPublic, setIsPublic] = useState(true);
@@ -32,9 +32,10 @@ const AddConversationComponent: React.FC<AddConversationComponentProps> = ({ loa
 				is_channel: isChannel,
 				isPublic: isPublic,
 				isProtected: isPassword,
-				password: !isPassword ? '' : passwordValue,
+				password: passwordValue,
 			}
 
+			console.log(conversationDto);
 			const response = await fetch(`${process.env.API_URL}/chat/newConversation`, {
 				method: 'POST',
 				headers: {

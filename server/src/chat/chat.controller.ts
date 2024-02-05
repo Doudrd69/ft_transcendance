@@ -53,9 +53,9 @@ export class ChatController {
 	addUserToConversation(@Req() req, @Body() addUserToConversationDto: AddUserToConversationDto): Promise<Conversation> {
 		const { user } = req;
 		if (addUserToConversationDto.userToAdd)
-			return this.chatService.addUserToConversation(addUserToConversationDto.conversationID, addUserToConversationDto.userToAdd);
+			return this.chatService.addUserToConversation(addUserToConversationDto.conversationID, addUserToConversationDto.userToAdd, true);
 		else
-			return this.chatService.addUserToConversation(addUserToConversationDto.conversationID, user.sub);
+			return this.chatService.addUserToConversation(addUserToConversationDto.conversationID, user.sub, false);
 	}
 
 	@UseGuards(AuthGuard)

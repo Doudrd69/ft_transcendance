@@ -27,6 +27,7 @@ const TFAComponent: React.FC  = () => {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
+					'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
 				},
 				body: JSON.stringify(dto),
 			});
