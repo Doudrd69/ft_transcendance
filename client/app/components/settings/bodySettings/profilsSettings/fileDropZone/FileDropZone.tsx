@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Image } from 'image-js';  // Assurez-vous d'avoir installé la bibliothèque
+import { Image } from 'image-js';
 
 import './FileDropZone.css';
 
@@ -35,24 +35,14 @@ const FileDropZoneComponent: React.FC<FileDropZoneProps> = ({ onChange }) => {
 			onChange(null);
 			return;
 			}
-
-			// Chargez l'image avec image-js
 			const data = await readFileAsArrayBuffer(droppedFile);
 			const image = await Image.load(data);
-
-			// Obtenez les dimensions de l'image
 			const { width, height } = image;
-
-			// Calculez la taille minimale
 			const size = Math.min(width, height);
-
-			// Créez un canvas pour la découpe et le redimensionnement
 			const canvas = document.createElement('canvas');
 			canvas.width = 400;
 			canvas.height = 400;
 			const ctx = canvas.getContext('2d');
-
-			// Découpez et redimensionnez l'image en carré
 			if (ctx)
 			{
 				ctx.drawImage(
@@ -67,11 +57,8 @@ const FileDropZoneComponent: React.FC<FileDropZoneProps> = ({ onChange }) => {
 				400
 				);
 			}
-
-			// Convertissez le canvas en Blob
 			canvas.toBlob((blob) => {
 			if (blob) {
-				// Créez un nouveau fichier avec le Blob
 				const croppedFile = new File([blob], droppedFile.name, { type: 'image/png' });
 				onChange(croppedFile);
 			} else {
