@@ -10,7 +10,7 @@ import { GameService } from 'src/game/game.service';
 import { GameEngineService } from 'src/game/gameEngine.service';
 import { MatchmakingService } from 'src/game/matchmaking/matchmaking.service';
 import { GatewayGuard } from 'src/gateway/Gatewayguard.guard';
-import { UseGuards } from '@nestjs/common'
+import { HttpException, HttpStatus, UseGuards } from '@nestjs/common'
 import { User } from 'src/users/entities/users.entity';
 import dotenv from 'dotenv';
 dotenv.config();
@@ -273,20 +273,28 @@ export class GameGateway {
     @UseGuards(GatewayGuard)
     async handleStartGame(@ConnectedSocket() client: Socket, @MessageBody() data: { gameId: number }) {
         try {
-            // check la gameId si biend celle du user co
-            const gameInstance: game_instance = this.GameService.getGameInstance(this.game_instance, data.gameId);
-            if (gameInstance) {
-                this.GameService.playerJoined(client.id, gameInstance)
-                if (this.GameService.everyPlayersJoined(gameInstance)) {
-                    this.GameService.setUpDisconnection(gameInstance.gameID);
-                    setTimeout(() => {
-                        this.server.to([gameInstance.players[0], gameInstance.players[1]]).emit('startGameLoop');
-                        const gameLoop = setInterval(() => {
-                            this.executeGameTick(gameLoop, gameInstance, client.id)
-                        }, 16)
-                    }, 3000);
+            const user = client.handshake.auth.user;
+            if (!user)
+                throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+
+            const gameEntity = await this.GameService.getGameByID(data.gameId)
+            if (((gameEntity.userOneId == user.sub) || (gameEntity.userTwoId == user.sub)) && !gameEntity.gameEnd) {
+                const gameInstance: game_instance = this.GameService.getGameInstance(this.game_instance, data.gameId);
+                if (gameInstance) {
+                    this.GameService.playerJoined(client.id, gameInstance)
+                    if (this.GameService.everyPlayersJoined(gameInstance)) {
+                        this.GameService.setUpDisconnection(gameInstance.gameID);
+                        setTimeout(() => {
+                            this.server.to([gameInstance.players[0], gameInstance.players[1]]).emit('startGameLoop');
+                            const gameLoop = setInterval(() => {
+                                this.executeGameTick(gameLoop, gameInstance, client.id)
+                            }, 16)
+                        }, 3000);
+                    }
                 }
             }
+
+            throw new Error();
         }
         catch (error) {
             await this.handleException(error, client)

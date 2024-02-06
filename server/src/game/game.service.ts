@@ -246,6 +246,8 @@ export class GameService {
 
 	async getGameByID(gameID: number): Promise<Game> {
 		const game: Game = await this.gameRepository.findOne({ where: { gameId: gameID } })
+		if (!game)
+			throw new Error();
 		return (game);
 	}
 
