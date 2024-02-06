@@ -38,7 +38,6 @@ const ChatListComponent: React.FC = () => {
 			if (requestDms.ok) {
 				const dmResult = await requestDms.json();
 				setDm([...dmResult]);
-				console.log(dm);
 			}
 			else {
 				const error = await requestDms.json();
@@ -60,7 +59,6 @@ const ChatListComponent: React.FC = () => {
 		});
 		
 		globalState.userSocket?.on('refreshUserOnlineState', (notif: string) => {
-			console.log("Friend online status event (Chatlist.tsx) --> ", notif);
 			loadDMs();
 		});
 
@@ -80,7 +78,6 @@ const ChatListComponent: React.FC = () => {
 	return (
 		<div className="bloc-discussion-list">
 			{dm.map((dm: Conversation, id: number) => (
-				console.log("user.name :", dm.username),
 				<div key={dm.id} className="bloc-button-discussion-list">
 				<img
 					src={`${process.env.API_URL}/users/getAvatar/${dm.userID}/${timestamp}`}

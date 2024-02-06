@@ -35,7 +35,6 @@ const AddConversationComponent: React.FC<AddConversationComponentProps> = ({ loa
 				password: passwordValue ? passwordValue : null,
 			}
 
-			console.log(conversationDto);
 			const response = await fetch(`${process.env.API_URL}/chat/newConversation`, {
 				method: 'POST',
 				headers: {

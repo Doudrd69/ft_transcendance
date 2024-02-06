@@ -156,7 +156,6 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 		};
 
 	}, [globalState?.userSocket]);
-	console.log(chatState);
 
 	useEffect(() => {
 		getMessages();

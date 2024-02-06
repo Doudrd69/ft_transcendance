@@ -131,7 +131,6 @@ const FriendsListComponent: React.FC = () => {
 		});
 
 		globalState.userSocket?.on('refreshUserOnlineState', (notif: string) => {
-			console.log("Friend online status event (FriendList.tsx) --> ", notif);
 			loadFriendList();
 		});
 

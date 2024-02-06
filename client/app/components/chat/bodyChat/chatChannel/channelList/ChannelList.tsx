@@ -60,9 +60,6 @@ const ChannelListComponent: React.FC = () => {
 				if (usersList ) {
 					setUserList([...usersList]);
 				}
-				console.log(conversationList);
-				console.log(usersList);
-				console.log(isAdmin);
 			}
 			else {
 				const error = await response.json();

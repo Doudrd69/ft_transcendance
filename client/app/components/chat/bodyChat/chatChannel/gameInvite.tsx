@@ -16,10 +16,8 @@ const GameInviteComponent: React.FC = () => {
 	
 	const gameInvite = () => {
 
-		console.log("Enter game invite");
 		globalState.gameInvite = false;
 			globalState.gameInviteValidation = false;
-			console.log(`INVITATION: ${globalState.userSocket?.id}`);
 			globalState.gameSocketConnected = true;
 			globalState.userSocket?.emit('checkAndInviteToGame', {
 				usernameToInvite: globalState.targetUsername,
@@ -28,7 +26,6 @@ const GameInviteComponent: React.FC = () => {
 	}
 
 		useEffect(() => {
-			console.log("GLOBALSTATE GAME INVITE USE EFFECT: ", globalState.gameInvite);
 			if (globalState.gameInvite) {
 				gameInvite();
 			}
