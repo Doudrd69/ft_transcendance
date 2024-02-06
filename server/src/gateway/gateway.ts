@@ -55,7 +55,7 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 				}
 			}
 		} catch (error) {
-			throw error;
+			// throw error;
 		}
 	}
 
@@ -82,7 +82,7 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 				}
 			}
 		} catch (error) {
-			throw error;
+			// throw error;
 		}
 	}
 
@@ -242,12 +242,22 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 			const user = await this.userService.getUserByID(userId);
 			console.log(`[checkAndsetInGame] : otherUserIsActive: ${otherUser.isActive}, userActive: ${user.isActive}`)
 			if (await this.userService.usersInGame(userId, data.opponentUserId) || !otherUser.isActive || !user.isActive) {
+				console.log("================2=================")
+				console.log("CHECK AND SET In GAME");
+				console.log(`users already inGame`);
+				console.log(`user id : ${data.opponentUserId} and userToInvite : ${otherUser.id}`)
+
 				console.log(`users already inGame or Inactive`);
 				this.server.to(client.id).emit('usersInGame');
 				return;
 			}
 			await this.userService.setUserInGame(userId)
 			await this.userService.setUserInGame(data.opponentUserId)
+			console.log("================3=================")
+			console.log("CHECK AND SET In GAME");
+			console.log(`set in game`);
+			console.log(`user id : ${data.opponentUserId} and userToInvite : ${otherUser.id}`)
+
 			this.server.to(client.id).emit('usersNotInGame');
 		} catch (error) {
 			console.log(`[GAME INVITE ERROR]: ${error.stack}`)
@@ -286,7 +296,11 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 			const {userIdToInvite } = data;
 			const user = client.handshake.auth.user;
 			if (await this.userService.usersInGame(user.sub, userIdToInvite)) {
+				console.log("================1=================")
+				console.log("CHECK AND INVITE TO GAME");
 				console.log(`users already inGame`);
+				console.log(`user id : ${user.sub} and userToInvite : ${userIdToInvite}`)
+
 				this.server.to(client.id).emit('usersInGame');
 				return;
 			}
