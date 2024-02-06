@@ -100,6 +100,7 @@ const ChannelListComponent: React.FC = () => {
 			loadDiscussions();
 		});
 		globalState.userSocket?.on('refreshAdmin', () => {
+			loadDiscussions();
 			chatDispatch({type: 'TOGGLEX', payload: 'isAdmin' });
 		});
 
@@ -109,8 +110,9 @@ const ChannelListComponent: React.FC = () => {
 			globalState.userSocket?.off('refreshChannel');
 			globalState.userSocket?.off('channelDeleted');
 			globalState.userSocket?.off('refreshChannelListBis');
-			globalState.userSocket?.off('useeshAdmin');
-			globalState.userSocket?.off('refrrIsBan');
+			globalState.userSocket?.off('refreshAdmin');
+			globalState.userSocket?.off('userIsBan');
+			globalState.userSocket?.off('userIsUnban');
 		}
 
 	}, [globalState?.userSocket]);
