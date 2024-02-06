@@ -10,6 +10,10 @@ interface userList {
 	isBan: boolean;
 	id: boolean;
 }
+interface targetStat{
+	id: number;
+	username: string;
+}
 
 type ActionType =
   | 'ACTIVATE'
@@ -29,7 +33,8 @@ type ActionType =
   | 'SET_CURRENT_CONVERSATION_IS_PROTECTED'
   | 'SET_CURRENT_COMPONENT'
   | 'SET_CURRENT_USER'
-  | 'SET_CURRENT_TARGET';
+  | 'SET_CURRENT_TARGET'
+  | 'SET_CURRENT_TARGET_STATS';
 // Définir l'interface de l'action
 interface Action {
   type: ActionType;
@@ -50,6 +55,7 @@ interface ChatState {
 	showAddFriend:false,
 	showConfirmation:boolean,
 	showAddUser: boolean;
+	showStatistiques: boolean;
 	showAvatar: boolean;
 	showCreateChannel: boolean;
 	showListChannelAdd:boolean,
@@ -82,7 +88,8 @@ interface ChatState {
 	showTimer: boolean;
 	currentTarget: any;
 	currentUser: any;
-	[key: string]: boolean  | number | string | null | userList[] | userList;
+	currentTargetStats: any;
+	[key: string]: boolean  | number | string | null | userList[] | userList | targetStat;
 }
 
 // État initial
@@ -98,6 +105,7 @@ const initialState: ChatState = {
 	showChat: false,
 	showChannel: false,
 	showAdd: false,
+	showStatistiques: false,
 	showSettings: false,
 	showUser:false,
 	showAvatar: false,
@@ -132,6 +140,7 @@ const initialState: ChatState = {
 	showTimer: false,
 	currentTarget: null,
 	currentUser: null,
+	currentTargetStats: null,
 };
 
 // Réducteur
@@ -181,6 +190,8 @@ const chatReducer = (state: ChatState, action: Action): ChatState => {
 			return { ...state, currentTarget: action.payload || null };
 		case 'SET_CURRENT_USER':
 			return { ...state, currentUser: action.payload || null };
+		case 'SET_CURRENT_TARGET_STATS':
+			return { ...state, currentTargetStats: action.payload || null };
 	  default:
 		return state;
 	}
@@ -238,10 +249,6 @@ export const setCurrentFriend = (payload: string | null): Action => ({
 	payload,
 });
 
-// export const setCurrentComponent = (payload: string | null): Action => ({
-// 	type: 'SET_CURRENT_COMPONENT',
-// 	payload,
-// });
 
 export const setCurrentComponent = (payload: string | null): Action => {
 	return {
@@ -259,7 +266,7 @@ export const setCurrentConversationIsProtected = (payload: boolean): Action => (
 	type: 'SET_CURRENT_CONVERSATION_IS_PROTECTED',
 	payload,
 });
-  
+
   
 // Hook personnalisé pour utiliser le contexte
 export const useChat = () => {

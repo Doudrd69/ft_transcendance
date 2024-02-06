@@ -12,10 +12,22 @@ interface User {
 	isBlocked: boolean;
 }
 
+
 interface FriendsListTabComponentProps {
 	user: User;
 	all: boolean
 }
+
+interface targetStat{
+	id: number;
+	username: string;
+}
+
+interface Conversation {
+	name: string,
+	id: number,
+}
+
 
 const FriendsListTabComponent: React.FC<FriendsListTabComponentProps> = ({ user, all }) => {
 
@@ -26,6 +38,67 @@ const FriendsListTabComponent: React.FC<FriendsListTabComponentProps> = ({ user,
 	const [confirmationText, setConfirmationText] = useState('');
 	const [funtionToExecute, setFunctionToExecute] = useState<() => void>(() => { });
 	const [accepted, setAccepted] = useState(false);
+	chatState.currentTargetStats = useState<targetStat>({id : user.id, username: user.username});
+	console.log(chatState.currentTargetStats);
+
+	const handleDms = async() => {
+
+		try {
+			console.log("user.id", user.id);
+			const createDMConversationDto = {
+				user1: Number(user.id),
+				user2: Number(sessionStorage.getItem("currentUserID")),
+			}
+			const response = await fetch(`${process.env.API_URL}/chat/newDMConversation`, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
+				},
+				body: JSON.stringify(createDMConversationDto),
+			});
+	
+			if (response.ok) {
+				const conversation : Conversation = await response.json();
+				let tmp = conversation.name;
+				let conversationName;
+				const currentUserLogin = sessionStorage.getItem("currentUserLogin");
+				if (currentUserLogin)
+					conversationName = tmp.replace(currentUserLogin, '');
+				chatDispatch({ type: 'SET_CURRENT_CONVERSATION', payload: conversationName });
+				chatDispatch({ type: 'SET_CURRENT_ROOM', payload: conversation.name });
+				chatDispatch({ type: 'SET_CURRENT_CONVERSATION_ID', payload: conversation.id });
+				globalState.userSocket?.emit('joinRoom', { roomName: conversation.name, roomID: conversation.id } );
+				globalState.userSocket?.emit('addUserToRoom', {
+					convID: conversation.id,
+					convName: conversation.name,
+					friend: user.username,
+				});
+				globalState.userSocket?.emit('refreshUser', {
+					userToRefresh: user.username,
+					target: 'refreshDmList',
+					status: true
+				});
+			}
+			else {
+				const error = await response.json();
+				if (Array.isArray(error.message))
+					toast.warn(error.message[0]);
+				else
+					toast.warn(error.message);
+			}
+		}
+		catch (error) {
+			console.log(error);
+		}
+		console.log("user.id", user.id);
+		chatDispatch({ type: 'DISABLE', payload: 'showOptionsUserChannel' });
+		chatDispatch({ type: 'DISABLE', payload: 'currentChannelBool' });
+		chatDispatch({ type: 'DISABLE', payload: 'showFriendsList' });
+		chatDispatch({ type: 'ACTIVATE', payload: 'showChat' });
+		chatDispatch({ type: 'ACTIVATE', payload: 'showBackComponent' });
+
+	}
 
 	const blockUser = async () => {
 
@@ -190,13 +263,19 @@ const FriendsListTabComponent: React.FC<FriendsListTabComponentProps> = ({ user,
 		}
 	};
 
+	
+	const handleStats = () => {
+		chatDispatch({ type: 'ACTIVATE', payload: 'showStatistiques' });
+		chatDispatch({ type: 'DISABLE', payload: 'showBackComponent' });
+		chatDispatch({ type: 'SET_CURRENT_TARGET_STATS',  });
+	}
 	return (
 		<>
 			<div className="bloc-tab">
 				<div className='bloc-tab-img1'  onClick={() => handleTabClick(`Êtes vous sur de vouloir défier ${user.username.toUpperCase()} ?`, handleGameInvite)}>
-					<img className='image-tab' src="ping-pong.png" />
+					<img className='image-tab' src="ping-pong.png"/>
 				</div>
-				<div className='bloc-tab-img'>
+				<div className='bloc-tab-img' onClick={handleDms}>
 					<img className='image-tab' src="bulle.png" />
 				</div>
 				{all &&
@@ -207,8 +286,8 @@ const FriendsListTabComponent: React.FC<FriendsListTabComponentProps> = ({ user,
 				<div className='bloc-tab-img'  onClick={() => chatDispatch({ type: 'ACTIVATE', payload: 'showListChannelAdd' })}>
 					<img className='image-tab' src="ajouter-un-group.png" />
 				</div>
-				<div className='bloc-tab-img'>
-					<img className='image-tab' src="tableau-statistique1.png" />
+				<div className='bloc-tab-img'  onClick={handleStats} >
+					<img className='image-tab' src="tableau-statistique1.png"/>
 				</div>
 				{!all ? (
 					user.isBlocked ? (
@@ -222,7 +301,7 @@ const FriendsListTabComponent: React.FC<FriendsListTabComponentProps> = ({ user,
 					)
 				) : (
 					user.isBlocked ? (
-						<div className='bloc-tab-img8' onClick={() => handleTabClick(`Êtes vous sur de vouloir bloquer ${user.username.toUpperCase()} ?`, unblockUser)}>
+						<div className='bloc-tab-img8' onClick={() => handleTabClick(`Êtes vous sur de vouloir débloquer ${user.username.toUpperCase()} ?`, unblockUser)}>
 							<img className='image-tab' src="bloquer-un-utilisateur1.png" />
 						</div>
 					) : (

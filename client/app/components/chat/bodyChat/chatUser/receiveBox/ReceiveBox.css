@@ -28,7 +28,7 @@
 .my-message {
     background-color: #1bb418;
     border-radius: 15px 15px 0px 15px;
-    margin-left: auto;
+	margin-left: calc(30% - 15px);
     align-self: flex-end;
 }
 
