@@ -45,7 +45,6 @@ const GeneralComponent = () => {
 	const [show2FAForm, setShow2FAForm] = useState(false);
 	const [authValidated, setAuthValidated] = useState(false);
 	const [Game, setGame] = useState<Game>();
-	const [listSendUserIdToPlayGame, setListSendUserIdToPlayGame] = useState<GameInviteDto[]>([]);
 
 	const searchParams = useSearchParams();
 	const code = searchParams.get('code');
@@ -76,7 +75,6 @@ const GeneralComponent = () => {
 	}
 
 	const gameInviteClosed = (gameInviteDto: GameInviteDto) => {
-		unfillListUserId(gameInviteDto);
 		setTimeout(() => {
 			globalState.userSocket?.emit('inviteClosed', {
 				senderUserId: gameInviteDto.senderUserID,
@@ -268,22 +266,6 @@ const GeneralComponent = () => {
 		return false;
 	}
 
-	const fillListUserId = (newInviteDto: GameInviteDto) => {
-		const exists = listSendUserIdToPlayGame.find(invite => invite.senderUserID === newInviteDto.senderUserID);
-		if (!exists || exists == undefined) {
-			setListSendUserIdToPlayGame([...listSendUserIdToPlayGame, newInviteDto]);
-			return true;
-		}
-		return false;
-	}
-
-	const unfillListUserId = (newInviteDto: GameInviteDto) => {
-		const exists = listSendUserIdToPlayGame.find(invite => invite.senderUserID === newInviteDto.senderUserID);
-		if (exists) {
-			setListSendUserIdToPlayGame(listSendUserIdToPlayGame.filter(invite => invite.senderUserID !== newInviteDto.senderUserID));
-		}
-	}
-
 	// UserSocket multi-purpose useEffect
 	useEffect(() => {
 
@@ -341,15 +323,17 @@ const GeneralComponent = () => {
 		});
 
 		globalState.userSocket?.on('gameInvite', (gameInviteDto: GameInviteDto) => {
-
-			if (fillListUserId(gameInviteDto)) {
+			console.log("================3=================")
+			console.log("ON USERINGAME")
+			console.log("globalState.gameInvite", globalState.gameInvite)
+			console.log("globalState.gameInviteValidation", globalState.gameInviteValidation)
+			console.log("globalState.gameSocketConnected", globalState.gameSocketConnected)	
 				toast(<GameInviteNotification gameInviteDto={gameInviteDto} />,
 					{
 						pauseOnFocusLoss: false,
 						autoClose: 5000,
 						onClose: props => gameInviteClosed(gameInviteDto),
 					});
-			}
 		});
 
 		return () => {
@@ -401,6 +385,11 @@ const GeneralComponent = () => {
 
 		});
 		globalState.userSocket?.on('usersInGame', () => {
+			console.log("================2=================")
+			console.log("ON USERINGAME")
+			console.log("globalState.gameInvite", globalState.gameInvite)
+			console.log("globalState.gameInviteValidation", globalState.gameInviteValidation)
+			console.log("globalState.gameSocketConnected", globalState.gameSocketConnected)
 			globalState.gameSocketConnected = false;
 		})
 		globalState.userSocket?.on('userInGame', () => {
