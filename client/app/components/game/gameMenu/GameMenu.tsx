@@ -41,7 +41,7 @@ const Menu = () => {
 				gameSocket.on('connect', () => {
 					dispatchGame({ type: 'TOGGLE', payload: 'showGameMatchmaking' });
 					// enlever userLogin, et userId, le gameMode pas besoin (si pas de gameMode peut etre faire un set joinQueue par defaut a NORMAL)
-					gameSocket.emit('join-matchmaking', {gameMode: globalState.gameMode});
+					gameSocket.emit('join-matchmaking', {gameMode: gameMode});
 				});
 			}
 		});
@@ -59,11 +59,12 @@ const Menu = () => {
 			globalState.userSocket?.off('gameNotInProgress');
 			globalState.gameSocket?.off('setGameInvited');
 		}
-	}, [globalState?.gameSocket, globalState?.userSocket])
+	}, [globalState?.gameSocket, globalState?.userSocket, gameMode])
 
 	const handleStartClick = async () => {
 
 		try {
+				setGameMode("NORMAL");
 				globalState.gameMode = "NORMAL";
 				globalState.userSocket?.emit('checkAndSetUserInMatchmaking');
 
@@ -75,6 +76,7 @@ const Menu = () => {
 	const handleSpeedClick = () => {
 
 		try {
+			setGameMode("SPEED");
 			globalState.gameMode = "SPEED";
 			globalState.userSocket?.emit('checkAndSetUserInMatchmaking');
 

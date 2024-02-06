@@ -217,9 +217,12 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	@SubscribeMessage('inviteAccepted')
 	@UseGuards(GatewayGuard)
 	async inviteAccepted(@ConnectedSocket() client: Socket, @MessageBody() data: { otherUserId: number, userGameSocketId: string }) {
+		// bien check le userId voir la socket si genant
 		try {
 			const user = client.handshake.auth.user;
 			const otherUser = await this.userService.getUserByID(data.otherUserId);
+			//recheck de si ils sont ingame, si oui rentre sinon mettre un message de pas bon user? 
+			// peut etre pas assez, peut etre passer 
 			console.log(`[inviteAccepted] : ${user.sub}`)
 			this.server.to(otherUser.username).emit('acceptInvitation', { userTwoId: user.sub, userTwoGameId: data.userGameSocketId });
 			// remplacer au front par un Dto, like gameInviteLaunchInfo
@@ -230,32 +233,22 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 
 	@SubscribeMessage('checkAndsetInGame')
 	@UseGuards(GatewayGuard)
-	async checkAndSetInGame(@ConnectedSocket() client: Socket, @MessageBody() data: { oposantUserId: number }) {
+	async checkAndSetInGame(@ConnectedSocket() client: Socket, @MessageBody() data: { opponentUserId: number }) {
 		try {
-			const user = client.handshake.auth.user;
-			if (await this.userService.usersInGame(user.sub, data.oposantUserId)) {
-				console.log(`users already inGame`);
+			// voir pour faire un check que l'opposant soit pas un random, verifier que c'est lui qui a gameInvite
+
+			const userId = client.handshake.auth.user.sub;
+			const otherUser = await this.userService.getUserByID(data.opponentUserId);
+			const user = await this.userService.getUserByID(userId);
+			console.log(`[checkAndsetInGame] : otherUserIsActive: ${otherUser.isActive}, userActive: ${user.isActive}`)
+			if (await this.userService.usersInGame(userId, data.opponentUserId) || !otherUser.isActive || !user.isActive) {
+				console.log(`users already inGame or Inactive`);
 				this.server.to(client.id).emit('usersInGame');
 				return;
 			}
-			await this.userService.setUserInGame(user.sub)
-			await this.userService.setUserInGame(data.oposantUserId)
+			await this.userService.setUserInGame(userId)
+			await this.userService.setUserInGame(data.opponentUserId)
 			this.server.to(client.id).emit('usersNotInGame');
-		} catch (error) {
-			console.log(`[GAME INVITE ERROR]: ${error.stack}`)
-		}
-	}
-
-	@SubscribeMessage('checkUserInMatch')
-	@UseGuards(GatewayGuard)
-	async checkIfUserInMatch(@MessageBody() data: { senderUsername: string, senderUserId: number }) {
-		try {
-			if (await this.userService.userInGame(data.senderUserId)) {
-				console.log(`sender already inGame`);
-				this.server.to(data.senderUsername).emit('userInGame');
-				return;
-			}
-			this.server.to(data.senderUsername).emit('userNotInGame');
 		} catch (error) {
 			console.log(`[GAME INVITE ERROR]: ${error.stack}`)
 		}
@@ -287,17 +280,18 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 
 	@SubscribeMessage('checkAndInviteToGame')
 	@UseGuards(GatewayGuard)
-	async inviteUserToGame(@ConnectedSocket() client: Socket, @MessageBody() data: { usernameToInvite: string, userIdToInvite: number}) {
-		console.log(`inviteUserToGame:  ${data.userIdToInvite}`);
+	async inviteUserToGame(@ConnectedSocket() client: Socket, @MessageBody() data: {userIdToInvite: number}) {
 		try {
-			const { usernameToInvite, userIdToInvite } = data;
+			// check si userId est good?
+			const {userIdToInvite } = data;
 			const user = client.handshake.auth.user;
 			if (await this.userService.usersInGame(user.sub, userIdToInvite)) {
 				console.log(`users already inGame`);
 				this.server.to(client.id).emit('usersInGame');
 				return;
 			}
-			this.server.to(usernameToInvite).emit('gameInvite', {
+			const userToInvite = await this.userService.getUserByID(userIdToInvite);
+			this.server.to(userToInvite.username).emit('gameInvite', {
 				senderUserID: user.sub,
 			});
 		}
@@ -310,6 +304,7 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	@UseGuards(GatewayGuard)
 	async handleInviteClosed(@ConnectedSocket() client: Socket, @MessageBody() data: { senderUserId: number }) {
 		console.log("[inviteClosed] CLOSED")
+		// peut etre check l'Id? apres le seul souci c'est qu'il peut renvoyer une invite plus vite
 		try {
 			const user = await this.userService.getUserByID(data.senderUserId)
 			this.server.to(user.login).emit('closedInvitation');
@@ -323,6 +318,7 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	@UseGuards(GatewayGuard)
 	async handleInviteDenied(@ConnectedSocket() client: Socket, @MessageBody() data: { senderUserId: number }) {
 		console.log("[inviteDenied] DENY")
+		// peut etre check l'Id? apres le seul souci c'est qu'il peut renvoyer une invite plus vite
 		try {
 			const user = await this.userService.getUserByID(data.senderUserId)
 			this.server.to(user.login).emit('deniedInvitation');

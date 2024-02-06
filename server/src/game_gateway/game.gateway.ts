@@ -116,9 +116,9 @@ export class GameGateway {
                         if (gameInstance && gameInstance.game_has_ended !== true) {
                             console.log(`[handleDisconnect] User will be disconnect from game ${gameInstance}`)
                             if (user.login === gameInstance.playersLogin[0])
-                                await this.GameService.disconnectSocket(gameInstance.usersId[0], gameInstance.gameID, gameInstance.players[0])
+                                await this.GameService.disconnectSocket(gameInstance.usersId[0], game.gameId, gameInstance.players[0])
                             else
-                                await this.GameService.disconnectSocket(gameInstance.usersId[1], gameInstance.gameID, gameInstance.players[1])
+                                await this.GameService.disconnectSocket(gameInstance.usersId[1], game.gameId, gameInstance.players[1])
                         }
                     }
                 }
@@ -215,6 +215,7 @@ export class GameGateway {
         try {
             // faire un check si c'est bien une string
             // peut etre check si gameMode est pas NORMAL OU SPEED
+            console.log(`[join-matchmaking]: gameMode : ${data.gameMode}`);
             if (data.gameMode === undefined || (data.gameMode !== "NORMAL" && data.gameMode !== "SPEED"))
                 data.gameMode = "NORMAL";
             const userId = client.handshake.auth.user.sub;
@@ -390,12 +391,12 @@ export class GameGateway {
 
     @SubscribeMessage('leave-matchmaking')
     @UseGuards(GatewayGuard)
-    async handleLeaveMatchmaking(@ConnectedSocket() client: Socket, @MessageBody() data: { playerLogin: string, userId: number }) {
+    async handleLeaveMatchmaking(@ConnectedSocket() client: Socket) {
         try {
-            // check
+            const userId = client.handshake.auth.user.sub;
             console.log("emit leave-matchmaking :", client.id);
-            const user: User = await this.GameService.getUserWithUserId(data.userId);
-            await this.MatchmakingService.leaveQueue(client.id, data.userId);
+            const user: User = await this.GameService.getUserWithUserId(userId);
+            await this.MatchmakingService.leaveQueue(client.id, userId);
             // this.GameService.deleteGameSocketsIdForPlayer(data.userId);
             this.server.to(client.id).emit('leave-game');
         }
