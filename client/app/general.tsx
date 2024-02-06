@@ -52,11 +52,9 @@ const GeneralComponent = () => {
 
 	// GAME INVITE
 	const gameInviteValidation = (gameInviteDto: GameInviteDto) => {
-		// faire un emit checkAndsetInGame il check les users et si oui set ingame
-		// je met le socket on et je cree
 		globalState.userSocket?.off('usersNotInGame');
 		globalState.userSocket?.emit('checkAndsetInGame', {
-			oposantUserId: gameInviteDto.senderUserID,
+			opponentUserId: gameInviteDto.senderUserID,
 		})
 		globalState.userSocket?.on('usersNotInGame', (userId: number) => {
 			const gameSocket = io(`${process.env.API_URL}/game`, {
@@ -78,7 +76,6 @@ const GeneralComponent = () => {
 	}
 
 	const gameInviteClosed = (gameInviteDto: GameInviteDto) => {
-		console.log("lololo")
 		unfillListUserId(gameInviteDto);
 		setTimeout(() => {
 			globalState.userSocket?.emit('inviteClosed', {
@@ -87,7 +84,7 @@ const GeneralComponent = () => {
 		}, 200);
 	}
 
-	const gameInviteDeny = (gameInviteDto: GameInviteDto) => {
+	const gameInviteDeny = (gameInviteDto: GameInviteDto) => { 
 		globalState.userSocket?.emit('inviteDenied', {
 			senderUserId: gameInviteDto.senderUserID,
 		});
