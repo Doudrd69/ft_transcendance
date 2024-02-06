@@ -46,7 +46,6 @@ const StatistiquesComponent: React.FC = () => {
 	
 			if (response.ok) {
 				const stats = await response.json();
-				console.log(stats);
 				setStatsUser(stats);
 			}
 			else {
@@ -75,7 +74,6 @@ const StatistiquesComponent: React.FC = () => {
 			if (response.ok) {
 				const gameHistoryData = await response.json();
 				setGameHistory([...gameHistoryData]);
-				console.log(gameHistoryData);
 			}
 			else {
 				const error = await response.json();

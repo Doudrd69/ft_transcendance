@@ -65,7 +65,6 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 		});
 
 		if (response.ok) {
-			console.log("blocked user")
 			if (!block)
 				setBlock(true);
 			if (globalState.userSocket && chatState.currentConversation && chatState.currentConversationID) {
@@ -82,8 +81,6 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 			else
 				toast.warn(error.message);
 		}
-	console.log("block notwork user ")
-
 	}
 
 	const unblockUser = async() => {
@@ -115,12 +112,11 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 		else {
 			const error = await response.json();
 			if (Array.isArray(error.message))
-			toast.warn(error.message[0]);
-		else
-		toast.warn(error.message);
-	console.log("unblock notwork user ")
-}
-}
+				toast.warn(error.message[0]);
+			else
+				toast.warn(error.message);
+		}
+	}
 
 	const unmuteUser = async() => {
 
@@ -535,7 +531,6 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 
 	const handleTabClick = (target: User) => {
 		chatDispatch({ type: 'SET_CURRENT_TARGET', payload: target });
-		console.log(chatState.currentTarget);
 		chatDispatch({ type: 'ACTIVATE', payload: 'showConfirmation' });
 		chatDispatch({ type: 'DISABLE', payload: 'showOptionsUserChannel' });
 		chatDispatch({ type: 'DISABLE', payload: 'showOptionsUserChannelOwner' });

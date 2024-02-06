@@ -38,16 +38,16 @@ if (!dbPass || !dbUsername || !dbName || !dbHost) {
 imports: [
 
 	TypeOrmModule.forRoot({
-	type: 'postgres',
-	host: dbHost,
-	port: 5432,
-	username: dbUsername,
-	password: dbPass,
-	database: dbName,
-	entities: [User, Message, Conversation, Friendship],
-	synchronize: true,
-	dropSchema: true,
-	autoLoadEntities: true,
+		type: 'postgres',
+		host: dbHost,
+		port: 5432,
+		username: dbUsername,
+		password: dbPass,
+		database: dbName,
+		entities: [User, Message, Conversation, Friendship],
+		synchronize: true,
+		dropSchema: true,
+		autoLoadEntities: true,
 	}),
 
 	ServeStaticModule.forRoot({

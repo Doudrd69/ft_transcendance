@@ -29,7 +29,7 @@ const Menu = () => {
 
 		globalState.userSocket?.on('gameNotInProgress', () => {
 			if (!globalState.gameSocket?.connected) {
-				console.log(`[gameNotInProgress] : ${sessionStorage.getItem("currentUserLogin")}`)
+
 				const gameSocket = io(`${process.env.API_URL}/game`, {
 					autoConnect: false,
 					auth: {
@@ -48,7 +48,6 @@ const Menu = () => {
 
 
 		globalState.gameSocket?.on('setGameInvited', () => {
-			console.log("SET GAME");
 			dispatchGame({
 				type: 'TOGGLE',
 				payload: 'showGame',

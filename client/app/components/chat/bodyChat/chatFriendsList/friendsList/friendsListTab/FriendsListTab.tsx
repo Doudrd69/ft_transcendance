@@ -39,12 +39,10 @@ const FriendsListTabComponent: React.FC<FriendsListTabComponentProps> = ({ user,
 	const [funtionToExecute, setFunctionToExecute] = useState<() => void>(() => { });
 	const [accepted, setAccepted] = useState(false);
 	chatState.currentTargetStats = useState<targetStat>({id : user.id, username: user.username});
-	console.log(chatState.currentTargetStats);
 
 	const handleDms = async() => {
 
 		try {
-			console.log("user.id", user.id);
 			const createDMConversationDto = {
 				user1: Number(user.id),
 				user2: Number(sessionStorage.getItem("currentUserID")),
@@ -91,7 +89,6 @@ const FriendsListTabComponent: React.FC<FriendsListTabComponentProps> = ({ user,
 		catch (error) {
 			console.log(error);
 		}
-		console.log("user.id", user.id);
 		chatDispatch({ type: 'DISABLE', payload: 'showOptionsUserChannel' });
 		chatDispatch({ type: 'DISABLE', payload: 'currentChannelBool' });
 		chatDispatch({ type: 'DISABLE', payload: 'showFriendsList' });

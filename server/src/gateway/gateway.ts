@@ -88,32 +88,35 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 
 	private async notifyFriendList(userID: number, personnalRoom: string, status: string) {
 
-		let user;
-		if (status === 'online')
-			user = await this.userService.updateUserStatus(userID, true);
-		else if (status === 'offline')
-			user = await this.userService.updateUserStatus(userID, false);
-		else
-			throw new HttpException('Fatal error', HttpStatus.BAD_REQUEST);
-
-		if (user) {
-
-			const friends = await this.userService.getFriendships(userID);
-			if (friends) {
-
-				friends.forEach((friend: any) => {
-					console.log("-- Notifying connection/deconnction of ", friend.username, " --");
-					this.server.except(personnalRoom).to(friend.username).emit('refreshUserOnlineState', `${personnalRoom} is ${status}`);
-				});
-
-				// Emit to refresh DM list for user who are not friends
-				this.server.except(personnalRoom).emit('refreshUserOnlineState');
-
-				return;
+		try {
+			let user;
+			if (status === 'online')
+				user = await this.userService.updateUserStatus(userID, true);
+			else if (status === 'offline')
+				user = await this.userService.updateUserStatus(userID, false);
+			else
+				throw new HttpException('Fatal error', HttpStatus.BAD_REQUEST);
+	
+			if (user) {
+	
+				const friends = await this.userService.getFriendships(userID);
+				if (friends) {
+	
+					friends.forEach((friend: any) => {
+						console.log("-- Notifying connection/deconnction of ", friend.username, " --");
+						this.server.except(personnalRoom).to(friend.username).emit('refreshUserOnlineState', `${personnalRoom} is ${status}`);
+					});
+	
+					// Emit to refresh DM list for user who are not friends
+					this.server.except(personnalRoom).emit('refreshUserOnlineState');
+	
+					return;
+				}
 			}
+		} catch (error) {
+			throw error;
 		}
 
-		throw new HttpException('User not found', HttpStatus.NOT_FOUND);
 	}
 
 	async handleConnection(client: Socket) {

@@ -115,7 +115,6 @@ const GlobalSettingsComponent: React.FC = () => {
 	}
 
 	useEffect(() => {
-		console.log("urlImg = ", activeUrlImg);
 		sessionStorage.getItem("2fa") === "true" ? setActiveUrlImg(true) : setActiveUrlImg(false);
 	},[]);
 	

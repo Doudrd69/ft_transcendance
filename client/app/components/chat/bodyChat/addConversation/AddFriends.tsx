@@ -48,7 +48,6 @@ const AddFriendComponent: React.FC<AddFriendComponentProps> = ({ updateFriends, 
 				chatDispatch({ type: 'DISABLE', payload: 'showAddFriend' });
 
 				if (globalState.userSocket?.connected) {
-					console.log(data);
 					globalState.userSocket?.emit('joinRoom', { roomName: data.name, roomID: data.id });
 					globalState.userSocket?.emit('addFriend',  { recipientLogin: friendRequestDto.recipientLogin } );
 				}

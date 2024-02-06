@@ -45,7 +45,6 @@ const PongComponent = () => {
 
 	useEffect(() => {
 		const pongContainer = document.querySelector('.right-half');
-		console.log("pongContainer", pongContainer);
 
 		if (pongContainer) {
 			const handleResize = () => {
@@ -153,7 +152,6 @@ const PongComponent = () => {
 		});
 
 		globalState.gameSocket?.on('GameUpdate', (gameState: gameState) => {
-			// console.log("DISBALE THIS BLUR");
 			const newGameState: gameState = {
 				BallPosition: { x: gameState.BallPosition!.x * containerSize || 0.5 * containerSize, y: gameState.BallPosition!.y * containerSize || 0.5 * containerSize },
 				scoreOne: gameState.scoreOne,
@@ -213,7 +211,6 @@ const PongComponent = () => {
 				type: 'TOGGLE',
 				payload: 'showGameMenu',
 			});
-			console.log("GAME END FOR MATTHEO")
 			state.showGameMenu = true;
 			globalState.gameSocket?.disconnect();
 		});
@@ -227,7 +224,6 @@ const PongComponent = () => {
 				...prevState,
 				pause: true,
 			}));
-			console.log("GAME STOP FOR MATTHEO (c'est a dire un joueur a quitte pdt la game")
 			state.showGameMenu = true;
 			globalState.gameSocket?.disconnect();
 		});

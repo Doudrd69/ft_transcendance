@@ -20,7 +20,6 @@ const StatsComponent: React.FC = () => {
 	
 			if (response.ok) {
 				const stats = await response.json();
-				console.log(stats);
 				setStatsUser(stats);
 			}
 			else {
