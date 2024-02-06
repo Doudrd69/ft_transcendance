@@ -19,7 +19,7 @@ export class User {
 	
 	@Column({ default: false })
 	inGame: boolean;
-
+	
 	@Column()
  	login: string;
 

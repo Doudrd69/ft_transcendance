@@ -50,6 +50,8 @@ const GeneralComponent = () => {
 	const code = searchParams.get('code');
 
 	// GAME INVITE
+
+	// si j'inivte est ce que je peux check que j'ai bien invite?
 	const gameInviteValidation = (gameInviteDto: GameInviteDto) => {
 		globalState.userSocket?.off('usersNotInGame');
 		globalState.userSocket?.emit('checkAndsetInGame', {
@@ -400,6 +402,11 @@ const GeneralComponent = () => {
 				globalState.gameSocketConnected = false;
 			}
 			globalState.gameSocketConnected = false;
+		});
+
+		// this.server.to(client.id).emit('badsenderIdGameInvite');
+		globalState.userSocket?.on('badsenderIdGameInvite', () => {
+			globalState.gameSocket.disconnect();
 		});
 
 		return () => {
