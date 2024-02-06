@@ -1,8 +1,11 @@
 .tfaClass {
-    position: absolute;
+	background-image: url('./terrifiant.webp');
     display: flex;
     height: 100%;
     width: 100%;
+	background-size: cover; /* Ajuster la taille de l'image pour couvrir tout le conteneur */
+    background-position: center; /* Centrer l'image horizontalement et verticalement */
+    background-repeat: no-repeat;
     align-content: center;
     align-items: center;
     justify-content: center;
@@ -15,5 +18,35 @@
 .tfa-form {
     display: flex;
     align-content: center;
-    justify-content: right;
+    justify-content: center;
+
+}
+
+.tfa-form-input {
+	margin: 0px 20px;
+	padding: 20px;
+	box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+	border-radius: 10px;
+	border: none;
+	font-size: 20px;
+	background-color: #ffffff;
+	font-family: 'Gill Sans' , sans-serif;
+}
+
+.tfa-form-button {
+	margin: 0px 20px;
+	padding: 20px;
+	box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+	border-radius: 10px;
+	border: none;
+	font-size: 20px;
+	background-color: #ffffff;
+	font-family: 'Gill Sans' , sans-serif;
+}
+
+.tfa-form-button:hover {
+	transform: scale(1.2);
+	background-color: rgb(84, 84, 84);
+	color: white;
+	transition: ease 0.3s;
 }

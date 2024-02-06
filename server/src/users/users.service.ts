@@ -351,11 +351,10 @@ export class UsersService {
 		const user: User = await this.usersRepository.findOne({ where: { id: userId } });
 
 		if (user) {
-			console.log(`[getUsersStats] userVictory: ${user.victory}`);
 			let object = {
 				victory: user.victory,
 				defeat: user.defeat,
-				ratio: user.defeat ? (user.victory / (user.defeat + user.victory) * 100) : 0,
+				ratio: user.victory ? (user.victory / (user.defeat + user.victory) * 100) : 0,
 			};
 
 			return object;

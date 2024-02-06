@@ -9,7 +9,6 @@ const ChatComponent: React.FC = () => {
 	return (
 			<div className="left-half">
 				<div className="header-body">
-				
 					<HeaderChatComponent/>
 					<BodyChatComponent />
 				</div>
