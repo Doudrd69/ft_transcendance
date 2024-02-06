@@ -217,9 +217,14 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	@SubscribeMessage('inviteAccepted')
 	@UseGuards(GatewayGuard)
 	async inviteAccepted(@ConnectedSocket() client: Socket, @MessageBody() data: { otherUserId: number, userGameSocketId: string }) {
-		// bien check le userId voir la socket si genant
 		try {
 			const user = client.handshake.auth.user;
+			if (await this.userService.userInGame(data.otherUserId) === false)
+			{
+				// set me pas ingame
+				await this.userService.unsetUserInGame(user.sub);
+				this.server.to(client.id).emit('badsenderIdGameInvite');
+			}
 			const otherUser = await this.userService.getUserByID(data.otherUserId);
 			//recheck de si ils sont ingame, si oui rentre sinon mettre un message de pas bon user? 
 			// peut etre pas assez, peut etre passer 
@@ -236,7 +241,7 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	async checkAndSetInGame(@ConnectedSocket() client: Socket, @MessageBody() data: { opponentUserId: number }) {
 		try {
 			// voir pour faire un check que l'opposant soit pas un random, verifier que c'est lui qui a gameInvite
-
+			// check si opponent 
 			const userId = client.handshake.auth.user.sub;
 			const otherUser = await this.userService.getUserByID(data.opponentUserId);
 			const user = await this.userService.getUserByID(userId);
@@ -282,17 +287,18 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	@UseGuards(GatewayGuard)
 	async inviteUserToGame(@ConnectedSocket() client: Socket, @MessageBody() data: {userIdToInvite: number}) {
 		try {
-			// check si userId est good?
 			const {userIdToInvite } = data;
-			const user = client.handshake.auth.user;
-			if (await this.userService.usersInGame(user.sub, userIdToInvite)) {
+			const userId = client.handshake.auth.user.sub;
+			if (await this.userService.usersInGame(userId, userIdToInvite)) {
 				console.log(`users already inGame`);
 				this.server.to(client.id).emit('usersInGame');
 				return;
 			}
+			// const user = await this.userService.getUserByID(userId);
+			// set opponent in this user
 			const userToInvite = await this.userService.getUserByID(userIdToInvite);
 			this.server.to(userToInvite.username).emit('gameInvite', {
-				senderUserID: user.sub,
+				senderUserID: userId,
 			});
 		}
 		catch (error) {

@@ -134,6 +134,7 @@ export class GameGateway {
     @UseGuards(GatewayGuard)
     async handleCheckGameInvite(@ConnectedSocket() client: Socket, @MessageBody() data : {userTwoId: number, userTwoGameId: string}) {
         try {
+            // 
             const userOne = client.handshake.auth.user;
             console.log(`invite accpeted :=====> ${data.userTwoGameId}`);
             console.log(`invite accpeted :=====> ${data.userTwoId}`);
@@ -213,8 +214,6 @@ export class GameGateway {
     @UseGuards(GatewayGuard)
     async handleJoinMatchmaking(@ConnectedSocket() client: Socket, @MessageBody() data: {gameMode: string}) {
         try {
-            // faire un check si c'est bien une string
-            // peut etre check si gameMode est pas NORMAL OU SPEED
             console.log(`[join-matchmaking]: gameMode : ${data.gameMode}`);
             if (data.gameMode === undefined || (data.gameMode !== "NORMAL" && data.gameMode !== "SPEED"))
                 data.gameMode = "NORMAL";
@@ -409,7 +408,6 @@ export class GameGateway {
     @UseGuards(GatewayGuard)
     async handlePaddleMove(@ConnectedSocket() client: Socket, @MessageBody() data: { input: string, gameID: number }) {
         try {
-            // check input bien string, check GameID bien number et voir pour check game
             const gameInstance: game_instance = this.GameService.getGameInstance(this.game_instance, data.gameID);
             if (gameInstance) {
                 if (gameInstance.pause !== true) {
@@ -426,7 +424,6 @@ export class GameGateway {
     @UseGuards(GatewayGuard)
     async handlePaddleStop(@ConnectedSocket() client: Socket, @MessageBody() data: { input: string, gameID: number }) {
         try {
-            // check input bien string, check GameID bien number et voir pour check game
             const gameInstance: game_instance = this.GameService.getGameInstance(this.game_instance, data.gameID);
             if (gameInstance) {
                 this.GameEngineceService.switchInputUp(data.input, gameInstance, client.id);
