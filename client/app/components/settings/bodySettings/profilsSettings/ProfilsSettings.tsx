@@ -112,10 +112,13 @@ const ProfilsSettingsComponent: React.FC = () => {
 	return (
 		<div className="bloc-profils-settings">
 			<div className="upload-image">
-			{imageURL ?
-				(<img src={imageURL} alt="profile-image" className="profil-image" />) 
-				:
-				(<AvatarImageComponent className="profil-image"/>)}
+			<div className='bloc-avatar'>
+				{imageURL ?
+					(<img src={imageURL} alt="profile-image" className="profil-image" />) 
+					:
+					(<AvatarImageComponent className="profil-image"/>)}
+			
+			</div>
 				<FileDropZoneComponent onChange={(newImage) => setNewImage(newImage)} />
 				<button className="button-modified-image" onClick={() => {handleImage()}}>
 					Update Avatar
