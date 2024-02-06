@@ -351,6 +351,7 @@ export class UsersService {
 		const user: User = await this.usersRepository.findOne({ where: { id: userId } });
 
 		if (user) {
+
 			let object = {
 				victory: user.victory,
 				defeat: user.defeat,

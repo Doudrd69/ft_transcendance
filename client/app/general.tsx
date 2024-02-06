@@ -443,25 +443,6 @@ const GeneralComponent = () => {
 
 	}, [globalState?.gameSocket, globalState.gameInviteValidation, globalState?.userSocket, globalState.gameSocketConnected, globalState.userTwoIdGame, globalState.userTwoGameSocketId]);
 
-	// Connection - Deconnection useEffect
-	useEffect(() => {
-
-		// Works on both connection and reconnection
-		globalState.userSocket?.on('connect', () => {
-			const personnalRoom = sessionStorage.getItem("currentUserLogin");
-			globalState.userSocket?.emit('joinPersonnalRoom', personnalRoom, sessionStorage.getItem("currentUserID"));
-		})
-
-		globalState.userSocket?.on('disconnect', () => {
-		})
-
-		return () => {
-			globalState.userSocket?.off('connect');
-			globalState.userSocket?.off('disconnect');
-		}
-
-	}, [globalState?.userSocket])
-
 	// Game socket handler
 	useEffect(() => {
 
