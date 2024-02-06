@@ -221,11 +221,12 @@ export class AuthService {
 				}
 				else {
 					console.error("-- INVALID CODE --");
-					this.usersService.upate2FAState(user, false);
+					// this.usersService.upate2FAState(user, false);
 					throw new HttpException('Invalid code', HttpStatus.BAD_REQUEST);
 				}
 			}
 
+			throw new HttpException('User not found', HttpStatus.NOT_FOUND);
 		}
 		catch (error) {
 			console.error("!! Token verification failed !!");
