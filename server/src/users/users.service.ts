@@ -130,6 +130,7 @@ export class UsersService {
 	/***					USER MANAGEMENT						***/
 	/**************************************************************/
 
+
 	async uploadAvatarURL(avatarURL: string, userID: number): Promise<UpdateResult | undefined> {
 
 		const user = await this.usersRepository.findOne({ where: { id: userID } });
@@ -138,7 +139,6 @@ export class UsersService {
 			const oldAvatarPath = join(__dirname, user.avatarURL);
 			if (existsSync(oldAvatarPath))
 				unlinkSync(oldAvatarPath);
-
 			const updateResult = await this.usersRepository.update({ id: userID }, { avatarURL });
 			return updateResult;
 		}
@@ -348,7 +348,7 @@ export class UsersService {
 
 	async getUsersStats(userId: number) {
 
-		const user: User = await this.usersRepository.findOne({ where: { id: userId } });
+		const user = await this.usersRepository.findOne({ where: { id: userId } });
 
 		if (user) {
 
@@ -591,6 +591,7 @@ export class UsersService {
 
 		throw new HttpException('User not found', HttpStatus.BAD_REQUEST);
 	}
+
 
 	async getUserList(userId: number) {
 		const user = await this.usersRepository.findOne({ where: { id: userId } });

@@ -6,7 +6,7 @@ import './ProfilsSettings.css';
 import FileDropZoneComponent from './fileDropZone/FileDropZone';
 import AvatarImageComponent from '@/app/components/Avatar/Avatar';
 import { Socket } from 'socket.io-client'
-
+import { Image } from 'image-js';
 const ProfilsSettingsComponent: React.FC = () => {
 
 	const [newImage, setNewImage] = useState<File | null>(null);
@@ -93,6 +93,7 @@ const ProfilsSettingsComponent: React.FC = () => {
 
 	const [imageURL, setImageURL] = useState<string | null>(null);
 
+	
 	useEffect(() => {
 		if (newImage) {
 			const fileReader = new FileReader();

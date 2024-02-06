@@ -6,6 +6,7 @@ import { diskStorage } from 'multer';
 import Jimp from 'jimp';
 import * as path from 'path';
 import { extname } from 'path';
+import * as fs from 'fs';
 
 import { AuthGuard } from 'src/auth/auth.guard';
 
@@ -54,7 +55,13 @@ export class UsersController {
 	async uploadAvatar(@UploadedFile() avatar: Express.Multer.File, @Req() req) {
 		try
 		{
-
+			const fileDescriptor = await fs.promises.open(avatar.path, 'r');
+			const buffer = Buffer.alloc(8);
+			await fileDescriptor.read(buffer, 0, 8, 0);
+			await fileDescriptor.close();
+			const signature = buffer.toString('hex');
+			if(signature !== "89504e470d0a1a0a")
+				throw new HttpException('Invalid file type', HttpStatus.BAD_REQUEST);
 			const { user } = req;
 			const cheminImageSortie = path.join(__dirname, 'avatars', `carredanslaxe_${avatar.filename}`);
 			const image = await Jimp.read(avatar.path);
