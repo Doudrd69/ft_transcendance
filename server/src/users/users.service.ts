@@ -37,6 +37,7 @@ export class UsersService {
 		}
 		return true;
 	}
+
 	async userInGame(userId: number) {
 		const user: User = await this.usersRepository.findOne({ where: { id: userId } })
 		if (!user)
@@ -100,34 +101,33 @@ export class UsersService {
 	/***							2FA							***/
 	/**************************************************************/
 
-	async register2FATempSecret(userID: number, secret: string) {
+	async register2FATempSecret(userID: number, secret: string): Promise<boolean> {
 
 		const userToUpdate = await this.usersRepository.findOne({ where: { id: userID } });
 		if (userToUpdate) {
 			userToUpdate.TFA_temp_secret = secret;
-			return this.usersRepository.save(userToUpdate);
+			await this.usersRepository.save(userToUpdate);
+			return true;
 		}
 
-		return;
+		return false;
 	}
 
 	async save2FASecret(user: User, code: string) {
 		user.TFA_secret = code;
-		return await this.usersRepository.save(user);
+		await this.usersRepository.save(user);
+		return ;
 	}
 
 	async upate2FAState(user: User, state: boolean) {
 		user.TFA_isEnabled = state;
-		if (!state) {
-			user.TFA_secret = "";
-			user.TFA_temp_secret = "";
-		}
-		return await this.usersRepository.save(user);
+		await this.usersRepository.save(user);
+		return ;
 	}
 
-	async get2faSecret(userID: number) {
+	async get2faSecret(userID: number): Promise<string | null> {
 
-		const user: User = await this.usersRepository.findOne({ where: { id: userID } });
+		const user : User = await this.usersRepository.findOne({ where: { id: userID } });
 		if (user) {
 			return user.TFA_secret;
 		}
@@ -268,12 +268,10 @@ export class UsersService {
 
 	async updateUsername(updateUsernameDto: UpdateUsernameDto, userID: number) {
 
-		const user: User = await this.usersRepository.findOne({ where: { id: userID } });
-
+		const user = await this.usersRepository.findOne({ where: { id: userID } });
 		if (user) {
 
 			const usernameValidation = await this.isUsernameValid(updateUsernameDto.newUsername);
-
 			if (usernameValidation) {
 
 				user.username = updateUsernameDto.newUsername;
@@ -379,7 +377,6 @@ export class UsersService {
 
 	async createFriendship(friendRequestDto: FriendRequestDto, userID: number): Promise<boolean> {
 
-		// userID is the id of the initiator
 		const initiator = await this.usersRepository.findOne({
 			where: { id: userID },
 			relations: ["initiatedFriendships"],
@@ -530,8 +527,8 @@ export class UsersService {
 
 	async blockUser(blockUserDto: BlockUserDto, userID: number): Promise<boolean> {
 
-		const user: User = await this.usersRepository.findOne({ where: { id: userID } });
-		const userToBlock: User = await this.usersRepository.findOne({ where: { username: blockUserDto.recipientLogin } });
+		const user = await this.usersRepository.findOne({ where: { id: userID } });
+		const userToBlock = await this.usersRepository.findOne({ where: { username: blockUserDto.recipientLogin } });
 
 		if (user && userToBlock) {
 
@@ -546,7 +543,7 @@ export class UsersService {
 			return true;
 		}
 
-		throw new HttpException('Fatal error', HttpStatus.BAD_REQUEST);
+		throw new HttpException('User not found', HttpStatus.BAD_REQUEST);
 	}
 
 	async unblockUser(blockUserDto: BlockUserDto, userID: number): Promise<boolean> {
@@ -561,7 +558,7 @@ export class UsersService {
 			return true;
 		}
 
-		throw new HttpException('Fatal error', HttpStatus.BAD_REQUEST);
+		throw new HttpException('User not found', HttpStatus.BAD_REQUEST);
 	}
 
 	/**************************************************************/
@@ -604,8 +601,8 @@ export class UsersService {
 		const user = await this.usersRepository.findOne({ where: { id: userId } });
 
 		if (user) {
+
 			const users = await this.usersRepository.find();
-		
 			if (users && users.length > 0) {
 		
 				const array = users

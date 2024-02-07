@@ -153,46 +153,51 @@ export class AuthService {
 
 			const secret = await this.usersService.get2faSecret(userID);
 			if (!secret) {
+
 				const newSecret = speakeasy.generateSecret();
-				await this.usersService.register2FATempSecret(userID, newSecret.base32);
+				if (await this.usersService.register2FATempSecret(userID, newSecret.base32)) {
 
-				const qrcodeURL = await new Promise<string> ( (resolve, reject) => {
-					QRCode.toDataURL(newSecret.otpauth_url, function(err, data_url) {
-						if (err)
-						{
-							console.error(err);
-							reject(err);
-						}
-						else
-						{
-							console.log(data_url);
-							resolve(data_url);
-						}
+					const qrcodeURL = await new Promise<string> ( (resolve, reject) => {
+						QRCode.toDataURL(newSecret.otpauth_url, function(err, data_url) {
+							if (err)
+							{
+								console.error(err);
+								reject(err);
+							}
+							else
+							{
+								console.log(data_url);
+								resolve(data_url);
+							}
+						});
 					});
-				});
-
-				return { qrcodeURL };
+	
+					return { qrcodeURL };
+				}
 			}
+
+			throw new HttpException('Data loading failed', 406);
 		}
 		catch (error) {
-			throw new HttpException('Fatal error', HttpStatus.BAD_REQUEST);
+			throw error;
 		}
 	}
 
 	async get2fa(userID: number) {
-		const user = await this.usersService.getUserByID(userID);
 
-		if (user) {
-			return user.TFA_isEnabled;
+		try {
+			const user = await this.usersService.getUserByID(userID);
+			if (user)
+				return user.TFA_isEnabled;
+			else
+				throw new HttpException('User not found', HttpStatus.BAD_REQUEST);
+		} catch (error) {
+			throw error;
 		}
-
-		throw new HttpException('User not found', HttpStatus.BAD_REQUEST);
 	}
 
 	async verifyCode(authenticatorCodeDto: AuthenticatorCodeDto, userID: number) {
 
-		// We find the user whose need a check to retrieve its temporary secret
-		// and compare it with the code he has on its authenticator service
 		try {
 
 			const user = await this.usersService.getUserByID(userID);
@@ -211,17 +216,17 @@ export class AuthService {
 					token: authenticatorCodeDto.code,
 				});
 		
-				if (verified)
-				{
+				if (verified) {
+
 					console.log("-- CODE VERIFIED --");
 					if (!user.TFA_secret)
-						this.usersService.save2FASecret(user, base32secret);
+						await this.usersService.save2FASecret(user, base32secret);
 					await this.usersService.upate2FAState(user, true);
 					return true;
 				}
 				else {
+
 					console.error("-- INVALID CODE --");
-					// this.usersService.upate2FAState(user, false);
 					throw new HttpException('Invalid code', HttpStatus.BAD_REQUEST);
 				}
 			}
@@ -230,7 +235,7 @@ export class AuthService {
 		}
 		catch (error) {
 			console.error("!! Token verification failed !!");
-			throw new HttpException(error, HttpStatus.BAD_REQUEST);
+			throw error;
 		}
 	}
 }

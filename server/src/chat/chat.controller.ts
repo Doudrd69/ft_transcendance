@@ -61,13 +61,13 @@ export class ChatController {
 			return this.chatService.addUserToConversation(addUserToConversationDto.conversationID, user.sub, false, false);
 	}
 
-	@UseGuards(AuthGuard)
-	@HttpCode(HttpStatus.OK)
-	@Post('updateConversation')
-	updateConversationStatusAndPassword(@Req() req, @Body() updateConversationDto: UpdateConversationDto): Promise<Conversation> {
-		const { user } = req;
-		return this.chatService.updateConversation(updateConversationDto, user.sub);
-	}
+	// @UseGuards(AuthGuard)
+	// @HttpCode(HttpStatus.OK)
+	// @Post('updateConversation')
+	// updateConversationStatusAndPassword(@Req() req, @Body() updateConversationDto: UpdateConversationDto): Promise<Conversation> {
+	// 	const { user } = req;
+	// 	return this.chatService.updateConversation(updateConversationDto, user.sub);
+	// }
 
 	@UseGuards(AuthGuard)
 	@HttpCode(HttpStatus.OK)
