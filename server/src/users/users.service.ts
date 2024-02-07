@@ -421,15 +421,13 @@ export class UsersService {
 		throw new HttpException('Fatal error', HttpStatus.BAD_REQUEST);
 	}
 
-	async findDMConversation(user1: User, user2: User) {
+	async findDMConversation(user1: User, user2: User): Promise<Conversation> {
 
-		let conversation = null;
+		let conversation : Conversation = null;
 		user1.groups.forEach((userOneGroup: GroupMember) => {
 			user2.groups.forEach((userTwoGroup: GroupMember) => {
 				if ((userOneGroup.conversation.id == userTwoGroup.conversation.id) &&
 					(!userOneGroup.conversation.is_channel && !userTwoGroup.conversation.is_channel)) {
-					console.log("== found common DM ==");
-					console.log(userOneGroup.conversation);
 					conversation = userOneGroup.conversation;
 					return;
 				}

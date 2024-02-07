@@ -114,7 +114,7 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 				}
 			}
 		} catch (error) {
-			throw error;
+			// throw error;
 		}
 
 	}

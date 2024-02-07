@@ -46,6 +46,7 @@ services:
       context: ./client
       args:
         API_URL: ${API_URL}
+        AUTH_API_URL: ${AUTH_API_URL}
     depends_on:
       - server
     ports:

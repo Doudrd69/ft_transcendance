@@ -280,7 +280,6 @@ const GeneralComponent = () => {
 		globalState.userSocket?.on('disconnect', () => { })
 
 		globalState.userSocket?.on('refreshUserOnlineState', (notif: string) => {
-			console.log("Friend online status event (general.tsx) --> ", notif);
 			toast.info(notif);
 		});
 
@@ -325,11 +324,6 @@ const GeneralComponent = () => {
 		});
 
 		globalState.userSocket?.on('gameInvite', (gameInviteDto: GameInviteDto) => {
-			console.log("================3=================")
-			console.log("ON USERINGAME")
-			console.log("globalState.gameInvite", globalState.gameInvite)
-			console.log("globalState.gameInviteValidation", globalState.gameInviteValidation)
-			console.log("globalState.gameSocketConnected", globalState.gameSocketConnected)	
 				toast(<GameInviteNotification gameInviteDto={gameInviteDto} />,
 					{
 						pauseOnFocusLoss: false,
@@ -387,11 +381,6 @@ const GeneralComponent = () => {
 
 		});
 		globalState.userSocket?.on('usersInGame', () => {
-			console.log("================2=================")
-			console.log("ON USERINGAME")
-			console.log("globalState.gameInvite", globalState.gameInvite)
-			console.log("globalState.gameInviteValidation", globalState.gameInviteValidation)
-			console.log("globalState.gameSocketConnected", globalState.gameSocketConnected)
 			globalState.gameSocketConnected = false;
 		})
 		globalState.userSocket?.on('userInGame', () => {
@@ -427,7 +416,6 @@ const GeneralComponent = () => {
 		})
 
 		globalState.gameSocket?.on('disconnect', () => {
-			console.log('GameSocket? disconnected from the server : ', globalState.gameSocket?.id);
 			globalState.gameSocketConnected = false;
 		})
 
