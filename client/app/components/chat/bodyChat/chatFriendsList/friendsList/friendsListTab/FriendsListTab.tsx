@@ -175,9 +175,7 @@ const FriendsListTabComponent: React.FC<FriendsListTabComponentProps> = ({ user,
 	};
  
 	const handleGameInvite = () => {
-		globalState.gameTargetId = user.id;
-		globalState.targetUsername = user.username;
-		globalState.gameInvite = true;
+		globalState.userSocket?.emit('InviteToGame', user.id);
 	}
 
 	const removeFriends = async () => {

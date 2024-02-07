@@ -76,12 +76,13 @@ const GeneralComponent = () => {
 		})
 	}
 
-	const gameInviteClosed = (gameInviteDto: GameInviteDto) => {
-		setTimeout(() => {
-			globalState.userSocket?.emit('inviteClosed', {
-				senderUserId: gameInviteDto.senderUserID,
-			})
-		}, 200);
+	const gameInviteClosed = (targetUserId: number) => {
+		//le timeout qui etait precedemment dans le toast 
+		//faisais demarrer le jeu en différé est n'envoyé pas l'emit en meme temps que le toast se fermait
+		//je sais pas si c'etait fais expres
+		//mais jy ai trouvé aucune utilité ca pouvais meme poser des problemes
+		//mais ca strouve j'ai raté qqch
+		globalState.userSocket?.emit('inviteClosed', targetUserId)
 	}
 
 	const gameInviteDeny = (gameInviteDto: GameInviteDto) => { 
@@ -90,22 +91,45 @@ const GeneralComponent = () => {
 		});
 	}
 
-	const GameInviteNotification = ({ closeToast, toastProps, gameInviteDto }: any) => (
-
-		<div>
-			You received a game invite from  {gameInviteDto.senderUsername}
-			<button style={{ padding: '5px ' }} onClick={() => {
-				gameInviteValidation(gameInviteDto);
-				closeToast();
-			}}>
-				Accept
-			</button>
-			<button style={{ padding: '5px ' }} onClick={() => {
-				gameInviteDeny(gameInviteDto);
-				closeToast();
-			}}>Deny</button>
-		</div>
-	)
+	const GameInviteNotification = ({ closeToast, toastProps, gameInviteDto }: any) => {
+		// Effet useEffect pour écouter l'événement 'closeToast' émis par le serveur
+		useEffect(() => {
+			const handleSocketEvent = (event:any) => {
+				if (event === 'closeToast') {
+					closeToast(); // Fermer le toast
+				}
+			};
+	
+			// Ajouter l'écouteur d'événement
+			// Assurez-vous de supprimer l'écouteur d'événement lorsque le composant est démonté pour éviter les fuites de mémoire
+			globalState.userSocket?.on('closeToast', handleSocketEvent);
+	
+			return () => {
+				// Supprimer l'écouteur d'événement lorsque le composant est démonté
+				globalState.userSocket?.off('closeToast', handleSocketEvent);
+			};
+		}, [closeToast]); // Assurez-vous que cette dépendance est correctement spécifiée pour éviter les problèmes de mémoire
+	
+		return (
+			<div className='toast-container'>
+				You received a game invite from {gameInviteDto.senderUsername}
+				<div className='bloc-toast-button'>
+					<div className='toast-yes' onClick={() => {
+						gameInviteValidation(gameInviteDto);
+						closeToast();
+					}}>
+						Accept
+					</div>
+					<div className='toast-no' onClick={() => {
+						gameInviteDeny(gameInviteDto);
+						closeToast();
+					}}>
+						Deny
+					</div>
+				</div>
+			</div>
+		);
+	};
 
 	// FRIEND REQUEST
 	const friendRequestValidation = async (friendRequestDto: FriendRequestDto) => {
@@ -325,17 +349,13 @@ const GeneralComponent = () => {
 		});
 
 		globalState.userSocket?.on('gameInvite', (gameInviteDto: GameInviteDto) => {
-			console.log("================3=================")
-			console.log("ON USERINGAME")
-			console.log("globalState.gameInvite", globalState.gameInvite)
-			console.log("globalState.gameInviteValidation", globalState.gameInviteValidation)
-			console.log("globalState.gameSocketConnected", globalState.gameSocketConnected)	
-				toast(<GameInviteNotification gameInviteDto={gameInviteDto} />,
-					{
-						pauseOnFocusLoss: false,
-						autoClose: 5000,
-						onClose: props => gameInviteClosed(gameInviteDto),
-					});
+			toast(<GameInviteNotification gameInviteDto = {gameInviteDto} />,
+				{
+					pauseOnFocusLoss: false,
+					autoClose: 5000,
+					onClose: props => gameInviteClosed(gameInviteDto.senderUserID),
+					// onClose: props => gameInviteClosed(gameInviteDto.senderUserID),
+				});
 		});
 
 		return () => {
