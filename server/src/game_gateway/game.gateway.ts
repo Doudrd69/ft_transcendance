@@ -198,60 +198,61 @@ export class GameGateway {
         }
     }
 
-    @SubscribeMessage('join-matchmaking')
-    @UseGuards(GatewayGuard)
-    async handleJoinMatchmaking(@ConnectedSocket() client: Socket, @MessageBody() data: {gameMode: string}) {
-        try {
-            if (data.gameMode === undefined || (data.gameMode !== "NORMAL" && data.gameMode !== "SPEED"))
-                data.gameMode = "NORMAL";
-            const userId = client.handshake.auth.user.sub;
-            const user: User = await this.GameService.getUserWithUserId(userId);
-            this.GameService.createNewGameSockets(user.id);
-            this.GameService.addGameSocket(client.id, user.id);
-            await this.MatchmakingService.joinQueue(client.id, user.id, data.gameMode);
-            await this.GameService.linkSocketIDWithUser(client.id, user.id);
-            const enoughPlayers = await this.MatchmakingService.IsThereEnoughPairs(data.gameMode);
-            if (enoughPlayers) {
-                // peut etre check les users de nouveaux ici? 
-                const pairs: [string, string][] = await this.MatchmakingService.getPlayersPairsQueue(data.gameMode);
-                for (const pair of pairs) {
-                    const socketIDs: [string, string] = [pair[0], pair[1]];
-                    let game = await this.GameService.createGame(pair[0], pair[1], data.gameMode);
-                    if (!game)
-                    throw new Error("Fatal error");
-                    const gameInstance: game_instance = this.GameEngineceService.createGameInstance(game);
-                    await this.MatchmakingService.leaveQueue(pair[0], gameInstance.usersId[0]);
-                    await this.MatchmakingService.leaveQueue(pair[1], gameInstance.usersId[1]);
-                    this.game_instance.push(gameInstance);
-                    console.log("SOCKET IDs: ", socketIDs);
-                    this.server.to(socketIDs).emit('setgame');
-                    this.server.to(socketIDs).emit('joinGame', {
-                        gameId: game.gameId,
-                        playerOneID: game.playerOneID,
-                        playerTwoID: game.playerTwoID,
-                        playerOneLogin: game.playerOneLogin,
-                        playerTwoLogin: game.playerTwoLogin,
-                        scoreOne: game.scoreOne,
-                        scoreTwo: game.scoreTwo,
-                    });
-                    setTimeout(() => {
-                        this.server.to(socketIDs).emit('gameStart', {
-                            gameId: game.gameId,
-                            playerOneID: game.playerOneID,
-                            playerTwoID: game.playerTwoID,
-                            playerOneLogin: game.playerOneLogin,
-                            playerTwoLogin: game.playerTwoLogin,
-                            scoreOne: game.scoreOne,
-                            scoreTwo: game.scoreTwo,
-                        });
-                    }, 1000);
-                }
-            }
-        }
-        catch (error) {
-            await this.handleException(error, client)
-        }
-    }
+	@SubscribeMessage('join-matchmaking')
+	@UseGuards(GatewayGuard)
+	async handleJoinMatchmaking(@ConnectedSocket() client: Socket, @MessageBody() data: {gameMode: string}) {
+		try {
+			if (data.gameMode === undefined || (data.gameMode !== "NORMAL" && data.gameMode !== "SPEED"))
+				data.gameMode = "NORMAL";
+			const userId = client.handshake.auth.user.sub;
+
+			const user: User = await this.GameService.getUserWithUserId(userId);
+			if (!user)
+				throw new Error("ERROR");
+			this.GameService.addGameSocket(client.id, userId);
+			await this.MatchmakingService.joinQueue(client.id, userId, data.gameMode);
+			await this.GameService.linkSocketIDWithUser(client.id, userId);
+			const enoughPlayers = await this.MatchmakingService.IsThereEnoughPairs(data.gameMode);
+			if (enoughPlayers) {
+				const pairs: [string, string][] = await this.MatchmakingService.getPlayersPairsQueue(data.gameMode);
+				for (const pair of pairs) {
+					const socketIDs: [string, string] = [pair[0], pair[1]];
+					let game = await this.GameService.createGame(pair[0], pair[1], data.gameMode);
+					if (!game)
+					throw new Error("Fatal error");
+					const gameInstance: game_instance = this.GameEngineceService.createGameInstance(game);
+					await this.MatchmakingService.leaveQueue(pair[0], gameInstance.usersId[0]);
+					await this.MatchmakingService.leaveQueue(pair[1], gameInstance.usersId[1]);
+					this.game_instance.push(gameInstance);
+					console.log("SOCKET IDs: ", socketIDs);
+					this.server.to(socketIDs).emit('setgame');
+					this.server.to(socketIDs).emit('joinGame', {
+						gameId: game.gameId,
+						playerOneID: game.playerOneID,
+						playerTwoID: game.playerTwoID,
+						playerOneLogin: game.playerOneLogin,
+						playerTwoLogin: game.playerTwoLogin,
+						scoreOne: game.scoreOne,
+						scoreTwo: game.scoreTwo,
+					});
+					setTimeout(() => {
+						this.server.to(socketIDs).emit('gameStart', {
+							gameId: game.gameId,
+							playerOneID: game.playerOneID,
+							playerTwoID: game.playerTwoID,
+							playerOneLogin: game.playerOneLogin,
+							playerTwoLogin: game.playerTwoLogin,
+							scoreOne: game.scoreOne,
+							scoreTwo: game.scoreTwo,
+						});
+					}, 1000);
+				}
+			}
+		}
+		catch (error) {
+			await this.handleException(error, client)
+		}
+	}
 
     @SubscribeMessage('playerJoined')
     @UseGuards(GatewayGuard)
