@@ -316,6 +316,11 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 				||
 				invite.emitUserId === targetUserId && invite.targetUserId === emitUserId
 			);
+			// check si les deux users existent et sont bien differents
+			if (emitUserId && targetToInvite.id && (emitUserId !== targetToInvite.id))
+			{
+				console.log(`[check de l'existence des users] : les deux id sont bien la`);
+			}
 			// Supprimer un élément de la file
 			const removeFromGameQueue = (item: GameInviteDto) => {
 				const index = gameQueue.indexOf(item);
@@ -329,11 +334,6 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 			console.log(`[targetUserId] : ${targetUserId}`)
 			// fonction pour savoir si une paire existe deja
 
-			// check si les deux users existent et sont bien differents
-			if (emitUserId && targetToInvite.id && (emitUserId !== targetToInvite.id))
-			{
-				console.log(`[check de l'existence des users] : les deux id sont bien la`);
-			}
 
 			// check si les deux users sont deja en game
 			if (await this.userService.usersInGame(emitUserId, targetUserId)) {
@@ -341,12 +341,15 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 				console.log(`[check si l'un des deux users sont deja en game] : l'un des deux users sont deja en game`);
 				return;
 			}
+			const existingMyPair = gameQueue.find(invite => 
+				invite.emitUserId === targetUserId && invite.targetUserId === emitUserId
+			);
 			//creation d'une paire
 			const newGameInvite: GameInviteDto = {
 				emitUserId: emitUserId,
 				targetUserId: targetUserId,
 				isAcceptedEmitUser: true,
-				isAcceptedTargetUser: existingPair ? true : false,
+				isAcceptedTargetUser: existingMyPair ? true : false,
 			};
 			console.log(`[newGameInviteId] : ${newGameInvite.emitUserId} | ${newGameInvite.targetUserId}`)
 			console.log(`[newGameInviteState] : ${newGameInvite.isAcceptedEmitUser} | ${newGameInvite.isAcceptedTargetUser}`)
@@ -362,11 +365,10 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 					//pour etre bien sur que le gameInvite ne soit pas fait par POSTMAN
 					//la on a un genre de emit croisé avec un char russe
 					removeFromGameQueue(newGameInvite);
-				}, 5000); 
+				}, 5000);
 				this.server.to(targetToInvite.username).emit('gameInvite', {
 					senderUsername: client.handshake.auth.user.username,
 					senderUserID: emitUserId,
-
 				});
 			}
 
@@ -376,7 +378,6 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 				if (existingPair && newGameInvite.isAcceptedTargetUser && newGameInvite.isAcceptedEmitUser) {
 					//si en gros il font l'invite en meme temps dans les 5s du toast, meme si il n'accepte pas 
 					//les deux seront ajouter a une game automatiquement
-					this.server.to(emitUserId).emit('closeToast');
 					console.log(`[La target a fait aussi la demande] : il faut lancer la game`);
 					return;
 				}
@@ -419,8 +420,8 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 			// Vérifiez si existingPair a été trouvé dans gameQueue
 			if (indexToDelete !== -1) {
 				// Supprimez existingPair de gameQueue
-				// const removedPair = gameQueue.splice(indexToDelete, 1);
-				// console.log("Element supprimé de gameQueue :", removedPair);
+				const removedPair = gameQueue.splice(indexToDelete, 1);
+				console.log("Element supprimé de gameQueue :", removedPair);
 			}
 		} catch (error) {
 			console.log(`[GAME INVITE ERROR]: ${error.stack}`)

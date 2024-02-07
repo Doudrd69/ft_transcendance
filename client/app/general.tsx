@@ -92,24 +92,6 @@ const GeneralComponent = () => {
 	}
 
 	const GameInviteNotification = ({ closeToast, toastProps, gameInviteDto }: any) => {
-		// Effet useEffect pour écouter l'événement 'closeToast' émis par le serveur
-		useEffect(() => {
-			const handleSocketEvent = (event:any) => {
-				if (event === 'closeToast') {
-					closeToast(); // Fermer le toast
-				}
-			};
-	
-			// Ajouter l'écouteur d'événement
-			// Assurez-vous de supprimer l'écouteur d'événement lorsque le composant est démonté pour éviter les fuites de mémoire
-			globalState.userSocket?.on('closeToast', handleSocketEvent);
-	
-			return () => {
-				// Supprimer l'écouteur d'événement lorsque le composant est démonté
-				globalState.userSocket?.off('closeToast', handleSocketEvent);
-			};
-		}, [closeToast]); // Assurez-vous que cette dépendance est correctement spécifiée pour éviter les problèmes de mémoire
-	
 		return (
 			<div className='toast-container'>
 				You received a game invite from {gameInviteDto.senderUsername}
@@ -354,7 +336,6 @@ const GeneralComponent = () => {
 					pauseOnFocusLoss: false,
 					autoClose: 5000,
 					onClose: props => gameInviteClosed(gameInviteDto.senderUserID),
-					// onClose: props => gameInviteClosed(gameInviteDto.senderUserID),
 				});
 		});
 
