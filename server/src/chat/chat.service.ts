@@ -390,7 +390,6 @@ export class ChatService {
 	/***					CHANNEL PASSWORD					***/
 	/**************************************************************/
 
-	// attention userID soit le bon user
 	async compareChannelPassword(checkPasswordDto: CheckPasswordDto, userID: number): Promise<boolean> {
 
 		const conversation : Conversation = await this.conversationRepository.findOne({ where: { id: checkPasswordDto.conversationID} });
@@ -398,7 +397,7 @@ export class ChatService {
 			const isMatch = await bcrypt.compare(checkPasswordDto.userInput, conversation.password);
 			if (isMatch) {
 
-				const conversationToAdd = await this.addUserToConversation(conversation.id, userID, true);
+				const conversationToAdd = await this.addUserToConversation(conversation.id, userID, true, true);
 				if (conversationToAdd)
 					return true;
 				else
@@ -993,7 +992,7 @@ export class ChatService {
 		throw new HttpException('Fatal error', HttpStatus.BAD_REQUEST);
 	}
 
-	async addUserToConversation(conversationToAddId: number, userID: number, inviteFlag: boolean): Promise<Conversation> {
+	async addUserToConversation(conversationToAddId: number, userID: number, inviteFlag: boolean, passwordCheck: boolean): Promise<Conversation> {
 		
 		const userToAdd = await this.usersRepository.findOne({
 			where: { id: userID },
@@ -1003,6 +1002,9 @@ export class ChatService {
 		const conversationToAdd = await this.conversationRepository.findOne({
 			where: { id: conversationToAddId },
 		});
+
+		if (conversationToAdd.isProtected && !passwordCheck && !inviteFlag)
+			throw new HttpException(`Channel is protected: you need the password`, HttpStatus.BAD_REQUEST);
 
 		if (!conversationToAdd.isPublic && !inviteFlag)
 			throw new HttpException(`Channel is private: you need an invitation`, HttpStatus.BAD_REQUEST);

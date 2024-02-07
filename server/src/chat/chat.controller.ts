@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post, UseGuards, Req } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, HttpException, Param, Post, UseGuards, Req } from '@nestjs/common';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { ChatService } from './chat.service';
 import { UpdateConversationDto } from './dto/UpdateConversationDto.dto';
@@ -52,10 +52,13 @@ export class ChatController {
 	@Post('addUserToConversation')
 	addUserToConversation(@Req() req, @Body() addUserToConversationDto: AddUserToConversationDto): Promise<Conversation> {
 		const { user } = req;
-		if (addUserToConversationDto.userToAdd)
-			return this.chatService.addUserToConversation(addUserToConversationDto.conversationID, addUserToConversationDto.userToAdd, true);
+		if (addUserToConversationDto.userToAdd) {
+			if (user.sub === addUserToConversationDto.userToAdd)	
+				throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
+			return this.chatService.addUserToConversation(addUserToConversationDto.conversationID, addUserToConversationDto.userToAdd, true, false);
+		}
 		else
-			return this.chatService.addUserToConversation(addUserToConversationDto.conversationID, user.sub, false);
+			return this.chatService.addUserToConversation(addUserToConversationDto.conversationID, user.sub, false, false);
 	}
 
 	@UseGuards(AuthGuard)

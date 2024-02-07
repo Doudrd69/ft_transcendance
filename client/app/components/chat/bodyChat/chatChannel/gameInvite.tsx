@@ -1,11 +1,8 @@
-import React, { use, useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 // import ConfirmationComponent from '../../confirmation/Confirmation';
 import { useChat } from '@/app/components/chat/ChatContext';
 // import ListMyChannelComponent from '../../../listMyChannel/ListMyChannel';
-import { io, Socket } from 'socket.io-client';
-import { handleWebpackExternalForEdgeRuntime } from 'next/dist/build/webpack/plugins/middleware-plugin';
-import { setGameSocket, useGlobal } from '@/app/GlobalContext';
-import { ToastContainer, toast } from 'react-toastify';
+import { useGlobal } from '@/app/GlobalContext';
 
 const GameInviteComponent: React.FC = () => {
 
