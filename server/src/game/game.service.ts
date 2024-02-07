@@ -150,14 +150,11 @@ export class GameService {
 		// console.log(`playerTwo id: ${player2ID}`);
 		const UserOne: User = await this.usersRepository.findOne({ where: { gameSocketId: player1ID } })
 		const UserTwo: User = await this.usersRepository.findOne({ where: { gameSocketId: player2ID } })
-
+		if (!UserOne || !UserTwo)
+			throw new Error(`[getUserIdByIDpairStartGame]: Users not found`);
 		// console.log("USER ONE: ", UserOne);
 		// console.log("USER TWO: ", UserTwo);
-		UserOne.inMatchmaking = false;
-		UserOne.inSpeedQueue = false;
 		UserOne.inGame = true;
-		UserTwo.inMatchmaking = false;
-		UserTwo.inSpeedQueue = false;
 		UserTwo.inGame = true;
 		await this.usersRepository.save(UserOne);
 		await this.usersRepository.save(UserTwo);
@@ -168,13 +165,13 @@ export class GameService {
 		}
 	}
 
-	getUserIdWithSocketId(socketId: string): number | null{
+	getUserIdWithSocketId(socketId: string): number | null {
 		for (const userId in this.userGameSockets) {
-            if (this.userGameSockets.hasOwnProperty(userId)) {
-                if (this.userGameSockets[userId] === socketId) {
-                    return Number(userId); // Convertir la clé en nombre
-                }
-            }
+			if (this.userGameSockets.hasOwnProperty(userId)) {
+				if (this.userGameSockets[userId] === socketId) {
+					return Number(userId); // Convertir la clé en nombre
+				}
+			}
 		}
 		// for (const [userIdValue, socketIdValue] of Object.entries(this.userGameSockets)) {
 		// 	console.log("USERID VALUE: ", Number(userIdValue), "socket :", socketIdValue, "||||", this.userGameSockets[userIdValue]);
@@ -200,9 +197,6 @@ export class GameService {
 	}
 
 	async linkSocketIDWithUser(playerID: string, userId: number) {
-
-		console.log("Search for userID ", userId);
-		console.log("Search for playerID ", playerID);
 		const Player: User = await this.usersRepository.findOne({ where: { id: userId } })
 		if (!Player)
 			throw new Error()
@@ -216,13 +210,12 @@ export class GameService {
 	}
 
 	async getLoginByUserIdStartGame(userId1: number, userId2: number) {
-		const UserOne: User = await this.usersRepository.findOne({ where: { id : userId1 } })
-		const UserTwo: User = await this.usersRepository.findOne({ where: { id : userId2 } })
-
-		if (UserOne && UserTwo) {
-			const playersLogin: [string, string] = [UserOne.username, UserTwo.username]
-			return (playersLogin);
-		}
+		const UserOne: User = await this.usersRepository.findOne({ where: { id: userId1 } })
+		const UserTwo: User = await this.usersRepository.findOne({ where: { id: userId2 } })
+		if (!UserOne || !UserTwo)
+			throw new Error(`[getLoginByUserIdStartGame  ERROR]: Users not found`);
+		const playersLogin: [string, string] = [UserOne.username, UserTwo.username]
+		return (playersLogin);
 	}
 
 	async deleteGame(game: Game) {
@@ -247,7 +240,7 @@ export class GameService {
 	async getGameByID(gameID: number): Promise<Game> {
 		const game: Game = await this.gameRepository.findOne({ where: { gameId: gameID } })
 		if (!game)
-			throw new Error();
+			throw new Error(`game Not Found`);
 		return (game);
 	}
 
@@ -255,6 +248,8 @@ export class GameService {
 		console.log("==== END OF GAME ====");
 		const UserOne: User = await this.usersRepository.findOne({ where: { gameSocketId: gameInstance.players[0] } })
 		const UserTwo: User = await this.usersRepository.findOne({ where: { gameSocketId: gameInstance.players[1] } })
+		if (!UserOne || !UserTwo)
+			throw new Error(`[endOfGame not found Users]`);
 		UserOne.inGame = false;
 		UserTwo.inGame = false;
 
@@ -346,22 +341,27 @@ export class GameService {
 		const gameTwo = await this.gameRepository.findOne({ where: { playerTwoID: this.userGameSockets[userId] } })
 		if (gameTwo)
 			return gameTwo;
+		throw new Error(`[getGameWithUserId ERROR]: gameNotFound`); // estce bien nessecaire?
 	}
 
 	async getGameWithGameId(gameId: number) {
 		const gameOne = await this.gameRepository.findOne({ where: { gameId: gameId } })
-		if (gameOne) {
-			return gameOne;
-		}
+		if (!gameOne)
+			throw new Error(`[getGameWithGameId]: game not found`);
+		return gameOne;
 	}
 
 	async getOtherUser(game: Game, user: User): Promise<User> {
 		let otherUser: User = null;
 		if (user.id === game.userOneId) {
 			otherUser = await this.usersRepository.findOne({ where: { id: user.id } })
+			if (!otherUser)
+				throw new Error(`[getOtherUser]: user not found`);
 		}
 		else if (user.id === game.userTwoId) {
 			otherUser = await this.usersRepository.findOne({ where: { id: user.id } })
+			if (!otherUser)
+				throw new Error(`[getOtherUser]: user not found`);
 		}
 		return otherUser
 	}
