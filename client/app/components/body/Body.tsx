@@ -28,7 +28,6 @@ const BodyComponent: React.FC = () => {
 						<ChatComponent/>
 						<GameProvider>
 							<GameComponent />
-							<GameInviteComponent/>
 						</GameProvider>
 				</div>
 		</>

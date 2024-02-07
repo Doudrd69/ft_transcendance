@@ -22,7 +22,50 @@ body{
   font-size: 20px; /* Exemple de taille de police */
   font-family: 'Gill Sans', sans-serif;
 }
+.toast-container{
+	display:flex;
+	flex-direction: column;
+	text-align: center;
+}
+.toast-yes {
+	padding: 5px;
+	margin: 5px;
+	background-color:rgb(17, 194, 50);
+	border-radius: 5px;
+	border: none;
+	color: white;
+	box-shadow: 0px 0px 10px 0px black;
+	
+}
+.toast-yes:hover {
+	transform: scale(1.1);
+	transition: transform 0.2s ease;
+	
+}
+.toast-no {
+	padding: 5px;
+	margin: 5px;
+	background-color:rgb(163, 47, 47);
+	border-radius: 5px;
+	border: none;
+	color: white;
+	box-shadow: 0px 0px 10px 0px black;
+}
 
+.toast-no:hover {
+	transform: scale(1.1);
+	transition: transform 0.2s ease;
+	
+}
+
+.bloc-toast-button{
+	display: flex;
+	flex-direction: row;
+	width: 100%;
+	margin: 10px;
+	align-items: center;
+	justify-content: center;
+}
 /*
 d1470b
 e97700

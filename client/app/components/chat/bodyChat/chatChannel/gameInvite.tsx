@@ -9,7 +9,6 @@ const GameInviteComponent: React.FC = () => {
 	const { globalState, dispatch } = useGlobal();
 	const { chatState, chatDispatch } = useChat();
 	const gameInvite = () => {
-	
 		globalState.gameInvite = false;
 		globalState.gameInviteValidation = false;
 		globalState.gameSocketConnected = true;
@@ -26,7 +25,7 @@ const GameInviteComponent: React.FC = () => {
 
 
 	return (
-		<div></div>
+		null
 	);
 }
 
