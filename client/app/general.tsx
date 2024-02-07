@@ -406,7 +406,7 @@ const GeneralComponent = () => {
 
 		// this.server.to(client.id).emit('badsenderIdGameInvite');
 		globalState.userSocket?.on('badsenderIdGameInvite', () => {
-			globalState.gameSocket.disconnect();
+			globalState.gameSocket?.disconnect();
 		});
 
 		return () => {

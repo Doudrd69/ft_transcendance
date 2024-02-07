@@ -45,20 +45,24 @@ export class MatchmakingService {
             this.playersSpeedQueue.push(playerID);
         }
         newUser.inMatchmaking = true;
-        console.log(`User game : ${newUser.inGame}`);
         console.log(`joinSpeedQueue: ${this.playersSpeedQueue}`)
         console.log(`joinNormalQueue: ${this.playersNormalQueue}`)
         await this.usersRepository.save(newUser);
     }
 
     async leaveQueue(playerID: string, userId: number) {
+        console.log(`[leaveQueue] : playerId: ${playerID}`);
         const newUser: User = await this.usersRepository.findOne({ where: { id: userId } })
+        if (!newUser)
+            throw new Error(`[LEAVEQUEUE]: user not found`);
         newUser.inMatchmaking = false;
-        if (newUser.inSpeedQueue == false) {
+        if (newUser.inSpeedQueue === false) {
+            console.log(`LEAVE NORMAL QUEUE`);
             this.playersNormalQueue.splice(this.playersNormalQueue.indexOf(playerID), 1);
         }
         else {
             newUser.inSpeedQueue = false;
+            console.log(`LEAVE SPEED QUEUE`);
             this.playersSpeedQueue.splice(this.playersSpeedQueue.indexOf(playerID), 1);
         }
         await this.usersRepository.save(newUser);

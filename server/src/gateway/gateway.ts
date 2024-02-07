@@ -301,7 +301,6 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 			const userId = client.handshake.auth.user.sub;
 			if (await this.userService.usersInGame(userId, userIdToInvite)) {
 				console.log(`users already inGame`);
-				console.log(`user id : ${user.sub} and userToInvite : ${userIdToInvite}`)
 
 				this.server.to(client.id).emit('usersInGame');
 				return;
