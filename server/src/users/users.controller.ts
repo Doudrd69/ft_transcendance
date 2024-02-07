@@ -62,18 +62,19 @@ export class UsersController {
 			const signature = buffer.toString('hex');
 			if(signature !== "89504e470d0a1a0a")
 				throw new HttpException('Invalid file type', HttpStatus.BAD_REQUEST);
-			const { user } = req;
+		
 			const cheminImageSortie = path.join(__dirname, 'avatars', `carredanslaxe_${avatar.filename}`);
 			const image = await Jimp.read(avatar.path);
 			const taille = Math.min(image.bitmap.width, image.bitmap.height);
 			const xOffset = (image.bitmap.width - taille) / 2;
 			const yOffset = (image.bitmap.height - taille) / 2;
-
+			
 			await image
-				.crop(xOffset, yOffset, taille, taille)
-				.resize(400, 400)
-				.writeAsync(cheminImageSortie);
-
+			.crop(xOffset, yOffset, taille, taille)
+			.resize(400, 400)
+			.writeAsync(cheminImageSortie);
+			
+			const { user } = req;
 			const avatarURL = `/avatars/carredanslaxe_${avatar.filename}`;
 			const status = await this.usersService.uploadAvatarURL(avatarURL, user.sub);
 			if (!status)

@@ -52,7 +52,7 @@ export class ChatService {
 			where: { conversation: conversation },
 		});
 
-		let groupFound;
+		let groupFound : GroupMember = null;
 		user.groups.forEach((userGroup: GroupMember) => {
 			groupList.forEach((group: GroupMember) => {
 				if (userGroup.id == group.id) {
@@ -62,10 +62,7 @@ export class ChatService {
 			});
 		});
 
-		if (groupFound)
-			return groupFound;
-
-		return ;
+		return groupFound;
 	}
 
 	private async getGroupIsOwnerStatus(user: User, conversation: Conversation): Promise<boolean> {
@@ -867,9 +864,11 @@ export class ChatService {
 
 				throw new HttpException('User is not the owner', HttpStatus.BAD_REQUEST);
 			}
+
+			throw new HttpException('User is not in this conversation', HttpStatus.BAD_REQUEST);
 		}
 
-		throw new HttpException('Fatal error', HttpStatus.BAD_REQUEST);
+		throw new HttpException('User not found', HttpStatus.BAD_REQUEST);
 	}
 
 	async promoteNewOwner(conversation: Conversation): Promise<boolean> {
@@ -949,9 +948,11 @@ export class ChatService {
 					return true;
 				}
 			}
+
+			throw new HttpException('User is not in this conversation', HttpStatus.BAD_REQUEST);
 		}
 
-		throw new HttpException('Fatal error', HttpStatus.BAD_REQUEST);
+		throw new HttpException('User not found', HttpStatus.BAD_REQUEST);
 	}
 
 	async kickUserFromConversation(kickUserDto: kickUserDto, userID: number) {
@@ -981,7 +982,6 @@ export class ChatService {
 						conversationID: conversation.id,
 						userID: userToKick.id,
 					}
-					// attention id du user
 					return await this.quitConversation(dto, userToKick.id);
 				}
 				throw new HttpException(`${userToKick.username} is the owner`, HttpStatus.BAD_REQUEST);
@@ -1091,41 +1091,42 @@ export class ChatService {
 
 		if (user1 && user2) {
 			const dm = await this.createDMConversation(user1, user2);
-			if (dm) {
+			if (dm)
 				return dm;
-			}
+
+				throw new HttpException('Data loading failed', HttpStatus.BAD_REQUEST);
 		}
 
-		throw new HttpException('Fatal error', HttpStatus.BAD_REQUEST);
+		throw new HttpException('User not found', HttpStatus.BAD_REQUEST);
 	}
 	
 	// Let admins update conversation to private/public and add/remove password
-	async updateConversation(updateConversationDto: UpdateConversationDto, userID: number): Promise<Conversation> {
+	// async updateConversation(updateConversationDto: UpdateConversationDto, userID: number): Promise<Conversation> {
 		
-		const conversationToUpdate = await this.conversationRepository.findOne({ where: { id: updateConversationDto.conversationID} });
-		const user = await this.usersRepository.findOne({
-			where: { id: userID },
-			relations: ["groups", "groups.conversation"],
-		});
+	// 	const conversationToUpdate = await this.conversationRepository.findOne({ where: { id: updateConversationDto.conversationID} });
+	// 	const user = await this.usersRepository.findOne({
+	// 		where: { id: userID },
+	// 		relations: ["groups", "groups.conversation"],
+	// 	});
 
-		if (user && conversationToUpdate) {
+	// 	if (user && conversationToUpdate) {
 			
-			const adminStatus = await this.getGroupIsAdminStatus(user, conversationToUpdate);
+	// 		const adminStatus = await this.getGroupIsAdminStatus(user, conversationToUpdate);
 
-			if (adminStatus) {
+	// 		if (adminStatus) {
 
-				conversationToUpdate.isPublic = updateConversationDto.isPublic;
-				conversationToUpdate.isProtected = updateConversationDto.isProtected;
-				if (updateConversationDto.newPassword)
-					conversationToUpdate.password = await this.hashChannelPassword(updateConversationDto.newPassword);
-				return await this.conversationRepository.save(conversationToUpdate);
-			}
+	// 			conversationToUpdate.isPublic = updateConversationDto.isPublic;
+	// 			conversationToUpdate.isProtected = updateConversationDto.isProtected;
+	// 			if (updateConversationDto.newPassword)
+	// 				conversationToUpdate.password = await this.hashChannelPassword(updateConversationDto.newPassword);
+	// 			return await this.conversationRepository.save(conversationToUpdate);
+	// 		}
 			
-			throw new HttpException(`User is not admin`, HttpStatus.BAD_REQUEST);
-		}
+	// 		throw new HttpException(`User is not admin`, HttpStatus.BAD_REQUEST);
+	// 	}
 		
-		throw new HttpException('Fatal error', HttpStatus.BAD_REQUEST);
-	}
+	// 	throw new HttpException('Fatal error', HttpStatus.BAD_REQUEST);
+	// }
 	
 	async createConversation(conversationDto: ConversationDto, userID: number): Promise<Conversation> {
 		
@@ -1144,21 +1145,21 @@ export class ChatService {
 
 			if (!conversationDto.password && conversationDto.isProtected)
 				throw new HttpException('Please enter a password', HttpStatus.BAD_REQUEST);
-			if (conversationDto.password) {
+
+			if (conversationDto.password)
 				conv.password = await this.hashChannelPassword(conversationDto.password);
-			}
+
 			await this.conversationRepository.save(conv);
 			
 			// The user who created the conversation is set to admin
 			const group = await this.createGroup(conv, true, true);
-			
 			if (group) {
 				
 				user.groups.push(group);
 				await this.usersRepository.save(user);
-				
 				return conv;
 			}
+
 			throw new HttpException('Fatal error', HttpStatus.BAD_REQUEST);
 		}
 
@@ -1188,11 +1189,11 @@ export class ChatService {
 	
 			const isMuteStatus = await this.getGroupIsMuteStatus(sender, conversation);
 			if (isMuteStatus)
-				throw new HttpException(`user is muted`, HttpStatus.BAD_REQUEST);
+				throw new HttpException(`User is muted`, HttpStatus.BAD_REQUEST);
 	
 			const isBanStatus = await this.getGroupIsBanStatus(sender, conversation);
 			if (isBanStatus)
-				throw new HttpException(`user is ban`, HttpStatus.BAD_REQUEST);
+				throw new HttpException(`User is ban`, HttpStatus.BAD_REQUEST);
 	
 			const newMessage = new Message();
 			newMessage.from = sender.username;
