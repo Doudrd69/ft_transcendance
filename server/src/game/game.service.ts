@@ -17,64 +17,7 @@ interface GameInfoDto {
 	playerTwoId: string;
 }
 
-
-// export interface vector_instance {
-//     x: number;
-//     y: number;
-// }
-
-
-// export interface ball_instance {
-//     position: vector_instance;
-//     speed: vector_instance;
-//     r: number;
-//     alive: boolean;
-//     elasticity: number;
-//     player1Scored: boolean;
-//     player2Scored: boolean;
-// }
-
-// export interface paddle_instance {
-//     speed: number;
-//     ArrowUp: boolean;
-//     ArrowDown: boolean;
-//     is_a_paddle: boolean;
-//     length: number;
-//     start: vector_instance;
-//     end: vector_instance;
-//     number: number;
-// }
-
-// export interface game_instance {
-//     gameID: number;
-//     playersLogin: string[];
-//     player1_score: number;
-//     player2_score: number;
-//     game_has_started: boolean;
-//     super_game_mode: boolean;
-//     players: string[];
-//     game_has_ended: boolean;
-//     ball: ball_instance;
-//     paddles: paddle_instance[];
-//     victory_condition: number;
-//     player1Joined: boolean;
-//     player2Joined: boolean;
-//     pause: boolean;
-//     stop: boolean;
-//     usersId: number[];
-// }
-
-// interface BallPosition {
-// 	x: number,
-// 	y: number,
-// 	r: number,
-// }
-
-// let gameInstance: game_instance | null = null;
-
-@Injectable()
 export class GameService {
-	// game_instance: game_instance[]
 	constructor(
 		@InjectRepository(Game)
 		private gameRepository: Repository<Game>,
@@ -83,7 +26,8 @@ export class GameService {
 		private readonly GameEngineService: GameEngineService,
 		private readonly MatchmakingService: MatchmakingService,
 
-	) {
+	) 
+	{
 
 		this.userGameSockets = {};
 		this.disconnections = {};
@@ -201,10 +145,8 @@ export class GameService {
 		if (!Player)
 			throw new Error()
 		Player.gameSocketId = playerID;
-
 		// console.log(`playerID link : ${playerID}, ${Player.gameSocketId}`)
 		await this.usersRepository.save(Player);
-		const otherPlayer: User = await this.usersRepository.findOne({ where: { gameSocketId: playerID } })
 		// console.log(`otherplayerID link : ${playerID}, ${otherPlayer.gameSocketId}`)
 		return;
 	}

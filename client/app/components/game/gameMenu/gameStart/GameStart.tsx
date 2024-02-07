@@ -16,12 +16,11 @@ const MatchMaking = () => {
 		}
 	};
   
-    useEffect(() => {
-
-        globalState.gameSocket?.on('leave-game', () => {
-            dispatchGame({ type: 'TOGGLE', payload: 'showGameMenu'});
-            state.showGameMenu = true;
-            globalState.gameSocket?.disconnect();
+	useEffect(() => {
+		globalState.gameSocket?.on('leave-game', () => {
+			dispatchGame({ type: 'TOGGLE', payload: 'showGameMenu'});
+			state.showGameMenu = true;
+			globalState.gameSocket?.disconnect();
 		});
 			
 		globalState.gameSocket?.on('setgame', () => {

@@ -26,7 +26,6 @@ const Menu = () => {
 	}
 
 	useEffect(() => {
-
 		globalState.userSocket?.on('gameNotInProgress', () => {
 			if (!globalState.gameSocket?.connected) {
 
@@ -110,32 +109,3 @@ const Menu = () => {
 };
 
 export default Menu;
-
-{/* <div className="paddle paddle-left">
-                <div className="solid">
-                    <div className="surface"></div>
-                    <div className="hold">
-                        <div className="top"></div>
-                        <div className="transition"></div>
-                        <div className="handle"></div>
-                    </div>
-                </div>
-                <div className="wiggly">
-                    <div className="string"></div>
-                    <div className="ball"></div>
-                </div>
-            </div>
-            <div className="paddle paddle-right">
-                <div className="solid">
-                    <div className="surface"></div>
-                    <div className="hold">
-                        <div className="top"></div>
-                        <div className="transition"></div>
-                        <div className="handle"></div>
-                    </div>
-                </div> 
-                <div className="wiggly">
-                    <div className="string"></div>
-                    <div className="ball"></div>
-                </div>
-            </div> */}

@@ -283,11 +283,17 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	async handleSetUserInMatchmaking(@ConnectedSocket() client: Socket) {
 		try {
 			const user = client.handshake.auth.user;
+			if (!user)
+			{
+					console.log(`[checkAndSetUserInMatchmaking] : ${user.sub}`)
+					return;
+			}
 			if (await this.userService.userInGame(user.sub)) {
 				console.log(`sender already inGame`);
 				this.server.to(client.id).emit('userInGame');
 				return;
 			}
+			
 			await this.userService.setUserInMatchmaking(user.sub);
 			this.server.to(client.id).emit('gameNotInProgress');
 		}
@@ -317,9 +323,10 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 				invite.emitUserId === targetUserId && invite.targetUserId === emitUserId
 			);
 			// check si les deux users existent et sont bien differents
-			if (emitUserId && targetToInvite.id && (emitUserId !== targetToInvite.id))
+			if (!emitUserId || !targetToInvite.id || (emitUserId === targetToInvite.id))
 			{
 				console.log(`[check de l'existence des users] : les deux id sont bien la`);
+				return;
 			}
 			// Supprimer un élément de la file
 			const removeFromGameQueue = (item: GameInviteDto) => {
