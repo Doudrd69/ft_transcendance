@@ -7,7 +7,9 @@ WORKDIR /srv/app/admin-client
 COPY package*.json ./
 
 ARG API_URL
+ARG AUTH_API_URL
 ENV NEXT_PUBLIC_API_URL=$API_URL
+ENV NEXT_PUBLIC_AUTH_API_URL=$AUTH_API_URL
 
 RUN npm install && \
 	npm install -y socket.io-client && \
