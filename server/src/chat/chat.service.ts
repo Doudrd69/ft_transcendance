@@ -253,7 +253,7 @@ export class ChatService {
 			throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
 		}
 		
-		throw new HttpException('User not found', HttpStatus.NOT_FOUND;
+		throw new HttpException('User not found', HttpStatus.NOT_FOUND);
 	}
 
 	private async getAllChannels(userID: number): Promise<Conversation[]> {
