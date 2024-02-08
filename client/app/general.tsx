@@ -85,7 +85,7 @@ const GeneralComponent = () => {
 		globalState.userSocket?.emit('inviteClosed', targetUserId)
 	}
 
-	const gameInviteDeny = (gameInviteDto: GameInviteDto) => {
+	const gameInviteDeny = (gameInviteDto: GameInviteDto) => { 
 		globalState.userSocket?.emit('inviteDenied', {
 			senderUserId: gameInviteDto.senderUserID,
 		});
@@ -333,7 +333,7 @@ const GeneralComponent = () => {
 		});
 
 		globalState.userSocket?.on('gameInvite', (gameInviteDto: GameInviteDto) => {
-			toast(<GameInviteNotification gameInviteDto={gameInviteDto} />,
+			toast(<GameInviteNotification gameInviteDto = {gameInviteDto} />,
 				{
 					pauseOnFocusLoss: false,
 					autoClose: 5000,
@@ -358,14 +358,14 @@ const GeneralComponent = () => {
 
 	// GAME INVITE
 
-	// useEffect(() => {
-	// 	globalState.userSocket?.on('createGameInviteSocket', (GameInviteUserTwoDto: GameInviteUserTwoDto) => {
-	// 		globalState.gameSocket?.emit('launchGameInvite', { userTwoId: GameInviteUserTwoDto.userTwoId, userTwoGameId: GameInviteUserTwoDto.userTwoGameId });
-	// 	});
-	// 	return () => {
-	// 		globalState.userSocket?.off('createGameInviteSocket');
-	// 	};
-	// }, [globalState?.userSocket, globalState?.gameSocket]);
+	useEffect(() => {
+		globalState.userSocket?.on('createGameInviteSocket', (GameInviteUserTwoDto: GameInviteUserTwoDto) => {
+			globalState.gameSocket?.emit('launchGameInvite', { userTwoId: GameInviteUserTwoDto.userTwoId, userTwoGameId: GameInviteUserTwoDto.userTwoGameId });
+		});
+		return () => {
+			globalState.userSocket?.off('createGameInviteSocket');
+		};
+	}, [globalState?.userSocket, globalState?.gameSocket]);
 
 	useEffect(() => {
 
@@ -380,9 +380,7 @@ const GeneralComponent = () => {
 			});
 			gameSocket.connect();
 			dispatch({ type: 'SET_GAME_SOCKET', payload: gameSocket });
-			gameSocket.on('connect', () => {
-				globalState.gameSocket?.emit('launchGameInvite', { userTwoId: GameInviteUserTwoDto.userTwoId, userTwoGameId: GameInviteUserTwoDto.userTwoGameId });
-			});
+			globalState.userSocket?.emit('setGameInvite', { userTwoId: GameInviteUserTwoDto.userTwoId, userTwoGameId: GameInviteUserTwoDto.userTwoGameId });
 		});
 		globalState.userSocket?.on('deniedInvitation', () => {
 			globalState.gameSocketConnected = false;

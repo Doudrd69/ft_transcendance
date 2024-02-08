@@ -176,7 +176,6 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 	const timestamp = new Date().getTime();
 	return (
 		<>
-
 			<div className='bloc-owner-user'>
 				<div className='list-users-channel-owner'>
 					<div className='user-list-item'>
