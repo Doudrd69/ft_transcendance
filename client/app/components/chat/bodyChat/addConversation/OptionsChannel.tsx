@@ -58,6 +58,7 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 					roomName : chatState.currentConversation,
 					roomID: chatState.currentConversationID,
 				});
+				// globalState.userSocket?.emit('refreshChannelListTest');
 				chatDispatch({ type: 'ACTIVATE', payload: 'currentConversationIsPrivate' });
 			}
 			else {
@@ -94,6 +95,7 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 					roomName : chatState.currentConversation,
 					roomID: chatState.currentConversationID,
 				});
+				// globalState.userSocket?.emit('refreshChannelListTest');
 				chatDispatch({ type: 'DISABLE', payload: 'currentConversationIsPrivate' });
 			}
 			else {
@@ -133,7 +135,7 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 					roomName: chatState.currentConversation,
 					roomID: chatState.currentConversationID,
 				});
-
+				// globalState.userSocket?.emit('refreshChannelListTest');
 				chatDispatch({ type: 'DISABLE', payload: 'showOptionChannel' });
 				chatDispatch({ type: 'DISABLE', payload: 'showChannel' });
 				chatDispatch({ type: 'ACTIVATE', payload: 'showBackComponent' });
@@ -175,6 +177,7 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 						roomName : chatState.currentConversation,
 						roomID: chatState.currentConversationID,
 					});
+					// globalState.userSocket?.emit('refreshChannelListTest');
 					chatDispatch({ type: 'DISABLE', payload: 'currentConversationIsProtected' });
 			}
 			else {
