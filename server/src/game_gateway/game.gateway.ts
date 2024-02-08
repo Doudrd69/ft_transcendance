@@ -250,6 +250,14 @@ export class GameGateway {
         }
         catch (error) {
             await this.handleException(error, client)
+            if (this.userInGame[client.id] == true)
+            {
+                const pairs: [string, string][] = await this.MatchmakingService.getPlayersPairsQueue(data.gameMode);
+                for (const pair of pairs) {
+                    this.userInGame[pair[0]] = false;
+                    this.userInGame[pair[1]] = false;
+                }
+            }
         }
     }
 

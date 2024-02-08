@@ -1003,35 +1003,40 @@ export class ChatService {
 			where: { id: conversationToAddId },
 		});
 
-		if (conversationToAdd.isProtected && !passwordCheck && !inviteFlag)
-			throw new HttpException(`Channel is protected: you need the password`, HttpStatus.BAD_REQUEST);
+		if (conversationToAdd) {
 
-		if (!conversationToAdd.isPublic && !inviteFlag)
-			throw new HttpException(`Channel is private: you need an invitation`, HttpStatus.BAD_REQUEST);
-
-		if (userToAdd && conversationToAdd) {
-
-			const isGroupInUsersArray = await this.getRelatedGroup(userToAdd, conversationToAdd);
-			if (isGroupInUsersArray)
-				throw new HttpException(`User has already joined the conversation`, HttpStatus.BAD_REQUEST);
+			if (conversationToAdd.isProtected && !passwordCheck && !inviteFlag)
+				throw new HttpException(`Channel is protected: you need the password`, HttpStatus.BAD_REQUEST);
 	
-			if (await this.getGroupIsBanStatus(userToAdd, conversationToAdd))
-				throw new HttpException(`User is ban from this channel`, HttpStatus.BAD_REQUEST);
-
-			const group = new GroupMember();
-			group.isAdmin = false;
-			group.joined_datetime = new Date();
-			group.conversation = conversationToAdd;
-			await this.groupMemberRepository.save(group);
-				
-			if (group) {
-				userToAdd.groups.push(group);
-				await this.usersRepository.save(userToAdd);
-				return conversationToAdd;
+			if (!conversationToAdd.isPublic && !inviteFlag)
+				throw new HttpException(`Channel is private: you need an invitation`, HttpStatus.BAD_REQUEST);
+	
+			if (userToAdd) {
+	
+				const isGroupInUsersArray = await this.getRelatedGroup(userToAdd, conversationToAdd);
+				if (isGroupInUsersArray)
+					throw new HttpException(`User has already joined the conversation`, HttpStatus.BAD_REQUEST);
+		
+				if (await this.getGroupIsBanStatus(userToAdd, conversationToAdd))
+					throw new HttpException(`User is ban from this channel`, HttpStatus.BAD_REQUEST);
+	
+				const group = new GroupMember();
+				group.isAdmin = false;
+				group.joined_datetime = new Date();
+				group.conversation = conversationToAdd;
+				await this.groupMemberRepository.save(group);
+					
+				if (group) {
+					userToAdd.groups.push(group);
+					await this.usersRepository.save(userToAdd);
+					return conversationToAdd;
+				}
 			}
+
+			throw new HttpException('User not found', HttpStatus.NOT_FOUND);
 		}
 
-		throw new HttpException('Fatal error', HttpStatus.BAD_REQUEST);
+		throw new HttpException('Conversation does not exist', HttpStatus.NOT_FOUND);
 	}
 	
 	async createDMConversation(initiator: User, friend: User): Promise<Conversation> {
