@@ -53,8 +53,6 @@ export class UsersService {
 		const user1: User = await this.usersRepository.findOne({ where: { id: user1Id } })
 		if (!user1)
 			throw new Error("user1 undefined")
-		// userToInvite.inGame = false;
-		// await this.usersRepository.save(userToInvite);
 		if (user1.inGame === true || user1.inMatchmaking === true) {
 			console.log(`usernametoinvite : game: ${user1.inGame} match: ${user1.inMatchmaking}`);
 			return true;
@@ -62,8 +60,6 @@ export class UsersService {
 		const user2: User = await this.usersRepository.findOne({ where: { id: user2Id } })
 		if (!user2)
 			throw new Error("userToInvite undefined")
-		// userToInvite.inGame = false;
-		// await this.usersRepository.save(userToInvite);
 		if (user2.inGame === true || user2.inMatchmaking === true) {
 			console.log(`usernametoinvite : game: ${user2.inGame} match: ${user2.inMatchmaking}`);
 			return true;
@@ -84,6 +80,19 @@ export class UsersService {
 			throw new Error("user undefined")
 		user.inGame = true;
 		await this.usersRepository.save(user);
+	}
+
+	async setUsersInGame(userId1: number, userId2: number) {
+		const user1: User = await this.usersRepository.findOne({ where: { id: userId1 } })
+		if (!user1)
+			throw new Error("user undefined")
+		user1.inGame = true;
+		const user2: User = await this.usersRepository.findOne({ where: { id: userId2 } })
+		if (!user2)
+			throw new Error("user undefined")
+		user2.inGame = true;
+		await this.usersRepository.save(user1);
+		await this.usersRepository.save(user2);
 	}
 
 	async unsetUserInGame(userId: number) {
