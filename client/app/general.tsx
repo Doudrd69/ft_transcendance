@@ -187,11 +187,6 @@ const GeneralComponent = () => {
 					}}>
 						Accept
 					</div>
-					<div className='toast-no' onClick={() => {
-						closeToast();
-					}}>
-						Deny
-					</div>
 				</div>
 			</div>
 		);

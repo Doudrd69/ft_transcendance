@@ -119,6 +119,7 @@ const FriendsListTabComponent: React.FC<FriendsListTabComponentProps> = ({ user,
 				user.isBlocked = true;
 				chatDispatch({ type: 'DISABLE', payload: 'showConfirmation' })
 				globalState.userSocket?.emit('joinRoom', { roomName: `whoblocked${user.username}`, roomID: '' });
+				// refresh all user list et friend list
 			}
 			else {
 				const error = await response.json();
