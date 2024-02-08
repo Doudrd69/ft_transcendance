@@ -215,14 +215,6 @@ const ListMyChannelComponent: React.FC<ListMyChannelComponentProps> = ({ user, f
 			loadDiscussionsPublic();
 	}, [chatState.refreshChannel]);
 
-	// useEffect(() => {
-
-	// 	globalState.userSocket?.on('refreshChannelListTest_', () => {
-	// 		loadDiscussions();
-	// 		loadDiscussionsPublic();
-	// 	});
-	// }, [globalState?.userSocket]);
-
 	useEffect(() => {
 		const handleEscape = (event: KeyboardEvent) => {
 			if (event.key === 'Escape') {
