@@ -54,9 +54,7 @@ const GeneralComponent = () => {
 	// si j'inivte est ce que je peux check que j'ai bien invite?
 	const gameInviteValidation = (gameInviteDto: GameInviteDto) => {
 		globalState.userSocket?.off('usersNotInGame');
-		globalState.userSocket?.emit('checkAndsetInGame', {
-			opponentUserId: gameInviteDto.senderUserID,
-		})
+		globalState.userSocket?.emit('checkAndsetInGame', gameInviteDto.senderUserID)
 		globalState.userSocket?.on('usersNotInGame', () => {
 			const gameSocket = io(`${process.env.API_URL}/game`, {
 				autoConnect: false,

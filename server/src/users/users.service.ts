@@ -74,6 +74,7 @@ export class UsersService {
 		user.inMatchmaking = true;
 		await this.usersRepository.save(user);
 	}
+	
 	async setUserInGame(userId: number) {
 		const user: User = await this.usersRepository.findOne({ where: { id: userId } })
 		if (!user)
