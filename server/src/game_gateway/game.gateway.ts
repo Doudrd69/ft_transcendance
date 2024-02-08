@@ -134,7 +134,7 @@ export class GameGateway {
     @UseGuards(GatewayGuard)
     async handleCheckGameInvite(@ConnectedSocket() client: Socket, @MessageBody() data: { userTwoId: number, userTwoGameId: string }) {
         try {
-            // 
+            // check les users si bien opposant
             const userOne = client.handshake.auth.user;
             const userTwo: User = await this.GameService.getUserWithUserId(data.userTwoId);
             this.GameService.addGameInviteSocket(client.id, userOne.sub, data.userTwoGameId, data.userTwoId);
@@ -250,6 +250,14 @@ export class GameGateway {
         }
         catch (error) {
             await this.handleException(error, client)
+            if (this.userInGame[client.id] == true)
+            {
+                const pairs: [string, string][] = await this.MatchmakingService.getPlayersPairsQueue(data.gameMode);
+                for (const pair of pairs) {
+                    this.userInGame[pair[0]] = false;
+                    this.userInGame[pair[1]] = false;
+                }
+            }
         }
     }
 

@@ -228,18 +228,14 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	async inviteAccepted(@ConnectedSocket() client: Socket, @MessageBody() data: { otherUserId: number, userGameSocketId: string }) {
 		try {
 			const user = client.handshake.auth.user;
+			// check l'opposant
 			if (await this.userService.userInGame(data.otherUserId) === false)
 			{
-				// set me pas ingame
 				await this.userService.unsetUserInGame(user.sub);
 				this.server.to(client.id).emit('badsenderIdGameInvite');
 			}
 			const otherUser = await this.userService.getUserByID(data.otherUserId);
-			//recheck de si ils sont ingame, si oui rentre sinon mettre un message de pas bon user? 
-			// peut etre pas assez, peut etre passer 
-			console.log(`[inviteAccepted] : ${user.sub}`)
 			this.server.to(otherUser.username).emit('acceptInvitation', { userTwoId: user.sub, userTwoGameId: data.userGameSocketId });
-			// remplacer au front par un Dto, like gameInviteLaunchInfo
 		} catch (error) {
 			console.log(`[GAME INVITE ERROR]: ${error.stack}`)
 		}
@@ -249,29 +245,18 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	@UseGuards(GatewayGuard)
 	async checkAndSetInGame(@ConnectedSocket() client: Socket, @MessageBody() data: { opponentUserId: number }) {
 		try {
-			// voir pour faire un check que l'opposant soit pas un random, verifier que c'est lui qui a gameInvite
 			// check si opponent 
 			const userId = client.handshake.auth.user.sub;
 			const otherUser = await this.userService.getUserByID(data.opponentUserId);
 			const user = await this.userService.getUserByID(userId);
 			console.log(`[checkAndsetInGame] : otherUserIsActive: ${otherUser.isActive}, userActive: ${user.isActive}`)
 			if (await this.userService.usersInGame(userId, data.opponentUserId) || !otherUser.isActive || !user.isActive) {
-				console.log("================2=================")
-				console.log("CHECK AND SET In GAME");
-				console.log(`users already inGame`);
-				console.log(`user id : ${data.opponentUserId} and userToInvite : ${otherUser.id}`)
-
 				console.log(`users already inGame or Inactive`);
 				this.server.to(client.id).emit('usersInGame');
 				return;
 			}
 			await this.userService.setUserInGame(userId)
 			await this.userService.setUserInGame(data.opponentUserId)
-			console.log("================3=================")
-			console.log("CHECK AND SET In GAME");
-			console.log(`set in game`);
-			console.log(`user id : ${data.opponentUserId} and userToInvite : ${otherUser.id}`)
-
 			this.server.to(client.id).emit('usersNotInGame');
 		} catch (error) {
 			console.log(`[GAME INVITE ERROR]: ${error.stack}`)
@@ -304,7 +289,7 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 
 	@SubscribeMessage('setGameInvite')
 	handleEvent(@ConnectedSocket() client: Socket, @MessageBody() data: { userTwoId: number, userTwoGameId: string }) {
-		// faire un check des ID et peut etre socket
+		// refaire un check de game Socket
 		this.server.to(client.id).emit('createGameInviteSocket', { userTwoId: data.userTwoId, userTwoGameId: data.userTwoGameId });
 	}
 

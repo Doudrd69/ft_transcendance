@@ -170,9 +170,7 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 	}, [messages]);
 
 	const handleGameInvite = () => {
-		globalState.gameTargetId = chatState.currentTarget.id;
-		globalState.targetUsername = chatState.currentTarget.login;
-		globalState.gameInvite = true;
+		globalState.userSocket?.emit('InviteToGame', chatState.currentTarget.id);
 	}
 
 	const timestamp = new Date().getTime();

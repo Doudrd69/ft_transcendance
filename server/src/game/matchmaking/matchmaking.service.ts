@@ -16,7 +16,6 @@ export class MatchmakingService {
 	public playersNormalQueue: string[] = [];
 	public playersSpeedQueue: string[] = [];
 	async getPlayersPairsQueue(gameMode: string) {
-		// Créer des paires
 		const pairs: Array<[string, string]> = [];
 		if (gameMode === "NORMAL") {
 			for (let i = 0; i < this.playersNormalQueue.length - 1; i += 2) {
@@ -38,6 +37,8 @@ export class MatchmakingService {
 		if (!newUser)
 			throw new Error(`new user undefined`)
 		// check if user is already in queue normal or speed
+		if (this.playersNormalQueue.includes(gameSocketId) || this.playersSpeedQueue.includes(gameSocketId))
+			throw new Error(`User alredy in Matchmaking`);
 		if (gameMode === "NORMAL" )
 			this.playersNormalQueue.push(gameSocketId);
 		else if (gameMode === "SPEED") {
