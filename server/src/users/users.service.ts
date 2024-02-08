@@ -42,8 +42,6 @@ export class UsersService {
 		const user: User = await this.usersRepository.findOne({ where: { id: userId } })
 		if (!user)
 			throw new Error("userToInvite undefined")
-		// userToInvite.inGame = false;
-		// await this.usersRepository.save(userToInvite);
 		if (user.inGame === true || user.inMatchmaking === true) {
 			console.log(`usernametoinvite : game: ${user.inGame} match: ${user.inMatchmaking}`);
 			return true;
