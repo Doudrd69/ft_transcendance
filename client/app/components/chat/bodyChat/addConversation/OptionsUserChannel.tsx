@@ -48,6 +48,7 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 	// 	setBlock (!!me.blockList.find((userblock) => userblock === user.login));
 	// }
 
+	
 	const blockUser = async() => {
 		const BlockUserDto = {
 			initiatorLogin: sessionStorage.getItem("currentUserLogin"),
@@ -542,6 +543,11 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 		};
 	}, []);
 
+	useEffect(() => {
+
+		console.log("=========================>1");
+
+	}, [globalState?.userSocket]);
 	return (
 		<>
 		<div className="blur-background"></div>
