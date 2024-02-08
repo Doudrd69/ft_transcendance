@@ -115,7 +115,8 @@ export class GameGateway {
                         let game = await this.GameService.getGameWithUserId(userId);
                         const gameInstance: game_instance = this.GameService.getGameInstance(this.game_instance, game.gameId);
                         if (gameInstance && gameInstance.game_has_ended !== true) {
-                            if (user.login === gameInstance.playersLogin[0])
+                            console.log(`[DISCONNECTLIST] user: ${user.login}`)
+                            if (user.id === gameInstance.usersId[0])
                                 await this.GameService.disconnectSocket(gameInstance.usersId[0], game.gameId, gameInstance.players[0])
                             else
                                 await this.GameService.disconnectSocket(gameInstance.usersId[1], game.gameId, gameInstance.players[1])
@@ -135,6 +136,7 @@ export class GameGateway {
     async handleCheckGameInvite(@ConnectedSocket() client: Socket, @MessageBody() data: { userTwoId: number, userTwoGameId: string }) {
         try {
             // check les users si bien opposant
+            // si pas opposant alors soit mettre le bon userId a la place si il en a un soit juste dec les deux et les unset ingame
             const userOne = client.handshake.auth.user;
             const userTwo: User = await this.GameService.getUserWithUserId(data.userTwoId);
             this.GameService.addGameInviteSocket(client.id, userOne.sub, data.userTwoGameId, data.userTwoId);
@@ -317,9 +319,9 @@ export class GameGateway {
             await this.GameService.createGameStop(user1, user2, gameInstance, disconnectedSockets);
             await this.GameService.updateStateGameForUsers(user1, user2);
 
+            this.GameService.deleteGameSocketsIdForPlayers(user1, user2);
             this.server.to([gameInstance.players[0], gameInstance.players[1]]).emit('userDisconnected');
             await this.GameService.clearDisconnections(gameInstance.gameID);
-            this.GameService.deleteGameSocketsIdForPlayers(user1, user2);
             // delete gameInstance
         } catch (error) {
             console.log(error.stack)

@@ -287,7 +287,6 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 
 	@SubscribeMessage('setGameInvite')
 	handleEvent(@ConnectedSocket() client: Socket, @MessageBody() data: { userTwoId: number, userTwoGameId: string }) {
-		// refaire un check de game Socket
 		this.server.to(client.id).emit('createGameInviteSocket', { userTwoId: data.userTwoId, userTwoGameId: data.userTwoGameId });
 	}
 
@@ -368,6 +367,7 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 				if (existingPair && newGameInvite.isAcceptedTargetUser && newGameInvite.isAcceptedEmitUser) {
 					//si en gros il font l'invite en meme temps dans les 5s du toast, meme si il n'accepte pas 
 					//les deux seront ajouter a une game automatiquement
+					// creer leurs 2 sockets et donc un emit sur l'autre pour qu'il se cree sa gameSocket, puis on revient sur le sender pour qu'il cree sa gameSocket et qu'il lance la game.
 					console.log(`[La target a fait aussi la demande] : il faut lancer la game`);
 					return;
 				}

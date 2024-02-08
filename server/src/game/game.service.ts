@@ -323,11 +323,14 @@ export class GameService {
 		game.userTwoId = gameInstance.usersId[1];
 		user1.inGame = false;
 		user2.inGame = false;
-		if (disconnectedSockets.includes(gameInstance.players[0])) {
-			game.scoreOne = 0;
-		}
 		if (disconnectedSockets.includes(gameInstance.players[1])) {
+
+			console.log(`[createGameStop] : player[1]: ${user2.login}`)
 			game.scoreTwo = 0;
+		}
+		if (disconnectedSockets.includes(gameInstance.players[0])) {
+			console.log(`[createGameStop] : player[0]: ${user1.login}`)
+			game.scoreOne = 0;
 		}
 		if (game.scoreOne > game.scoreTwo) {
 			user1.victory += 1;
@@ -337,6 +340,7 @@ export class GameService {
 			user1.defeat += 1;
 			user2.victory += 1;
 		}
+		console.log(`[createGameStop] : scoreOne: ${game.scoreOne}, scoreTwo: ${game.scoreTwo}`);
 		await this.usersRepository.save(user1);
 		await this.usersRepository.save(user2);
 
