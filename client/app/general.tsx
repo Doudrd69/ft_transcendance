@@ -176,23 +176,26 @@ const GeneralComponent = () => {
 
 
 	// sinon on peut deny que dans la notif
-	const FriendRequestReceived = ({ closeToast, toastProps, friendRequestDto }: any) => (
-		<div>
-			You received a friend request from  {friendRequestDto.initiatorLogin}
-			<button style={{ padding: '5px ' }} onClick={() => {
-				friendRequestValidation(friendRequestDto);
-				closeToast();
-			}}>
-				Accept
-			</button>
-			{/* <button style={{ padding: '5px ' }} onClick={() => {
-				friendRequestDeny(friendRequestDto)
-				closeToast();
-			}}>
-				Deny
-			</button> */}
-		</div>
-	)
+	const FriendRequestReceived = ({ closeToast, toastProps, friendRequestDto }: any) => {
+		return (
+			<div className='toast-container'>
+				You received a friend request from {friendRequestDto.initiatorLogin}
+				<div className='bloc-toast-button'>
+					<div className='toast-yes' onClick={() => {
+						friendRequestValidation(friendRequestDto);
+						closeToast();
+					}}>
+						Accept
+					</div>
+					<div className='toast-no' onClick={() => {
+						closeToast();
+					}}>
+						Deny
+					</div>
+				</div>
+			</div>
+		);
+	};
 
 	const FriendRequestAccepted = ({ closeToast, toastProps, friend }: any) => (
 		<div>
