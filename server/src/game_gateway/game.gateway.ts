@@ -76,6 +76,7 @@ export class GameGateway {
     @WebSocketServer()
     server: Server;
     game_instance: game_instance[];
+    userInGame: { [userGameSocketId: string]: boolean };
 
     constructor(
         private readonly GameService: GameService,
@@ -83,6 +84,7 @@ export class GameGateway {
         private readonly GameEngineceService: GameEngineService,
     ) {
         this.game_instance = [];
+        this.userInGame = {};
     }
 
     @UseGuards(GatewayGuard)
@@ -101,21 +103,18 @@ export class GameGateway {
         try {
             console.log("[handleDisconnect] ONE DISCONNECT");
             const userId = client.handshake.auth.user.sub;
-            // number = this.GameService.getUserIdWithSocketId(client.id);
-            console.log(`[handleDisconnect] User ${userId} retrieved by socketId`)
             if (userId && client.id) {
                 const user: User = await this.GameService.getUserWithUserId(userId);
                 console.log(`[handleDisconnect] Retrieved disconnected user : ${user.login}`)
                 if (user && await this.GameService.userInGameOrInMacthmaking(user)) {
+                    this.userInGame[client.id] = false;
                     if (user.inMatchmaking === true) {
                         console.log(`[handleDisconnect] User is in the matchmaking`)
                         await this.GameService.deconnectUserMatchmaking(user, userId, client.id);
                     } else {
                         let game = await this.GameService.getGameWithUserId(userId);
                         const gameInstance: game_instance = this.GameService.getGameInstance(this.game_instance, game.gameId);
-                        console.log(`[handleDisconnect] User is in Game ${game.gameId}, is it ended :? ${gameInstance.game_has_ended}`)
                         if (gameInstance && gameInstance.game_has_ended !== true) {
-                            console.log(`[handleDisconnect] User will be disconnect from game ${gameInstance}`)
                             if (user.login === gameInstance.playersLogin[0])
                                 await this.GameService.disconnectSocket(gameInstance.usersId[0], game.gameId, gameInstance.players[0])
                             else
@@ -124,7 +123,7 @@ export class GameGateway {
                     }
                 }
             }
-            console.log(`[${client.id}] GameGtw client disconnected : ${client.id}`);
+            console.log(`[handleDisconnect] GameGtw client disconnected : ${client.id}`);
         }
         catch (error) {
             await this.handleException(error, client)
@@ -133,13 +132,11 @@ export class GameGateway {
 
     @SubscribeMessage('launchGameInvite')
     @UseGuards(GatewayGuard)
-    async handleCheckGameInvite(@ConnectedSocket() client: Socket, @MessageBody() data : {userTwoId: number, userTwoGameId: string}) {
+    async handleCheckGameInvite(@ConnectedSocket() client: Socket, @MessageBody() data: { userTwoId: number, userTwoGameId: string }) {
         try {
             // 
             const userOne = client.handshake.auth.user;
-            console.log(`invite accpeted :=====> ${data.userTwoGameId}`);
-            console.log(`invite accpeted :=====> ${data.userTwoId}`);
-            const userTwo: User = await this.GameService.getUserWithUserId(data.userTwoId); 
+            const userTwo: User = await this.GameService.getUserWithUserId(data.userTwoId);
             this.GameService.addGameInviteSocket(client.id, userOne.sub, data.userTwoGameId, data.userTwoId);
             await this.GameService.linkSocketIDWithUser(client.id, userOne.sub);
             await this.GameService.linkSocketIDWithUser(data.userTwoGameId, data.userTwoId);
@@ -198,61 +195,63 @@ export class GameGateway {
         }
     }
 
-	@SubscribeMessage('join-matchmaking')
-	@UseGuards(GatewayGuard)
-	async handleJoinMatchmaking(@ConnectedSocket() client: Socket, @MessageBody() data: {gameMode: string}) {
-		try {
-			if (data.gameMode === undefined || (data.gameMode !== "NORMAL" && data.gameMode !== "SPEED"))
-				data.gameMode = "NORMAL";
-			const userId = client.handshake.auth.user.sub;
+    @SubscribeMessage('join-matchmaking')
+    @UseGuards(GatewayGuard)
+    async handleJoinMatchmaking(@ConnectedSocket() client: Socket, @MessageBody() data: { gameMode: string }) {
+        try {
+            if (data.gameMode === undefined || (data.gameMode !== "NORMAL" && data.gameMode !== "SPEED"))
+                data.gameMode = "NORMAL";
+            const userId = client.handshake.auth.user.sub;
 
-			const user: User = await this.GameService.getUserWithUserId(userId);
-			if (!user)
-				throw new Error("ERROR");
-			this.GameService.addGameSocket(client.id, userId);
-			await this.MatchmakingService.joinQueue(client.id, userId, data.gameMode);
-			await this.GameService.linkSocketIDWithUser(client.id, userId);
-			const enoughPlayers = await this.MatchmakingService.IsThereEnoughPairs(data.gameMode);
-			if (enoughPlayers) {
-				const pairs: [string, string][] = await this.MatchmakingService.getPlayersPairsQueue(data.gameMode);
-				for (const pair of pairs) {
-					const socketIDs: [string, string] = [pair[0], pair[1]];
-					let game = await this.GameService.createGame(pair[0], pair[1], data.gameMode);
-					if (!game)
-					throw new Error("Fatal error");
-					const gameInstance: game_instance = this.GameEngineceService.createGameInstance(game);
-					await this.MatchmakingService.leaveQueue(pair[0], gameInstance.usersId[0]);
-					await this.MatchmakingService.leaveQueue(pair[1], gameInstance.usersId[1]);
-					this.game_instance.push(gameInstance);
-					console.log("SOCKET IDs: ", socketIDs);
-					this.server.to(socketIDs).emit('setgame');
-					this.server.to(socketIDs).emit('joinGame', {
-						gameId: game.gameId,
-						playerOneID: game.playerOneID,
-						playerTwoID: game.playerTwoID,
-						playerOneLogin: game.playerOneLogin,
-						playerTwoLogin: game.playerTwoLogin,
-						scoreOne: game.scoreOne,
-						scoreTwo: game.scoreTwo,
-					});
-					setTimeout(() => {
-						this.server.to(socketIDs).emit('gameStart', {
-							gameId: game.gameId,
-							playerOneID: game.playerOneID,
-							playerTwoID: game.playerTwoID,
-							playerOneLogin: game.playerOneLogin,
-							playerTwoLogin: game.playerTwoLogin,
-							scoreOne: game.scoreOne,
-							scoreTwo: game.scoreTwo,
-						});
-					}, 1000);
-				}
-			}
-		}
-		catch (error) {
-			await this.handleException(error, client)
-		}
-	}
+            const user: User = await this.GameService.getUserWithUserId(userId);
+            if (!user)
+                throw new Error("ERROR");
+            this.userInGame[client.id] = false;
+            this.GameService.addGameSocket(client.id, userId);
+            await this.MatchmakingService.joinQueue(client.id, userId, data.gameMode);
+            await this.GameService.linkSocketIDWithUser(client.id, userId);
+            const enoughPlayers = await this.MatchmakingService.IsThereEnoughPairs(data.gameMode);
+            if (enoughPlayers) {
+                const pairs: [string, string][] = await this.MatchmakingService.getPlayersPairsQueue(data.gameMode);
+                for (const pair of pairs) {
+                    this.userInGame[pair[0]] = true;
+                    this.userInGame[pair[1]] = true;
+                    const socketIDs: [string, string] = [pair[0], pair[1]];
+                    let game = await this.GameService.createGame(pair[0], pair[1], data.gameMode);
+                    if (!game)
+                        throw new Error("Fatal error");
+                    const gameInstance: game_instance = this.GameEngineceService.createGameInstance(game);
+                    await this.MatchmakingService.leaveQueue(pair[0], gameInstance.usersId[0]);
+                    await this.MatchmakingService.leaveQueue(pair[1], gameInstance.usersId[1]);
+                    this.game_instance.push(gameInstance);
+                    this.server.to(socketIDs).emit('setgame');
+                    this.server.to(socketIDs).emit('joinGame', {
+                        gameId: game.gameId,
+                        playerOneID: game.playerOneID,
+                        playerTwoID: game.playerTwoID,
+                        playerOneLogin: game.playerOneLogin,
+                        playerTwoLogin: game.playerTwoLogin,
+                        scoreOne: game.scoreOne,
+                        scoreTwo: game.scoreTwo,
+                    });
+                    setTimeout(() => {
+                        this.server.to(socketIDs).emit('gameStart', {
+                            gameId: game.gameId,
+                            playerOneID: game.playerOneID,
+                            playerTwoID: game.playerTwoID,
+                            playerOneLogin: game.playerOneLogin,
+                            playerTwoLogin: game.playerTwoLogin,
+                            scoreOne: game.scoreOne,
+                            scoreTwo: game.scoreTwo,
+                        });
+                    }, 1000);
+                }
+            }
+        }
+        catch (error) {
+            await this.handleException(error, client)
+        }
+    }
 
     @SubscribeMessage('playerJoined')
     @UseGuards(GatewayGuard)
@@ -287,38 +286,16 @@ export class GameGateway {
     async endGame(gameInstance: game_instance, gameLoop: NodeJS.Timeout) {
         gameInstance.stop = true
         clearInterval(gameLoop);
-        // const user: User = await this.GameService.
         this.server.to([gameInstance.players[0], gameInstance.players[1]]).emit('GameEnd')
         const user1: User = await this.GameService.getUserWithUserId(gameInstance.usersId[0]);
         const user2: User = await this.GameService.getUserWithUserId(gameInstance.usersId[1]);
         await this.GameService.updateStateGameForUsers(user1, user2);
         this.GameService.deleteGameSocketsIdForPlayers(user1, user2);
         let game = await this.GameService.getGameWithGameId(gameInstance.gameID);
-        console.log(`[endGame] score: ${gameInstance.player1_score}, ${gameInstance.player2_score}, game.gameEnd = ${game.gameEnd}, game.id = ${game.gameId}`)
         if (game.gameEnd === false) {
-            console.log(`[endGame] gameEnd is false ${gameInstance.player1_score}, ${gameInstance.player2_score}`)
             await this.GameService.endOfGame(game, gameInstance);
         }
     }
-
-//     GameGtw client connected : cQ264ZpyzQgo2rlAAAAF
-// server         | == wmonacho, userID= 1 JOINS MATCHMAKING ==
-// server         | gameMode ==== NORMAL
-// server         | Search for userID  1
-// server         | Search for playerID  cQ264ZpyzQgo2rlAAAAF
-// server         | User game : false
-// server         | joinSpeedQueue: 
-// server         | joinNormalQueue: cQ264ZpyzQgo2rlAAAAF
-// server         | Ready to start:  false
-// server         | emit leave-matchmaking : cQ264ZpyzQgo2rlAAAAF
-// server         | quitSpeedQueue: 
-// server         | quitNormalQueue: 
-// server         | [handleDisconnect] ONE DISCONNECT
-// server         | [handleDisconnect] User 1 retrieved by socketId
-// server         | [handleDisconnect] Retrieved disconnected user : wmonacho
-// server         | user ingame : false, user inmatchmaking: false
-// server         | [cQ264ZpyzQgo2rlAAAAF] GameGtw client disconnected : cQ264ZpyzQgo2rlAAAAF
-
 
     async handleUserDisconnection(disconnectedSockets: string[], gameInstance: game_instance, gameLoop: NodeJS.Timeout) {
         console.log(`[handleUserDisconnection]: ${disconnectedSockets} `)
@@ -331,7 +308,7 @@ export class GameGateway {
             await this.GameService.deleteGame(game);
             await this.GameService.createGameStop(user1, user2, gameInstance, disconnectedSockets);
             await this.GameService.updateStateGameForUsers(user1, user2);
-            
+
             this.server.to([gameInstance.players[0], gameInstance.players[1]]).emit('userDisconnected');
             await this.GameService.clearDisconnections(gameInstance.gameID);
             this.GameService.deleteGameSocketsIdForPlayers(user1, user2);
@@ -353,11 +330,6 @@ export class GameGateway {
                 await this.handleUserDisconnection(disconnectedSockets, gameInstance, gameLoop)
             if (gameInstance.game_has_ended === true)
                 await this.endGame(gameInstance, gameLoop)
-            // if (gameInstance.stop === true) {
-            //     clearInterval(gameLoop);
-            //     // enlever la gameInstance
-            // }
-
             this.GameEngineceService.processInput(gameInstance);
             this.GameEngineceService.updateGameInstance(gameInstance, this.server);
             this.server.to([gameInstance.players[0], gameInstance.players[1]]).emit('GameUpdate', {
@@ -380,16 +352,13 @@ export class GameGateway {
         }
     }
 
-    @SubscribeMessage('leave-matchmaking')
+    @SubscribeMessage('leaveMatchmaking')
     @UseGuards(GatewayGuard)
     async handleLeaveMatchmaking(@ConnectedSocket() client: Socket) {
         try {
             const userId = client.handshake.auth.user.sub;
             const user = await this.GameService.getUserWithUserId(userId);
-            if (user.inGame)
-            {
-                if (user.inMatchmaking)
-                    this.MatchmakingService.leaveQueue(client.id, userId);
+            if (this.userInGame[client.id] === true) {
                 return;
             }
             await this.MatchmakingService.leaveQueue(client.id, userId);

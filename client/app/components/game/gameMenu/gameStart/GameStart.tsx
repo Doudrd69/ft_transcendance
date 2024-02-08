@@ -12,7 +12,7 @@ const MatchMaking = () => {
 	const handleLeave= () => {
 
 		if (globalState.gameSocket?.connected) {
-			globalState.gameSocket?.emit('leave-matchmaking');
+			globalState.gameSocket?.emit('leaveMatchmaking');
 		}
 	};
   
