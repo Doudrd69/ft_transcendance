@@ -8,7 +8,7 @@ import {
 import { Server, Socket } from 'socket.io';
 import { GameService } from 'src/game/game.service';
 import { GameEngineService } from 'src/game/gameEngine.service';
-import { MatchmakingService } from 'src/game/matchmaking/matchmaking.service';
+import { MatchmakingService, userInGame } from 'src/game/matchmaking/matchmaking.service';
 import { GatewayGuard } from 'src/gateway/Gatewayguard.guard';
 import { HttpException, HttpStatus, UseGuards } from '@nestjs/common'
 import { User } from 'src/users/entities/users.entity';
@@ -61,6 +61,8 @@ export interface game_instance {
     stop: boolean;
     usersId: number[];
 }
+
+
 
 let gameInstance: game_instance | null = null;
 @WebSocketGateway({
@@ -212,10 +214,12 @@ export class GameGateway {
             this.GameService.addGameSocket(client.id, userId);
             await this.MatchmakingService.joinQueue(client.id, userId, data.gameMode);
             await this.GameService.linkSocketIDWithUser(client.id, userId);
-            const enoughPlayers = await this.MatchmakingService.IsThereEnoughPairs(data.gameMode);
+            const enoughPlayers = this.MatchmakingService.IsThereEnoughPairs(data.gameMode);
             if (enoughPlayers) {
                 const pairs: [string, string][] = await this.MatchmakingService.getPlayersPairsQueue(data.gameMode);
                 for (const pair of pairs) {
+                    userInGame[this.GameService.getUserIdWithSocketId(pair[0])] = true;
+                    userInGame[userId] = true;
                     this.userInGame[pair[0]] = true;
                     this.userInGame[pair[1]] = true;
                     const socketIDs: [string, string] = [pair[0], pair[1]];

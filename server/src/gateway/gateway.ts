@@ -9,6 +9,7 @@ import { GatewayGuard } from './Gatewayguard.guard';
 import { HttpException, HttpStatus, UseGuards } from '@nestjs/common'
 import { Req } from '@nestjs/common'
 import dotenv from 'dotenv';
+import { userInGame } from 'src/game/matchmaking/matchmaking.service';
 
 dotenv.config();
 
@@ -278,12 +279,13 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 					console.log(`[checkAndSetUserInMatchmaking] : ${user.sub}`)
 					return;
 			}
+			// a changer pour le ingame et le inMatchmaking
 			if (await this.userService.userInGame(user.sub)) {
 				console.log(`sender already inGame`);
 				this.server.to(client.id).emit('userInGame');
 				return;
 			}
-			
+			userInGame[user.sub] = true;
 			await this.userService.setUserInMatchmaking(user.sub);
 			this.server.to(client.id).emit('gameNotInProgress');
 		}

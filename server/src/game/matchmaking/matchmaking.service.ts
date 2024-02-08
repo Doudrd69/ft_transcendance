@@ -4,6 +4,9 @@ import { User } from '../../users/entities/users.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Game } from '../entities/games.entity';
 
+export let userInGame: { [userId: number]: boolean };
+export let userInMatchmaking: { [userId: number]: boolean };
+
 @Injectable()
 export class MatchmakingService {
 	constructor(
@@ -33,13 +36,14 @@ export class MatchmakingService {
 	}
 
 	async joinQueue(gameSocketId: string, userId: number, gameMode: string) {
+		userInMatchmaking[userId] = true;
 		const newUser: User = await this.usersRepository.findOne({ where: { id: userId } })
 		if (!newUser)
 			throw new Error(`new user undefined`)
 		// check if user is already in queue normal or speed
 		if (this.playersNormalQueue.includes(gameSocketId) || this.playersSpeedQueue.includes(gameSocketId))
 			throw new Error(`User alredy in Matchmaking`);
-		if (gameMode === "NORMAL" )
+		if (gameMode === "NORMAL")
 			this.playersNormalQueue.push(gameSocketId);
 		else if (gameMode === "SPEED") {
 			newUser.inSpeedQueue = true;
@@ -71,7 +75,7 @@ export class MatchmakingService {
 		return;
 	}
 
-	async IsThereEnoughPairs(gameMode: string) {
+	IsThereEnoughPairs(gameMode: string) {
 		if (gameMode === "NORMAL" && (this.playersNormalQueue.length >= 2))
 			return true;
 		else if (gameMode === "SPEED" && (this.playersSpeedQueue.length >= 2)) {
