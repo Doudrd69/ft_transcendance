@@ -47,7 +47,6 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 	// if (me && me.blockList) {
 	// 	setBlock (!!me.blockList.find((userblock) => userblock === user.login));
 	// }
-	
 
 	const blockUser = async() => {
 		const BlockUserDto = {
@@ -69,9 +68,6 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 				setBlock(true);
 			if (globalState.userSocket && chatState.currentConversation && chatState.currentConversationID) {
 				globalState.userSocket?.emit('joinRoom', { roomName: `whoblocked${user.login}`, roomID: '' } );
-				globalState.userSocket?.emit('refreshChannel', {
-					channel: chatState.currentConversation + chatState.currentConversationID,
-				});
 			}
 		}
 		else {
@@ -104,9 +100,6 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 				setBlock (false);
 			if (globalState.userSocket && chatState.currentConversation && chatState.currentConversationID) {
 				globalState.userSocket?.emit('leaveRoom', { roomName: `whoblocked${user.login}`, roomID: '' } );
-				globalState.userSocket?.emit('refreshChannel', {
-					channel: chatState.currentConversation + chatState.currentConversationID,
-				});
 			}
 		}
 		else {
@@ -288,10 +281,8 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 				user.isAdmin = !user.isAdmin;
 
 				if (chatState.currentConversation) {
-					globalState.userSocket?.emit('refreshChannel', {
-						channel: chatState.currentConversation + chatState.currentConversationID,
-					});
 
+					// Emit notification to channel
 					globalState.userSocket?.emit('emitNotification', {
 						channel: chatState.currentConversation + chatState.currentConversationID,
 						content: `${user.login} has been promoted to admin`,
@@ -303,7 +294,8 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 						target: 'refreshAdmin',
 						status: true,
 					});
-					// refresh channel list for userToRefresh (who has been promoted)
+
+					// refresh the channel list of userToRefresh (who has been promoted)
 					globalState.userSocket?.emit('refreshUserChannelList', {
 						userToRefresh: user.login,
 					});
@@ -345,24 +337,25 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 				user.isAdmin = !user.isAdmin;
 
 				if (chatState.currentConversation) {
-					globalState.userSocket?.emit('refreshChannel', {
-						channel: chatState.currentConversation + chatState.currentConversationID,
-					});
 					
-					globalState.userSocket?.emit('refreshUser', {
-						userToRefresh: user.login,
-						target: 'refreshAdmin',
-						status: true,
-					});
-					// refresh channel list for userToRefresh (who has been promoted)
-					globalState.userSocket?.emit('refreshUserChannelList', {
-						userToRefresh: user.login,
-					});
 					globalState.userSocket?.emit('emitNotification', {
 						channel: chatState.currentConversation + chatState.currentConversationID,
 						content: `${user.login} has been demoted to admin`,
 						channelID: chatState.currentConversationID,
 					});
+
+
+					globalState.userSocket?.emit('refreshUser', {
+						userToRefresh: user.login,
+						target: 'refreshAdmin',
+						status: true,
+					});
+
+					// refresh the channel list of userToRefresh (who has been demoted)
+					globalState.userSocket?.emit('refreshUserChannelList', {
+						userToRefresh: user.login,
+					});
+
 	
 				}
 
@@ -404,9 +397,6 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 					chatDispatch({ type: 'DISABLE', payload: 'showOptionsUserChannel' });
 
 					if (chatState.currentConversation) {
-						globalState.userSocket?.emit('refreshChannel', {
-							channel: chatState.currentConversation + chatState.currentConversationID,
-						});
 						globalState.userSocket?.emit('leaveRoom', {
 							roomName: chatState.currentConversation,
 							roomID: chatState.currentConversationID,
@@ -446,9 +436,6 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 					chatDispatch({ type: 'DISABLE', payload: 'showOptionsUserChannel' });
 
 					if (chatState.currentConversation) {
-						globalState.userSocket?.emit('refreshChannel', {
-							channel: chatState.currentConversation + chatState.currentConversationID,
-						});
 						globalState.userSocket?.emit('kickUserFromChannel', {
 							userToKick: user.login,
 							roomName: chatState.currentConversation,
@@ -528,7 +515,6 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 		chatDispatch({ type: 'DISABLE', payload: 'showOptionsUserChannelOwner' });
 	}
 
-
 	const handleTabClick = (target: User) => {
 		chatDispatch({ type: 'SET_CURRENT_TARGET', payload: target });
 		chatDispatch({ type: 'ACTIVATE', payload: 'showConfirmation' });
@@ -555,6 +541,7 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 			document.removeEventListener('keydown', handleEscape);
 		};
 	}, []);
+
 	return (
 		<>
 		<div className="blur-background"></div>

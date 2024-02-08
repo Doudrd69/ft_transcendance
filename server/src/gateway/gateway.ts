@@ -184,7 +184,10 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 			else
 				client.join(roomName);
 
+			// event pour refresh la userList d'un channel
 			this.server.to(roomName + roomID).emit('refresh_channel');
+			this.server.emit('refreshGlobalUserList');
+			this.server.emit('refreshFriends');
 
 			return;
 		} catch (error) {
@@ -205,12 +208,16 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		else
 			client.leave(roomName);
 
+		// event pour refresh la userList d'un channel
 		this.server.to(roomName + roomID).emit('refresh_channel');
 		this.server.emit('refreshChannelList');
+		this.server.emit('refreshGlobalUserList');
+		this.server.emit('refreshFriends');
 
 		return;
 	}
 
+	// comment securiser? que le gar qui ajoute soit dans la conv?
 	@SubscribeMessage('addUserToRoom')
 	@UseGuards(GatewayGuard)
 	addUserToNewRoom(@MessageBody() data: { convID: number, convName: string, friend: string }) {
@@ -556,6 +563,7 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	@UseGuards(GatewayGuard)
 	handleUserRefresh(@MessageBody() data: { userToRefresh: string, target: string, status: boolean }) {
 		const { userToRefresh, target, status } = data;
+		this.server.emit('refresh_channel');
 		this.server.to(userToRefresh).emit(target, status);
 	}
 
