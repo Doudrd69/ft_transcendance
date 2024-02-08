@@ -1036,7 +1036,7 @@ export class ChatService {
 			throw new HttpException('User not found', HttpStatus.NOT_FOUND);
 		}
 
-		throw new HttpException('Conversation does not exist', HttpStatus.NOT_FOUND);
+		throw new HttpException('Conversation does not exist, please refresh the list', HttpStatus.NOT_FOUND);
 	}
 	
 	async createDMConversation(initiator: User, friend: User): Promise<Conversation> {
