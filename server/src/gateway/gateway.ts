@@ -9,6 +9,7 @@ import { GatewayGuard } from './Gatewayguard.guard';
 import { HttpException, HttpStatus, UseGuards } from '@nestjs/common'
 import { Req } from '@nestjs/common'
 import dotenv from 'dotenv';
+import { verify } from 'crypto';
 
 dotenv.config();
 
@@ -19,7 +20,10 @@ export interface GameInviteDto {
 	isAcceptedTargetUser: boolean,
 }
 
-export const gameQueue: GameInviteDto[] = [];
+
+// Définition d'un objet pour stocker les éléments uniques
+const gameQueue: { [key: string]: GameInviteDto } = {};
+
 
 @WebSocketGateway({
 	namespace: 'user',
@@ -286,99 +290,88 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 			await this.handleException(error, client)
 		}
 	}
-
+	
 	@SubscribeMessage('setGameInvite')
 	handleEvent(@ConnectedSocket() client: Socket, @MessageBody() data: { userTwoId: number, userTwoGameId: string }) {
 		// refaire un check de game Socket
 		this.server.to(client.id).emit('createGameInviteSocket', { userTwoId: data.userTwoId, userTwoGameId: data.userTwoGameId });
 	}
-
+	
 	@SubscribeMessage('InviteToGame')
 	@UseGuards(GatewayGuard)
 	async inviteUserToGame(@ConnectedSocket() client: Socket, @MessageBody() targetUserId: number) {
 		try {
 			console.log(`[gameQueue] : ${gameQueue}`)
-			
+			// Fonction pour générer une clé unique basée sur emitUserId et targetUserId
 			const emitUserId = client.handshake.auth.user.sub;
 			const targetToInvite = await this.userService.getUserByID(targetUserId);
-			// check si la paire existe deja
-			const existingPair = gameQueue.find(invite => 
-				invite.emitUserId === emitUserId && invite.targetUserId === targetUserId 
-				||
-				invite.emitUserId === targetUserId && invite.targetUserId === emitUserId
-			);
-			// check si les deux users existent et sont bien differents
 			if (!emitUserId || !targetToInvite.id || (emitUserId === targetToInvite.id))
 			{
 				console.log(`[check de l'existence des users] : les deux id sont bien la`);
 				return;
 			}
-			// Supprimer un élément de la file
-			const removeFromGameQueue = (item: GameInviteDto) => {
-				const index = gameQueue.indexOf(item);
-				if (index !== -1) {
-					gameQueue.splice(index, 1);
-				}
-			};
-			if (existingPair)
-				console.log(`[existingPair] : ${existingPair.isAcceptedTargetUser} | ${existingPair.isAcceptedEmitUser}`)
-			console.log(`[emitUserId] : ${emitUserId}`)
-			console.log(`[targetUserId] : ${targetUserId}`)
-			// fonction pour savoir si une paire existe deja
-
-
 			// check si les deux users sont deja en game
 			if (await this.userService.usersInGame(emitUserId, targetUserId)) {
 				this.server.to(client.id).emit('usersInGame');
 				console.log(`[check si l'un des deux users sont deja en game] : l'un des deux users sont deja en game`);
 				return;
 			}
-			const existingMyPair = gameQueue.find(invite => 
-				invite.emitUserId === targetUserId && invite.targetUserId === emitUserId
-			);
-			//creation d'une paire
-			const newGameInvite: GameInviteDto = {
-				emitUserId: emitUserId,
-				targetUserId: targetUserId,
-				isAcceptedEmitUser: true,
-				isAcceptedTargetUser: existingMyPair ? true : false,
-			};
-			console.log(`[newGameInviteId] : ${newGameInvite.emitUserId} | ${newGameInvite.targetUserId}`)
-			console.log(`[newGameInviteState] : ${newGameInvite.isAcceptedEmitUser} | ${newGameInvite.isAcceptedTargetUser}`)
-
-
-			if (!existingPair) {
-				//si la paire n'existe pas, on la push dans le tableau et on emet l'event
-				console.log(`[existingPair] : pair does not exist`);
-
-				gameQueue.push(newGameInvite);
-				setTimeout(() => {
-					// Supprime l'invitation après 5 secondes 
-					//pour etre bien sur que le gameInvite ne soit pas fait par POSTMAN
-					//la on a un genre de emit croisé avec un char russe
-					removeFromGameQueue(newGameInvite);
-				}, 5000);
-				this.server.to(targetToInvite.username).emit('gameInvite', {
+			//fonction qui cree une paire
+			function createGameInvite(emitUserId: number, targetUserId: number, pair: GameInviteDto | null): GameInviteDto {
+				const isAcceptedTargetUser = pair ? true : false; // Détermine si la cible a déjà accepté l'invitation
+				const newGameInvite: GameInviteDto = {
+					emitUserId: emitUserId,
+					targetUserId: targetUserId,
+					isAcceptedEmitUser: true, // Par défaut, l'émetteur accepte toujours l'invitation
+					isAcceptedTargetUser: isAcceptedTargetUser,
+				};
+				return newGameInvite;
+			}
+			console.log(`[emitUserId] : ${emitUserId}`)
+			console.log(`[targetUserId] : ${targetUserId}`)
+			//creer une clef unique pour la pair
+			const uniqueKey =  `${Math.min(emitUserId, targetUserId)}-${Math.max(emitUserId, targetUserId)}`
+			//LA PAIR EXISTE DEJA
+			if (uniqueKey in gameQueue) {
+				console.log('===============>La clé existe dans gameQueue.');
+				var newPair : GameInviteDto = createGameInvite(emitUserId, targetUserId, gameQueue[uniqueKey]);
+				gameQueue[uniqueKey] = newPair;
+					console.log(`[existingPair] : ${newPair.isAcceptedTargetUser} | ${newPair.isAcceptedEmitUser}`)
+					console.log(`[gameQueue] : ${newPair.isAcceptedEmitUser} | ${newPair.isAcceptedTargetUser}`)
+					//si la paire existe, on check si la target a deja fait la demande
+					if (newPair && newPair.isAcceptedTargetUser && newPair.isAcceptedEmitUser) {
+						//si en gros il font l'invite en meme temps dans les 5s du toast, meme si il n'accepte pas 
+						//les deux seront ajouter a une game automatiquement
+						this.server.to(client.id).emit('usersInGame');
+						console.log(`[La target a fait aussi la demande] : il faut lancer la game`);
+						return;
+					}
+					
+					else {
+						//sinon ca veut dire que tu spam alors arrete forceur
+						console.log(`[existingPair] : Enorme Forceur`);
+						return;
+					}
+				}
+				else //  LA PAIRE N'EXISTE PAS
+				{
+					console.log('===============>La clé n\'existe pas dans gameQueue.');
+					var newPair : GameInviteDto = createGameInvite(emitUserId, targetUserId, gameQueue[uniqueKey]);
+					gameQueue[uniqueKey] = newPair;
+					setTimeout(() => {
+						// Supprime l'invitation après 5 secondes 
+						//pour etre bien sur que le gameInvite ne soit pas fait par POSTMAN
+						//la on a un genre de emit croisé avec un char russe
+						if (gameQueue.hasOwnProperty(uniqueKey)) {
+							delete gameQueue[uniqueKey];
+							console.log('La paire a été supprimée de la queue.');
+						} else {
+							console.log('La clé spécifiée n\'existe pas dans la queue.');
+					}}, 5000);
+					this.server.to(targetToInvite.username).emit('gameInvite', {
 					senderUsername: client.handshake.auth.user.username,
 					senderUserID: emitUserId,
 				});
-			}
-
-			else {
-				console.log(`[gameQueue] : ${newGameInvite.isAcceptedEmitUser} | ${newGameInvite.isAcceptedTargetUser}`)
-				//si la paire existe, on check si la target a deja fait la demande
-				if (existingPair && newGameInvite.isAcceptedTargetUser && newGameInvite.isAcceptedEmitUser) {
-					//si en gros il font l'invite en meme temps dans les 5s du toast, meme si il n'accepte pas 
-					//les deux seront ajouter a une game automatiquement
-					console.log(`[La target a fait aussi la demande] : il faut lancer la game`);
-					return;
-				}
-
-				else {
-					//sinon ca veut dire que tu spam alors arrete forceur
-					console.log(`[existingPair] : Enorme Forceur`);
-					return;
-				}
 			}
 		}
 		catch (error) {
@@ -405,15 +398,14 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 			const emitUserId = client.handshake.auth.user.sub;
 			console.log(`[emitUserId] : ${emitUserId}`)
 			console.log(`[targetUserId] : ${targetUserId}`)
-			const indexToDelete = gameQueue.findIndex(invite => 
-				(invite.emitUserId === emitUserId && invite.targetUserId === targetUserId) ||
-				(invite.emitUserId === targetUserId && invite.targetUserId === emitUserId)
-			);	
+	
+			const uniqueKey =  `${Math.min(emitUserId, targetUserId)}-${Math.max(emitUserId, targetUserId)}`
 			// Vérifiez si existingPair a été trouvé dans gameQueue
-			if (indexToDelete !== -1) {
-				// Supprimez existingPair de gameQueue
-				const removedPair = gameQueue.splice(indexToDelete, 1);
-				console.log("Element supprimé de gameQueue :", removedPair);
+			if (gameQueue.hasOwnProperty(uniqueKey)) {
+				delete gameQueue[uniqueKey];
+				console.log('La paire a été supprimée de la queue.');
+			} else {
+				console.log('La clé spécifiée n\'existe pas dans la queue.');
 			}
 		} catch (error) {
 			console.log(`[GAME INVITE ERROR]: ${error.stack}`)
