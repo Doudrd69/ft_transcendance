@@ -130,6 +130,7 @@ const ListMyChannelComponent: React.FC<ListMyChannelComponentProps> = ({ user, f
 
 					// refresh userList in channel for user arrival update
 					globalState.userSocket?.emit('refreshChannel', {
+						
 						channel: conversation.name + conversation.id,
 					});
 

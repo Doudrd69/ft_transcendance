@@ -215,6 +215,7 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		return;
 	}
 
+	// comment securiser? que le gar qui ajoute soit dans la conv?
 	@SubscribeMessage('addUserToRoom')
 	@UseGuards(GatewayGuard)
 	addUserToNewRoom(@MessageBody() data: { convID: number, convName: string, friend: string }) {

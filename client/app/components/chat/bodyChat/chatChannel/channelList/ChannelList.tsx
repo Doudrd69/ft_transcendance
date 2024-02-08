@@ -107,7 +107,6 @@ const ChannelListComponent: React.FC = () => {
 		return () => {
 			globalState.userSocket?.off('banUser');
 			globalState.userSocket?.off('refreshChannelList');
-			globalState.userSocket?.off('refreshChannel');
 			globalState.userSocket?.off('channelDeleted');
 			globalState.userSocket?.off('refreshChannelListBis');
 			globalState.userSocket?.off('refreshAdmin');

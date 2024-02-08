@@ -69,9 +69,9 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 				setBlock(true);
 			if (globalState.userSocket && chatState.currentConversation && chatState.currentConversationID) {
 				globalState.userSocket?.emit('joinRoom', { roomName: `whoblocked${user.login}`, roomID: '' } );
-				globalState.userSocket?.emit('refreshChannel', {
-					channel: chatState.currentConversation + chatState.currentConversationID,
-				});
+				// globalState.userSocket?.emit('refreshChannel', {
+				// 	channel: chatState.currentConversation + chatState.currentConversationID,
+				// });
 			}
 		}
 		else {
@@ -104,9 +104,9 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 				setBlock (false);
 			if (globalState.userSocket && chatState.currentConversation && chatState.currentConversationID) {
 				globalState.userSocket?.emit('leaveRoom', { roomName: `whoblocked${user.login}`, roomID: '' } );
-				globalState.userSocket?.emit('refreshChannel', {
-					channel: chatState.currentConversation + chatState.currentConversationID,
-				});
+				// globalState.userSocket?.emit('refreshChannel', {
+				// 	channel: chatState.currentConversation + chatState.currentConversationID,
+				// });
 			}
 		}
 		else {
@@ -288,9 +288,9 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 				user.isAdmin = !user.isAdmin;
 
 				if (chatState.currentConversation) {
-					globalState.userSocket?.emit('refreshChannel', {
-						channel: chatState.currentConversation + chatState.currentConversationID,
-					});
+					// globalState.userSocket?.emit('refreshChannel', {
+					// 	channel: chatState.currentConversation + chatState.currentConversationID,
+					// });
 
 					globalState.userSocket?.emit('emitNotification', {
 						channel: chatState.currentConversation + chatState.currentConversationID,
@@ -345,9 +345,9 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 				user.isAdmin = !user.isAdmin;
 
 				if (chatState.currentConversation) {
-					globalState.userSocket?.emit('refreshChannel', {
-						channel: chatState.currentConversation + chatState.currentConversationID,
-					});
+					// globalState.userSocket?.emit('refreshChannel', {
+					// 	channel: chatState.currentConversation + chatState.currentConversationID,
+					// });
 					
 					globalState.userSocket?.emit('refreshUser', {
 						userToRefresh: user.login,
@@ -404,9 +404,9 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 					chatDispatch({ type: 'DISABLE', payload: 'showOptionsUserChannel' });
 
 					if (chatState.currentConversation) {
-						globalState.userSocket?.emit('refreshChannel', {
-							channel: chatState.currentConversation + chatState.currentConversationID,
-						});
+						// globalState.userSocket?.emit('refreshChannel', {
+						// 	channel: chatState.currentConversation + chatState.currentConversationID,
+						// });
 						globalState.userSocket?.emit('leaveRoom', {
 							roomName: chatState.currentConversation,
 							roomID: chatState.currentConversationID,
@@ -446,9 +446,9 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 					chatDispatch({ type: 'DISABLE', payload: 'showOptionsUserChannel' });
 
 					if (chatState.currentConversation) {
-						globalState.userSocket?.emit('refreshChannel', {
-							channel: chatState.currentConversation + chatState.currentConversationID,
-						});
+						// globalState.userSocket?.emit('refreshChannel', {
+						// 	channel: chatState.currentConversation + chatState.currentConversationID,
+						// });
 						globalState.userSocket?.emit('kickUserFromChannel', {
 							userToKick: user.login,
 							roomName: chatState.currentConversation,
