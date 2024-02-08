@@ -407,11 +407,3 @@ export class GameGateway {
         }
     }
 }
-
-/** Liste des choses a faire :
- * 
- * Try and catch tout les retour d'await et voir avec gael
- * 
- * 
- * 
- */
