@@ -674,6 +674,7 @@ export class UsersService {
 					username: element.friend ? element.friend.username : element.initiator ? element.initiator.username : 'unknown user',
 					isBlocked: blockStatus,
 					onlineStatus: element.friend ? element.friend.isActive : element.initiator ? element.initiator.isActive : false,
+					inGameStatus: element.friend ? element.friend.inGame : element.initiator ? element.initiator.inGame : false,
 				});
 			});
 
@@ -709,6 +710,7 @@ export class UsersService {
 					username: element.initiator.username,
 					isBlocked: blockStatus,
 					onlineStatus: element.initiator.isActive,
+					inGameStatus: element.friend ? element.friend.inGame : element.initiator ? element.initiator.inGame : false,
 				});
 			});
 

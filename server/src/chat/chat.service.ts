@@ -320,6 +320,7 @@ export class ChatService {
 										userID: user.id,
 										name: userGroup.conversation.name,
 										onlineStatus: user.isActive,
+										inGameStatus: user.inGame,
 									});
 								}
 							})
