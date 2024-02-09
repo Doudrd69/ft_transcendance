@@ -102,8 +102,7 @@ const FriendsListTabComponent: React.FC<FriendsListTabComponentProps> = ({ user,
 		try {
 
 			const BlockUserDto = {
-				initiatorLogin: sessionStorage.getItem("currentUserLogin"),
-				recipientLogin: user.username,
+				recipientID: user.id,
 			}
 
 			const response = await fetch(`${process.env.API_URL}/users/blockUser`, {
@@ -116,10 +115,11 @@ const FriendsListTabComponent: React.FC<FriendsListTabComponentProps> = ({ user,
 			});
 
 			if (response.ok) {
+				const userToBlock = await response.json();
 				user.isBlocked = true;
 				chatDispatch({ type: 'DISABLE', payload: 'showConfirmation' })
-				globalState.userSocket?.emit('joinRoom', { roomName: `whoblocked${user.username}`, roomID: '' });
-				// refresh all user list et friend list
+				if (userToBlock)
+					globalState.userSocket?.emit('joinRoom', { roomName: `whoblocked${userToBlock}`, roomID: '' });
 			}
 			else {
 				const error = await response.json();
@@ -138,8 +138,7 @@ const FriendsListTabComponent: React.FC<FriendsListTabComponentProps> = ({ user,
 
 		try {
 			const BlockUserDto = {
-				initiatorLogin: sessionStorage.getItem("currentUserLogin"),
-				recipientLogin: user.username,
+				recipientID: user.id,
 			}
 			const response = await fetch(`${process.env.API_URL}/users/unblockUser`, {
 				method: 'POST',
@@ -152,8 +151,9 @@ const FriendsListTabComponent: React.FC<FriendsListTabComponentProps> = ({ user,
 
 			if (response.ok) {
 				user.isBlocked = false;
-
-				globalState.userSocket?.emit('leaveRoom', { roomName: `whoblocked${user.username}`, roomID: '' });
+				const userToUnblock = await response.json();
+				if (userToUnblock)
+					globalState.userSocket?.emit('leaveRoom', { roomName: `whoblocked${userToUnblock}`, roomID: '' });
 				chatDispatch({ type: 'DISABLE', payload: 'showConfirmation' })
 			}
 			else {
