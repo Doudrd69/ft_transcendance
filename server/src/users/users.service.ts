@@ -88,15 +88,15 @@ export class UsersService {
 
 	async setUsersInGame(userId1: number, userId2: number) {
 		// enelever les appels DB
+		userInGame[userId1] = true;
+		userInGame[userId2] = true;
 		const user1: User = await this.usersRepository.findOne({ where: { id: userId1 } })
 		if (!user1)
 			throw new Error("user undefined")
-		userInGame[userId1] = true;
 		user1.inGame = true;
 		const user2: User = await this.usersRepository.findOne({ where: { id: userId2 } })
 		if (!user2)
 			throw new Error("user undefined")
-		userInGame[userId2] = true;
 		user2.inGame = true;
 		await this.usersRepository.save(user1);
 		await this.usersRepository.save(user2);

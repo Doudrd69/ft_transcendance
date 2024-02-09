@@ -14,6 +14,8 @@ import { HttpException, HttpStatus, UseGuards } from '@nestjs/common'
 import { User } from 'src/users/entities/users.entity';
 import dotenv from 'dotenv';
 import { Client } from 'socket.io/dist/client';
+import { gameQueue } from 'src/gateway/gateway';
+import { UsersService } from 'src/users/users.service';
 dotenv.config();
 
 export interface vector_instance {
@@ -84,6 +86,7 @@ export class GameGateway {
         private readonly GameService: GameService,
         private readonly MatchmakingService: MatchmakingService,
         private readonly GameEngineceService: GameEngineService,
+        private readonly userService: UsersService,
     ) {
         this.game_instance = [];
         this.userInGame = {};
@@ -138,6 +141,16 @@ export class GameGateway {
     @UseGuards(GatewayGuard)
     async handleCheckGameInvite(@ConnectedSocket() client: Socket, @MessageBody() data: { userTwoId: number, userTwoGameId: string }) {
         try {
+            const emitUserId = client.handshake.auth.user.sub;
+			const targetUserId = data.userTwoId;
+			
+			const uniqueKey =  `${Math.min(emitUserId, targetUserId)}-${Math.max(emitUserId, targetUserId)}`
+			if (uniqueKey in gameQueue) {
+				if (gameQueue[uniqueKey] && gameQueue[uniqueKey].isAcceptedTargetUser && gameQueue[uniqueKey].isAcceptedEmitUser) {
+					// unset les deux de ingame et deco leurs socket 
+					return;
+				}
+			} 
             // check les users si bien opposant
             // si pas opposant alors soit mettre le bon userId a la place si il en a un soit juste dec les deux et les unset ingame
             const userOne = client.handshake.auth.user;

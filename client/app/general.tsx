@@ -65,8 +65,7 @@ const GeneralComponent = () => {
 			gameSocket.connect();
 			dispatch({ type: 'SET_GAME_SOCKET', payload: gameSocket });
 			gameSocket.on('connect', () => {
-				globalState.userSocket?.emit('inviteAccepted', {
-					otherUserId: gameInviteDto.senderUserID,
+				globalState.userSocket?.emit('inviteAccepted', {otherUserId: gameInviteDto.senderUserID,
 					userGameSocketId: gameSocket.id,
 				});
 			});
