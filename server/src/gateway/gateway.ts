@@ -478,36 +478,50 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	@UseGuards(GatewayGuard)
 	async handleFriendRequest(@ConnectedSocket() client: Socket, @MessageBody() data: { recipientLogin: string }) {
 
+		// user is the initiator of the friend request
+		// si le mec est bloque on se barre de la grooooos
 		try {
 			const { recipientLogin } = data;
-			// user is the initiator of the friend request
 			const user = client.handshake.auth.user;
-			const username = await this.userService.getUsername(user.sub);
-			if (!username)
-				throw new HttpException('User not foud', HttpStatus.NOT_FOUND);
-			this.server.to(recipientLogin).except(`whoblocked${username}`).emit('friendRequest', {
-				recipientLogin: recipientLogin,
-				initiatorID: Number(user.sub),
-				initiatorLogin: username,
-			});
-			this.server.to(recipientLogin).except(`whoblocked${username}`).emit('refreshHeaderNotif');
+			const checkedInitiator = await this.userService.getUserByID(user.sub);
+			const checkedRecipient = await this.userService.getUserByUsername(recipientLogin);
+			if (!checkedRecipient.blockedUsers.find((user: number) => user === checkedInitiator.id)) {
+				if (checkedInitiator && checkedRecipient) {
+					this.server.to(this.connectedUsers[checkedRecipient.id]).except(`whoblocked${checkedInitiator.id}`).emit('friendRequest', {
+						recipientLogin: recipientLogin,
+						initiatorID: Number(user.sub),
+						initiatorLogin: checkedInitiator.username,
+					});
+					this.server.to(this.connectedUsers[checkedRecipient.id]).except(`whoblocked${checkedInitiator.id}`).emit('refreshHeaderNotif');
+				}
+			}
+			console.error(`${checkedInitiator.username} is blocked`);
 		} catch (error) {
-			throw error;
+			// throw error;
 		}
 	}
 
 	@SubscribeMessage('friendRequestAccepted')
 	@UseGuards(GatewayGuard)
-	handleAcceptedFriendRequest(@MessageBody() data: { roomName: string, roomID: string, initiator: string, recipient: string }) {
+	async handleAcceptedFriendRequest(@MessageBody() data: { roomName: string, roomID: string, initiator: string, recipient: string }) {
 
-		const { roomName, roomID, initiator, recipient } = data;
-		this.server.to(initiator).emit('friendRequestAcceptedNotif', {
-			roomName: roomName,
-			roomID: roomID,
-			recipient: recipient,
-		})
-		this.server.to(recipient).emit('refreshFriends');
-		this.server.to(recipient).emit('refreshHeaderNotif');
+		try {
+			const { roomName, roomID, initiator, recipient } = data;
+			const checkedInitiator = await this.userService.getUserByUsername(initiator);
+			const checkedRecipient = await this.userService.getUserByUsername(recipient);
+			if (checkedInitiator && checkedRecipient) {
+				this.server.to(initiator).emit('friendRequestAcceptedNotif', {
+					roomName: roomName,
+					roomID: roomID,
+					recipient: recipient,
+				})
+				this.server.to(this.connectedUsers[checkedInitiator.id]).emit('refreshFriends');
+				this.server.to(this.connectedUsers[checkedRecipient.id]).emit('refreshFriends');
+				this.server.to(this.connectedUsers[checkedRecipient.id]).emit('refreshHeaderNotif');
+			}
+		} catch (error) {
+			// throw error;
+		}
 	}
 
 	/* REFRESH HANDLERS */
