@@ -15,7 +15,7 @@ import { User } from 'src/users/entities/users.entity';
 import dotenv from 'dotenv';
 import { Client } from 'socket.io/dist/client';
 import { gameQueue } from 'src/gateway/gateway';
-import { UsersService } from 'src/users/users.service';
+
 dotenv.config();
 
 export interface vector_instance {
@@ -86,7 +86,6 @@ export class GameGateway {
         private readonly GameService: GameService,
         private readonly MatchmakingService: MatchmakingService,
         private readonly GameEngineceService: GameEngineService,
-        private readonly userService: UsersService,
     ) {
         this.game_instance = [];
         this.userInGame = {};
