@@ -543,11 +543,24 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 		};
 	}, []);
 
+	const handleRefreshOptionsUserChannel = () => {
+		chatDispatch({ type: 'DISABLE', payload: 'showOptionsUserChannel' });
+		chatDispatch({ type: 'DISABLE', payload: 'showOptionsUserChannelOwner' });
+		chatDispatch({ type: 'ACTIVATE', payload: 'showBackComponent' });	
+	};
 	useEffect(() => {
+	
+	
+		// Abonnez-vous à l'événement refreshOptionsUserChannel
+		globalState.userSocket?.on('refreshOptionsUserChannel', handleRefreshOptionsUserChannel);
+	
+		// Nettoyez l'abonnement lorsque le composant est démonté
+		return () => {
+			globalState.userSocket?.off('refreshOptionsUserChannel', handleRefreshOptionsUserChannel);
+		};
+	  }, [globalState?.userSocket]);
 
-		console.log("=========================>1");
 
-	}, [globalState?.userSocket]);
 	return (
 		<>
 		<div className="blur-background"></div>

@@ -124,6 +124,7 @@ const ListMyChannelComponent: React.FC<ListMyChannelComponentProps> = ({ user, f
 						friend: user,
 					});
 					// refresh channel list
+
 					globalState.userSocket?.emit('refreshUserChannelList', {
 						userToRefresh: user, 
 					});
@@ -136,6 +137,7 @@ const ListMyChannelComponent: React.FC<ListMyChannelComponentProps> = ({ user, f
 
 					chatDispatch({ type: 'TOGGLEX', payload: 'showAddCreateChannel' });
 					chatDispatch({ type: 'TOGGLEX', payload: 'showAddChannel' });
+
 					chatDispatch({ type: 'DISABLE', payload: 'showListChannelAdd' });
 				}
 			}
@@ -170,7 +172,8 @@ const ListMyChannelComponent: React.FC<ListMyChannelComponentProps> = ({ user, f
 			});
 
 			if (response.ok) {
-
+				console.log('addMyselfToConversation');
+				chatDispatch({ type: 'TOGGLEX', payload: 'refreshChannel' });
 				const conversation = await response.json();
 
 				if (globalState.userSocket?.connected) {
@@ -189,6 +192,7 @@ const ListMyChannelComponent: React.FC<ListMyChannelComponentProps> = ({ user, f
 					globalState.userSocket?.emit('refreshChannel', {
 						channel: conversation.name + conversation.id,
 					});
+
 
 					chatDispatch({ type: 'TOGGLEX', payload: 'showAddCreateChannel' });
 					chatDispatch({ type: 'TOGGLEX', payload: 'showAddChannel' });
