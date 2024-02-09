@@ -70,10 +70,10 @@ const FriendsListTabComponent: React.FC<FriendsListTabComponentProps> = ({ user,
 				globalState.userSocket?.emit('addUserToRoom', {
 					convID: conversation.id,
 					convName: conversation.name,
-					friend: user.username,
+					friend: user.id,
 				});
 				globalState.userSocket?.emit('refreshUser', {
-					userToRefresh: user.username,
+					userToRefresh: user.id,
 					target: 'refreshDmList',
 					status: true
 				});
@@ -199,7 +199,11 @@ const FriendsListTabComponent: React.FC<FriendsListTabComponentProps> = ({ user,
 				chatDispatch({ type: 'TOGGLEX', payload: 'refreshFriendsList' });
 				chatDispatch({ type: 'DISABLE', payload: 'showConfirmation' });
 
-				globalState.userSocket?.emit('refreshUser', { userToRefresh: user.username, target: 'refreshFriends', status: true});
+				globalState.userSocket?.emit('refreshUser', {
+					userToRefresh: user.id,
+					target: 'refreshFriends',
+					status: true,
+				});
 
 			}
 			else {
