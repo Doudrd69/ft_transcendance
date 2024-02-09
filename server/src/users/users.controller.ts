@@ -194,7 +194,8 @@ export class UsersController {
 	@UseGuards(AuthGuard)
 	@HttpCode(HttpStatus.OK)
 	@Post('blockUser')
-	blockUser(@Req() req, @Body() blockUserDto: BlockUserDto): Promise<boolean> {
+	blockUser(@Req() req, @Body() blockUserDto: BlockUserDto): Promise<number> {
+		// user is the initiator
 		const { user } = req; 
 		return this.usersService.blockUser(blockUserDto, user.sub);
 	}
@@ -202,7 +203,7 @@ export class UsersController {
 	@UseGuards(AuthGuard)
 	@HttpCode(HttpStatus.OK)
 	@Post('unblockUser')
-	unblockUser(@Req() req, @Body() blockUserDto: BlockUserDto): Promise<boolean> {
+	unblockUser(@Req() req, @Body() blockUserDto: BlockUserDto): Promise<number> {
 		const { user } = req;
 		return this.usersService.unblockUser(blockUserDto, user.sub);
 	}

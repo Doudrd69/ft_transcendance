@@ -50,9 +50,9 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 
 	
 	const blockUser = async() => {
+
 		const BlockUserDto = {
-			initiatorLogin: sessionStorage.getItem("currentUserLogin"),
-			recipientLogin: user.login,
+			recipientID: user.id,
 		}
 
 		const response = await fetch(`${process.env.API_URL}/users/blockUser`, {
@@ -67,8 +67,9 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 		if (response.ok) {
 			if (!block)
 				setBlock(true);
-			if (globalState.userSocket && chatState.currentConversation && chatState.currentConversationID) {
-				globalState.userSocket?.emit('joinRoom', { roomName: `whoblocked${user.login}`, roomID: '' } );
+			const userToBlock = await response.json();
+			if (userToBlock && globalState.userSocket && chatState.currentConversation && chatState.currentConversationID) {
+				globalState.userSocket?.emit('joinRoom', { roomName: `whoblocked${userToBlock}`, roomID: '' } );
 			}
 		}
 		else {
@@ -83,8 +84,7 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 	const unblockUser = async() => {
 
 		const BlockUserDto = {
-			initiatorLogin: sessionStorage.getItem("currentUserLogin"),
-			recipientLogin: user.login,
+			recipientID: user.login,
 		}
 
 		const response = await fetch(`${process.env.API_URL}/users/unblockUser`, {
@@ -99,8 +99,9 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 		if (response.ok) {
 			if (block)
 				setBlock (false);
-			if (globalState.userSocket && chatState.currentConversation && chatState.currentConversationID) {
-				globalState.userSocket?.emit('leaveRoom', { roomName: `whoblocked${user.login}`, roomID: '' } );
+			const userToUnblock = await response.json();
+			if (userToUnblock && globalState.userSocket && chatState.currentConversation && chatState.currentConversationID) {
+				globalState.userSocket?.emit('leaveRoom', { roomName: `whoblocked${userToUnblock}`, roomID: '' } );
 			}
 		}
 		else {

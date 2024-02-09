@@ -60,7 +60,7 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 
 				const blockedUsers = await this.userService.getBlockedUserList(userID);
 				if (blockedUsers) {
-					blockedUsers.forEach((blockedUser: string) => {
+					blockedUsers.forEach((blockedUser: number) => {
 						client.join(`whoblocked${blockedUser}`)
 					})
 				}
@@ -87,7 +87,7 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 
 				const blockedUsers = await this.userService.getBlockedUserList(userID);
 				if (blockedUsers) {
-					blockedUsers.forEach((blockedUser: string) => {
+					blockedUsers.forEach((blockedUser: number) => {
 						client.leave(`whoblocked${blockedUser}`)
 					})
 				}

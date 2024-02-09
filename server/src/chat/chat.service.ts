@@ -246,7 +246,8 @@ export class ChatService {
 			if (group) {
 
 				const messages = await this.messageRepository.find({ where: {conversation: conversation}});
-				const filteredMessages = messages.filter((message: Message) => !user.blockedUsers.includes(message.from));
+				console.log(user.blockedUsers);
+				const filteredMessages = messages.filter((message: Message) => !user.blockedUsers.includes(message.senderId));
 				return filteredMessages;
 			}
 
