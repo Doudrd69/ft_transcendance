@@ -41,7 +41,7 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	@WebSocketServer()
 	server: Server;
 
-	private connectedUsers: { [userId: string]: Socket } = {};
+	private connectedUsers: { [clientId: string]: number } = {};
 
 	private async userRejoinsRooms(client: Socket, userID: number) {
 
@@ -135,12 +135,14 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		try {
 
 			console.log(`== GeneralGtw ---> USERSOCKET client connected: ${client.id}`);
-			this.connectedUsers[client.id] = client;
-
+			// this.connectedUsers[client.id] = userID;
+			// client.join(personnalRoom);
+			
 			client.on('joinPersonnalRoom', (personnalRoom: string, userID: number) => {
-
-				client.join(personnalRoom);
-				console.log("== Client ", client.id, " has joined ", personnalRoom, " room");
+				
+				this.connectedUsers[client.id] = userID;
+				client.join(client.id);
+				console.log("== Client ", personnalRoom, " has joined ", client.id, " room");
 				this.userRejoinsRooms(client, userID);
 				this.notifyFriendList(userID, personnalRoom, 'online');
 				this.server.emit('newUser');
@@ -181,10 +183,11 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 			console.log("==== joinRoom Event ====");
 			console.log("Add ", "[", client.id, "]", " to room : ", roomName + roomID);
 
+			// If there is an ID, we are joining a channel room
 			if (roomID && await this.chatService.isUserInConversation(user.sub, Number(roomID)))
 				client.join(roomName + roomID);
 			else
-				client.join(roomName);
+				client.join(roomName); // joining personnal room
 
 			// event to refresh the user list of a channel
 			this.server.to(roomName + roomID).emit('refresh_channel');
