@@ -3,9 +3,13 @@ import { Repository } from 'typeorm';
 import { User } from '../../users/entities/users.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Game } from '../entities/games.entity';
+import { UserOptionsDto } from 'src/chat/dto/userOptionsDto.dto';
 
 export let userInGame: { [userId: number]: boolean };
 export let userInMatchmaking: { [userId: number]: boolean };
+
+userInGame = {};
+userInMatchmaking = {};
 
 @Injectable()
 export class MatchmakingService {
@@ -59,6 +63,7 @@ export class MatchmakingService {
 		const newUser: User = await this.usersRepository.findOne({ where: { id: userId } })
 		if (!newUser)
 			throw new Error(`[LEAVEQUEUE]: user not found`);
+		userInMatchmaking[userId] = false;
 		newUser.inMatchmaking = false;
 		if (newUser.inSpeedQueue === false) {
 			console.log(`LEAVE NORMAL QUEUE`);
