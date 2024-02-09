@@ -1,3 +1,4 @@
+import { useGlobal } from '@/app/GlobalContext';
 import './History.css'
 import React, { useEffect, useState } from 'react';
 
@@ -12,32 +13,49 @@ interface gameHistory {
 }
 
 const HistoryComponent: React.FC = () => {
+
+	const { globalState } = useGlobal();
 	const [gameHistory, setGameHistory] = useState<gameHistory[]>([]);
 	const handleGameHistory = async () => {
-		try {
-			const response = await fetch(`${process.env.API_URL}/users/getGameHistory/${sessionStorage.getItem("currentUserID")}`, {
-				method: 'GET',
-				headers: {
-					'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`
+			try {
+				const response = await fetch(`${process.env.API_URL}/users/getGameHistory/${sessionStorage.getItem("currentUserID")}`, {
+					method: 'GET',
+					headers: {
+						'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`
+					}
+				});
+		
+				if (response.ok) {
+					const gameHistoryData = await response.json();
+					setGameHistory([...gameHistoryData]);
 				}
-			});
-	
-			if (response.ok) {
-				const gameHistoryData = await response.json();
-				setGameHistory([...gameHistoryData]);
-			}
-			else {
-				console.log("Error");
-			}
+				else {
+					console.log("Error");
+				}
 
-		} catch (error) {
-			console.error(error);
-		}
+			} catch (error) {
+				console.error(error);
+			}
 	}
+
 	useEffect(() => {
+
+		
 		handleGameHistory();
 	}, []);
+	
+	useEffect(() => {
+		globalState.userSocket?.on('refreshGameHistory', () => {
+			handleGameHistory();
+		});
+
+		return () => {
+			globalState.userSocket?.off('refreshGameHistory');
+		}
+	}, [globalState?.userSocket]);
+
 	const timestamp = new Date()
+
 		return (
 			<div className='bloc-history-title'>
 				<div className="title-game"> HISTORY</div>

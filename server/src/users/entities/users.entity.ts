@@ -56,11 +56,11 @@ export class User {
 	@Column({ default: 0  })
 	defeat: number;
 
-	@Column("varchar", {
+	@Column("int", {
 		array: true,
 		default: null,
 	})
-	blockedUsers: string[];
+	blockedUsers: number[];
 
 	@ManyToMany(type => GroupMember, {
 		eager: true,

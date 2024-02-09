@@ -233,23 +233,6 @@ export class UsersService {
 	// 	return this.avatarService.getAvatarByID(user.avatarID);
 	//   }
 
-	// Testing purpose - Maybe future implementation
-	async createNewUser(username: string): Promise<User> {
-		const userToCreate = await this.usersRepository.findOne({ where: { username: username } });
-		if (!userToCreate) {
-			// const saltOrRounds = 10;
-			// password = await bcrypt.hash(password, saltOrRounds);
-			// const isMatch = await bcrypt.compare(password, hash);
-			const newUser = new User();
-			newUser.login = username;
-			newUser.firstname = username;
-			newUser.username = username;
-			newUser.officialProfileImage = "";
-			return await this.usersRepository.save(newUser);
-		}
-		throw new HttpException(`Username already used`, HttpStatus.BAD_REQUEST);
-	}
-
 	// async deleteUser(username: string) {
 	// 	const userToDelete = await this.usersRepository.findOne({ where: { username } });
 	// 	if (userToDelete) {
@@ -257,6 +240,24 @@ export class UsersService {
 	// 	}
 	// 	throw new NotFoundException();
 	// }
+
+	// // Testing purpose - Maybe future implementation
+	// async createNewUser(username: string): Promise<User> {
+	// 	const userToCreate = await this.usersRepository.findOne({ where: { username: username } });
+	// 	if (!userToCreate) {
+	// 		// const saltOrRounds = 10;
+	// 		// password = await bcrypt.hash(password, saltOrRounds);
+	// 		// const isMatch = await bcrypt.compare(password, hash);
+	// 		const newUser = new User();
+	// 		newUser.login = username;
+	// 		newUser.firstname = username;
+	// 		newUser.username = username;
+	// 		newUser.officialProfileImage = "";
+	// 		return await this.usersRepository.save(newUser);
+	// 	}
+	// 	throw new HttpException(`Username already used`, HttpStatus.BAD_REQUEST);
+	// }
+
 
 	async updateUserStatus(userID: number, flag: boolean): Promise<User> {
 
@@ -300,34 +301,43 @@ export class UsersService {
 		throw new HttpException('User not found', HttpStatus.BAD_REQUEST);
 	}
 
-	// async blockUser(blockUserDto: BlockUserDto): Promise<boolean> {
+	async blockUser(blockUserDto: BlockUserDto, userID: number): Promise<number> {
 
-	// 	const user : User = await this.usersRepository.findOne({ where: { username: blockUserDto.initiatorLogin } });
-	// 	const userToBlock : User = await this.usersRepository.findOne({ where: {username: blockUserDto.recipientLogin } });
+		const user = await this.usersRepository.findOne({ where: { id: userID } });
+		const userToBlock = await this.usersRepository.findOne({ where: { id: blockUserDto.recipientID } });
 
-	// 	if (user && userToBlock) {
-	// 		user.blockedUsers.push(userToBlock.login);
-	// 		await this.usersRepository.save(user);
-	// 		return true;
-	// 	}
+		if (user && userToBlock) {
 
-	// 	throw new Error("Fatal error");
-	// }
+			user.blockedUsers.forEach((id: number) => {
+				if (id === userToBlock.id) {
+					throw new HttpException('User is blocked', HttpStatus.BAD_REQUEST);
+				}
+			});
 
-	// async unblockUser(blockUserDto: BlockUserDto): Promise<boolean> {
+			user.blockedUsers.push(userToBlock.id);
+			await this.usersRepository.save(user);
+			return userToBlock.id;
+		}
 
-	// 	const user : User = await this.usersRepository.findOne({ where: { username: blockUserDto.initiatorLogin } });
-	// 	const userToUnblock : User = await this.usersRepository.findOne({ where: {username: blockUserDto.recipientLogin } });
+		throw new HttpException('User not found', HttpStatus.BAD_REQUEST);
+	}
 
-	// 	if (user && userToUnblock) {
-	// 		const filter = user.blockedUsers.filter((user: string) => user != userToUnblock.login);
-	// 		user.blockedUsers = filter;
-	// 		await this.usersRepository.save(user);
-	// 		return true;
-	// 	}
+	async unblockUser(blockUserDto: BlockUserDto, userID: number): Promise<number> {
 
-	// 	throw new Error("Fatal error");
-	// }
+		const user: User = await this.usersRepository.findOne({ where: { id: userID } });
+		const userToUnblock: User = await this.usersRepository.findOne({ where: { id: blockUserDto.recipientID } });
+
+		if (user && userToUnblock) {
+			const filter = user.blockedUsers.filter((user: number) => user != userToUnblock.id);
+			user.blockedUsers = filter;
+			await this.usersRepository.save(user);
+			return userToUnblock.id;
+		}
+
+		throw new HttpException('User not found', HttpStatus.BAD_REQUEST);
+	}
+
+
 
 	/**************************************************************/
 	/***				GAMES MANAGEMENT						***/
@@ -540,41 +550,7 @@ export class UsersService {
 		throw new HttpException('Fatal error', HttpStatus.BAD_REQUEST);
 	}
 
-	async blockUser(blockUserDto: BlockUserDto, userID: number): Promise<boolean> {
 
-		const user = await this.usersRepository.findOne({ where: { id: userID } });
-		const userToBlock = await this.usersRepository.findOne({ where: { username: blockUserDto.recipientLogin } });
-
-		if (user && userToBlock) {
-
-			user.blockedUsers.forEach((username: string) => {
-				if (username === userToBlock.username) {
-					throw new HttpException('User already blocked', HttpStatus.BAD_REQUEST);
-				}
-			});
-
-			user.blockedUsers.push(userToBlock.login);
-			await this.usersRepository.save(user);
-			return true;
-		}
-
-		throw new HttpException('User not found', HttpStatus.BAD_REQUEST);
-	}
-
-	async unblockUser(blockUserDto: BlockUserDto, userID: number): Promise<boolean> {
-
-		const user: User = await this.usersRepository.findOne({ where: { id: userID } });
-		const userToUnblock: User = await this.usersRepository.findOne({ where: { username: blockUserDto.recipientLogin } });
-
-		if (user && userToUnblock) {
-			const filter = user.blockedUsers.filter((user: string) => user != userToUnblock.login);
-			user.blockedUsers = filter;
-			await this.usersRepository.save(user);
-			return true;
-		}
-
-		throw new HttpException('User not found', HttpStatus.BAD_REQUEST);
-	}
 
 	/**************************************************************/
 	/***					GETTERS						***/
@@ -626,8 +602,8 @@ export class UsersService {
 					.map((user_: User) => {
 						let blockStatus = false;
 
-						user.blockedUsers.forEach((blockedFriend: string) => {
-							if (blockedFriend === user_.username) {
+						user.blockedUsers.forEach((blockedFriend: number) => {
+							if (blockedFriend === user_.id) {
 								blockStatus = true;
 							}
 						});
@@ -676,8 +652,8 @@ export class UsersService {
 			const friendships = [...initiatedFriends, ...acceptedFriends];
 			friendships.forEach((element: Friendship) => {
 				let blockStatus = false;
-				user.blockedUsers.forEach((blockedFriend: string) => {
-					if (blockedFriend == (element.friend ? element.friend.username : element.initiator ? element.initiator.username : '')) {
+				user.blockedUsers.forEach((blockedFriend: number) => {
+					if (blockedFriend == (element.friend ? element.friend.id: element.initiator ? element.initiator.id : null)) {
 						blockStatus = true;
 					}
 				});
@@ -711,8 +687,8 @@ export class UsersService {
 			let array = [];
 			acceptedFriends.forEach((element: Friendship) => {
 				let blockStatus = false;
-				user.blockedUsers.forEach((blockedFriend: string) => {
-					if (blockedFriend == (element.initiator.username)) {
+				user.blockedUsers.forEach((blockedFriend: number) => {
+					if (blockedFriend == (element.initiator.id)) {
 						blockStatus = true;
 					}
 				});

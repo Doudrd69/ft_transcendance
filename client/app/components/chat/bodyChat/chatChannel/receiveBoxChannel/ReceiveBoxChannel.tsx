@@ -138,6 +138,7 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 			chatDispatch({ type: 'ACTIVATE', payload: 'showChannelList' });
 		});
 
+		// event emitted after a joinRoom (new user in channel, updated username)
 		globalState.userSocket?.on('refresh_channel', () => {
 			loadUserList();
 		});

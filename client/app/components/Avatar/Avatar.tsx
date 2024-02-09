@@ -46,8 +46,10 @@ const AvatarImageComponent: React.FC<AvatarImageProps> = ({ className, refresh, 
 	useEffect(() => {
 		fetchAvatar();
 	}, [globalState.showUploadAvatar]);
+
+
 	return (
-					<img src={url} className={className} alt="User Avatar" />	
+					<img src={url} className={className} alt="User0 Avatar" />	
 	);
 };
 

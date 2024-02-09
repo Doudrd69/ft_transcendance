@@ -60,7 +60,7 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 
 				const blockedUsers = await this.userService.getBlockedUserList(userID);
 				if (blockedUsers) {
-					blockedUsers.forEach((blockedUser: string) => {
+					blockedUsers.forEach((blockedUser: number) => {
 						client.join(`whoblocked${blockedUser}`)
 					})
 				}
@@ -87,7 +87,7 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 
 				const blockedUsers = await this.userService.getBlockedUserList(userID);
 				if (blockedUsers) {
-					blockedUsers.forEach((blockedUser: string) => {
+					blockedUsers.forEach((blockedUser: number) => {
 						client.leave(`whoblocked${blockedUser}`)
 					})
 				}
@@ -186,9 +186,11 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 			else
 				client.join(roomName);
 
-			// event pour refresh la userList d'un channel
+			// event to refresh the user list of a channel
 			this.server.to(roomName + roomID).emit('refresh_channel');
+			// event to refresh the global user list
 			this.server.emit('refreshGlobalUserList');
+			this.server.emit('refreshChannelList');
 			this.server.emit('refreshFriends');
 
 			return;
@@ -209,10 +211,11 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		else
 			client.leave(roomName);
 
-		// event pour refresh la userList d'un channel
+		// event to refresh the user list of a channel
 		this.server.to(roomName + roomID).emit('refresh_channel');
-		this.server.emit('refreshChannelList');
+		// event to refresh the global user list
 		this.server.emit('refreshGlobalUserList');
+		this.server.emit('refreshChannelList');
 		this.server.emit('refreshFriends');
 		this.server.to(roomName + roomID).emit('refreshOptionsUserChannel');
 		return;
@@ -360,6 +363,15 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 				console.log(`[check de l'existence des users] : les deux id sont bien la`);
 				return;
 			}
+
+			// Check if the sender is blocked by the recipient
+			targetToInvite.blockedUsers.forEach((user: number) => {
+				if (user == emitUserId) {
+					console.log("User is blocked");
+					throw new Error("User is blocked");
+				}
+			});
+
 			//clé unique basée sur emitUserId et targetUserId
 			const uniqueKey =  `${Math.min(emitUserId, targetUserId)}-${Math.max(emitUserId, targetUserId)}`
 			// check si les deux users sont deja en game
@@ -538,21 +550,26 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	@UseGuards(GatewayGuard)
 	handleUserBan(@MessageBody() data: { userToBan: string, roomName: string, roomID: string }) {
 		const { userToBan, roomName, roomID } = data;
-		console.log(userToBan);
+		// on pourrait rajouter une verif du back
+		// This event aims to disable showChannel and to make the targeted user to leave the room
 		this.server.to(userToBan).emit('userIsBan', {
 			roomName: roomName,
 			roomID: roomID,
 		});
+		this.server.emit('refreshChannelList');
 	}
+
 	@SubscribeMessage('unbanUser')
 	@UseGuards(GatewayGuard)
 	handleUserUnban(@MessageBody() data: { userToUnban: string, roomName: string, roomID: string }) {
 		const { userToUnban, roomName, roomID } = data;
-		console.log(userToUnban);
+		// on pourrait rajouter une verif du back
+		// This event aims to make the targeted user to rejoin the room
 		this.server.to(userToUnban).emit('userIsUnban', {
 			roomName: roomName,
 			roomID: roomID,
 		});
+		this.server.emit('refreshChannelList');
 	}
 
 	@SubscribeMessage('deleteChannel')
@@ -600,14 +617,10 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	@UseGuards(GatewayGuard)
 	handleUserRefresh(@MessageBody() data: { userToRefresh: string, target: string, status: boolean }) {
 		const { userToRefresh, target, status } = data;
-		this.server.emit('refresh_channel');
+		// custom event to refresh on a particular user room
 		this.server.to(userToRefresh).emit(target, status);
-	}
-
-	@SubscribeMessage('userJoinedChannel')
-	@UseGuards(GatewayGuard)
-	handleRefreshUserSearchList(@MessageBody() roomName: string) {
-		this.server.to(roomName).emit('refreshChannelList');
+		// event to refresh the user list of a channel
+		this.server.emit('refresh_channel');
 	}
 
 	@SubscribeMessage('refreshHeader')
@@ -622,6 +635,19 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		this.server.emit('refreshFriends');
 		this.server.emit('refreshGlobalUserList');
 		this.server.emit('refreshDmList');
+		this.server.emit('refreshChannelList');
+		// this.server.emit('refresh_channel');
+	}
+
+	@SubscribeMessage('refreshAvatar')
+	@UseGuards(GatewayGuard)
+	handleRefreshAvatar() {
+		this.server.emit('refreshFriends');
+		this.server.emit('refreshGlobalUserList');
+		this.server.emit('refreshDmList');
+		this.server.emit('refreshChannelList');
+		this.server.emit('refresh_channel');
+		this.server.emit('refreshGameHistory');
 	}
 
 	@SubscribeMessage('emitNotification')

@@ -214,7 +214,7 @@ export class ChatService {
 				if (group.conversation.id == conversationID) {
 					if (group.conversation.is_channel) {
 						array.push({
-							login: user_.login,
+							login: user_.username,
 							avatarURL: user_.avatarURL,
 							isAdmin: group.isAdmin,
 							isMute: group.isMute,
@@ -246,7 +246,8 @@ export class ChatService {
 			if (group) {
 
 				const messages = await this.messageRepository.find({ where: {conversation: conversation}});
-				const filteredMessages = messages.filter((message: Message) => !user.blockedUsers.includes(message.from));
+				console.log(user.blockedUsers);
+				const filteredMessages = messages.filter((message: Message) => !user.blockedUsers.includes(message.senderId));
 				return filteredMessages;
 			}
 
@@ -956,7 +957,6 @@ export class ChatService {
 	}
 
 	async kickUserFromConversation(kickUserDto: kickUserDto, userID: number) {
-
 
 		const userToKick : User = await this.usersRepository.findOne({
 			where: { id: kickUserDto.userToKickID },

@@ -38,8 +38,7 @@ const ProfilsSettingsComponent: React.FC = () => {
 				const userName = await response.json();
 				const { newUsername } = userName;
 				sessionStorage.setItem("currentUserLogin", newUsername);
-				globalState.userSocket?.emit('joinRoom',  { roomName: sessionStorage.getItem("currentUserLogin"), roomID: '' });
-				globalState.userSocket?.emit('refreshUserChannelList', { userToRefresh: newUsername });
+				globalState.userSocket?.emit('joinRoom',  { roomName: newUsername, roomID: '' });
 				globalState.userSocket?.emit('refreshUserList');
 				globalState.userSocket?.emit('refreshHeader');
 				toast.success('Username has been updated');
@@ -76,6 +75,7 @@ const ProfilsSettingsComponent: React.FC = () => {
 					dispatch({ type: 'ACTIVATE', payload: 'showAvatar' });
 					dispatch({ type: 'DISABLE', payload: 'showUploadAvatar' });
 					dispatch({ type: 'TOGGLEX', payload: 'showRefresh'});
+					globalState.userSocket?.emit('refreshAvatar');
 				}
 				else {
 					const error = await response.json();

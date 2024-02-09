@@ -16,7 +16,7 @@ interface User {
 	isMute: boolean;
 	isBan: boolean;
 	isOwner: boolean;
-	blockList: string[];
+	blockList: number[];
 }
 
 interface OptionsUserChannelProps {
@@ -50,9 +50,9 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 
 	
 	const blockUser = async() => {
+
 		const BlockUserDto = {
-			initiatorLogin: sessionStorage.getItem("currentUserLogin"),
-			recipientLogin: user.login,
+			recipientID: user.id,
 		}
 
 		const response = await fetch(`${process.env.API_URL}/users/blockUser`, {
@@ -67,8 +67,9 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 		if (response.ok) {
 			if (!block)
 				setBlock(true);
-			if (globalState.userSocket && chatState.currentConversation && chatState.currentConversationID) {
-				globalState.userSocket?.emit('joinRoom', { roomName: `whoblocked${user.login}`, roomID: '' } );
+			const userToBlock = await response.json();
+			if (userToBlock && globalState.userSocket && chatState.currentConversation && chatState.currentConversationID) {
+				globalState.userSocket?.emit('joinRoom', { roomName: `whoblocked${userToBlock}`, roomID: '' } );
 			}
 		}
 		else {
@@ -83,8 +84,7 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 	const unblockUser = async() => {
 
 		const BlockUserDto = {
-			initiatorLogin: sessionStorage.getItem("currentUserLogin"),
-			recipientLogin: user.login,
+			recipientID: user.id,
 		}
 
 		const response = await fetch(`${process.env.API_URL}/users/unblockUser`, {
@@ -99,8 +99,9 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 		if (response.ok) {
 			if (block)
 				setBlock (false);
-			if (globalState.userSocket && chatState.currentConversation && chatState.currentConversationID) {
-				globalState.userSocket?.emit('leaveRoom', { roomName: `whoblocked${user.login}`, roomID: '' } );
+			const userToUnblock = await response.json();
+			if (userToUnblock && globalState.userSocket && chatState.currentConversation && chatState.currentConversationID) {
+				globalState.userSocket?.emit('leaveRoom', { roomName: `whoblocked${userToUnblock}`, roomID: '' } );
 			}
 		}
 		else {
@@ -163,7 +164,6 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 
 		try{
 
-
 			const userOptionDto = {
 				conversationID: Number(chatState.currentConversationID),
 				target: user.id,
@@ -185,11 +185,14 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 				setBan(true);
 
 				if (chatState.currentConversation) {
+
+					// event to disable showChannel for banned user and refresh channel list
 					globalState.userSocket?.emit('banUser', {
 						userToBan: user.login,
 						roomName: chatState.currentConversation,
 						roomID: chatState.currentConversationID
 					});
+
 					globalState.userSocket?.emit('emitNotification', {
 						channel: chatState.currentConversation + chatState.currentConversationID,
 						content: `${user.login} has been ban`,
@@ -235,6 +238,7 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 				setBan(false);
 
 				if (chatState.currentConversation) {
+					// // event to 
 					globalState.userSocket?.emit('unbanUser', {
 						userToUnban: user.login,
 						roomName: chatState.currentConversation,
@@ -290,6 +294,7 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 						channelID: chatState.currentConversationID,
 					});
 	
+					// emit sur un refreshd e channel?
 					globalState.userSocket?.emit('refreshUser', {
 						userToRefresh: user.login,
 						target: 'refreshAdmin',
@@ -346,6 +351,7 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 					});
 
 
+					// emit sur un refresh de channel
 					globalState.userSocket?.emit('refreshUser', {
 						userToRefresh: user.login,
 						target: 'refreshAdmin',
@@ -432,6 +438,7 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 				},
 				body: JSON.stringify(KickConversationDto),
 			});
+
 			if (response.ok) {
 					chatDispatch({ type: 'ACTIVATE', payload: 'showBackComponent' });
 					chatDispatch({ type: 'DISABLE', payload: 'showOptionsUserChannel' });
@@ -548,6 +555,7 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 		chatDispatch({ type: 'DISABLE', payload: 'showOptionsUserChannelOwner' });
 		chatDispatch({ type: 'ACTIVATE', payload: 'showBackComponent' });	
 	};
+
 	useEffect(() => {
 	
 	

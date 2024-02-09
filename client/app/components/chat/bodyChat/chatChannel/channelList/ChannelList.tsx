@@ -76,20 +76,11 @@ const ChannelListComponent: React.FC = () => {
 
 	useEffect(() => {
 
-		globalState.userSocket?.on('userIsBan', ( data: { roomName: string, roomID: number} ) => {
-			const { roomName, roomID } = data;
-			loadDiscussions();
-		});
-
 		globalState.userSocket?.on('channelDeleted', ( data: {roomName: string, roomID: string} ) => {
 			const { roomName, roomID } = data;
 			loadDiscussions();
 			globalState.userSocket?.emit('leaveRoom', { roomName: roomName, roomID: roomID });
 			chatDispatch({ type: 'ACTIVATE', payload: 'showChannelList' });
-		});
-
-		globalState.userSocket?.on('userIsUnban', () => {
-			loadDiscussions();
 		});
 
 		globalState.userSocket?.on('refreshChannelList', () => {
@@ -105,13 +96,10 @@ const ChannelListComponent: React.FC = () => {
 		});
 
 		return () => {
-			globalState.userSocket?.off('banUser');
 			globalState.userSocket?.off('refreshChannelList');
 			globalState.userSocket?.off('channelDeleted');
 			globalState.userSocket?.off('refreshChannelListBis');
 			globalState.userSocket?.off('refreshAdmin');
-			globalState.userSocket?.off('userIsBan');
-			globalState.userSocket?.off('userIsUnban');
 		}
 
 	}, [globalState?.userSocket]);
@@ -146,6 +134,8 @@ const ChannelListComponent: React.FC = () => {
 		chatDispatch({ type: 'SET_CURRENT_CONVERSATION_IS_PROTECTED', payload: conversation.isProtected });
 		chatDispatch({ type: 'ACTIVATE', payload: 'currentChannelBool' });
 		chatDispatch({ type: 'ACTIVATE', payload: 'dontcancel' });
+		chatDispatch({ type: 'DISABLE', payload: 'showOptionsUserChannel' });
+		chatDispatch({ type: 'DISABLE', payload: 'showOptionsChannel' });
 		if(isAdmin[index])
 		{
 			chatDispatch({ type: 'ACTIVATE', payload: 'showAdmin' });
@@ -153,7 +143,7 @@ const ChannelListComponent: React.FC = () => {
 		}
 		const me = user.filter((user: User) => user.login === sessionStorage.getItem("currentUserLogin"));
 
-		if(me[0].isOwner)
+		if(me && me[0].isOwner)
 			chatDispatch({ type: 'ACTIVATE', payload: 'isOwner' });
 		
 		chatDispatch({ type: 'DISABLE', payload: 'showChannelList' });
