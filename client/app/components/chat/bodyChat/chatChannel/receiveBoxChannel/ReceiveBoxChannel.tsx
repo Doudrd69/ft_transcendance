@@ -23,7 +23,7 @@ interface User {
 	isMute: boolean;
 	isBan: boolean;
 	isOwner: boolean;
-	blockList: string[];
+	blockList: number[];
 }
 
 const ReceiveBoxChannelComponent: React.FC = () => {

@@ -41,7 +41,7 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 	const [funtionToExecute, setFunctionToExecute] = useState<() => void>(() => { });
 	const [gameSocketConnected, setgameSocketConnected] = useState<boolean>(false);
 	const [gameInviteValidation, setgameInviteValidation] = useState<boolean>(false);
-	const [block, setBlock] = useState<boolean>(!!me.blockList.find((userblock) => userblock === user.login));
+	const [block, setBlock] = useState<boolean>(!!me.blockList.find((userblock) => userblock === user.id));
 	
 	// console.log(chatState);
 	// if (me && me.blockList) {
