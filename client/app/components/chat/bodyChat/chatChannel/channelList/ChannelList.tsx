@@ -134,6 +134,8 @@ const ChannelListComponent: React.FC = () => {
 		chatDispatch({ type: 'SET_CURRENT_CONVERSATION_IS_PROTECTED', payload: conversation.isProtected });
 		chatDispatch({ type: 'ACTIVATE', payload: 'currentChannelBool' });
 		chatDispatch({ type: 'ACTIVATE', payload: 'dontcancel' });
+		chatDispatch({ type: 'DISABLE', payload: 'showOptionsUserChannel' });
+		chatDispatch({ type: 'DISABLE', payload: 'showOptionsChannel' });
 		if(isAdmin[index])
 		{
 			chatDispatch({ type: 'ACTIVATE', payload: 'showAdmin' });

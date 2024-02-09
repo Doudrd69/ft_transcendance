@@ -114,6 +114,7 @@
 	flex-direction: row;
 	align-items: center;
 	width: 100%;
+	overflow-x: scroll;
 }
 
 .list-users-channel-owner{
@@ -121,6 +122,7 @@
 	display: flex;
 	flex-direction: row;
 	align-items: center;
+	overflow-x: scroll;
 }
 
 
@@ -129,7 +131,6 @@
 	height: auto;
 	margin: 10px;
 	margin-top: 0px;
-	overflow-x: scroll;
 }
 .img-list-users-channel{
 	width: 40px;
