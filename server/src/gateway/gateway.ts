@@ -10,6 +10,7 @@ import { HttpException, HttpStatus, UseGuards } from '@nestjs/common'
 import { Req } from '@nestjs/common'
 import dotenv from 'dotenv';
 import { userInGame } from 'src/game/matchmaking/matchmaking.service';
+import e from 'express';
 
 dotenv.config();
 
@@ -20,7 +21,7 @@ export interface GameInviteDto {
 	isAcceptedTargetUser: boolean,
 }
 
-export const gameQueue: GameInviteDto[] = [];
+export const gameQueue: { [key: string]: GameInviteDto } = {};``
 
 @WebSocketGateway({
 	namespace: 'user',
@@ -203,7 +204,6 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		const { roomName, roomID } = data;
 		console.log("==== leaveRoom Event ====");
 		console.log("Remove ", "[", client.id, "]", " to room : ", roomName + roomID);
-
 		if (roomID)
 			client.leave(roomName + roomID);
 		else
@@ -214,7 +214,7 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		this.server.emit('refreshChannelList');
 		this.server.emit('refreshGlobalUserList');
 		this.server.emit('refreshFriends');
-
+		this.server.to(roomName + roomID).emit('refreshOptionsUserChannel');
 		return;
 	}
 
@@ -251,23 +251,30 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 
 	@SubscribeMessage('checkAndsetInGame')
 	@UseGuards(GatewayGuard)
-	async checkAndSetInGame(@ConnectedSocket() client: Socket, @MessageBody() data: { opponentUserId: number }) {
+	async checkAndSetInGame(@ConnectedSocket() client: Socket, @MessageBody()  targetUserId: number) {
 		try {
 			// check si opponent 
-			const userId = client.handshake.auth.user.sub;
-			const otherUser = await this.userService.getUserByID(data.opponentUserId);
-			const user = await this.userService.getUserByID(userId);
-			console.log(`[checkAndsetInGame] : otherUserIsActive: ${otherUser.isActive}, userActive: ${user.isActive}`)
-			if (await this.userService.usersInGame(userId, data.opponentUserId) || !otherUser.isActive || !user.isActive) {
+			const emitUserId = client.handshake.auth.user.sub;
+			const EmitUser = await this.userService.getUserByID(emitUserId);
+			const targetUser = await this.userService.getUserByID(targetUserId);
+			if (!emitUserId || !targetUser.id || !EmitUser || (emitUserId === targetUserId))
+			{
+				console.log(`[check de l'existence des users] : les deux id sont bien la`);
+				return;
+			}
+
+			console.log(`[checkAndsetInGame] : otherUserIsActive: ${targetUser.isActive}, userActive: ${EmitUser.isActive}`)
+			if (await this.userService.usersInGame(emitUserId, targetUserId) || !targetUser.isActive || !EmitUser.isActive) {
 				console.log(`users already inGame or Inactive`);
 				return;
 			}
-			await this.userService.setUsersInGame(userId, data.opponentUserId)
+			await this.userService.setUsersInGame(emitUserId, targetUserId)
 			this.server.to(client.id).emit('usersNotInGame');
 		} catch (error) {
 			console.log(`[GAME INVITE ERROR]: ${error.stack}`)
 		}
 	}
+
 
 	@SubscribeMessage('checkAndSetUserInMatchmaking')
 	@UseGuards(GatewayGuard)
@@ -303,90 +310,69 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	@UseGuards(GatewayGuard)
 	async inviteUserToGame(@ConnectedSocket() client: Socket, @MessageBody() targetUserId: number) {
 		try {
-			console.log(`[gameQueue] : ${gameQueue}`)
-			
 			const emitUserId = client.handshake.auth.user.sub;
 			const targetToInvite = await this.userService.getUserByID(targetUserId);
-			// check si la paire existe deja
-			const existingPair = gameQueue.find(invite => 
-				invite.emitUserId === emitUserId && invite.targetUserId === targetUserId 
-				||
-				invite.emitUserId === targetUserId && invite.targetUserId === emitUserId
-			);
-			// check si les deux users existent et sont bien differents
 			if (!emitUserId || !targetToInvite.id || (emitUserId === targetToInvite.id))
 			{
 				console.log(`[check de l'existence des users] : les deux id sont bien la`);
 				return;
 			}
-			// Supprimer un élément de la file
-			const removeFromGameQueue = (item: GameInviteDto) => {
-				const index = gameQueue.indexOf(item);
-				if (index !== -1) {
-					gameQueue.splice(index, 1);
-				}
-			};
-			if (existingPair)
-				console.log(`[existingPair] : ${existingPair.isAcceptedTargetUser} | ${existingPair.isAcceptedEmitUser}`)
-			console.log(`[emitUserId] : ${emitUserId}`)
-			console.log(`[targetUserId] : ${targetUserId}`)
-			// fonction pour savoir si une paire existe deja
-
-
+			//clé unique basée sur emitUserId et targetUserId
+			const uniqueKey =  `${Math.min(emitUserId, targetUserId)}-${Math.max(emitUserId, targetUserId)}`
 			// check si les deux users sont deja en game
 			if (await this.userService.usersInGame(emitUserId, targetUserId)) {
 				this.server.to(client.id).emit('usersInGame');
 				console.log(`[check si l'un des deux users sont deja en game] : l'un des deux users sont deja en game`);
 				return;
 			}
-			const existingMyPair = gameQueue.find(invite => 
-				invite.emitUserId === targetUserId && invite.targetUserId === emitUserId
-			);
-			//creation d'une paire
-			const newGameInvite: GameInviteDto = {
-				emitUserId: emitUserId,
-				targetUserId: targetUserId,
-				isAcceptedEmitUser: true,
-				isAcceptedTargetUser: existingMyPair ? true : false,
-			};
-			console.log(`[newGameInviteId] : ${newGameInvite.emitUserId} | ${newGameInvite.targetUserId}`)
-			console.log(`[newGameInviteState] : ${newGameInvite.isAcceptedEmitUser} | ${newGameInvite.isAcceptedTargetUser}`)
+			var newPair: GameInviteDto;
+			if (uniqueKey in gameQueue) {
+				const existingPair = gameQueue[uniqueKey];
+				const isInvitedByExistingUser = existingPair.emitUserId !== emitUserId;
+				newPair = {
+					emitUserId: emitUserId,
+					targetUserId: targetUserId,
+					isAcceptedEmitUser: true,
+					isAcceptedTargetUser: isInvitedByExistingUser || existingPair.isAcceptedTargetUser,
+				};
+			} else {
+				newPair = {
+					emitUserId: emitUserId,
+					targetUserId: targetUserId,
+					isAcceptedEmitUser: true,
+					isAcceptedTargetUser: false,
+				};
+			}
 
-
-			if (!existingPair) {
-				//si la paire n'existe pas, on la push dans le tableau et on emet l'event
-				console.log(`[existingPair] : pair does not exist`);
-
-				gameQueue.push(newGameInvite);
-				setTimeout(() => {
-					// Supprime l'invitation après 5 secondes 
-					//pour etre bien sur que le gameInvite ne soit pas fait par POSTMAN
-					//la on a un genre de emit croisé avec un char russe
-					removeFromGameQueue(newGameInvite);
-				}, 5000);
+			//LA PAIR EXISTE DEJA
+			if (uniqueKey in gameQueue) {
+				gameQueue[uniqueKey] = newPair;
+				if (newPair && newPair.isAcceptedTargetUser && newPair.isAcceptedEmitUser) {
+					console.log(`[La target a fait aussi la demande] : il faut lancer la game`);
+					return;
+				}
+				else {
+					console.log(`[forceur] : Enorme Forceur`);
+					return;
+				}
+			}
+			else //  LA PAIRE N'EXISTE PAS
+			{
+				console.log('===============>La clé n\'existe pas dans gameQueue.');
+				gameQueue[uniqueKey] = newPair;
+				console.log(`[creatPair] : ${gameQueue[uniqueKey].isAcceptedEmitUser} |  ${gameQueue[uniqueKey].isAcceptedTargetUser}`)
 				this.server.to(targetToInvite.username).emit('gameInvite', {
 					senderUsername: client.handshake.auth.user.username,
 					senderUserID: emitUserId,
 				});
 			}
-
-			else {
-				console.log(`[gameQueue] : ${newGameInvite.isAcceptedEmitUser} | ${newGameInvite.isAcceptedTargetUser}`)
-				//si la paire existe, on check si la target a deja fait la demande
-				if (existingPair && newGameInvite.isAcceptedTargetUser && newGameInvite.isAcceptedEmitUser) {
-					//si en gros il font l'invite en meme temps dans les 5s du toast, meme si il n'accepte pas 
-					//les deux seront ajouter a une game automatiquement
-					// creer leurs 2 sockets et donc un emit sur l'autre pour qu'il se cree sa gameSocket, puis on revient sur le sender pour qu'il cree sa gameSocket et qu'il lance la game.
-					console.log(`[La target a fait aussi la demande] : il faut lancer la game`);
-					return;
-				}
-
-				else {
-					//sinon ca veut dire que tu spam alors arrete forceur
-					console.log(`[existingPair] : Enorme Forceur`);
-					return;
-				}
-			}
+			setTimeout(() => {
+				if (gameQueue.hasOwnProperty(uniqueKey)) {
+					delete gameQueue[uniqueKey];
+					console.log('La paire a été supprimée de la queue.');
+				} else {
+					console.log('La clé spécifiée n\'existe pas dans la queue.');
+			}}, 5000);
 		}
 		catch (error) {
 			console.log(`[GAME INVITE ERROR]: ${error.stack}`)
@@ -412,15 +398,13 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 			const emitUserId = client.handshake.auth.user.sub;
 			console.log(`[emitUserId] : ${emitUserId}`)
 			console.log(`[targetUserId] : ${targetUserId}`)
-			const indexToDelete = gameQueue.findIndex(invite => 
-				(invite.emitUserId === emitUserId && invite.targetUserId === targetUserId) ||
-				(invite.emitUserId === targetUserId && invite.targetUserId === emitUserId)
-			);	
-			// Vérifiez si existingPair a été trouvé dans gameQueue
-			if (indexToDelete !== -1) {
-				// Supprimez existingPair de gameQueue
-				const removedPair = gameQueue.splice(indexToDelete, 1);
-				console.log("Element supprimé de gameQueue :", removedPair);
+			const uniqueKey =  `${Math.min(emitUserId, targetUserId)}-${Math.max(emitUserId, targetUserId)}`
+			// Supprimez existingPair de gameQueue
+			if (gameQueue.hasOwnProperty(uniqueKey)) {
+				delete gameQueue[uniqueKey];
+				console.log('La paire a été supprimée de la queue.');
+			} else {
+				console.log('La clé spécifiée n\'existe pas dans la queue.');
 			}
 		} catch (error) {
 			console.log(`[GAME INVITE ERROR]: ${error.stack}`)
@@ -515,7 +499,6 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 			roomID: roomID,
 		});
 	}
-
 	@SubscribeMessage('unbanUser')
 	@UseGuards(GatewayGuard)
 	handleUserUnban(@MessageBody() data: { userToUnban: string, roomName: string, roomID: string }) {
@@ -549,9 +532,16 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 
 	@SubscribeMessage('refreshUserChannelList')
 	@UseGuards(GatewayGuard)
-	handleRefresh(@MessageBody() data: { userToRefresh: string }) {
+	handleRefresh(@MessageBody() data: { roomName: string, roomID: string }) {
+		const { roomName, roomID } = data;
+		this.server.to(roomName + roomID).emit('refreshChannelList');
+	}
+
+	@SubscribeMessage('refreshOptionsUserChannel')
+	@UseGuards(GatewayGuard)
+	handleRefreshOption(@MessageBody() data: { userToRefresh: string }) {
 		const { userToRefresh } = data;
-		this.server.to(userToRefresh).emit('refreshChannelList');
+		this.server.to(userToRefresh).emit('refreshOption');
 	}
 
 	@SubscribeMessage('refreshChannelList')

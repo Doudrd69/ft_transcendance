@@ -28,6 +28,7 @@ const MatchMaking = () => {
 				type: 'TOGGLE',
 				payload: 'showGame',
 			});
+			// globalState.gameSocket?.emit('playerJoined', { gameId: game.gameId })
 			state.showGame = true;
 		});
 		globalState.gameSocket?.on('gameInProgress', () => {

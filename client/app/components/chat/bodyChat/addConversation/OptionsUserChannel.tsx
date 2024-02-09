@@ -48,6 +48,7 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 	// 	setBlock (!!me.blockList.find((userblock) => userblock === user.login));
 	// }
 
+	
 	const blockUser = async() => {
 		const BlockUserDto = {
 			initiatorLogin: sessionStorage.getItem("currentUserLogin"),
@@ -541,6 +542,24 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 			document.removeEventListener('keydown', handleEscape);
 		};
 	}, []);
+
+	const handleRefreshOptionsUserChannel = () => {
+		chatDispatch({ type: 'DISABLE', payload: 'showOptionsUserChannel' });
+		chatDispatch({ type: 'DISABLE', payload: 'showOptionsUserChannelOwner' });
+		chatDispatch({ type: 'ACTIVATE', payload: 'showBackComponent' });	
+	};
+	useEffect(() => {
+	
+	
+		// Abonnez-vous à l'événement refreshOptionsUserChannel
+		globalState.userSocket?.on('refreshOptionsUserChannel', handleRefreshOptionsUserChannel);
+	
+		// Nettoyez l'abonnement lorsque le composant est démonté
+		return () => {
+			globalState.userSocket?.off('refreshOptionsUserChannel', handleRefreshOptionsUserChannel);
+		};
+	  }, [globalState?.userSocket]);
+
 
 	return (
 		<>
