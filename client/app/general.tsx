@@ -51,11 +51,13 @@ const GeneralComponent = () => {
 
 	// GAME INVITE
 
+
 	// si j'inivte est ce que je peux check que j'ai bien invite?
 	const gameInviteValidation = (gameInviteDto: GameInviteDto) => {
 		globalState.userSocket?.off('usersNotInGame');
 		globalState.userSocket?.emit('checkAndsetInGame', gameInviteDto.senderUserID)
-		globalState.userSocket?.on('usersNotInGame', () => {
+		globalState.userSocket?.on('usersNotInGame', (otherUserId: number) => {
+			console.log("=============================================>");
 			const gameSocket = io(`${process.env.API_URL}/game`, {
 				autoConnect: false,
 				auth: {
@@ -66,13 +68,40 @@ const GeneralComponent = () => {
 			dispatch({ type: 'SET_GAME_SOCKET', payload: gameSocket });
 			gameSocket.on('connect', () => {
 				globalState.userSocket?.emit('inviteAccepted', {
-					otherUserId: gameInviteDto.senderUserID,
+					otherUserId: otherUserId,
 					userGameSocketId: gameSocket.id,
 				});
 			});
 			return;
 		})
 	}
+
+	useEffect(() => {
+		globalState.userSocket?.on('gameInviteDUO', (otherUserId: number) => {
+			console.log("=============================================>");
+			const gameSocket = io(`${process.env.API_URL}/game`, {
+				autoConnect: false,
+				auth: {
+					token: sessionStorage.getItem("jwt"),
+				}
+			});
+			gameSocket.connect();
+			dispatch({ type: 'SET_GAME_SOCKET', payload: gameSocket });
+			gameSocket.on('connect', () => {
+				console.log("otherUserId", otherUserId)
+				globalState.userSocket?.emit('inviteAccepted', {
+					otherUserId: otherUserId,
+					userGameSocketId: gameSocket.id,
+				});
+			});
+		}
+		);
+
+		return () => {
+			globalState.userSocket?.off('gameInviteDUO');
+		}; 
+	}), [globalState?.userSocket];
+
 
 	const gameInviteClosed = (targetUserId: number) => {
 		//le timeout qui etait precedemment dans le toast 
@@ -83,7 +112,7 @@ const GeneralComponent = () => {
 		globalState.userSocket?.emit('inviteClosed', targetUserId)
 	}
 
-	const gameInviteDeny = (gameInviteDto: GameInviteDto) => { 
+	const gameInviteDeny = (gameInviteDto: GameInviteDto) => {
 		globalState.userSocket?.emit('inviteDenied', {
 			senderUserId: gameInviteDto.senderUserID,
 		});
@@ -325,7 +354,7 @@ const GeneralComponent = () => {
 		});
 
 		globalState.userSocket?.on('gameInvite', (gameInviteDto: GameInviteDto) => {
-			toast(<GameInviteNotification gameInviteDto = {gameInviteDto} />,
+			toast(<GameInviteNotification gameInviteDto={gameInviteDto} />,
 				{
 					pauseOnFocusLoss: false,
 					autoClose: 5000,
@@ -406,6 +435,7 @@ const GeneralComponent = () => {
 			globalState.userSocket?.off('userInGame');
 			globalState.userSocket?.off('usersInGame');
 			globalState.userSocket?.off('userToInviteAlreadyInGame');
+			globalState.userSocket?.off('badsenderIdGameInvite');
 		};
 
 	}, [globalState?.gameSocket, globalState.gameInviteValidation, globalState?.userSocket, globalState.gameSocketConnected, globalState.userTwoIdGame, globalState.userTwoGameSocketId]);

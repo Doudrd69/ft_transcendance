@@ -185,8 +185,6 @@ export class GameService {
 			throw new Error(`[endOfGame not found Users]`);
 		UserOne.inGame = false;
 		UserTwo.inGame = false;
-		userInGame[gameInstance.usersId[0]] = false;
-		userInGame[gameInstance.usersId[1]] = false;
 		game.scoreOne = gameInstance.player1_score;
 		game.scoreTwo = gameInstance.player2_score;
 		if (game.scoreOne > game.scoreTwo) {
@@ -261,6 +259,15 @@ export class GameService {
 		// appeler une fonction qui l'enleve de matchmaking queue hophop
 		await this.usersRepository.save(user);
 	}
+	
+	async unsetUserInGame(userId: number) {
+		const user: User = await this.usersRepository.findOne({ where: { id: userId } })
+		if (!user)
+			throw new Error("user undefined")
+		userInGame[userId] = false;
+		user.inGame = false;
+		await this.usersRepository.save(user);
+	}
 
 	async getGameWithUserId(userId: number): Promise<Game> {
 		// console.log(`[${this.userGameSockets[userId]}] userId de ses morts gameWithUserLogin: ${userId}`);
@@ -297,8 +304,6 @@ export class GameService {
 	}
 
 	async updateStateGameForUsers(user: User, otherUser: User) {
-		userInGame[user.id] = false;
-		userInGame[otherUser.id] = false;
 		user.inGame = false;
 		otherUser.inGame = false;
 		await this.usersRepository.save(user);
@@ -314,13 +319,6 @@ export class GameService {
 		this.userGameSockets[userId] = null;
 	}
 
-	async updateStateGameForUser(user: User) {
-		// choper l'ID pour userInGame
-		userInGame[user.id] = false;
-		user.inGame = false;
-		await this.usersRepository.save(user);
-	}
-
 	async createGameStop(user1: User, user2: User, gameInstance: game_instance, disconnectedSockets: string[]) {
 		console.log("==== STOP GAME ====");
 		let game = new Game;
@@ -333,8 +331,6 @@ export class GameService {
 		game.gameEnd = false;
 		game.userOneId = gameInstance.usersId[0];
 		game.userTwoId = gameInstance.usersId[1];
-		userInGame[gameInstance.usersId[0]] = false;
-		userInGame[gameInstance.usersId[1]] = false;
 		user1.inGame = false;
 		user2.inGame = false;
 		if (disconnectedSockets.includes(gameInstance.players[1])) {
