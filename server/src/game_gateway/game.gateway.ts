@@ -15,6 +15,7 @@ import { User } from 'src/users/entities/users.entity';
 import dotenv from 'dotenv';
 import { Client } from 'socket.io/dist/client';
 import { gameQueue } from 'src/gateway/gateway';
+
 dotenv.config();
 
 export interface vector_instance {
