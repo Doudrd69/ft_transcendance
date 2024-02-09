@@ -47,7 +47,8 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	@WebSocketServer()
 	server: Server;
 
-	private connectedUsers: { [userId: string]: Socket } = {};
+	// we link a userID with its socket
+	private connectedUsers: { [userId: number]: string } = {};
 
 	private async userRejoinsRooms(client: Socket, userID: number) {
 
@@ -103,7 +104,7 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		}
 	}
 
-	private async notifyFriendList(userID: number, personnalRoom: string, status: string) {
+	private async notifyFriendList(userID: number, clientId: string, status: string) {
 
 		try {
 			let user;
@@ -121,11 +122,11 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 
 					friends.forEach((friend: any) => {
 						console.log("-- Notifying connection/deconnction of ", friend.username, " --");
-						this.server.except(personnalRoom).to(friend.username).emit('refreshUserOnlineState', `${personnalRoom} is ${status}`);
+						this.server.except(clientId).to(friend.username).emit('refreshUserOnlineState', `${user.username} is ${status}`);
 					});
 
 					// Emit to refresh DM list for user who are not friends
-					this.server.except(personnalRoom).emit('refreshUserOnlineState');
+					this.server.except(clientId).emit('refreshUserOnlineState');
 
 					return;
 				}
@@ -136,29 +137,32 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 
 	}
 
+	@UseGuards(GatewayGuard)
 	async handleConnection(client: Socket) {
 
 		try {
 
+			// this.connectedUsers[client.id] = userID;
+			// client.join(personnalRoom);
 			console.log(`== GeneralGtw ---> USERSOCKET client connected: ${client.id}`);
-			this.connectedUsers[client.id] = client;
-
-			client.on('joinPersonnalRoom', (personnalRoom: string, userID: number) => {
-
-				client.join(personnalRoom);
-				console.log("== Client ", client.id, " has joined ", personnalRoom, " room");
+			
+			client.on('joinPersonnalRoom', (userID: number) => {
+				
+				this.connectedUsers[userID] = client.id;
+				client.join(client.id);
+				console.log("== Client ", userID, " has joined ", client.id, " room");
 				this.userRejoinsRooms(client, userID);
-				this.notifyFriendList(userID, personnalRoom, 'online');
+				this.notifyFriendList(userID, client.id, 'online');
 				this.server.emit('newUser');
 
 				client.on('disconnect', () => {
-					console.log("===> Disconnecting user ", personnalRoom, " with ID ", userID);
-					this.notifyFriendList(userID, personnalRoom, 'offline');
-					client.leave(personnalRoom);
-					console.log("Client ", client.id, " has left ", personnalRoom, " room");
+					console.log("===> Disconnecting user ", userID, " with ID ", userID);
+					this.notifyFriendList(userID, client.id, 'offline');
+					client.leave(client.id);
+					console.log("Client ", userID, " has left ", client.id, " room");
 					this.userLeavesRooms(client, userID);
-				})
-
+					delete this.connectedUsers[userID];
+				});
 			});
 		} catch (error) {
 			console.log(' == Gatewway: ', error);
@@ -173,7 +177,6 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 
 	handleDisconnect(client: Socket) {
 		console.log(`== GeneralGtw ---> USERSOCKET client disconnected: ${client.id}`);
-		delete this.connectedUsers[client.id];
 	}
 
 
@@ -188,19 +191,25 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 			console.log("==== joinRoom Event ====");
 			console.log("Add ", "[", client.id, "]", " to room : ", roomName + roomID);
 
-			if (roomID && await this.chatService.isUserInConversation(user.sub, Number(roomID)))
+			// If there is an ID, we are joining a channel room
+			if (roomID && await this.chatService.isUserInConversation(user.sub, Number(roomID))) {
+				// event to refresh the user list of a channel
 				client.join(roomName + roomID);
+				this.server.to(roomName + roomID).emit('refresh_channel');
+			}
 			else
-				client.join(roomName);
+			client.join(roomName); // joining personnal room
 
-			// event to refresh the user list of a channel
-			this.server.to(roomName + roomID).emit('refresh_channel');
+			this.server.emit('refresh_channel');
 			// event to refresh the global user list
 			this.server.emit('refreshGlobalUserList');
+			// event to refresh the channel list
 			this.server.emit('refreshChannelList');
+			// event to refresh the friend list
 			this.server.emit('refreshFriends');
 
 			return;
+
 		} catch (error) {
 			throw error;
 		}
@@ -213,13 +222,15 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		const { roomName, roomID } = data;
 		console.log("==== leaveRoom Event ====");
 		console.log("Remove ", "[", client.id, "]", " to room : ", roomName + roomID);
-		if (roomID)
+		if (roomID) {
 			client.leave(roomName + roomID);
+			// event to refresh the user list of a channel
+			this.server.to(roomName + roomID).emit('refresh_channel');
+		}
 		else
 			client.leave(roomName);
 
-		// event to refresh the user list of a channel
-		this.server.to(roomName + roomID).emit('refresh_channel');
+		this.server.emit('refresh_channel');
 		// event to refresh the global user list
 		this.server.emit('refreshGlobalUserList');
 		this.server.emit('refreshChannelList');
@@ -231,11 +242,11 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	// comment securiser? que le gar qui ajoute soit dans la conv?
 	@SubscribeMessage('addUserToRoom')
 	@UseGuards(GatewayGuard)
-	addUserToNewRoom(@MessageBody() data: { convID: number, convName: string, friend: string }) {
+	addUserToNewRoom(@MessageBody() data: { convID: number, convName: string, friend: number }) {
 		const { convID, convName, friend } = data;
 		console.log("==== addUserToRoom Event ====");
 		console.log("Emit to add ", friend, " to room : ", convName + convID);
-		this.server.to(friend).emit('userAddedToRoom', {
+		this.server.to(this.connectedUsers[friend]).emit('userAddedToRoom', {
 			convID: convID,
 			convName: convName,
 		});
@@ -492,7 +503,7 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		if (verifyUser) {
 
 			// The room's name is not the conversation's name in DB
-			this.server.to(conversationName + dto.conversationID).except(`whoblocked${verifyUser.username}`).emit('onMessage', {
+			this.server.to(conversationName + dto.conversationID).except(`whoblocked${verifyUser.id}`).emit('onMessage', {
 				from: verifyUser.username,
 				senderId: user.sub,
 				content: dto.content,
@@ -511,47 +522,62 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	@UseGuards(GatewayGuard)
 	async handleFriendRequest(@ConnectedSocket() client: Socket, @MessageBody() data: { recipientLogin: string }) {
 
+		// user is the initiator of the friend request
+		// si le mec est bloque on se barre de la grooooos
 		try {
 			const { recipientLogin } = data;
-			// user is the initiator of the friend request
 			const user = client.handshake.auth.user;
-			const username = await this.userService.getUsername(user.sub);
-			if (!username)
-				throw new HttpException('User not foud', HttpStatus.NOT_FOUND);
-			this.server.to(recipientLogin).except(`whoblocked${username}`).emit('friendRequest', {
-				recipientLogin: recipientLogin,
-				initiatorID: Number(user.sub),
-				initiatorLogin: username,
-			});
-			this.server.to(recipientLogin).except(`whoblocked${username}`).emit('refreshHeaderNotif');
+			const checkedInitiator = await this.userService.getUserByID(user.sub);
+			const checkedRecipient = await this.userService.getUserByUsername(recipientLogin);
+			if (!checkedRecipient.blockedUsers.find((user: number) => user === checkedInitiator.id)) {
+				if (checkedInitiator && checkedRecipient) {
+					this.server.to(this.connectedUsers[checkedRecipient.id]).except(`whoblocked${checkedInitiator.id}`).emit('friendRequest', {
+						recipientLogin: recipientLogin,
+						initiatorID: Number(user.sub),
+						initiatorLogin: checkedInitiator.username,
+					});
+					this.server.to(this.connectedUsers[checkedRecipient.id]).except(`whoblocked${checkedInitiator.id}`).emit('refreshHeaderNotif');
+				}
+			}
+			console.error(`${checkedInitiator.username} is blocked`);
 		} catch (error) {
-			throw error;
+			// throw error;
 		}
 	}
 
 	@SubscribeMessage('friendRequestAccepted')
 	@UseGuards(GatewayGuard)
-	handleAcceptedFriendRequest(@MessageBody() data: { roomName: string, roomID: string, initiator: string, recipient: string }) {
+	async handleAcceptedFriendRequest(@MessageBody() data: { roomName: string, roomID: string, initiator: string, recipient: string }) {
 
-		const { roomName, roomID, initiator, recipient } = data;
-		this.server.to(initiator).emit('friendRequestAcceptedNotif', {
-			roomName: roomName,
-			roomID: roomID,
-			recipient: recipient,
-		})
-		this.server.to(recipient).emit('refreshFriends');
-		this.server.to(recipient).emit('refreshHeaderNotif');
+		try {
+			const { roomName, roomID, initiator, recipient } = data;
+			const checkedInitiator = await this.userService.getUserByUsername(initiator);
+			const checkedRecipient = await this.userService.getUserByUsername(recipient);
+			if (checkedInitiator && checkedRecipient) {
+				this.server.to(initiator).emit('friendRequestAcceptedNotif', {
+					roomName: roomName,
+					roomID: roomID,
+					recipient: recipient,
+				})
+				this.server.to(this.connectedUsers[checkedInitiator.id]).emit('refreshFriends');
+				this.server.to(this.connectedUsers[checkedRecipient.id]).emit('refreshFriends');
+				this.server.to(this.connectedUsers[checkedRecipient.id]).emit('refreshHeaderNotif');
+			}
+		} catch (error) {
+			// throw error;
+		}
 	}
 
 	/* REFRESH HANDLERS */
 
 	@SubscribeMessage('banUser')
 	@UseGuards(GatewayGuard)
-	handleUserBan(@MessageBody() data: { userToBan: string, roomName: string, roomID: string }) {
+	handleUserBan(@MessageBody() data: { userToBan: number, roomName: string, roomID: string }) {
 		const { userToBan, roomName, roomID } = data;
+		const room = this.connectedUsers[userToBan];
 		// on pourrait rajouter une verif du back
 		// This event aims to disable showChannel and to make the targeted user to leave the room
-		this.server.to(userToBan).emit('userIsBan', {
+		this.server.to(room).emit('userIsBan', {
 			roomName: roomName,
 			roomID: roomID,
 		});
@@ -560,11 +586,12 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 
 	@SubscribeMessage('unbanUser')
 	@UseGuards(GatewayGuard)
-	handleUserUnban(@MessageBody() data: { userToUnban: string, roomName: string, roomID: string }) {
+	handleUserUnban(@MessageBody() data: { userToUnban: number, roomName: string, roomID: string }) {
 		const { userToUnban, roomName, roomID } = data;
+		const room = this.connectedUsers[userToUnban];
 		// on pourrait rajouter une verif du back
 		// This event aims to make the targeted user to rejoin the room
-		this.server.to(userToUnban).emit('userIsUnban', {
+		this.server.to(room).emit('userIsUnban', {
 			roomName: roomName,
 			roomID: roomID,
 		});
@@ -614,10 +641,10 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 
 	@SubscribeMessage('refreshUser')
 	@UseGuards(GatewayGuard)
-	handleUserRefresh(@MessageBody() data: { userToRefresh: string, target: string, status: boolean }) {
+	handleUserRefresh(@MessageBody() data: { userToRefresh: number, target: string, status: boolean }) {
 		const { userToRefresh, target, status } = data;
 		// custom event to refresh on a particular user room
-		this.server.to(userToRefresh).emit(target, status);
+		this.server.to(this.connectedUsers[userToRefresh]).emit(target, status);
 		// event to refresh the user list of a channel
 		this.server.emit('refresh_channel');
 	}

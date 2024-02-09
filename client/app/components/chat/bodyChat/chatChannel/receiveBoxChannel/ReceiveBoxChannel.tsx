@@ -148,12 +148,12 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 		});
 
 		return () => {
+			globalState.userSocket?.off('userIsBan');
 			globalState.userSocket?.off('onMessage');
-			globalState.userSocket?.off('refresh_channel');
 			globalState.userSocket?.off('kickUser');
 			globalState.userSocket?.off('channelDeleted');
+			globalState.userSocket?.off('refresh_channel');
 			globalState.userSocket?.off('recv_notif');
-			globalState.userSocket?.off('userIsBan');
 		};
 
 	}, [globalState?.userSocket]);

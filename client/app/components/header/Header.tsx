@@ -54,6 +54,7 @@ const HeaderComponent: React.FC = () => {
 				'Authorization': `Bearer ${sessionStorage.getItem("jwt")}`,
 			},
 		});
+
 		if (response.ok) {
 			const notify = await response.json()
 			if (notify)

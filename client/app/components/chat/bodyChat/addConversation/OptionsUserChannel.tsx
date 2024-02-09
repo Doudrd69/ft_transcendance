@@ -188,7 +188,7 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 
 					// event to disable showChannel for banned user and refresh channel list
 					globalState.userSocket?.emit('banUser', {
-						userToBan: user.login,
+						userToBan: user.id,
 						roomName: chatState.currentConversation,
 						roomID: chatState.currentConversationID
 					});
@@ -238,9 +238,8 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 				setBan(false);
 
 				if (chatState.currentConversation) {
-					// // event to 
 					globalState.userSocket?.emit('unbanUser', {
-						userToUnban: user.login,
+						userToUnban: user.id,
 						roomName: chatState.currentConversation,
 						roomID: chatState.currentConversationID
 					});
@@ -296,7 +295,7 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 	
 					// emit sur un refreshd e channel?
 					globalState.userSocket?.emit('refreshUser', {
-						userToRefresh: user.login,
+						userToRefresh: user.id,
 						target: 'refreshAdmin',
 						status: true,
 					});
@@ -353,7 +352,7 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 
 					// emit sur un refresh de channel
 					globalState.userSocket?.emit('refreshUser', {
-						userToRefresh: user.login,
+						userToRefresh: user.id,
 						target: 'refreshAdmin',
 						status: true,
 					});
@@ -496,10 +495,10 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 				globalState.userSocket?.emit('addUserToRoom', {
 					convID: conversation.id,
 					convName: conversation.name,
-					friend: user.login,
+					friend: user.id,
 				});
 				globalState.userSocket?.emit('refreshUser', {
-					userToRefresh: user.login,
+					userToRefresh: user.id,
 					target: 'refreshDmList',
 					status: true
 				});
@@ -537,6 +536,12 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 		setFormValue('');
 	};
 		
+	const handleRefreshOptionsUserChannel = () => {
+		chatDispatch({ type: 'DISABLE', payload: 'showOptionsUserChannel' });
+		chatDispatch({ type: 'DISABLE', payload: 'showOptionsUserChannelOwner' });
+		chatDispatch({ type: 'ACTIVATE', payload: 'showBackComponent' });	
+	};
+
 	useEffect(() => {
 		const handleEscape = (event: KeyboardEvent) => {
 			if (event.key === 'Escape') {
@@ -550,22 +555,14 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 		};
 	}, []);
 
-	const handleRefreshOptionsUserChannel = () => {
-		chatDispatch({ type: 'DISABLE', payload: 'showOptionsUserChannel' });
-		chatDispatch({ type: 'DISABLE', payload: 'showOptionsUserChannelOwner' });
-		chatDispatch({ type: 'ACTIVATE', payload: 'showBackComponent' });	
-	};
-
 	useEffect(() => {
-	
-	
-		// Abonnez-vous à l'événement refreshOptionsUserChannel
+
 		globalState.userSocket?.on('refreshOptionsUserChannel', handleRefreshOptionsUserChannel);
 	
-		// Nettoyez l'abonnement lorsque le composant est démonté
 		return () => {
 			globalState.userSocket?.off('refreshOptionsUserChannel', handleRefreshOptionsUserChannel);
 		};
+
 	  }, [globalState?.userSocket]);
 
 

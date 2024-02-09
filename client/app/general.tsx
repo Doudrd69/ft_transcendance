@@ -304,8 +304,7 @@ const GeneralComponent = () => {
 
 		// Works on both connection and reconnection
 		globalState.userSocket?.on('connect', () => {
-			const personnalRoom = sessionStorage.getItem("currentUserLogin");
-			globalState.userSocket?.emit('joinPersonnalRoom', personnalRoom, sessionStorage.getItem("currentUserID"));
+			globalState.userSocket?.emit('joinPersonnalRoom', sessionStorage.getItem("currentUserID"));
 		})
 
 		globalState.userSocket?.on('disconnect', () => { })

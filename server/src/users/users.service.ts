@@ -407,6 +407,9 @@ export class UsersService {
 			if (initiator.id == recipient.id)
 				throw new HttpException('Seriously?', HttpStatus.BAD_REQUEST);
 
+			if (recipient.blockedUsers.find((user: number) => user === initiator.id))
+				throw new HttpException(`${recipient.username} has blocked you`, HttpStatus.BAD_REQUEST);
+
 			const friendshipAlreadyExists = await this.friendshipRepository
 				.createQueryBuilder('friendship')
 				.where('(friendship.initiator.id = :initiatorId AND friendship.friend.id = :friendId) OR (friendship.initiator.id = :friendId AND friendship.friend.id = :initiatorId)', {
@@ -564,7 +567,16 @@ export class UsersService {
 	}
 
 	async getUserByLogin(loginToSearch: string): Promise<User> {
+		
 		return await this.usersRepository.findOne({ where: { login: loginToSearch } });
+	}
+
+	async getUserByUsername(usernameToSearch: string): Promise<User> {
+		
+		const user = await this.usersRepository.findOne({ where: { username: usernameToSearch } });
+		if (!user)
+			throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+		return user;
 	}
 
 	async getBlockedUserList(userID: number) {
@@ -652,6 +664,7 @@ export class UsersService {
 					username: element.friend ? element.friend.username : element.initiator ? element.initiator.username : 'unknown user',
 					isBlocked: blockStatus,
 					onlineStatus: element.friend ? element.friend.isActive : element.initiator ? element.initiator.isActive : false,
+					inGameStatus: element.friend ? element.friend.inGame : element.initiator ? element.initiator.inGame : false,
 				});
 			});
 
@@ -687,6 +700,7 @@ export class UsersService {
 					username: element.initiator.username,
 					isBlocked: blockStatus,
 					onlineStatus: element.initiator.isActive,
+					inGameStatus: element.friend ? element.friend.inGame : element.initiator ? element.initiator.inGame : false,
 				});
 			});
 
