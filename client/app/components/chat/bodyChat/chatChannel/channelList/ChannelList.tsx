@@ -76,20 +76,11 @@ const ChannelListComponent: React.FC = () => {
 
 	useEffect(() => {
 
-		globalState.userSocket?.on('userIsBan', ( data: { roomName: string, roomID: number} ) => {
-			const { roomName, roomID } = data;
-			loadDiscussions();
-		});
-
 		globalState.userSocket?.on('channelDeleted', ( data: {roomName: string, roomID: string} ) => {
 			const { roomName, roomID } = data;
 			loadDiscussions();
 			globalState.userSocket?.emit('leaveRoom', { roomName: roomName, roomID: roomID });
 			chatDispatch({ type: 'ACTIVATE', payload: 'showChannelList' });
-		});
-
-		globalState.userSocket?.on('userIsUnban', () => {
-			loadDiscussions();
 		});
 
 		globalState.userSocket?.on('refreshChannelList', () => {
@@ -105,13 +96,10 @@ const ChannelListComponent: React.FC = () => {
 		});
 
 		return () => {
-			globalState.userSocket?.off('banUser');
 			globalState.userSocket?.off('refreshChannelList');
 			globalState.userSocket?.off('channelDeleted');
 			globalState.userSocket?.off('refreshChannelListBis');
 			globalState.userSocket?.off('refreshAdmin');
-			globalState.userSocket?.off('userIsBan');
-			globalState.userSocket?.off('userIsUnban');
 		}
 
 	}, [globalState?.userSocket]);

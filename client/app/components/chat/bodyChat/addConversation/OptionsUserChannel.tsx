@@ -163,7 +163,6 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 
 		try{
 
-
 			const userOptionDto = {
 				conversationID: Number(chatState.currentConversationID),
 				target: user.id,
@@ -185,11 +184,14 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 				setBan(true);
 
 				if (chatState.currentConversation) {
+
+					// event to disable showChannel for banned user and refresh channel list
 					globalState.userSocket?.emit('banUser', {
 						userToBan: user.login,
 						roomName: chatState.currentConversation,
 						roomID: chatState.currentConversationID
 					});
+
 					globalState.userSocket?.emit('emitNotification', {
 						channel: chatState.currentConversation + chatState.currentConversationID,
 						content: `${user.login} has been ban`,
@@ -235,6 +237,7 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 				setBan(false);
 
 				if (chatState.currentConversation) {
+					// // event to 
 					globalState.userSocket?.emit('unbanUser', {
 						userToUnban: user.login,
 						roomName: chatState.currentConversation,
@@ -290,6 +293,7 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 						channelID: chatState.currentConversationID,
 					});
 	
+					// emit sur un refreshd e channel?
 					globalState.userSocket?.emit('refreshUser', {
 						userToRefresh: user.login,
 						target: 'refreshAdmin',
@@ -346,6 +350,7 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 					});
 
 
+					// emit sur un refresh de channel
 					globalState.userSocket?.emit('refreshUser', {
 						userToRefresh: user.login,
 						target: 'refreshAdmin',
@@ -548,6 +553,7 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 		chatDispatch({ type: 'DISABLE', payload: 'showOptionsUserChannelOwner' });
 		chatDispatch({ type: 'ACTIVATE', payload: 'showBackComponent' });	
 	};
+
 	useEffect(() => {
 	
 	
