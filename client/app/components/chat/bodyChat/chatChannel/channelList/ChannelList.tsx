@@ -153,7 +153,7 @@ const ChannelListComponent: React.FC = () => {
 		}
 		const me = user.filter((user: User) => user.login === sessionStorage.getItem("currentUserLogin"));
 
-		if(me[0].isOwner)
+		if(me && me[0].isOwner)
 			chatDispatch({ type: 'ACTIVATE', payload: 'isOwner' });
 		
 		chatDispatch({ type: 'DISABLE', payload: 'showChannelList' });

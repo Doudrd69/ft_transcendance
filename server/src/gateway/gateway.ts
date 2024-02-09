@@ -190,6 +190,7 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 			this.server.to(roomName + roomID).emit('refresh_channel');
 			this.server.emit('refreshGlobalUserList');
 			this.server.emit('refreshFriends');
+			this.server.emit('refreshChannelList');
 
 			return;
 		} catch (error) {
@@ -577,6 +578,7 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		this.server.emit('refreshFriends');
 		this.server.emit('refreshGlobalUserList');
 		this.server.emit('refreshDmList');
+		this.server.emit('refreshChannelList');
 	}
 
 	@SubscribeMessage('emitNotification')
