@@ -320,6 +320,15 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 				console.log(`[check de l'existence des users] : les deux id sont bien la`);
 				return;
 			}
+
+			// Check if the sender is blocked by the recipient
+			targetToInvite.blockedUsers.forEach((user: number) => {
+				if (user == emitUserId) {
+					console.log("User is blocked");
+					throw new Error("User is blocked");
+				}
+			});
+
 			//clé unique basée sur emitUserId et targetUserId
 			const uniqueKey =  `${Math.min(emitUserId, targetUserId)}-${Math.max(emitUserId, targetUserId)}`
 			// check si les deux users sont deja en game
