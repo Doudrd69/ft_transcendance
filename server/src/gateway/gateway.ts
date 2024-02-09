@@ -591,6 +591,18 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		this.server.emit('refreshGlobalUserList');
 		this.server.emit('refreshDmList');
 		this.server.emit('refreshChannelList');
+		// this.server.emit('refresh_channel');
+	}
+
+	@SubscribeMessage('refreshAvatar')
+	@UseGuards(GatewayGuard)
+	handleRefreshAvatar() {
+		this.server.emit('refreshFriends');
+		this.server.emit('refreshGlobalUserList');
+		this.server.emit('refreshDmList');
+		this.server.emit('refreshChannelList');
+		this.server.emit('refresh_channel');
+		this.server.emit('refreshGameHistory');
 	}
 
 	@SubscribeMessage('emitNotification')

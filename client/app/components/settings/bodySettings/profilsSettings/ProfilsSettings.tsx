@@ -75,6 +75,7 @@ const ProfilsSettingsComponent: React.FC = () => {
 					dispatch({ type: 'ACTIVATE', payload: 'showAvatar' });
 					dispatch({ type: 'DISABLE', payload: 'showUploadAvatar' });
 					dispatch({ type: 'TOGGLEX', payload: 'showRefresh'});
+					globalState.userSocket?.emit('refreshAvatar');
 				}
 				else {
 					const error = await response.json();
