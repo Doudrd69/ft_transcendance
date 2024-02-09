@@ -14,6 +14,7 @@ import { UpdateUsernameDto } from './dto/UpdateUsernameDto.dto';
 import { Friendship } from './entities/friendship.entity';
 import { User } from './entities/users.entity';
 import { DeleteFriendRequestDto } from './dto/DeleteFriendRequestDto.dto';
+import { userInGame, userInMatchmaking } from 'src/game/matchmaking/matchmaking.service';
 
 @Injectable()
 export class UsersService {
@@ -39,57 +40,63 @@ export class UsersService {
 	}
 
 	async userInGame(userId: number) {
+		// enelever les appels DB
 		const user: User = await this.usersRepository.findOne({ where: { id: userId } })
 		if (!user)
 			throw new Error("userToInvite undefined")
-		if (user.inGame === true || user.inMatchmaking === true) {
+			console.log(`[usersInGame] : userInGame[user1Id] : ${userInGame[userId]}, userInGame[user2Id] : ${userInGame[userId]}`)
+			// console.log(`[usersInGame] : userInMatchmaking[user1Id] : ${userInMatchmaking[user1Id]}, userInMatchmaking[user2Id] : ${userInMatchmaking[user2Id]}`)
+		if (userInGame[userId] === true || userInMatchmaking[userId] === true) {
 			console.log(`usernametoinvite : game: ${user.inGame} match: ${user.inMatchmaking}`);
 			return true;
 		}
 		return false;
 	}
 
-	async usersInGame(user1Id: number, user2Id: number) {
-		const user1: User = await this.usersRepository.findOne({ where: { id: user1Id } })
-		if (!user1)
-			throw new Error("user1 undefined")
-		if (user1.inGame === true || user1.inMatchmaking === true) {
-			console.log(`usernametoinvite : game: ${user1.inGame} match: ${user1.inMatchmaking}`);
+	usersInGame(user1Id: number, user2Id: number) {
+		// enelever les appels DB
+		console.log(`[usersInGame] : userInGame[user1Id] : ${userInGame[user1Id]}, userInGame[user2Id] : ${userInGame[user2Id]}`)
+		console.log(`[usersInGame] : userInMatchmaking[user1Id] : ${userInMatchmaking[user1Id]}, userInMatchmaking[user2Id] : ${userInMatchmaking[user2Id]}`)
+		if ((userInGame[user1Id] === true) || (userInMatchmaking[user1Id] === true)) {
 			return true;
 		}
-		const user2: User = await this.usersRepository.findOne({ where: { id: user2Id } })
-		if (!user2)
-			throw new Error("userToInvite undefined")
-		if (user2.inGame === true || user2.inMatchmaking === true) {
-			console.log(`usernametoinvite : game: ${user2.inGame} match: ${user2.inMatchmaking}`);
+		if ((userInGame[user2Id] === true) || (userInMatchmaking[user2Id] === true)) {
 			return true;
 		}
 		return false;
 	}
 
 	async setUserInMatchmaking(userId: number) {
+		// enelever les appels DB
 		const user: User = await this.usersRepository.findOne({ where: { id: userId } })
 		if (!user)
 			throw new Error("user undefined")
+		userInMatchmaking[userId] = true;
 		user.inMatchmaking = true;
 		await this.usersRepository.save(user);
 	}
 	async setUserInGame(userId: number) {
+		// enelever les appels DB
 		const user: User = await this.usersRepository.findOne({ where: { id: userId } })
 		if (!user)
 			throw new Error("user undefined")
+		console.log(`[setUserInGame] GAME SET IN TRUE`)
+		userInGame[userId] = true;
 		user.inGame = true;
 		await this.usersRepository.save(user);
 	}
 
 	async setUsersInGame(userId1: number, userId2: number) {
+		// enelever les appels DB
 		const user1: User = await this.usersRepository.findOne({ where: { id: userId1 } })
 		if (!user1)
 			throw new Error("user undefined")
+		userInGame[userId1] = true;
 		user1.inGame = true;
 		const user2: User = await this.usersRepository.findOne({ where: { id: userId2 } })
 		if (!user2)
 			throw new Error("user undefined")
+		userInGame[userId2] = true;
 		user2.inGame = true;
 		await this.usersRepository.save(user1);
 		await this.usersRepository.save(user2);
@@ -99,6 +106,7 @@ export class UsersService {
 		const user: User = await this.usersRepository.findOne({ where: { id: userId } })
 		if (!user)
 			throw new Error("user undefined")
+		userInGame[userId] = false;
 		user.inGame = false;
 		await this.usersRepository.save(user);
 	}

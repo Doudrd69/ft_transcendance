@@ -9,7 +9,7 @@ import { GatewayGuard } from './Gatewayguard.guard';
 import { HttpException, HttpStatus, UseGuards } from '@nestjs/common'
 import { Req } from '@nestjs/common'
 import dotenv from 'dotenv';
-import { userInGame } from 'src/game/matchmaking/matchmaking.service';
+import { userInGame, userInMatchmaking } from 'src/game/matchmaking/matchmaking.service';
 import e from 'express';
 
 dotenv.config();
@@ -292,7 +292,7 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 				this.server.to(client.id).emit('userInGame');
 				return;
 			}
-			userInGame[user.sub] = true;
+			userInMatchmaking[user.sub] = true;
 			await this.userService.setUserInMatchmaking(user.sub);
 			this.server.to(client.id).emit('gameNotInProgress');
 		}
@@ -320,7 +320,7 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 			//clé unique basée sur emitUserId et targetUserId
 			const uniqueKey =  `${Math.min(emitUserId, targetUserId)}-${Math.max(emitUserId, targetUserId)}`
 			// check si les deux users sont deja en game
-			if (await this.userService.usersInGame(emitUserId, targetUserId)) {
+			if (this.userService.usersInGame(emitUserId, targetUserId)) {
 				this.server.to(client.id).emit('usersInGame');
 				console.log(`[check si l'un des deux users sont deja en game] : l'un des deux users sont deja en game`);
 				return;

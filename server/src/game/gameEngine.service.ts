@@ -23,7 +23,7 @@ export class GameEngineService {
 			player2Joined: false,
 			game_has_started: true,
 			game_has_ended: false,
-			gameID: game.gameId,
+			gameID: game.gameId, // changer pour un unique key
 			ball: {
 				player1Scored: false,
 				player2Scored: false,
@@ -90,6 +90,8 @@ export class GameEngineService {
 			this.playerScoredIncr(gameInstance);
 			this.resetGamePause(gameInstance, server);
 		}
+		// pour avoir un effet ou la balle peut partir partout
+		// if (gameInstance.pause === false) 
 		gameInstance.ball = this.updateBall(gameInstance.ball);
 	}
 

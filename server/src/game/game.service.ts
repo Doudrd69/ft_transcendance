@@ -8,7 +8,7 @@ import { User } from 'src/users/entities/users.entity';
 import { Paddle } from './entities/paddle.entity';
 import { GameEngineService } from './gameEngine.service';
 import { game_instance } from 'src/game_gateway/game.gateway';
-import { MatchmakingService } from './matchmaking/matchmaking.service';
+import { MatchmakingService, userInGame, userInMatchmaking } from './matchmaking/matchmaking.service';
 
 interface GameInfoDto {
 	userOneId: number;
@@ -40,6 +40,7 @@ export class GameService {
 			const user: User = await this.usersRepository.findOne({ where: { id: userId } });
 			if (!user)
 				throw new Error();
+			userInGame[userId] = false;
 			user.inGame = false;
 			await this.usersRepository.save(user);
 			this.disconnections[gameID].push(socketId)
@@ -92,6 +93,7 @@ export class GameService {
 		const UserTwo: User = await this.usersRepository.findOne({ where: { gameSocketId: player2ID } })
 		if (!UserOne || !UserTwo)
 			throw new Error(`[getUserIdByIDpairStartGame]: Users not found`);
+		// deja set userInGame a true avant avec les keyUnique
 		UserOne.inGame = true;
 		UserTwo.inGame = true;
 		await this.usersRepository.save(UserOne);
@@ -120,9 +122,11 @@ export class GameService {
 		return (user);
 	}
 
-	async userInGameOrInMacthmaking(user: User) {
-		console.log(`user ingame : ${user.inGame}, user inmatchmaking: ${user.inMatchmaking}`);
-		if (user.inGame === true || user.inMatchmaking === true)
+	async userInGameOrInMacthmaking(userId: number) {
+		// donner le userId a la place
+
+		console.log(`user ingame : ${userInGame[userId]}, user inmatchmaking: ${userInMatchmaking[userId]}`);
+		if (userInGame[userId] === true || userInMatchmaking[userId] === true)
 			return true;
 		return false;
 	}
@@ -181,7 +185,8 @@ export class GameService {
 			throw new Error(`[endOfGame not found Users]`);
 		UserOne.inGame = false;
 		UserTwo.inGame = false;
-
+		userInGame[gameInstance.usersId[0]] = false;
+		userInGame[gameInstance.usersId[1]] = false;
 		game.scoreOne = gameInstance.player1_score;
 		game.scoreTwo = gameInstance.player2_score;
 		if (game.scoreOne > game.scoreTwo) {
@@ -230,6 +235,7 @@ export class GameService {
 	async setUserInMatchmaking(userId: number) {
 		let user: User = await this.getUserWithUserId(userId);
 		user.inMatchmaking = true;
+		userInMatchmaking[userId] = true;
 		await this.usersRepository.save(user);
 	}
 
@@ -248,6 +254,8 @@ export class GameService {
 	async deconnectUserMatchmaking(user: User, userId: number, playerId: string) {
 		console.log(`userGameSocket : ${this.userGameSockets[userId]}, userId: ${userId}`);
 		user.inMatchmaking = false;
+		userInMatchmaking[userId] = false;
+		// userInMatchmaking = false;
 		this.userGameSockets[userId] = null;
 		await this.MatchmakingService.leaveQueue(playerId, userId)
 		// appeler une fonction qui l'enleve de matchmaking queue hophop
@@ -289,6 +297,8 @@ export class GameService {
 	}
 
 	async updateStateGameForUsers(user: User, otherUser: User) {
+		userInGame[user.id] = false;
+		userInGame[otherUser.id] = false;
 		user.inGame = false;
 		otherUser.inGame = false;
 		await this.usersRepository.save(user);
@@ -305,6 +315,8 @@ export class GameService {
 	}
 
 	async updateStateGameForUser(user: User) {
+		// choper l'ID pour userInGame
+		userInGame[user.id] = false;
 		user.inGame = false;
 		await this.usersRepository.save(user);
 	}
@@ -321,6 +333,8 @@ export class GameService {
 		game.gameEnd = false;
 		game.userOneId = gameInstance.usersId[0];
 		game.userTwoId = gameInstance.usersId[1];
+		userInGame[gameInstance.usersId[0]] = false;
+		userInGame[gameInstance.usersId[1]] = false;
 		user1.inGame = false;
 		user2.inGame = false;
 		if (disconnectedSockets.includes(gameInstance.players[1])) {

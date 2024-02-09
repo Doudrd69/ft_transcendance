@@ -8,7 +8,7 @@ import {
 import { Server, Socket } from 'socket.io';
 import { GameService } from 'src/game/game.service';
 import { GameEngineService } from 'src/game/gameEngine.service';
-import { MatchmakingService, userInGame } from 'src/game/matchmaking/matchmaking.service';
+import { MatchmakingService, userInGame, userInMatchmaking } from 'src/game/matchmaking/matchmaking.service';
 import { GatewayGuard } from 'src/gateway/Gatewayguard.guard';
 import { HttpException, HttpStatus, UseGuards } from '@nestjs/common'
 import { User } from 'src/users/entities/users.entity';
@@ -108,12 +108,13 @@ export class GameGateway {
             if (userId && client.id) {
                 const user: User = await this.GameService.getUserWithUserId(userId);
                 console.log(`[handleDisconnect] Retrieved disconnected user : ${user.login}`)
-                if (user && await this.GameService.userInGameOrInMacthmaking(user)) {
+                if (this.GameService.userInGameOrInMacthmaking(userId)) {
                     this.userInGame[client.id] = false;
-                    if (user.inMatchmaking === true) {
+                    console.log(`usermatch: ${userInMatchmaking[userId]}, ${userInGame[userId]}`);
+                    if (userInMatchmaking[userId] === true) {
                         console.log(`[handleDisconnect] User is in the matchmaking`)
                         await this.GameService.deconnectUserMatchmaking(user, userId, client.id);
-                    } else {
+                    } else if (userInGame[userId] === true) {
                         let game = await this.GameService.getGameWithUserId(userId);
                         const gameInstance: game_instance = this.GameService.getGameInstance(this.game_instance, game.gameId);
                         if (gameInstance && gameInstance.game_has_ended !== true) {
@@ -219,6 +220,7 @@ export class GameGateway {
                 const pairs: [string, string][] = await this.MatchmakingService.getPlayersPairsQueue(data.gameMode);
                 for (const pair of pairs) {
                     userInGame[this.GameService.getUserIdWithSocketId(pair[0])] = true;
+                    console.log(`[handleJoinMatchmaking] GAME SET IN TRUE`)
                     userInGame[userId] = true;
                     this.userInGame[pair[0]] = true;
                     this.userInGame[pair[1]] = true;
