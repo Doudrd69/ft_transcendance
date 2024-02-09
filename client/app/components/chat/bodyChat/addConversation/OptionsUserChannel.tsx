@@ -16,7 +16,7 @@ interface User {
 	isMute: boolean;
 	isBan: boolean;
 	isOwner: boolean;
-	blockList: string[];
+	blockList: number[];
 }
 
 interface OptionsUserChannelProps {
@@ -84,7 +84,7 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 	const unblockUser = async() => {
 
 		const BlockUserDto = {
-			recipientID: user.login,
+			recipientID: user.id,
 		}
 
 		const response = await fetch(`${process.env.API_URL}/users/unblockUser`, {
@@ -438,6 +438,7 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 				},
 				body: JSON.stringify(KickConversationDto),
 			});
+
 			if (response.ok) {
 					chatDispatch({ type: 'ACTIVATE', payload: 'showBackComponent' });
 					chatDispatch({ type: 'DISABLE', payload: 'showOptionsUserChannel' });

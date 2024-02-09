@@ -214,7 +214,7 @@ export class ChatService {
 				if (group.conversation.id == conversationID) {
 					if (group.conversation.is_channel) {
 						array.push({
-							login: user_.login,
+							login: user_.username,
 							avatarURL: user_.avatarURL,
 							isAdmin: group.isAdmin,
 							isMute: group.isMute,
@@ -957,7 +957,6 @@ export class ChatService {
 	}
 
 	async kickUserFromConversation(kickUserDto: kickUserDto, userID: number) {
-
 
 		const userToKick : User = await this.usersRepository.findOne({
 			where: { id: kickUserDto.userToKickID },
