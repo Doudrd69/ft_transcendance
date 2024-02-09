@@ -147,6 +147,9 @@ export class GameGateway {
 			if (uniqueKey in gameQueue) {
 				if (gameQueue[uniqueKey] && gameQueue[uniqueKey].isAcceptedTargetUser && gameQueue[uniqueKey].isAcceptedEmitUser) {
 					// unset les deux de ingame et deco leurs socket 
+                    this.GameService.unsetUserInGame(gameQueue[uniqueKey].emitUserId);
+                    this.GameService.unsetUserInGame(gameQueue[uniqueKey].targetUserId);
+                    // emit de deco
 					return;
 				}
 			} 
@@ -332,10 +335,10 @@ export class GameGateway {
             clearInterval(gameLoop);
             const user1: User = await this.GameService.getUserWithUserId(gameInstance.usersId[0]);
             const user2: User = await this.GameService.getUserWithUserId(gameInstance.usersId[1]);
+            await this.GameService.updateStateGameForUsers(user1, user2);
             let game = await this.GameService.getGameWithUserId(user1.id);
             await this.GameService.deleteGame(game);
             await this.GameService.createGameStop(user1, user2, gameInstance, disconnectedSockets);
-            await this.GameService.updateStateGameForUsers(user1, user2);
 
             this.GameService.deleteGameSocketsIdForPlayers(user1, user2);
             this.server.to([gameInstance.players[0], gameInstance.players[1]]).emit('userDisconnected');

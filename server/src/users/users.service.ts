@@ -44,8 +44,8 @@ export class UsersService {
 		const user: User = await this.usersRepository.findOne({ where: { id: userId } })
 		if (!user)
 			throw new Error("userToInvite undefined")
-			console.log(`[usersInGame] : userInGame[user1Id] : ${userInGame[userId]}, userInGame[user2Id] : ${userInGame[userId]}`)
-			// console.log(`[usersInGame] : userInMatchmaking[user1Id] : ${userInMatchmaking[user1Id]}, userInMatchmaking[user2Id] : ${userInMatchmaking[user2Id]}`)
+		console.log(`[usersInGame] : userInGame[user1Id] : ${userInGame[userId]}, userInGame[user2Id] : ${userInGame[userId]}`)
+		// console.log(`[usersInGame] : userInMatchmaking[user1Id] : ${userInMatchmaking[user1Id]}, userInMatchmaking[user2Id] : ${userInMatchmaking[user2Id]}`)
 		if (userInGame[userId] === true || userInMatchmaking[userId] === true) {
 			console.log(`usernametoinvite : game: ${user.inGame} match: ${user.inMatchmaking}`);
 			return true;
@@ -88,8 +88,6 @@ export class UsersService {
 
 	async setUsersInGame(userId1: number, userId2: number) {
 		// enelever les appels DB
-		userInGame[userId1] = true;
-		userInGame[userId2] = true;
 		const user1: User = await this.usersRepository.findOne({ where: { id: userId1 } })
 		if (!user1)
 			throw new Error("user undefined")
@@ -98,6 +96,8 @@ export class UsersService {
 		if (!user2)
 			throw new Error("user undefined")
 		user2.inGame = true;
+		userInGame[userId1] = true;
+		userInGame[userId2] = true;
 		await this.usersRepository.save(user1);
 		await this.usersRepository.save(user2);
 	}
@@ -131,18 +131,18 @@ export class UsersService {
 	async save2FASecret(user: User, code: string) {
 		user.TFA_secret = code;
 		await this.usersRepository.save(user);
-		return ;
+		return;
 	}
 
 	async upate2FAState(user: User, state: boolean) {
 		user.TFA_isEnabled = state;
 		await this.usersRepository.save(user);
-		return ;
+		return;
 	}
 
 	async get2faSecret(userID: number): Promise<string | null> {
 
-		const user : User = await this.usersRepository.findOne({ where: { id: userID } });
+		const user: User = await this.usersRepository.findOne({ where: { id: userID } });
 		if (user) {
 			return user.TFA_secret;
 		}
@@ -445,7 +445,7 @@ export class UsersService {
 
 	async findDMConversation(user1: User, user2: User): Promise<Conversation> {
 
-		let conversation : Conversation = null;
+		let conversation: Conversation = null;
 		user1.groups.forEach((userOneGroup: GroupMember) => {
 			user2.groups.forEach((userTwoGroup: GroupMember) => {
 				if ((userOneGroup.conversation.id == userTwoGroup.conversation.id) &&
@@ -595,7 +595,7 @@ export class UsersService {
 
 			const users = await this.usersRepository.find();
 			if (users && users.length > 0) {
-		
+
 				const array = users
 					.filter((user_) => user_.id !== userId)
 					.sort((a, b) => a.username.localeCompare(b.username))
@@ -653,7 +653,7 @@ export class UsersService {
 			friendships.forEach((element: Friendship) => {
 				let blockStatus = false;
 				user.blockedUsers.forEach((blockedFriend: number) => {
-					if (blockedFriend == (element.friend ? element.friend.id: element.initiator ? element.initiator.id : null)) {
+					if (blockedFriend == (element.friend ? element.friend.id : element.initiator ? element.initiator.id : null)) {
 						blockStatus = true;
 					}
 				});

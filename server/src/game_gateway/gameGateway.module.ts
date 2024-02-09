@@ -16,6 +16,7 @@ import { Vector } from 'src/game/entities/vector.entity';
 import { GameGateway } from './game.gateway';
 import {APP_FILTER} from "@nestjs/core";
 import {AllExceptionsFilter} from "./game-exception.filter";
+import { UsersService } from 'src/users/users.service';
 
 
 @Module({

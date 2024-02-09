@@ -261,6 +261,15 @@ export class GameService {
 		// appeler une fonction qui l'enleve de matchmaking queue hophop
 		await this.usersRepository.save(user);
 	}
+	
+	async unsetUserInGame(userId: number) {
+		const user: User = await this.usersRepository.findOne({ where: { id: userId } })
+		if (!user)
+			throw new Error("user undefined")
+		userInGame[userId] = false;
+		user.inGame = false;
+		await this.usersRepository.save(user);
+	}
 
 	async getGameWithUserId(userId: number): Promise<Game> {
 		// console.log(`[${this.userGameSockets[userId]}] userId de ses morts gameWithUserLogin: ${userId}`);
