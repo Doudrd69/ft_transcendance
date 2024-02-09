@@ -21,7 +21,13 @@ export interface GameInviteDto {
 	isAcceptedTargetUser: boolean,
 }
 
-export const gameQueue: { [key: string]: GameInviteDto } = {};``
+export interface InGameDto {
+	emitUserId: number,
+	targetUserId: number,
+}
+
+export const gameQueue: { [key: string]: GameInviteDto } = {};
+export const inGame: { [key: string]: InGameDto } = {};
 
 @WebSocketGateway({
 	namespace: 'user',
@@ -107,20 +113,20 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 				user = await this.userService.updateUserStatus(userID, false);
 			else
 				throw new HttpException('Fatal error', HttpStatus.BAD_REQUEST);
-	
+
 			if (user) {
-	
+
 				const friends = await this.userService.getFriendships(userID);
 				if (friends) {
-	
+
 					friends.forEach((friend: any) => {
 						console.log("-- Notifying connection/deconnction of ", friend.username, " --");
 						this.server.except(personnalRoom).to(friend.username).emit('refreshUserOnlineState', `${personnalRoom} is ${status}`);
 					});
-	
+
 					// Emit to refresh DM list for user who are not friends
 					this.server.except(personnalRoom).emit('refreshUserOnlineState');
-	
+
 					return;
 				}
 			}
@@ -169,6 +175,7 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		console.log(`== GeneralGtw ---> USERSOCKET client disconnected: ${client.id}`);
 		delete this.connectedUsers[client.id];
 	}
+
 
 	@SubscribeMessage('joinRoom')
 	@UseGuards(GatewayGuard)
@@ -238,24 +245,20 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	@UseGuards(GatewayGuard)
 	async inviteAccepted(@ConnectedSocket() client: Socket, @MessageBody() data: { otherUserId: number, userGameSocketId: string }) {
 		try {
+
 			const emitUserId = client.handshake.auth.user.sub;
-			const targetUserId = data.otherUserId;
-			
-			const uniqueKey =  `${Math.min(emitUserId, targetUserId)}-${Math.max(emitUserId, targetUserId)}`
-			if (uniqueKey in gameQueue) {
-				if (gameQueue[uniqueKey] && gameQueue[uniqueKey].isAcceptedTargetUser && gameQueue[uniqueKey].isAcceptedEmitUser) {
+			const targetUserId: number = data.otherUserId;
+			const uniqueKey = `${Math.min(emitUserId, targetUserId)}-${Math.max(emitUserId, targetUserId)}`
+			console.log(`inGame[uniqueKey] dans inviteAccepted :  ${emitUserId} |  ${targetUserId}`)
+			if (inGame[uniqueKey])
+
+				if (!inGame[uniqueKey]) {
 					await this.userService.unsetUserInGame(emitUserId);
+					console.log(`DECO LAUNCH GAME INVITE`,);
 					this.server.to(client.id).emit('badsenderIdGameInvite');
 					return;
 				}
-			}
-			// check l'opposant
-			if (await this.userService.userInGame(data.otherUserId) === false)
-			{
-				await this.userService.unsetUserInGame(emitUserId);
-				this.server.to(client.id).emit('badsenderIdGameInvite');
-				return ;
-			}
+			console.log(`[inGame in InvitedAccepted], ${inGame[uniqueKey].emitUserId} | ${inGame[uniqueKey].targetUserId}`)
 			const otherUser = await this.userService.getUserByID(data.otherUserId);
 			this.server.to(otherUser.username).emit('acceptInvitation', { userTwoId: emitUserId, userTwoGameId: data.userGameSocketId });
 		} catch (error) {
@@ -265,31 +268,18 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 
 	@SubscribeMessage('checkAndsetInGame')
 	@UseGuards(GatewayGuard)
-	async checkAndSetInGame(@ConnectedSocket() client: Socket, @MessageBody()  targetUserId: number) {
+	async checkAndSetInGame(@ConnectedSocket() client: Socket, @MessageBody() targetUserId: number) {
 		try {
 
-			/**const emitUserId = client.handshake.auth.user.sub;
-			const targetUserId = data.otherUserId;
-			
-			const uniqueKey =  `${Math.min(emitUserId, targetUserId)}-${Math.max(emitUserId, targetUserId)}`
-			if (uniqueKey in gameQueue) {
-				if (gameQueue[uniqueKey] && gameQueue[uniqueKey].isAcceptedTargetUser && gameQueue[uniqueKey].isAcceptedEmitUser) {
-					await this.userService.unsetUserInGame(emitUserId);
-					this.server.to(client.id).emit('badsenderIdGameInvite');
-					return;
-				}
-			} */
-			// check si opponent 
 			const emitUserId = client.handshake.auth.user.sub;
 			const EmitUser = await this.userService.getUserByID(emitUserId);
 			const targetUser = await this.userService.getUserByID(targetUserId);
-			if (!emitUserId || !targetUser.id || !EmitUser || (emitUserId === targetUserId))
-			{
+			if (!emitUserId || !targetUser.id || !EmitUser || (emitUserId === targetUserId)) {
 				console.log(`[check de l'existence des users] : les deux id sont pas la`);
 				return;
 			}
 
-			const uniqueKey =  `${Math.min(emitUserId, targetUserId)}-${Math.max(emitUserId, targetUserId)}`
+			const uniqueKey = `${Math.min(emitUserId, targetUserId)}-${Math.max(emitUserId, targetUserId)}`
 			if (uniqueKey in gameQueue) {
 				if (gameQueue[uniqueKey] && gameQueue[uniqueKey].isAcceptedTargetUser && gameQueue[uniqueKey].isAcceptedEmitUser) {
 					console.log(`pas dans la room alors sort de la !`)
@@ -302,8 +292,13 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 				console.log(`users already inGame or Inactive`);
 				return;
 			}
+			const pairInGame = {
+				emitUserId: emitUserId,
+				targetUserId: targetUserId,
+			}
+			inGame[uniqueKey] = pairInGame;
 			await this.userService.setUsersInGame(emitUserId, targetUserId)
-			this.server.to(client.id).emit('usersNotInGame');
+			this.server.to(client.id).emit('usersNotInGame', targetUserId);
 		} catch (error) {
 			console.log(`[GAME INVITE ERROR]: ${error.stack}`)
 		}
@@ -315,10 +310,9 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	async handleSetUserInMatchmaking(@ConnectedSocket() client: Socket) {
 		try {
 			const user = client.handshake.auth.user;
-			if (!user)
-			{
-					console.log(`[checkAndSetUserInMatchmaking] : ${user.sub}`)
-					return;
+			if (!user) {
+				console.log(`[checkAndSetUserInMatchmaking] : ${user.sub}`)
+				return;
 			}
 			// a changer pour le ingame et le inMatchmaking
 			if (await this.userService.userInGame(user.sub)) {
@@ -337,18 +331,16 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 
 	@SubscribeMessage('setGameInvite')
 	async handleEvent(@ConnectedSocket() client: Socket, @MessageBody() data: { userTwoId: number, userTwoGameId: string }) {
-			const emitUserId = client.handshake.auth.user.sub;
-			const targetUserId = data.userTwoId;
-			
-			const uniqueKey =  `${Math.min(emitUserId, targetUserId)}-${Math.max(emitUserId, targetUserId)}`
-			if (uniqueKey in gameQueue) {
-				if (gameQueue[uniqueKey] && gameQueue[uniqueKey].isAcceptedTargetUser && gameQueue[uniqueKey].isAcceptedEmitUser) {
-					await this.userService.unsetUserInGame(emitUserId);
-					this.server.to(client.id).emit('badsenderIdGameInvite');
-					return;
-				}
-			} 
-			// check aussi la game socket?
+		const emitUserId = client.handshake.auth.user.sub;
+		const targetUserId = data.userTwoId;
+
+		const uniqueKey = `${Math.min(emitUserId, targetUserId)}-${Math.max(emitUserId, targetUserId)}`
+		if (!inGame[uniqueKey]) {
+			await this.userService.unsetUserInGame(emitUserId);
+			this.server.to(client.id).emit('badsenderIdGameInvite');
+			return;
+		}
+		// check aussi la game socket?
 		this.server.to(client.id).emit('createGameInviteSocket', { userTwoId: data.userTwoId, userTwoGameId: data.userTwoGameId });
 	}
 
@@ -358,8 +350,7 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		try {
 			const emitUserId = client.handshake.auth.user.sub;
 			const targetToInvite = await this.userService.getUserByID(targetUserId);
-			if (!emitUserId || !targetToInvite.id || (emitUserId === targetToInvite.id))
-			{
+			if (!emitUserId || !targetToInvite.id || (emitUserId === targetToInvite.id)) {
 				console.log(`[check de l'existence des users] : les deux id sont bien la`);
 				return;
 			}
@@ -373,7 +364,7 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 			});
 
 			//clé unique basée sur emitUserId et targetUserId
-			const uniqueKey =  `${Math.min(emitUserId, targetUserId)}-${Math.max(emitUserId, targetUserId)}`
+			const uniqueKey = `${Math.min(emitUserId, targetUserId)}-${Math.max(emitUserId, targetUserId)}`
 			// check si les deux users sont deja en game
 			if (this.userService.usersInGame(emitUserId, targetUserId)) {
 				this.server.to(client.id).emit('usersInGame');
@@ -404,8 +395,14 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 				gameQueue[uniqueKey] = newPair;
 				if (newPair && newPair.isAcceptedTargetUser && newPair.isAcceptedEmitUser) {
 					console.log(`[La target a fait aussi la demande] : il faut lancer la game`);
+					const pairInGame = {
+						emitUserId: emitUserId,
+						targetUserId: targetUserId,
+					}
+					inGame[uniqueKey] = pairInGame;
+					console.log(`inGame[uniqueKey] dans inviteToGame :  ${inGame[uniqueKey].emitUserId} |  ${inGame[uniqueKey].targetUserId}`)
 					this.userService.setUsersInGame(newPair.emitUserId, newPair.targetUserId);
-					this.server.to(client.id).emit('usersNotInGame');
+					this.server.to(client.id).emit('gameInviteDUO', targetUserId);
 					return;
 				}
 				else {
@@ -425,11 +422,13 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 			}
 			setTimeout(() => {
 				if (gameQueue.hasOwnProperty(uniqueKey)) {
+
 					delete gameQueue[uniqueKey];
 					console.log('La paire a été supprimée de la queue.');
 				} else {
 					console.log('La clé spécifiée n\'existe pas dans la queue.');
-			}}, 5000);
+				}
+			}, 5000);
 		}
 		catch (error) {
 			console.log(`[GAME INVITE ERROR]: ${error.stack}`)
@@ -438,24 +437,24 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 
 	@SubscribeMessage('closeToast')
 	@UseGuards(GatewayGuard)
-	async closeToast(@ConnectedSocket() client: Socket ) {
+	async closeToast(@ConnectedSocket() client: Socket) {
 		try {
 			console.log(`[JE SIUS LE CLOSETOAST]`)
-			
+
 		} catch (error) {
 			console.log(`[GAME INVITE ERROR]: ${error.stack}`)
 		}
 	}
-	
+
 	@SubscribeMessage('inviteClosed')
 	@UseGuards(GatewayGuard)
-	async handleInviteClosed(@ConnectedSocket() client: Socket, @MessageBody() targetUserId: number ) {
+	async handleInviteClosed(@ConnectedSocket() client: Socket, @MessageBody() targetUserId: number) {
 		console.log("[inviteClosed] CLOSED")
 		try {
 			const emitUserId = client.handshake.auth.user.sub;
 			console.log(`[emitUserId] : ${emitUserId}`)
 			console.log(`[targetUserId] : ${targetUserId}`)
-			const uniqueKey =  `${Math.min(emitUserId, targetUserId)}-${Math.max(emitUserId, targetUserId)}`
+			const uniqueKey = `${Math.min(emitUserId, targetUserId)}-${Math.max(emitUserId, targetUserId)}`
 			// Supprimez existingPair de gameQueue
 			if (gameQueue.hasOwnProperty(uniqueKey)) {
 				delete gameQueue[uniqueKey];
