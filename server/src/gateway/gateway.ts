@@ -204,7 +204,6 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		const { roomName, roomID } = data;
 		console.log("==== leaveRoom Event ====");
 		console.log("Remove ", "[", client.id, "]", " to room : ", roomName + roomID);
-
 		if (roomID)
 			client.leave(roomName + roomID);
 		else
@@ -215,6 +214,7 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		this.server.emit('refreshChannelList');
 		this.server.emit('refreshGlobalUserList');
 		this.server.emit('refreshFriends');
+		this.server.to(roomName + roomID).emit('refreshOptionsUserChannel');
 		return;
 	}
 
@@ -499,7 +499,6 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 			roomID: roomID,
 		});
 	}
-
 	@SubscribeMessage('unbanUser')
 	@UseGuards(GatewayGuard)
 	handleUserUnban(@MessageBody() data: { userToUnban: string, roomName: string, roomID: string }) {
@@ -533,9 +532,16 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 
 	@SubscribeMessage('refreshUserChannelList')
 	@UseGuards(GatewayGuard)
-	handleRefresh(@MessageBody() data: { userToRefresh: string }) {
+	handleRefresh(@MessageBody() data: { roomName: string, roomID: string }) {
+		const { roomName, roomID } = data;
+		this.server.to(roomName + roomID).emit('refreshChannelList');
+	}
+
+	@SubscribeMessage('refreshOptionsUserChannel')
+	@UseGuards(GatewayGuard)
+	handleRefreshOption(@MessageBody() data: { userToRefresh: string }) {
 		const { userToRefresh } = data;
-		this.server.to(userToRefresh).emit('refreshChannelList');
+		this.server.to(userToRefresh).emit('refreshOption');
 	}
 
 	@SubscribeMessage('refreshChannelList')
