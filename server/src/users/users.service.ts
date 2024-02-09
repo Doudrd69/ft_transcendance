@@ -75,16 +75,6 @@ export class UsersService {
 		user.inMatchmaking = true;
 		await this.usersRepository.save(user);
 	}
-	async setUserInGame(userId: number) {
-		// enelever les appels DB
-		const user: User = await this.usersRepository.findOne({ where: { id: userId } })
-		if (!user)
-			throw new Error("user undefined")
-		console.log(`[setUserInGame] GAME SET IN TRUE`)
-		userInGame[userId] = true;
-		user.inGame = true;
-		await this.usersRepository.save(user);
-	}
 
 	async setUsersInGame(userId1: number, userId2: number) {
 		// enelever les appels DB
