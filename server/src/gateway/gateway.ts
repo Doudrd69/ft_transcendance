@@ -144,7 +144,9 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 			// this.connectedUsers[client.id] = userID;
 			// client.join(personnalRoom);
 			console.log(`== GeneralGtw ---> USERSOCKET client connected: ${client.id}`);
-			
+				console.log(`before userInGame ---?`, userInGame);
+				console.log(`before InGame --->`, inGame);
+				console.log(`before inMatchmakeing`, userInMatchmaking)
 			client.on('joinPersonnalRoom', (userID: number) => {
 				console.log(this.connectedUsers);
 				let count = 0;
@@ -165,16 +167,19 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 					Object.keys(userInGame).forEach(key => {
 						const dto = userInGame[key];
 						if (dto) {
-							delete userInGame[key];
+							userInGame[key] = false;
 						}
 					});
 					Object.keys(userInMatchmaking).forEach(key => {
 						const dto = userInMatchmaking[key];
 						if (dto) {
-							delete userInMatchmaking[key];
+							userInMatchmaking[key] = false;
 						}
 					});
 				}
+				console.log(`after userInGame ---?`, userInGame);
+				console.log(`after InGame --->`, inGame);
+				console.log(`after inMatchmakeing`, userInMatchmaking)
 				this.connectedUsers[userID] = client.id;
 				client.join(client.id);
 				console.log("== Client ", userID, " has joined ", client.id, " room");
