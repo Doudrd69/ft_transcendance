@@ -7,9 +7,34 @@ import { UserOptionsDto } from 'src/chat/dto/userOptionsDto.dto';
 
 export let userInGame: { [userId: number]: boolean };
 export let userInMatchmaking: { [userId: number]: boolean };
+export let playersNormalQueue: Queue[] = [];
+export let playersSpeedQueue: Queue[] = [];
 
 userInGame = {};
 userInMatchmaking = {};
+
+export interface Queue{
+	gameSocketId: string
+	userId : number;
+}
+
+export const getPlayerSpeedQueue = () => {
+
+	return playersSpeedQueue;
+}
+
+export const setPlayerSpeedQueue = (value: Queue[]) => {
+	playersSpeedQueue = value;
+}
+
+export const getPlayerNormalQueue = () => {
+
+	return playersNormalQueue;
+}
+
+export const setPlayerNormalQueue = (value: Queue[]) => {
+	playersNormalQueue = value;
+}
 
 @Injectable()
 export class MatchmakingService {
@@ -19,20 +44,17 @@ export class MatchmakingService {
 
 
 	) { }
-
-	public playersNormalQueue: string[] = [];
-	public playersSpeedQueue: string[] = [];
 	async getPlayersPairsQueue(gameMode: string) {
 		const pairs: Array<[string, string]> = [];
 		if (gameMode === "NORMAL") {
-			for (let i = 0; i < this.playersNormalQueue.length - 1; i += 2) {
-				pairs.push([this.playersNormalQueue[i], this.playersNormalQueue[i + 1]]);
+			for (let i = 0; i < playersNormalQueue.length - 1; i += 2) {
+				pairs.push([playersNormalQueue[i].gameSocketId, playersNormalQueue[i + 1].gameSocketId]);
 				console.log("Found a socket pair");
 			}
 		}
 		else if (gameMode === "SPEED") {
-			for (let i = 0; i < this.playersSpeedQueue.length - 1; i += 2) {
-				pairs.push([this.playersSpeedQueue[i], this.playersSpeedQueue[i + 1]]);
+			for (let i = 0; i < playersSpeedQueue.length - 1; i += 2) {
+				pairs.push([playersSpeedQueue[i].gameSocketId, playersSpeedQueue[i + 1].gameSocketId]);
 				console.log("Found a socket pair");
 			}
 		}
@@ -42,24 +64,32 @@ export class MatchmakingService {
 	async joinQueue(gameSocketId: string, userId: number, gameMode: string) {
 		userInMatchmaking[userId] = true;
 		const newUser: User = await this.usersRepository.findOne({ where: { id: userId } })
+		const socketIdUserId: Queue = {
+			gameSocketId : gameSocketId,
+			userId : userId,
+		}
 		if (!newUser)
 			throw new Error(`new user undefined`)
 		// check if user is already in queue normal or speed
-		if (this.playersNormalQueue.includes(gameSocketId) || this.playersSpeedQueue.includes(gameSocketId))
+		if (playersNormalQueue.includes(socketIdUserId) || playersSpeedQueue.includes(socketIdUserId))
 			throw new Error(`User alredy in Matchmaking`);
 		if (gameMode === "NORMAL")
-			this.playersNormalQueue.push(gameSocketId);
+			playersNormalQueue.push(socketIdUserId);
 		else if (gameMode === "SPEED") {
 			newUser.inSpeedQueue = true;
-			this.playersSpeedQueue.push(gameSocketId);
+			playersSpeedQueue.push(socketIdUserId);
 		}
-		console.log(`joinSpeedQueue: ${this.playersSpeedQueue}`)
-		console.log(`joinNormalQueue: ${this.playersNormalQueue}`)
+		console.log(`joinSpeedQueue: ${playersSpeedQueue}`)
+		console.log(`joinNormalQueue: ${playersNormalQueue}`)
 		await this.usersRepository.save(newUser);
 	}
 
 	async leaveQueue(playerID: string, userId: number) {
 		console.log(`[leaveQueue] : playerId: ${playerID}`);
+		const socketIdUserId: Queue = {
+			gameSocketId : playerID,
+			userId : userId,
+		}
 		const newUser: User = await this.usersRepository.findOne({ where: { id: userId } })
 		if (!newUser)
 			throw new Error(`[LEAVEQUEUE]: user not found`);
@@ -67,23 +97,23 @@ export class MatchmakingService {
 		newUser.inMatchmaking = false;
 		if (newUser.inSpeedQueue === false) {
 			console.log(`LEAVE NORMAL QUEUE`);
-			this.playersNormalQueue.splice(this.playersNormalQueue.indexOf(playerID), 1);
+			playersNormalQueue.splice(playersNormalQueue.indexOf(socketIdUserId), 1);
 		}
 		else {
 			newUser.inSpeedQueue = false;
 			console.log(`LEAVE SPEED QUEUE`);
-			this.playersSpeedQueue.splice(this.playersSpeedQueue.indexOf(playerID), 1);
+			playersSpeedQueue.splice(playersSpeedQueue.indexOf(socketIdUserId), 1);
 		}
 		await this.usersRepository.save(newUser);
-		console.log(`quitSpeedQueue: ${this.playersSpeedQueue}`)
-		console.log(`quitNormalQueue: ${this.playersNormalQueue}`)
+		console.log(`quitSpeedQueue: ${playersSpeedQueue}`)
+		console.log(`quitNormalQueue: ${playersNormalQueue}`)
 		return;
 	}
 
 	IsThereEnoughPairs(gameMode: string) {
-		if (gameMode === "NORMAL" && (this.playersNormalQueue.length >= 2))
+		if (gameMode === "NORMAL" && (playersNormalQueue.length >= 2))
 			return true;
-		else if (gameMode === "SPEED" && (this.playersSpeedQueue.length >= 2)) {
+		else if (gameMode === "SPEED" && (playersSpeedQueue.length >= 2)) {
 			return true;
 		}
 		return false;

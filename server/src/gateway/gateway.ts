@@ -1,16 +1,16 @@
 import { WebSocketGateway, WebSocketServer, SubscribeMessage, MessageBody, OnGatewayConnection, OnGatewayDisconnect, ConnectedSocket } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io'
-import { GroupMember } from 'src/chat/entities/group_member.entity';
 import { ChatService } from 'src/chat/chat.service';
 import { UsersService } from 'src/users/users.service';
-import { Conversation } from 'src/chat/entities/conversation.entity';
 import { MessageDto } from 'src/chat/dto/message.dto';
 import { GatewayGuard } from './Gatewayguard.guard';
 import { HttpException, HttpStatus, UseGuards } from '@nestjs/common'
-import { Req } from '@nestjs/common'
 import dotenv from 'dotenv';
 import { userInGame, userInMatchmaking } from 'src/game/matchmaking/matchmaking.service';
-import e from 'express';
+import { getPlayerSpeedQueue } from 'src/game/matchmaking/matchmaking.service';
+import { setPlayerSpeedQueue } from 'src/game/matchmaking/matchmaking.service'; 
+import { getPlayerNormalQueue } from 'src/game/matchmaking/matchmaking.service';
+import { setPlayerNormalQueue } from 'src/game/matchmaking/matchmaking.service';
 
 dotenv.config();
 
@@ -176,6 +176,16 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 							userInMatchmaking[key] = false;
 						}
 					});
+		
+					const playerNormalQueue = getPlayerNormalQueue(); 
+					playerNormalQueue.filter(item => item.userId !== userID);
+					setPlayerNormalQueue(playerNormalQueue);
+
+					const playerSpeedQueue = getPlayerSpeedQueue(); 
+					playerSpeedQueue.filter(item => item.userId !== userID);
+					setPlayerSpeedQueue(playerSpeedQueue);
+					delete this.connectedUsers[userID];
+					
 				}
 				console.log(`after userInGame ---?`, userInGame);
 				console.log(`after InGame --->`, inGame);
@@ -186,7 +196,6 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 				this.userRejoinsRooms(client, userID);
 				this.notifyFriendList(userID, client.id, 'online');
 				this.server.emit('newUser');
-
 				client.on('disconnect', () => {
 					let count = 0;
 					Object.keys(this.connectedUsers).forEach(key => {
@@ -204,25 +213,32 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 						Object.keys(userInGame).forEach(key => {
 							const dto = userInGame[key];
 							if (dto) {
-								delete userInGame[key];
+								userInGame[key] = false;
 							}
 						});
 						Object.keys(userInMatchmaking).forEach(key => {
 							const dto = userInMatchmaking[key];
 							if (dto) {
-								delete userInMatchmaking[key];
+								userInMatchmaking[key] = false;
+								
 							}
 						});
+						const playerNormalQueue = getPlayerNormalQueue(); 
+						playerNormalQueue.filter(item => item.userId !== userID);
+						setPlayerNormalQueue(playerNormalQueue);
+
+						const playerSpeedQueue = getPlayerSpeedQueue(); 
+						playerSpeedQueue.filter(item => item.userId !== userID);
+						setPlayerSpeedQueue(playerSpeedQueue);
+						delete this.connectedUsers[userID];
 					}
 					console.log("===> Disconnecting user ", userID, " with ID ", userID);
 					this.notifyFriendList(userID, client.id, 'offline');
 					client.leave(client.id);
 					console.log("Client ", userID, " has left ", client.id, " room");
 					this.userLeavesRooms(client, userID);
-					// delete this.connectedUsers[userID];
 				});
 			});
-		
 		} catch (error) {
 			console.log(' == Gatewway: ', error);
 		}
@@ -236,8 +252,6 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 
 	handleDisconnect(client: Socket) {
 		console.log(`== GeneralGtw ---> USERSOCKET client disconnected: ${client.id}`);
-
-
 	}
 
 

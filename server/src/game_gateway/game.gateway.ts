@@ -104,22 +104,27 @@ export class GameGateway {
     @UseGuards(GatewayGuard)
     async handleDisconnect(@ConnectedSocket() client: Socket) {
         try {
-            console.log(`[handleDisconnect] ONE DISCONNECT : ${client.id}`);
+            console.log(client.id,  `= [handleDisconnect] ONE DISCONNECT : ${client.id}`);
             const userId = this.GameService.getUserIdWithSocketId(client.id);
             if (userId && client.id) {
+                // check la queue
+                this.GameService.deleteQueue(userId, client.id);
                 const user: User = await this.GameService.getUserWithUserId(userId);
-                console.log(`[handleDisconnect] Retrieved disconnected user : ${user.login}`)
-                if (this.GameService.userInGameOrInMacthmaking(userId)) {
-                    console.log(`usermatch: ${userInMatchmaking[userId]}, ${userInGame[userId]}`);
-                    if (userInMatchmaking[userId] === true) {
-                        console.log(`[handleDisconnect] User is in the matchmaking`)
+                console.log(client.id,  `= [handleDisconnect] Retrieved disconnected user : ${user.login}`)
+                if (this.GameService.userInGameOrInMacthmaking(userId)) 
+                {
+                    console.log(client.id,  `= usermatch: ${userInMatchmaking[userId]}, ${userInGame[userId]}`);
+                    if (userInMatchmaking[userId] === true) 
+                    {
+                        console.log(client.id,  `= [handleDisconnect] User is in the matchmaking`)
                         await this.GameService.deconnectUserMatchmaking(user, userId, client.id);
-                    } else if (userInGame[userId] === true) {
+                    } else
+                    {
                         let game = await this.GameService.getGameWithUserId(userId);
                         if (game) {
                             const gameInstance: game_instance = this.GameService.getGameInstance(this.game_instance, game.gameId);
                             if (gameInstance && gameInstance.game_has_ended !== true) {
-                                console.log(`[DISCONNECTLIST] user: ${user.login}`)
+                                console.log(client.id,  `= [DISCONNECTLIST] user: ${user.login}`)
                                 if (user.id === gameInstance.usersId[0])
                                     await this.GameService.disconnectSocket(gameInstance.usersId[0], game.gameId, gameInstance.players[0])
                                 else
@@ -377,12 +382,13 @@ export class GameGateway {
 
     async executeGameTick(gameLoop: NodeJS.Timeout, gameInstance: game_instance, client: string) {
         try {
+
             if (gameInstance.stop === true) {
                 console.log(`[RETURN GAME STOP] gameinstance: ${gameInstance.game_has_ended}`)
                 return
             }
             const disconnectedSockets = this.GameService.getDisconnections(gameInstance.gameID)
-            if (disconnectedSockets.length > 0)
+            if (disconnectedSockets.length > 0 || !userInGame[gameInstance.usersId[0]] || !userInGame[gameInstance.usersId[1]])
                 await this.handleUserDisconnection(disconnectedSockets, gameInstance, gameLoop)
             if (gameInstance.game_has_ended === true)
                 await this.endGame(gameInstance, gameLoop)

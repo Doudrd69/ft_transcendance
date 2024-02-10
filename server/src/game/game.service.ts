@@ -8,7 +8,7 @@ import { User } from 'src/users/entities/users.entity';
 import { Paddle } from './entities/paddle.entity';
 import { GameEngineService } from './gameEngine.service';
 import { game_instance } from 'src/game_gateway/game.gateway';
-import { MatchmakingService, userInGame, userInMatchmaking } from './matchmaking/matchmaking.service';
+import { MatchmakingService, Queue, playersNormalQueue, playersSpeedQueue, userInGame, userInMatchmaking } from './matchmaking/matchmaking.service';
 
 interface GameInfoDto {
 	userOneId: number;
@@ -33,6 +33,7 @@ export class GameService {
 	}
 
 	userGameSockets: { [userId: number]: string };
+
 	disconnections: { [gameID: number]: string[] };
 
 	async disconnectSocket(userId: number, gameID: number, socketId: string) {
@@ -125,9 +126,11 @@ export class GameService {
 	async userInGameOrInMacthmaking(userId: number) {
 		// donner le userId a la place
 
-		console.log(`user ingame : ${userInGame[userId]}, user inmatchmaking: ${userInMatchmaking[userId]}`);
 		if (userInGame[userId] === true || userInMatchmaking[userId] === true)
+		{
+			console.log(userId,  ` = user ingame : ${userInGame[userId]}, user inmatchmaking: ${userInMatchmaking[userId]}`);
 			return true;
+		}
 		return false;
 	}
 
@@ -149,6 +152,20 @@ export class GameService {
 			throw new Error(`[getLoginByUserIdStartGame  ERROR]: Users not found`);
 		const playersLogin: [string, string] = [UserOne.username, UserTwo.username]
 		return (playersLogin);
+	}
+
+	deleteQueue(userId: number, gameSocketId: string)
+	{
+		const socketIdUserId: Queue = {
+			gameSocketId : gameSocketId,
+			userId : userId,
+		}
+		if (playersNormalQueue.includes(socketIdUserId)) {
+			playersNormalQueue.splice(playersNormalQueue.indexOf(socketIdUserId), 1);
+		}
+		if (playersSpeedQueue.includes(socketIdUserId)) {
+			playersSpeedQueue.splice(playersSpeedQueue.indexOf(socketIdUserId), 1);
+		}
 	}
 
 	async deleteGame(game: Game) {
@@ -278,7 +295,7 @@ export class GameService {
 		const gameTwo = await this.gameRepository.findOne({ where: { playerTwoID: this.userGameSockets[userId] } })
 		if (gameTwo)
 			return gameTwo;
-		throw new Error(`[getGameWithUserId ERROR]: gameNotFound`); // estce bien nessecaire?
+		// throw new Error(`[getGameWithUserId ERROR]: gameNotFound`); // estce bien nessecaire?
 	}
 
 	async getGameWithGameId(gameId: number) {
