@@ -30,6 +30,7 @@ interface FriendRequestDto {
 }
 
 interface GameInviteDto {
+	senderUsername: string;
 	senderUserID: number;
 }
 
@@ -304,7 +305,8 @@ const GeneralComponent = () => {
 
 		// Works on both connection and reconnection
 		globalState.userSocket?.on('connect', () => {
-			globalState.userSocket?.emit('joinPersonnalRoom', sessionStorage.getItem("currentUserID"));
+			console.log("Connected to userSocket", globalState.userSocket?.id);
+			globalState.userSocket?.emit('joinPersonnalRoom', Number(sessionStorage.getItem("currentUserID")));
 		})
 
 		globalState.userSocket?.on('disconnect', () => { })
@@ -354,6 +356,7 @@ const GeneralComponent = () => {
 		});
 
 		globalState.userSocket?.on('gameInvite', (gameInviteDto: GameInviteDto) => {
+			console.log("============================", gameInviteDto);
 			toast(<GameInviteNotification gameInviteDto={gameInviteDto} />,
 				{
 					pauseOnFocusLoss: false,

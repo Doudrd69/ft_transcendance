@@ -76,11 +76,11 @@ let gameInstance: game_instance | null = null;
 })
 
 export class GameGateway {
+    userInGame: { [userGameSocketId: string]: boolean };
 
     @WebSocketServer()
     server: Server;
     game_instance: game_instance[];
-    userInGame: { [userGameSocketId: string]: boolean };
 
     constructor(
         private readonly GameService: GameService,
@@ -96,12 +96,12 @@ export class GameGateway {
         console.log(`GameGtw client connected : ${client.id}`);
     }
 
-
     async handleException(error: Error, client: Socket) {
         console.log(`[GAME_ERROR]: ${error.stack}`)
         console.log(`[GAME_ERROR] ${error.name}, ${error.message}`)
         client.emit("exception", { error: error.message })
     }
+
     @UseGuards(GatewayGuard)
     async handleDisconnect(@ConnectedSocket() client: Socket) {
         try {
