@@ -139,15 +139,42 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 
 	@UseGuards(GatewayGuard)
 	async handleConnection(client: Socket) {
-
 		try {
-
+		
 			// this.connectedUsers[client.id] = userID;
 			// client.join(personnalRoom);
 			console.log(`== GeneralGtw ---> USERSOCKET client connected: ${client.id}`);
 			
 			client.on('joinPersonnalRoom', (userID: number) => {
-				
+				console.log(this.connectedUsers);
+				let count = 0;
+				Object.keys(this.connectedUsers).forEach(key => {
+					if (Number(key) === userID)
+						count++;
+					console.log("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@", count);
+				});
+				console.log("===========================================> count ", count);
+				if (count != 1) {
+					Object.keys(inGame).forEach(key => {
+						const dto : InGameDto = inGame[key];
+						if (dto.emitUserId === userID || dto.targetUserId === userID) {
+							console.log("inGame[key]", inGame[key])
+							delete inGame[key];
+						}
+					});
+					Object.keys(userInGame).forEach(key => {
+						const dto = userInGame[key];
+						if (dto) {
+							delete userInGame[key];
+						}
+					});
+					Object.keys(userInMatchmaking).forEach(key => {
+						const dto = userInMatchmaking[key];
+						if (dto) {
+							delete userInMatchmaking[key];
+						}
+					});
+				}
 				this.connectedUsers[userID] = client.id;
 				client.join(client.id);
 				console.log("== Client ", userID, " has joined ", client.id, " room");
@@ -156,14 +183,41 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 				this.server.emit('newUser');
 
 				client.on('disconnect', () => {
+					let count = 0;
+					Object.keys(this.connectedUsers).forEach(key => {
+						if (Number(key) === userID)
+							count++;
+					});
+					if (count != 1) {
+						Object.keys(inGame).forEach(key => {
+							const dto : InGameDto = inGame[key];
+							if (dto.emitUserId === userID || dto.targetUserId === userID) {
+								console.log("inGame[key]", inGame[key])
+								delete inGame[key];
+							}
+						});
+						Object.keys(userInGame).forEach(key => {
+							const dto = userInGame[key];
+							if (dto) {
+								delete userInGame[key];
+							}
+						});
+						Object.keys(userInMatchmaking).forEach(key => {
+							const dto = userInMatchmaking[key];
+							if (dto) {
+								delete userInMatchmaking[key];
+							}
+						});
+					}
 					console.log("===> Disconnecting user ", userID, " with ID ", userID);
 					this.notifyFriendList(userID, client.id, 'offline');
 					client.leave(client.id);
 					console.log("Client ", userID, " has left ", client.id, " room");
 					this.userLeavesRooms(client, userID);
-					delete this.connectedUsers[userID];
+					// delete this.connectedUsers[userID];
 				});
 			});
+		
 		} catch (error) {
 			console.log(' == Gatewway: ', error);
 		}
@@ -177,6 +231,8 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 
 	handleDisconnect(client: Socket) {
 		console.log(`== GeneralGtw ---> USERSOCKET client disconnected: ${client.id}`);
+
+
 	}
 
 
@@ -258,20 +314,25 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		try {
 
 			const emitUserId = client.handshake.auth.user.sub;
+			const targetUser = await this.userService.getUserByID(data.otherUserId);
+			if (!emitUserId || !targetUser.id || (emitUserId === targetUser.id)) {
+				console.log(`[check de l'existence des users] : les deux id sont pas la`);
+				return;
+			}
 			const targetUserId: number = data.otherUserId;
 			const uniqueKey = `${Math.min(emitUserId, targetUserId)}-${Math.max(emitUserId, targetUserId)}`
+			
 			console.log(`inGame[uniqueKey] dans inviteAccepted :  ${emitUserId} |  ${targetUserId}`)
 			if (inGame[uniqueKey])
 
 				if (!inGame[uniqueKey]) {
 					await this.userService.unsetUserInGame(emitUserId);
 					console.log(`DECO LAUNCH GAME INVITE`,);
-					this.server.to(client.id).emit('badsenderIdGameInvite');
+					this.server.to(this.connectedUsers[emitUserId]).emit('badsenderIdGameInvite');
 					return;
 				}
 			console.log(`[inGame in InvitedAccepted], ${inGame[uniqueKey].emitUserId} | ${inGame[uniqueKey].targetUserId}`)
-			const otherUser = await this.userService.getUserByID(data.otherUserId);
-			this.server.to(otherUser.username).emit('acceptInvitation', { userTwoId: emitUserId, userTwoGameId: data.userGameSocketId });
+			this.server.to(this.connectedUsers[emitUserId]).emit('acceptInvitation', { userTwoId: emitUserId, userTwoGameId: data.userGameSocketId });
 		} catch (error) {
 			console.log(`[GAME INVITE ERROR]: ${error.stack}`)
 		}
@@ -309,7 +370,7 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 			}
 			inGame[uniqueKey] = pairInGame;
 			await this.userService.setUsersInGame(emitUserId, targetUserId)
-			this.server.to(client.id).emit('usersNotInGame', targetUserId);
+			this.server.to(this.connectedUsers[emitUserId]).emit('usersNotInGame', targetUserId);
 		} catch (error) {
 			console.log(`[GAME INVITE ERROR]: ${error.stack}`)
 		}
@@ -354,6 +415,7 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		// check aussi la game socket?
 		this.server.to(client.id).emit('createGameInviteSocket', { userTwoId: data.userTwoId, userTwoGameId: data.userTwoGameId });
 	}
+
 
 	@SubscribeMessage('InviteToGame')
 	@UseGuards(GatewayGuard)
@@ -426,7 +488,10 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 				console.log('===============>La clé n\'existe pas dans gameQueue.');
 				gameQueue[uniqueKey] = newPair;
 				console.log(`[creatPair] : ${gameQueue[uniqueKey].isAcceptedEmitUser} |  ${gameQueue[uniqueKey].isAcceptedTargetUser}`)
-				this.server.to(targetToInvite.username).emit('gameInvite', {
+				console.log(`[targetToInvite.username] : ${targetToInvite.username}`)
+				console.log(`[targetToInvite.id] : ${targetToInvite.id}`)
+	
+				this.server.to(this.connectedUsers[targetToInvite.id]).emit('gameInvite', {
 					senderUsername: client.handshake.auth.user.username,
 					senderUserID: emitUserId,
 				});
@@ -511,7 +576,6 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 				conversationID: dto.conversationID,
 				conversationName: conversationName,
 			});
-
 			return;
 		}
 
