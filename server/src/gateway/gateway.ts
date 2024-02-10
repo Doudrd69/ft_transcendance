@@ -271,7 +271,7 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 				}
 			console.log(`[inGame in InvitedAccepted], ${inGame[uniqueKey].emitUserId} | ${inGame[uniqueKey].targetUserId}`)
 			const otherUser = await this.userService.getUserByID(data.otherUserId);
-			this.server.to(otherUser.username).emit('acceptInvitation', { userTwoId: emitUserId, userTwoGameId: data.userGameSocketId });
+			this.server.to(this.connectedUsers[otherUser.id]).emit('acceptInvitation', { userTwoId: emitUserId, userTwoGameId: data.userGameSocketId });
 		} catch (error) {
 			console.log(`[GAME INVITE ERROR]: ${error.stack}`)
 		}
@@ -426,7 +426,7 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 				console.log('===============>La clé n\'existe pas dans gameQueue.');
 				gameQueue[uniqueKey] = newPair;
 				console.log(`[creatPair] : ${gameQueue[uniqueKey].isAcceptedEmitUser} |  ${gameQueue[uniqueKey].isAcceptedTargetUser}`)
-				this.server.to(targetToInvite.username).emit('gameInvite', {
+				this.server.to(this.connectedUsers[targetToInvite.id]).emit('gameInvite', {
 					senderUsername: client.handshake.auth.user.username,
 					senderUserID: emitUserId,
 				});
@@ -485,7 +485,7 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		// peut etre check l'Id? apres le seul souci c'est qu'il peut renvoyer une invite plus vite
 		try {
 			const user = await this.userService.getUserByID(data.senderUserId)
-			this.server.to(user.login).emit('deniedInvitation');
+			this.server.to(this.connectedUsers[user.id]).emit('deniedInvitation');
 		}
 		catch (error) {
 			console.log(`[GAME INVITE ERROR]: ${error.stack}`)
