@@ -360,7 +360,6 @@ export class UsersService {
 			});
 
 			if (array) {
-				console.log(array);
 				return array;
 			}
 		}
