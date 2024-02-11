@@ -22,7 +22,6 @@ RUN npm install && \
 	npm install image-js  && \
 	npm install promise-file-reader
 
-
 COPY . .
 
 RUN npm run build

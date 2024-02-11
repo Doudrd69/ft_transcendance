@@ -9,6 +9,7 @@ import BodyComponent from './components/body/Body';
 import { ChatProvider } from './components/chat/ChatContext';
 import Game from './components/game/Game';
 import Header from './components/header/Header';
+import { useGame } from './components/game/GameContext';
 // import dotenv from 'dotenv';
 
 // dotenv.config();
@@ -127,14 +128,14 @@ const GeneralComponent = () => {
 					<div className='toast-yes' onClick={() => {
 						gameInviteValidation(gameInviteDto);
 						closeToast();
-					}}>
+						}}>
 						Accept
 					</div>
 					<div className='toast-no' onClick={() => {
 						gameInviteDeny(gameInviteDto);
 						closeToast();
 					}}>
-						Deny
+					Deny
 					</div>
 				</div>
 			</div>
@@ -302,7 +303,6 @@ const GeneralComponent = () => {
 
 	// UserSocket multi-purpose useEffect
 	useEffect(() => {
-
 		// Works on both connection and reconnection
 		globalState.userSocket?.on('connect', () => {
 			console.log("Connected to userSocket", globalState.userSocket?.id);
@@ -356,8 +356,7 @@ const GeneralComponent = () => {
 		});
 
 		globalState.userSocket?.on('gameInvite', (gameInviteDto: GameInviteDto) => {
-			console.log("============================", gameInviteDto);
-			toast(<GameInviteNotification gameInviteDto={gameInviteDto} />,
+			 toast(<GameInviteNotification gameInviteDto={gameInviteDto} />,
 				{
 					pauseOnFocusLoss: false,
 					autoClose: 5000,
@@ -525,11 +524,11 @@ const GeneralComponent = () => {
 				pauseOnHover={false}
 			/>
 			{!globalState.isConnected ?
-				(<AccessComponent />)
+				(<AccessComponent/>)
 				: (
 					<ChatProvider>
-						<Header />
-						<BodyComponent />
+						<Header/>
+						<BodyComponent/>
 					</ChatProvider>
 				)}
 		</>

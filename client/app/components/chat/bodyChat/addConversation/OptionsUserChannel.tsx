@@ -158,6 +158,7 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 	const muteUser = async() => {
 		chatDispatch({ type: 'ACTIVATE', payload: 'showTimer' });
 		chatDispatch({ type: 'DISABLE', payload: 'showOptionsUserChannel' });
+		chatDispatch({ type: 'SET_CURRENT_TARGET', payload: user });
 	}
 
 	const banUser = async() => {
