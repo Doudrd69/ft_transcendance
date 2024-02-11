@@ -3,8 +3,9 @@
 .bloc-history-title {
 	display: flex;
 	flex-direction: column;
+	
 	height: 100%;
-    width: 50%;
+    width: 70%;
 	justify-content: center;
 	align-items: center;
 	overflow: hidden;

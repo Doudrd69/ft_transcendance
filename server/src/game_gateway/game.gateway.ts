@@ -19,49 +19,49 @@ import { GameInviteDto, gameQueue, inGame } from 'src/gateway/gateway';
 dotenv.config();
 
 export interface vector_instance {
-    x: number;
-    y: number;
+	x: number;
+	y: number;
 }
 
 
 export interface ball_instance {
-    position: vector_instance;
-    speed: vector_instance;
-    r: number;
-    alive: boolean;
-    elasticity: number;
-    player1Scored: boolean;
-    player2Scored: boolean;
+	position: vector_instance;
+	speed: vector_instance;
+	r: number;
+	alive: boolean;
+	elasticity: number;
+	player1Scored: boolean;
+	player2Scored: boolean;
 }
 
 export interface paddle_instance {
-    speed: number;
-    ArrowUp: boolean;
-    ArrowDown: boolean;
-    is_a_paddle: boolean;
-    length: number;
-    start: vector_instance;
-    end: vector_instance;
-    number: number;
+	speed: number;
+	ArrowUp: boolean;
+	ArrowDown: boolean;
+	is_a_paddle: boolean;
+	length: number;
+	start: vector_instance;
+	end: vector_instance;
+	number: number;
 }
 
 export interface game_instance {
-    gameID: number;
-    playersLogin: string[];
-    player1_score: number;
-    player2_score: number;
-    game_has_started: boolean;
-    super_game_mode: boolean;
-    players: string[];
-    game_has_ended: boolean;
-    ball: ball_instance;
-    paddles: paddle_instance[];
-    victory_condition: number;
-    player1Joined: boolean;
-    player2Joined: boolean;
-    pause: boolean;
-    stop: boolean;
-    usersId: number[];
+	gameID: number;
+	playersLogin: string[];
+	player1_score: number;
+	player2_score: number;
+	game_has_started: boolean;
+	super_game_mode: boolean;
+	players: string[];
+	game_has_ended: boolean;
+	ball: ball_instance;
+	paddles: paddle_instance[];
+	victory_condition: number;
+	player1Joined: boolean;
+	player2Joined: boolean;
+	pause: boolean;
+	stop: boolean;
+	usersId: number[];
 }
 
 

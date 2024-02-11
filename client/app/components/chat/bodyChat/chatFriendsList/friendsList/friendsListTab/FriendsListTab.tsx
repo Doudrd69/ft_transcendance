@@ -38,7 +38,9 @@ const FriendsListTabComponent: React.FC<FriendsListTabComponentProps> = ({ user,
 	const [confirmationText, setConfirmationText] = useState('');
 	const [funtionToExecute, setFunctionToExecute] = useState<() => void>(() => { });
 	const [accepted, setAccepted] = useState(false);
+
 	chatState.currentTargetStats = useState<targetStat>({id : user.id, username: user.username});
+	console.log(chatState.currentTargetStats);
 
 	const handleDms = async() => {
 
@@ -61,9 +63,11 @@ const FriendsListTabComponent: React.FC<FriendsListTabComponentProps> = ({ user,
 				let tmp = conversation.name;
 				let conversationName;
 				const currentUserLogin = sessionStorage.getItem("currentUserLogin");
+				console.log("===============>", currentUserLogin);
+				console.log("===============>", conversation.name);
 				if (currentUserLogin)
 					conversationName = tmp.replace(currentUserLogin, '');
-				chatDispatch({ type: 'SET_CURRENT_CONVERSATION', payload: conversationName });
+				chatDispatch({ type: 'SET_CURRENT_CONVERSATION', payload: conversation.name });
 				chatDispatch({ type: 'SET_CURRENT_ROOM', payload: conversation.name });
 				chatDispatch({ type: 'SET_CURRENT_CONVERSATION_ID', payload: conversation.id });
 				globalState.userSocket?.emit('joinRoom', { roomName: conversation.name, roomID: conversation.id } );

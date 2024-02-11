@@ -55,40 +55,43 @@ const HistoryComponent: React.FC = () => {
 	}, [globalState?.userSocket]);
 
 	const timestamp = new Date()
-
-		return (
-			<div className='bloc-history-title'>
-				<div className="title-game"> HISTORY</div>
-					<div className='bloc-history'>
-						{gameHistory.map((game: gameHistory, index) => (
-							<div key={index} className="game-history">
-								<div className="game-history-player">
-									<img className='img-history' src={`${process.env.API_URL}/users/getAvatar/${game?.playerOneId}/${timestamp}`}/>
-									<div className={`game-history-player-name  ${game.scoreP1 > game.scoreP2 ? 'green-text' : 'red-text'}`}>
-										{game.playerOne}
-									</div>
-									<div className="game-history-player-score">
-										{game.scoreP1}
-									</div>
+	return (
+		<div className='bloc-history-title'>
+			<div className="title-game"> HISTORY</div>
+			<div className='bloc-history'>
+				{gameHistory.map((game, index) => {
+				const reversedIndex = gameHistory.length - 1 - index;
+				const gameData = gameHistory[reversedIndex];
+					return (
+						<div key={index} className="game-history">
+							<div className="game-history-player">
+								<img className='img-history' src={`${process.env.API_URL}/users/getAvatar/${gameData?.playerOneId}/${timestamp}`}/>
+								<div className={`game-history-player-name  ${gameData.scoreP1 > gameData.scoreP2 ? 'green-text' : 'red-text'}`}>
+									{gameData.playerOne}
 								</div>
-								<div className="game-history-player">
-									vs
-								</div>
-								<div className="game-history-player">
-									<img className='img-history' src={`${process.env.API_URL}/users/getAvatar/${game?.playerTwoId}/${timestamp}`}/>
-									<div className={`game-history-player-name  ${game.scoreP1 < game.scoreP2 ? 'green-text' : 'red-text'}`}>
-											{game.playerTwo}
-									</div>
-									<div className="game-history-player-score">
-										{game.scoreP2}
-									</div>
+								<div className="game-history-player-score">
+									{gameData.scoreP1}
 								</div>
 							</div>
-						))}
-				</div>
-			</div>
-			);
-
+						<div className="game-history-player">
+							vs
+						</div>
+						<div className="game-history-player">
+							<img className='img-history' src={`${process.env.API_URL}/users/getAvatar/${gameData?.playerTwoId}/${timestamp}`}/>
+							<div className={`game-history-player-name  ${gameData.scoreP1 < gameData.scoreP2 ? 'green-text' : 'red-text'}`}>
+								{gameData.playerTwo}
+							</div>
+							<div className="game-history-player-score">
+							{gameData.scoreP2}
+							</div>
+						</div>
+						</div>
+					);
+				})}
+		</div>
+		</div>
+	);
+	
 	};
 	
 	export default HistoryComponent;

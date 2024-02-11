@@ -27,11 +27,10 @@
 	position: fixed;
 	top: 50%;
 	left: 50%;
-	transform: translate(-50%, -70%);
+	transform: translate(-50%, -20%);
 	font-weight: bold;
 	z-index: 3300;
 	width: 50%;
-	height: 50%;
 	border-radius: 10px;
 	color: white;
 	font-size: 30px;
@@ -47,12 +46,11 @@
 }
 
 .bloc-statistiques-history-content{
-	width: 100%;
-    height: 100%;
-    overflow-y: scroll;
-    overflow-x: scroll;
+	max-height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden; 
     display: flex;
-    flex-direction: column-reverse;
+    flex-direction: column;
 }
 
 .statistiques-container{

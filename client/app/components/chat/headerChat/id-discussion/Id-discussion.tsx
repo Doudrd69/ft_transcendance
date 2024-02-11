@@ -12,7 +12,6 @@ const IdDiscussionComponent: React.FC = () => {
 	const { chatState, chatDispatch } = useChat();
 	const { globalState } = useGlobal();;
 	var id;
-
 	useEffect(() => {
 		globalState.userSocket?.on('refreshAdmin', () => {
 			chatDispatch({type: 'TOGGLEX', payload: 'isAdmin' });

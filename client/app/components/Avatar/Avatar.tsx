@@ -49,7 +49,7 @@ const AvatarImageComponent: React.FC<AvatarImageProps> = ({ className, refresh, 
 
 
 	return (
-					<img src={url} className={className} alt="User0 Avatar" />	
+					<img src={url} className={className} alt="User Avatar" />	
 	);
 };
 
