@@ -209,6 +209,16 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 		};
 	}, []);
 
+	useEffect(() => {
+		globalState.userSocket?.on('channelDeleted', ( data: {roomName: string, roomID: string} ) => {
+			chatDispatch({ type: 'ACTIVATE', payload: 'showChannelList' });
+		});
+
+		return () => {
+			globalState.userSocket?.off('refreshChannelList');
+		}
+	}, [globalState?.userSocket]);
+
 	return (
 		<>
 		<div className="blur-background"></div>

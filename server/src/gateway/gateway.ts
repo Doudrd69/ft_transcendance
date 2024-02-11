@@ -144,17 +144,19 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 			// this.connectedUsers[client.id] = userID;
 			// client.join(personnalRoom);
 			console.log(`== GeneralGtw ---> USERSOCKET client connected: ${client.id}`);
-				console.log(`before userInGame ---?`, userInGame);
-				console.log(`before InGame --->`, inGame);
-				console.log(`before inMatchmakeing`, userInMatchmaking)
+				console.log(`Connect before userInGame ---?`, userInGame);
+				console.log(`Connect before InGame --->`, inGame);
+				console.log(`Connect before inMatchmakeing`, userInMatchmaking)
+				console.log("Connect before GameQueue", gameQueue);
+
 			client.on('joinPersonnalRoom', (userID: number) => {
 				console.log(this.connectedUsers);
 				let count = 0;
 				Object.keys(this.connectedUsers).forEach(key => {
 					if (Number(key) === userID)
 						count++;
-					console.log("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@", count);
 				});
+				console.log("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@", count);
 				console.log("===========================================> count ", count);
 				if (count != 1) {
 					Object.keys(inGame).forEach(key => {
@@ -162,6 +164,15 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 						if (dto.emitUserId === userID || dto.targetUserId === userID) {
 							console.log("inGame[key]", inGame[key])
 							delete inGame[key];
+						}
+					});
+					Object.keys(gameQueue).forEach(key => {
+						console.log("gameQueue[key]", gameQueue[key])
+
+						const dto = gameQueue[key];
+						if (dto.emitUserId === userID || dto.targetUserId === userID) {
+							console.log("gameQueue[key]", gameQueue[key])
+							delete gameQueue[key];
 						}
 					});
 					Object.keys(userInGame).forEach(key => {
@@ -177,26 +188,30 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 						}
 					});
 		
-					const playerNormalQueue = getPlayerNormalQueue(); 
+					const playerNormalQueue = getPlayerNormalQueue();
 					playerNormalQueue.filter(item => item.userId !== userID);
 					setPlayerNormalQueue(playerNormalQueue);
-
-					const playerSpeedQueue = getPlayerSpeedQueue(); 
+					const playerSpeedQueue = getPlayerSpeedQueue();
 					playerSpeedQueue.filter(item => item.userId !== userID);
 					setPlayerSpeedQueue(playerSpeedQueue);
-					delete this.connectedUsers[userID];
-					
 				}
-				console.log(`after userInGame ---?`, userInGame);
-				console.log(`after InGame --->`, inGame);
-				console.log(`after inMatchmakeing`, userInMatchmaking)
+				console.log(`Connect after userInGame ---?`, userInGame);
+				console.log(`Connect after InGame --->`, inGame);
+				console.log(`Connect after inMatchmakeing`, userInMatchmaking)
+				console.log("Connect after", gameQueue);
 				this.connectedUsers[userID] = client.id;
 				client.join(client.id);
 				console.log("== Client ", userID, " has joined ", client.id, " room");
 				this.userRejoinsRooms(client, userID);
 				this.notifyFriendList(userID, client.id, 'online');
 				this.server.emit('newUser');
+				console.log(`== GeneralGtw ---> USERSOCKET client connected: ${client.id}`);
+				console.log(`Disconnect before userInGame ---?`, userInGame);
+				console.log(`Disconnect before InGame --->`, inGame);
+				console.log(`Disconnect before inMatchmakeing`, userInMatchmaking)
+				console.log("Disconnect before GameQueue", gameQueue);
 				client.on('disconnect', () => {
+					console
 					let count = 0;
 					Object.keys(this.connectedUsers).forEach(key => {
 						if (Number(key) === userID)
@@ -206,7 +221,6 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 						Object.keys(inGame).forEach(key => {
 							const dto : InGameDto = inGame[key];
 							if (dto.emitUserId === userID || dto.targetUserId === userID) {
-								console.log("inGame[key]", inGame[key])
 								delete inGame[key];
 							}
 						});
@@ -214,6 +228,13 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 							const dto = userInGame[key];
 							if (dto) {
 								userInGame[key] = false;
+							}
+						});
+						Object.keys(gameQueue).forEach(key => {
+							console.log("gameQueue[key]", gameQueue[key])
+							const dto = gameQueue[key];
+							if (dto.emitUserId === userID || dto.targetUserId === userID) {
+								delete gameQueue[key];
 							}
 						});
 						Object.keys(userInMatchmaking).forEach(key => {
@@ -230,10 +251,14 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 						const playerSpeedQueue = getPlayerSpeedQueue(); 
 						playerSpeedQueue.filter(item => item.userId !== userID);
 						setPlayerSpeedQueue(playerSpeedQueue);
+						this.notifyFriendList(userID, client.id, 'offline');
 						delete this.connectedUsers[userID];
 					}
+					console.log(`Disconnect after userInGame ---?`, userInGame);
+					console.log(`Disconnect after InGame --->`, inGame);
+					console.log(`Disconnect after inMatchmakeing`, userInMatchmaking)
+					console.log("Disconnect after", gameQueue);
 					console.log("===> Disconnecting user ", userID, " with ID ", userID);
-					this.notifyFriendList(userID, client.id, 'offline');
 					client.leave(client.id);
 					console.log("Client ", userID, " has left ", client.id, " room");
 					this.userLeavesRooms(client, userID);
@@ -495,6 +520,12 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 					inGame[uniqueKey] = pairInGame;
 					console.log(`inGame[uniqueKey] dans inviteToGame :  ${inGame[uniqueKey].emitUserId} |  ${inGame[uniqueKey].targetUserId}`)
 					this.userService.setUsersInGame(newPair.emitUserId, newPair.targetUserId);
+					if (gameQueue.hasOwnProperty(uniqueKey)) {
+						delete gameQueue[uniqueKey];
+						console.log('La paire a été supprimée de la queue.');
+					} else {
+						console.log('La clé spécifiée n\'existe pas dans la queue.');
+					}
 					this.server.to(client.id).emit('gameInviteDUO', targetUserId);
 					return;
 				}
