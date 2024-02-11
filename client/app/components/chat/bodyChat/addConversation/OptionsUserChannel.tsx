@@ -444,7 +444,7 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 
 					if (chatState.currentConversation) {
 						globalState.userSocket?.emit('kickUserFromChannel', {
-							userToKick: user.login,
+							userToKick: user.id,
 							roomName: chatState.currentConversation,
 							roomID: chatState.currentConversationID,
 						});

@@ -14,6 +14,11 @@ import { setPlayerNormalQueue } from 'src/game/matchmaking/matchmaking.service';
 
 dotenv.config();
 
+interface ConnectedUsers {
+	userId: number,
+	socketId: string,
+}
+
 export interface GameInviteDto {
 	emitUserId: number,
 	targetUserId: number,
@@ -48,7 +53,7 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	server: Server;
 
 	// we link a userID with its socket
-	private connectedUsers: { [userId: number]: string } = {};
+	private activeUsers : ConnectedUsers[];
 
 	private async userRejoinsRooms(client: Socket, userID: number) {
 
@@ -140,22 +145,14 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	@UseGuards(GatewayGuard)
 	async handleConnection(client: Socket) {
 		try {
-		
-			// this.connectedUsers[client.id] = userID;
-			// client.join(personnalRoom);
-			console.log(`== GeneralGtw ---> USERSOCKET client connected: ${client.id}`);
-				console.log(`before userInGame ---?`, userInGame);
-				console.log(`before InGame --->`, inGame);
-				console.log(`before inMatchmakeing`, userInMatchmaking)
+
 			client.on('joinPersonnalRoom', (userID: number) => {
-				console.log(this.connectedUsers);
+
 				let count = 0;
-				Object.keys(this.connectedUsers).forEach(key => {
-					if (Number(key) === userID)
+				this.activeUsers.forEach((user: ConnectedUsers) => {
+					if (user.userId === userID)
 						count++;
-					console.log("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@", count);
 				});
-				console.log("===========================================> count ", count);
 				if (count != 1) {
 					Object.keys(inGame).forEach(key => {
 						const dto : InGameDto = inGame[key];
@@ -184,22 +181,26 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 					const playerSpeedQueue = getPlayerSpeedQueue(); 
 					playerSpeedQueue.filter(item => item.userId !== userID);
 					setPlayerSpeedQueue(playerSpeedQueue);
-					delete this.connectedUsers[userID];
-					
 				}
-				console.log(`after userInGame ---?`, userInGame);
-				console.log(`after InGame --->`, inGame);
-				console.log(`after inMatchmakeing`, userInMatchmaking)
-				this.connectedUsers[userID] = client.id;
+
+				const newUser : ConnectedUsers = {
+					userId: userID,
+					socketId: client.id,
+				}
+
+				this.activeUsers.push(newUser);
+				console.log("Active users list: ", this.activeUsers);
+
 				client.join(client.id);
 				console.log("== Client ", userID, " has joined ", client.id, " room");
 				this.userRejoinsRooms(client, userID);
 				this.notifyFriendList(userID, client.id, 'online');
 				this.server.emit('newUser');
+
 				client.on('disconnect', () => {
 					let count = 0;
-					Object.keys(this.connectedUsers).forEach(key => {
-						if (Number(key) === userID)
+					this.activeUsers.forEach((user: ConnectedUsers) => {
+						if (user.userId === userID)
 							count++;
 					});
 					if (count != 1) {
@@ -230,7 +231,7 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 						const playerSpeedQueue = getPlayerSpeedQueue(); 
 						playerSpeedQueue.filter(item => item.userId !== userID);
 						setPlayerSpeedQueue(playerSpeedQueue);
-						delete this.connectedUsers[userID];
+						this.activeUsers = this.activeUsers.filter((user: ConnectedUsers) => user.socketId === client.id);
 					}
 					console.log("===> Disconnecting user ", userID, " with ID ", userID);
 					this.notifyFriendList(userID, client.id, 'offline');
@@ -321,9 +322,13 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		const { convID, convName, friend } = data;
 		console.log("==== addUserToRoom Event ====");
 		console.log("Emit to add ", friend, " to room : ", convName + convID);
-		this.server.to(this.connectedUsers[friend]).emit('userAddedToRoom', {
-			convID: convID,
-			convName: convName,
+		this.activeUsers.forEach((user: ConnectedUsers) => {
+			if (user.userId == friend) {
+				this.server.to(user.socketId).emit('userAddedToRoom', {
+					convID: convID,
+					convName: convName,
+				});
+			}
 		});
 	}
 
@@ -347,12 +352,18 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 				if (!inGame[uniqueKey]) {
 					await this.userService.unsetUserInGame(emitUserId);
 					console.log(`DECO LAUNCH GAME INVITE`,);
-					this.server.to(this.connectedUsers[emitUserId]).emit('badsenderIdGameInvite');
+					this.activeUsers.forEach((user: ConnectedUsers) => {
+						if (user.userId == emitUserId)
+							this.server.to(user.socketId).emit('badsenderIdGameInvite');
+					});
 					return;
 				}
 			console.log(`[inGame in InvitedAccepted], ${inGame[uniqueKey].emitUserId} | ${inGame[uniqueKey].targetUserId}`)
 			const otherUser = await this.userService.getUserByID(data.otherUserId);
-			this.server.to(this.connectedUsers[otherUser.id]).emit('acceptInvitation', { userTwoId: emitUserId, userTwoGameId: data.userGameSocketId });
+			this.activeUsers.forEach((user: ConnectedUsers) => {
+				if (user.userId == otherUser.id)
+					this.server.to(user.socketId).emit('acceptInvitation', { userTwoId: emitUserId, userTwoGameId: data.userGameSocketId });
+			});
 		} catch (error) {
 			console.log(`[GAME INVITE ERROR]: ${error.stack}`)
 		}
@@ -390,7 +401,10 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 			}
 			inGame[uniqueKey] = pairInGame;
 			await this.userService.setUsersInGame(emitUserId, targetUserId)
-			this.server.to(this.connectedUsers[emitUserId]).emit('usersNotInGame', targetUserId);
+			this.activeUsers.forEach((user: ConnectedUsers) => {
+				if (user.userId == emitUserId)
+					this.server.to(user.socketId).emit('usersNotInGame', targetUserId);
+			});
 		} catch (error) {
 			console.log(`[GAME INVITE ERROR]: ${error.stack}`)
 		}
@@ -507,9 +521,13 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 			{
 				console.log('===============>La clé n\'existe pas dans gameQueue.');
 				gameQueue[uniqueKey] = newPair;
-				this.server.to(this.connectedUsers[targetToInvite.id]).emit('gameInvite', {
-					senderUsername: client.handshake.auth.user.username,
-					senderUserID: emitUserId,
+				this.activeUsers.forEach((user: ConnectedUsers) => {
+					if (user.userId == targetToInvite.id) {
+						this.server.to(user.socketId).emit('gameInvite', {
+							senderUsername: client.handshake.auth.user.username,
+							senderUserID: emitUserId,
+						});
+					}
 				});
 			}
 		}
@@ -557,7 +575,10 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		// peut etre check l'Id? apres le seul souci c'est qu'il peut renvoyer une invite plus vite
 		try {
 			const user = await this.userService.getUserByID(data.senderUserId)
-			this.server.to(this.connectedUsers[user.id]).emit('deniedInvitation');
+			this.activeUsers.forEach((user_: ConnectedUsers) => {
+				if (user_.userId == user.id)
+					this.server.to(user_.socketId).emit('deniedInvitation');
+			});
 		}
 		catch (error) {
 			console.log(`[GAME INVITE ERROR]: ${error.stack}`)
@@ -602,12 +623,17 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 			const checkedRecipient = await this.userService.getUserByUsername(recipientLogin);
 			if (!checkedRecipient.blockedUsers.find((user: number) => user === checkedInitiator.id)) {
 				if (checkedInitiator && checkedRecipient) {
-					this.server.to(this.connectedUsers[checkedRecipient.id]).except(`whoblocked${checkedInitiator.id}`).emit('friendRequest', {
-						recipientLogin: recipientLogin,
-						initiatorID: Number(user.sub),
-						initiatorLogin: checkedInitiator.username,
+
+					this.activeUsers.forEach((user_: ConnectedUsers) => {
+						if (user_.userId == checkedRecipient.id) {
+							this.server.to(user_.socketId).except(`whoblocked${checkedInitiator.id}`).emit('friendRequest', {
+								recipientLogin: recipientLogin,
+								initiatorID: Number(user.sub),
+								initiatorLogin: checkedInitiator.username,
+							});
+							this.server.to(user_.socketId).except(`whoblocked${checkedInitiator.id}`).emit('refreshHeaderNotif');
+						}
 					});
-					this.server.to(this.connectedUsers[checkedRecipient.id]).except(`whoblocked${checkedInitiator.id}`).emit('refreshHeaderNotif');
 				}
 			}
 			console.error(`${checkedInitiator.username} is blocked`);
@@ -630,9 +656,13 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 					roomID: roomID,
 					recipient: recipient,
 				})
-				this.server.to(this.connectedUsers[checkedInitiator.id]).emit('refreshFriends');
-				this.server.to(this.connectedUsers[checkedRecipient.id]).emit('refreshFriends');
-				this.server.to(this.connectedUsers[checkedRecipient.id]).emit('refreshHeaderNotif');
+				this.activeUsers.forEach((user: ConnectedUsers) => {
+					if (user.userId == checkedInitiator.id) {
+						this.server.to(user.socketId).emit('refreshFriends');
+						this.server.to(user.socketId).emit('refreshFriends');
+						this.server.to(user.socketId).emit('refreshHeaderNotif');
+					}
+				});
 			}
 		} catch (error) {
 			// throw error;
@@ -645,12 +675,15 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	@UseGuards(GatewayGuard)
 	handleUserBan(@MessageBody() data: { userToBan: number, roomName: string, roomID: string }) {
 		const { userToBan, roomName, roomID } = data;
-		const room = this.connectedUsers[userToBan];
 		// on pourrait rajouter une verif du back
 		// This event aims to disable showChannel and to make the targeted user to leave the room
-		this.server.to(room).emit('userIsBan', {
-			roomName: roomName,
-			roomID: roomID,
+		this.activeUsers.forEach((user: ConnectedUsers) => {
+			if (user.userId == userToBan) {
+				this.server.to(user.socketId).emit('userIsBan', {
+					roomName: roomName,
+					roomID: roomID,
+				});
+			}
 		});
 		this.server.emit('refreshChannelList');
 	}
@@ -659,12 +692,15 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	@UseGuards(GatewayGuard)
 	handleUserUnban(@MessageBody() data: { userToUnban: number, roomName: string, roomID: string }) {
 		const { userToUnban, roomName, roomID } = data;
-		const room = this.connectedUsers[userToUnban];
 		// on pourrait rajouter une verif du back
 		// This event aims to make the targeted user to rejoin the room
-		this.server.to(room).emit('userIsUnban', {
-			roomName: roomName,
-			roomID: roomID,
+		this.activeUsers.forEach((user: ConnectedUsers) => {
+			if (user.userId == userToUnban) {
+				this.server.to(user.socketId).emit('userIsBan', {
+					roomName: roomName,
+					roomID: roomID,
+				});
+			}
 		});
 		this.server.emit('refreshChannelList');
 	}
@@ -681,11 +717,15 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 
 	@SubscribeMessage('kickUserFromChannel')
 	@UseGuards(GatewayGuard)
-	handleKickUser(@MessageBody() data: { userToKick: string, roomName: string, roomID: string }) {
+	handleKickUser(@MessageBody() data: { userToKick: number, roomName: string, roomID: string }) {
 		const { userToKick, roomName, roomID } = data;
-		this.server.to(userToKick).emit('kickUser', {
-			roomName: roomName,
-			roomID: roomID,
+		this.activeUsers.forEach((user: ConnectedUsers) => {
+			if (user.userId == userToKick) {
+				this.server.to(user.socketId).emit('kickUser', {
+					roomName: roomName,
+					roomID: roomID,
+				});
+			}
 		});
 	}
 
@@ -698,9 +738,12 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 
 	@SubscribeMessage('refreshOptionsUserChannel')
 	@UseGuards(GatewayGuard)
-	handleRefreshOption(@MessageBody() data: { userToRefresh: string }) {
+	handleRefreshOption(@MessageBody() data: { userToRefresh: number }) {
 		const { userToRefresh } = data;
-		this.server.to(userToRefresh).emit('refreshOption');
+		this.activeUsers.forEach((user: ConnectedUsers) => {
+			if (user.userId == userToRefresh)
+				this.server.to(user.socketId).emit('refreshOption');
+		});
 	}
 
 	@SubscribeMessage('refreshChannelList')
@@ -715,7 +758,10 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	handleUserRefresh(@MessageBody() data: { userToRefresh: number, target: string, status: boolean }) {
 		const { userToRefresh, target, status } = data;
 		// custom event to refresh on a particular user room
-		this.server.to(this.connectedUsers[userToRefresh]).emit(target, status);
+		this.activeUsers.forEach((user: ConnectedUsers) => {
+			if (user.userId == userToRefresh)
+				this.server.to(user.socketId).emit(target, status);
+		});
 		// event to refresh the user list of a channel
 		this.server.emit('refresh_channel');
 	}
