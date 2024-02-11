@@ -200,7 +200,7 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 					{userList && userList?.map((user: User, index: number) => (
 						<div key={index} className='user-list-item'>
 							<div className='avatar-container'>
-								{user.isAdmin && !user.isOwner &&
+								{user.isAdmin && !user.isOwner && !user.isBan &&
 									<>
 										<img className='admin-user' src='./crown.png' alt='user' />
 										<img
@@ -212,21 +212,45 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 												chatDispatch({ type: 'SET_CURRENT_OPTION_CHANNEL_NAME', payload: user.login });
 												chatDispatch({ type: 'SET_CURRENT_USER', payload: user });
 												chatDispatch({ type: 'DISABLE', payload: 'showBackComponent' });
-											}} />
+										}}/>
 									</>
 								}
-								{!user.isAdmin && !user.isOwner &&
-									<img
-										className='img-list-users-channel'
-										src={`${process.env.API_URL}${user.avatarURL}`}
-										onClick={() => {
-											chatDispatch({ type: 'SET_CURRENT_TARGET', payload: user });
-											chatDispatch({ type: 'ACTIVATE', payload: 'dontcandcel' });
-											chatDispatch({ type: 'ACTIVATE', payload: 'showOptionsUserChannel' });
-											chatDispatch({ type: 'SET_CURRENT_OPTION_CHANNEL_NAME', payload: user.login });
-											chatDispatch({ type: 'SET_CURRENT_USER', payload: user });
-											chatDispatch({ type: 'DISABLE', payload: 'showBackComponent' });
-										}} />}
+								{!user.isAdmin && !user.isOwner && !user.isBan &&
+										<img
+											className='img-list-users-channel'
+											src={`${process.env.API_URL}${user.avatarURL}`}
+											onClick={() => {
+												chatDispatch({ type: 'SET_CURRENT_TARGET', payload: user });
+												chatDispatch({ type: 'ACTIVATE', payload: 'dontcandcel' });
+												chatDispatch({ type: 'ACTIVATE', payload: 'showOptionsUserChannel' });
+												chatDispatch({ type: 'SET_CURRENT_OPTION_CHANNEL_NAME', payload: user.login });
+												chatDispatch({ type: 'SET_CURRENT_USER', payload: user });
+												chatDispatch({ type: 'DISABLE', payload: 'showBackComponent' });
+											}}/>
+						
+								}
+								{!user.isOwner && user.isBan &&
+									<div className="user-avatar-wrapper">
+										<img
+											className='img-list-users-channel'
+											src={`${process.env.API_URL}${user.avatarURL}`}
+											onClick={() => {
+												chatDispatch({ type: 'SET_CURRENT_TARGET', payload: user });
+												chatDispatch({ type: 'ACTIVATE', payload: 'dontcandcel' });
+												chatDispatch({ type: 'ACTIVATE', payload: 'showOptionsUserChannel' });
+												chatDispatch({ type: 'SET_CURRENT_OPTION_CHANNEL_NAME', payload: user.login });
+												chatDispatch({ type: 'SET_CURRENT_USER', payload: user });
+												chatDispatch({ type: 'DISABLE', payload: 'showBackComponent' });
+											}}/>
+											{user.isBan &&
+												<img
+													className='ban-overlay'
+													src='interdire.png'
+													alt='Banned'
+												/>
+											}
+										</div>
+								}
 							</div>
 						</div>
 					))}
