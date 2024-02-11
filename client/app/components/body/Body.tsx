@@ -26,9 +26,7 @@ const BodyComponent: React.FC = () => {
 				<div className="container-bloc">
 					{renderComponent(<SettingsComponent/>, globalState.showSettings)}
 						<ChatComponent/>
-						<GameProvider>
-							<GameComponent />
-						</GameProvider>
+						<GameComponent />
 				</div>
 		</>
 	)
