@@ -512,15 +512,6 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 					senderUserID: emitUserId,
 				});
 			}
-			setTimeout(() => {
-				if (gameQueue.hasOwnProperty(uniqueKey)) {
-
-					delete gameQueue[uniqueKey];
-					console.log('La paire a été supprimée de la queue.');
-				} else {
-					console.log('La clé spécifiée n\'existe pas dans la queue.');
-				}
-			}, 5000);
 		}
 		catch (error) {
 			console.log(`[GAME INVITE ERROR]: ${error.stack}`)
