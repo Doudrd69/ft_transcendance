@@ -258,6 +258,9 @@ const PongComponent = () => {
 		};
 	}, [blurGame, gameID, globalState?.gameSocket, containerSize, containerSize, inCountdown]);
 
+	useEffect(() => {
+		globalState.userSocket?.emit('refreshUserList');
+	}, []);
 
 	return (
 			<div className="pong-container" style={{ width: containerSize, height: containerSize }} tabIndex={0}>

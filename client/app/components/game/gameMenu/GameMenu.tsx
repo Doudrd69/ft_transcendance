@@ -85,6 +85,10 @@ const Menu = () => {
 
 	};
 
+	useEffect(() => {
+		globalState.userSocket?.emit('refreshUserList');
+	}, []);
+
 	return (
 		<div className="slider-thumb">
 			{/* <div className="background-game"> */}
