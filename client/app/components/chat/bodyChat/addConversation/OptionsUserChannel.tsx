@@ -488,7 +488,7 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 				const conversation : Conversation = await response.json();
 				let tmp = conversation.name;
 				let conversationName = tmp.replace(me.login, "");
-				chatDispatch({ type: 'SET_CURRENT_CONVERSATION', payload: conversationName });
+				chatDispatch({ type: 'SET_CURRENT_CONVERSATION', payload: user.login });
 				chatDispatch({ type: 'SET_CURRENT_ROOM', payload: conversation.name });
 				chatDispatch({ type: 'SET_CURRENT_CONVERSATION_ID', payload: conversation.id });
 				globalState.userSocket?.emit('joinRoom', { roomName: conversation.name, roomID: conversation.id } );

@@ -13,6 +13,7 @@ interface FriendShip {
 	username: string;
 	isBlocked: boolean;
 	onlineStatus: boolean;
+	inGameStatus: boolean;
 }
 
 interface Conversation {
@@ -162,11 +163,9 @@ const FriendsListComponent: React.FC = () => {
 									alt="User Avatar"
 								/>
 								<div className="amies" onClick={() => activateTabFriendsList(id, false)}>
-									{friend.onlineStatus ? 
-										<div className="online" />
-										:
-										<div className="offline" />
-									}
+									{friend.onlineStatus && !friend.inGameStatus &&  <div className="online" />}
+									{!friend.onlineStatus && <div className="offline" />}
+									{friend.inGameStatus && friend.onlineStatus && <div className="inGame" />}
 									{friend.username}
 								</div>
 						</div>

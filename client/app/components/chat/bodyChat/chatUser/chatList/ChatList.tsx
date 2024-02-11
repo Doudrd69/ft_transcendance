@@ -16,6 +16,7 @@ interface Conversation {
 	userID: number;
 	name: string;
 	onlineStatus: boolean;
+	inGameStatus: boolean;
 }
 
 const ChatListComponent: React.FC = () => {
@@ -92,11 +93,9 @@ const ChatListComponent: React.FC = () => {
 						chatDispatch({ type: 'ACTIVATE', payload: 'showChat' });
 						chatDispatch(setCurrentComponent('showChatList'));
 						}}>
-						{dm.onlineStatus ? 
-							<div className="online" />
-							:
-							<div className="offline" />
-						}
+						{dm.onlineStatus && !dm.inGameStatus &&  <div className="online" />}
+						{!dm.onlineStatus && <div className="offline" />}
+						{dm.inGameStatus && dm.onlineStatus && <div className="inGame" />}
 						{dm.username}
 					</div>
 				</div>

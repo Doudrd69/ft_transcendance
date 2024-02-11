@@ -60,14 +60,7 @@ const FriendsListTabComponent: React.FC<FriendsListTabComponentProps> = ({ user,
 	
 			if (response.ok) {
 				const conversation : Conversation = await response.json();
-				let tmp = conversation.name;
-				let conversationName;
-				const currentUserLogin = sessionStorage.getItem("currentUserLogin");
-				console.log("===============>", currentUserLogin);
-				console.log("===============>", conversation.name);
-				if (currentUserLogin)
-					conversationName = tmp.replace(currentUserLogin, '');
-				chatDispatch({ type: 'SET_CURRENT_CONVERSATION', payload: conversation.name });
+				chatDispatch({ type: 'SET_CURRENT_CONVERSATION', payload: user.username});
 				chatDispatch({ type: 'SET_CURRENT_ROOM', payload: conversation.name });
 				chatDispatch({ type: 'SET_CURRENT_CONVERSATION_ID', payload: conversation.id });
 				globalState.userSocket?.emit('joinRoom', { roomName: conversation.name, roomID: conversation.id } );
@@ -271,7 +264,7 @@ const FriendsListTabComponent: React.FC<FriendsListTabComponentProps> = ({ user,
 	const handleStats = () => {
 		chatDispatch({ type: 'ACTIVATE', payload: 'showStatistiques' });
 		chatDispatch({ type: 'DISABLE', payload: 'showBackComponent' });
-		chatDispatch({ type: 'SET_CURRENT_TARGET_STATS',  });
+		chatDispatch({ type: 'SET_CURRENT_TARGET_STATS',});
 	}
 	return (
 		<>

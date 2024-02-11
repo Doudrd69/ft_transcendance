@@ -143,6 +143,15 @@
     right: 10px;
 	
 }
+
+.inGame {
+	width: 15px;
+	height: 15px;
+	background-color: #245ecb; /* Couleur verte, tu peux changer cela selon tes préférences */
+	border-radius: 50%; /* Pour obtenir une forme de cercle */
+	position: absolute;
+	right: 10px;
+}
 .offline {
 	width: 15px;
 	height: 15px;
