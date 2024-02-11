@@ -53,7 +53,7 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	server: Server;
 
 	// we link a userID with its socket
-	private activeUsers : ConnectedUsers[];
+	private activeUsers : ConnectedUsers[] = [];
 
 	private async userRejoinsRooms(client: Socket, userID: number) {
 
@@ -126,8 +126,12 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 				if (friends) {
 
 					friends.forEach((friend: any) => {
-						console.log("-- Notifying connection/deconnction of ", friend.username, " --");
-						this.server.except(clientId).to(friend.username).emit('refreshUserOnlineState', `${user.username} is ${status}`);
+						this.activeUsers.forEach((user_: ConnectedUsers) => {
+							if (user_.userId == friend.id) {
+								console.log("-- Notifying connection/deconnction of ", friend.username, " --");
+								this.server.except(clientId).to(user_.socketId).emit('refreshUserOnlineState', `${user.username} is ${status}`);
+							}
+						});
 					});
 
 					// Emit to refresh DM list for user who are not friends
@@ -423,12 +427,18 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 			// a changer pour le ingame et le inMatchmaking
 			if (await this.userService.userInGame(user.sub)) {
 				console.log(`sender already inGame`);
-				this.server.to(client.id).emit('userInGame');
+				this.activeUsers.forEach((user_: ConnectedUsers) => {
+					if (user_.userId == user.sub)
+						this.server.to(user_.socketId).emit('userInGame');
+				});
 				return;
 			}
 			userInMatchmaking[user.sub] = true;
 			await this.userService.setUserInMatchmaking(user.sub);
-			this.server.to(client.id).emit('gameNotInProgress');
+			this.activeUsers.forEach((user_: ConnectedUsers) => {
+				if (user_.userId == user.sub)
+					this.server.to(user_.socketId).emit('gameNotInProgress');
+			});
 		}
 		catch (error) {
 			await this.handleException(error, client)
@@ -443,11 +453,17 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		const uniqueKey = `${Math.min(emitUserId, targetUserId)}-${Math.max(emitUserId, targetUserId)}`
 		if (!inGame[uniqueKey]) {
 			await this.userService.unsetUserInGame(emitUserId);
-			this.server.to(client.id).emit('badsenderIdGameInvite');
+			this.activeUsers.forEach((user: ConnectedUsers) => {
+				if (user.userId == emitUserId)
+					this.server.to(user.socketId).emit('badsenderIdGameInvite');
+			});
 			return;
 		}
 		// check aussi la game socket?
-		this.server.to(client.id).emit('createGameInviteSocket', { userTwoId: data.userTwoId, userTwoGameId: data.userTwoGameId });
+		this.activeUsers.forEach((user: ConnectedUsers) => {
+			if (user.userId == emitUserId)
+				this.server.to(user.socketId).emit('createGameInviteSocket', { userTwoId: data.userTwoId, userTwoGameId: data.userTwoGameId });
+		});
 	}
 
 
@@ -474,7 +490,10 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 			const uniqueKey = `${Math.min(emitUserId, targetUserId)}-${Math.max(emitUserId, targetUserId)}`
 			// check si les deux users sont deja en game
 			if (this.userService.usersInGame(emitUserId, targetUserId)) {
-				this.server.to(client.id).emit('usersInGame');
+				this.activeUsers.forEach((user: ConnectedUsers) => {
+					if (user.userId == emitUserId)
+						this.server.to(user.socketId).emit('usersInGame');
+				});
 				console.log(`[check si l'un des deux users sont deja en game] : l'un des deux users sont deja en game`);
 				return;
 			}
@@ -509,7 +528,10 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 					inGame[uniqueKey] = pairInGame;
 					console.log(`inGame[uniqueKey] dans inviteToGame :  ${inGame[uniqueKey].emitUserId} |  ${inGame[uniqueKey].targetUserId}`)
 					this.userService.setUsersInGame(newPair.emitUserId, newPair.targetUserId);
-					this.server.to(client.id).emit('gameInviteDUO', targetUserId);
+					this.activeUsers.forEach((user: ConnectedUsers) => {
+						if (user.userId == emitUserId)
+							this.server.to(user.socketId).emit('gameInviteDUO', targetUserId);
+					});
 					return;
 				}
 				else {

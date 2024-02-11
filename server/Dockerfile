@@ -1,4 +1,4 @@
-FROM node:20.3.1
+FROM node:latest
 
 RUN mkdir -p /srv/app/admin-server
 
