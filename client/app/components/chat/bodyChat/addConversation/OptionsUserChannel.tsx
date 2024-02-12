@@ -567,7 +567,10 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 
 	useEffect(() => {
 
-		globalState.userSocket?.on('refreshOptionsUserChannel', handleRefreshOptionsUserChannel);
+		globalState.userSocket?.on('refreshOptionsUserChannel', () => {
+			console.log("COucou je refresh les options");
+			handleRefreshOptionsUserChannel();
+		});
 	
 		return () => {
 			globalState.userSocket?.off('refreshOptionsUserChannel');

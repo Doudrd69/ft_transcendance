@@ -199,9 +199,11 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 					userId: userID,
 					socket: client,
 				}
-
+				console.log("-------------------------------------------------------------------------------");
+				console.log(`================ Active user list before PUSH: `, this.activeUsers);
 				this.activeUsers.push(newUser);
-				console.log("Active users list: ", this.activeUsers);
+				console.log(`================ Active user list After PUSH: `, this.activeUsers);
+				console.log("-------------------------------------------------------------------------------");
 				client.join(client.id);
 				console.log("== Client ", userID, " has joined ", client.id, " room");
 				this.userRejoinsRooms(client, userID);
@@ -209,7 +211,7 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 				this.server.emit('newUser');
 
 				client.on('disconnect', () => {
-					console
+
 					let count = 0;
 					this.activeUsers.forEach((user: ConnectedUsers) => {
 						if (user.userId === userID)
@@ -249,8 +251,19 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 						const playerSpeedQueue = getPlayerSpeedQueue(); 
 						playerSpeedQueue.filter(item => item.userId !== userID);
 						setPlayerSpeedQueue(playerSpeedQueue);
-						this.activeUsers = this.activeUsers.filter((user: ConnectedUsers) => user.socket.id === client.id);
 					}
+
+					console.log("-------------------------------------------------------------------------------");
+					console.log(`Active user list before FILTER: `, this.activeUsers);
+					console.log("Client to delete: ", client.id);
+					this.activeUsers.forEach((user: ConnectedUsers) => {
+						if (client.id === user.socket.id)
+							console.log("FOUND USER TO DELETE: ", client.id, user.socket.id);
+					})
+					this.activeUsers = this.activeUsers.filter((user: ConnectedUsers) => client.id !== user.socket.id);
+					console.log(`Active user list after FILTER: `, this.activeUsers);
+					console.log("-------------------------------------------------------------------------------");
+
 					console.log("===> Disconnecting user ", userID, " with ID ", userID);
 					this.notifyFriendList(userID, client.id, 'offline');
 					client.leave(client.id);
@@ -746,8 +759,10 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 			const user = client.handshake.auth.user;
 			if (user) {
 				this.activeUsers.forEach((user_: ConnectedUsers) => {
-					this.server.to(user_.socket.id).except(client.id).emit('refreshOptopmsUserChannel');
+					console.log(`Refresh ${user.socket.id} user options`);
+					this.server.to(user_.socket.id).except(client.id).emit('refreshOptionsUserChannel');
 				})
+				console.log("Out of user options refresh loop");
 			}
 			throw new HttpException('User not found', HttpStatus.NOT_FOUND);
 		} catch (error) {
