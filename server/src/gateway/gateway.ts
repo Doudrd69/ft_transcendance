@@ -211,7 +211,9 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 				client.join(client.id);
 				console.log("== Client ", userID, " has joined ", client.id, " room");
 				this.userRejoinsRooms(client, userID);
-				this.notifyFriendList(userID, client.id, 'online');
+				console.log("Count on co: ", count);
+				if (count == 0)
+					this.notifyFriendList(userID, client.id, 'online');
 				this.server.emit('newUser');
 
 				client.on('disconnect', () => {
@@ -260,7 +262,9 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 
 					this.activeUsers = this.activeUsers.filter((user: ConnectedUsers) => client.id !== user.socket.id);
 					console.log("===> Disconnecting user ", userID, " with ID ", userID);
-					this.notifyFriendList(userID, client.id, 'offline');
+					console.log("Count on disco: ", count);
+					if (count == 1)
+						this.notifyFriendList(userID, client.id, 'offline');
 					client.leave(client.id);
 					console.log("Client ", userID, " has left ", client.id, " room");
 					this.userLeavesRooms(client, userID);
@@ -847,7 +851,7 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	@UseGuards(GatewayGuard)
 	handleRefresh(@MessageBody() data: { roomName: string, roomID: string }) {
 		const { roomName, roomID } = data;
-		this.server.to(roomName + roomID).emit('refreshChannelList');
+		this.server.emit('refreshChannelList');
 	}
 
 	@SubscribeMessage('refreshOptionsUserChannel')
@@ -931,16 +935,36 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 
 		try {
 			const { channel, content, channelID } = data;
-			const dto = {
+
+			let dto = new MessageDto();
+			dto = {
+				content: content,
+				post_datetime: new Date(),
+				conversationID: Number(channelID),
+			};
+			await this.chatService.saveNotification(dto);
+
+			const messageType = {
 				from: 'Bot',
 				content: content,
 				post_datetime: new Date(),
 				conversationID: channelID,
-			};
-			await this.chatService.saveNotification(dto);
-			this.server.to(channel).emit('recv_notif', dto);
+				senderId: 0,
+			}
+			this.server.to(channel).emit('recv_notif', messageType);
 		} catch (error) {
 			throw error;
 		}
+	}
+
+	@SubscribeMessage('refreshUsernameInHeader')
+	@UseGuards(GatewayGuard)
+	handleRefreshUsernameInHeader(@ConnectedSocket() client: Socket, @MessageBody() value: string) {
+		console.log("Value for usernmae ==> ", value);
+		const user = client.handshake.auth.user;
+		this.activeUsers.forEach((user_: ConnectedUsers) => {
+			if (user_.userId == user.sub)
+				this.server.to(user_.socket.id).emit('refreshUsernameHeader', value);
+		});
 	}
 }

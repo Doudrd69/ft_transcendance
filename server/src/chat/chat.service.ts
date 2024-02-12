@@ -233,6 +233,8 @@ export class ChatService {
 
 	private async getAllMessages(conversationID: number, userID: number): Promise<Message[]> {
 
+		console.log("Conversation id for messages: ", conversationID);
+
 		const conversation = await this.conversationRepository.findOne({ where: {id: conversationID} });
 		
 		const user : User = await this.usersRepository.findOne({
@@ -1214,8 +1216,10 @@ export class ChatService {
 		throw new HttpException('Fatal error', HttpStatus.BAD_REQUEST);
 	}
 
-	async saveNotification(dto: any) {
-		const conversation : Conversation = await this.conversationRepository.findOne({ where: {id: dto.channelID} });
+	async saveNotification(dto: MessageDto) {
+
+		console.log("Notif for conversation: ", dto.conversationID);
+		const conversation : Conversation = await this.conversationRepository.findOne({ where: {id: dto.conversationID} });
 		
 		if (conversation) {
 			const newMessage = new Message();

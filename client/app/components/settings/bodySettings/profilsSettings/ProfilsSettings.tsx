@@ -40,6 +40,7 @@ const ProfilsSettingsComponent: React.FC = () => {
 				sessionStorage.setItem("currentUserLogin", newUsername);
 				globalState.userSocket?.emit('refreshUserList');
 				globalState.userSocket?.emit('refresh_channel');
+				globalState.userSocket?.emit('refreshUsernameInHeader', newUsername);
 				toast.success('Username has been updated');
 			} else {
 				const error = await response.json();
