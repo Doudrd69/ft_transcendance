@@ -194,6 +194,8 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 						roomID: chatState.currentConversationID
 					});
 
+					globalState.userSocket?.emit('refreshUserOptionsChannel');
+
 					globalState.userSocket?.emit('emitNotification', {
 						channel: chatState.currentConversation + chatState.currentConversationID,
 						content: `${user.login} has been ban`,
@@ -239,11 +241,15 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 				setBan(false);
 
 				if (chatState.currentConversation) {
+
 					globalState.userSocket?.emit('unbanUser', {
 						userToUnban: user.id,
 						roomName: chatState.currentConversation,
 						roomID: chatState.currentConversationID
 					});
+
+					globalState.userSocket?.emit('refreshUserOptionsChannel');
+
 					globalState.userSocket?.emit('emitNotification', {
 						channel: chatState.currentConversation + chatState.currentConversationID,
 						content: `${user.login} has been unban`,
@@ -293,6 +299,8 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 						content: `${user.login} has been promoted to admin`,
 						channelID: chatState.currentConversationID,
 					});
+
+					globalState.userSocket?.emit('refreshUserOptionsChannel');
 	
 					// emit sur un refreshd e channel?
 					globalState.userSocket?.emit('refreshUser', {
@@ -350,6 +358,7 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 						channelID: chatState.currentConversationID,
 					});
 
+					globalState.userSocket?.emit('refreshUserOptionsChannel');
 
 					// emit sur un refresh de channel
 					globalState.userSocket?.emit('refreshUser', {
@@ -558,10 +567,13 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 
 	useEffect(() => {
 
-		globalState.userSocket?.on('refreshOptionsUserChannel', handleRefreshOptionsUserChannel);
+		globalState.userSocket?.on('refreshOptionsUserChannel', () => {
+			console.log("COucou je refresh les options");
+			handleRefreshOptionsUserChannel();
+		});
 	
 		return () => {
-			globalState.userSocket?.off('refreshOptionsUserChannel', handleRefreshOptionsUserChannel);
+			globalState.userSocket?.off('refreshOptionsUserChannel');
 		};
 
 	  }, [globalState?.userSocket]);
