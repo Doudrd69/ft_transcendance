@@ -6,6 +6,7 @@ import OptionsUserChannel from '../../addConversation/OptionsUserChannel';
 import TimerComponent from '../../addConversation/Timer';
 import ConfirmationComponent from '../../chatFriendsList/confirmation/Confirmation';
 import './ReceiveBoxChannel.css';
+import { log } from 'console';
 
 interface Message {
 	from: string;
@@ -107,30 +108,31 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 				if (Array.isArray(error.message))
 					toast.warn(error.message[0]);
 				else
-					toast.warn(error.message);
-			}
-		} catch (error) {
-			console.log(error);
+				toast.warn(error.message);
 		}
+	} catch (error) {
+		console.log(error);
 	}
+}
 
 	useEffect(() => {
-
 		globalState.userSocket?.on('userIsBan', () => {
 			chatDispatch({ type: 'DISABLE', payload: 'showChannel' });
+			chatDispatch({ type: 'DISABLE', payload: 'showOptionsUserChannel' });
+
 			chatDispatch({ type: 'ACTIVATE', payload: 'showChannelList' });
 		});
 
 		globalState.userSocket?.on('onMessage', (message: Message) => {
 			if (message && (message.conversationID == chatState.currentConversationID))
-				setMessages((prevMessages: Message[]) => [...prevMessages, message]);
+			setMessages((prevMessages: Message[]) => [...prevMessages, message]);
 		});
-
+		
 		globalState.userSocket?.on('kickUser', (data: { roomName: string, roomID: string }) => {
 			const { roomName, roomID } = data;
 			chatDispatch({ type: 'DISABLE', payload: 'showChannel' });
 		});
-
+		
 		globalState.userSocket?.on('channelDeleted', (data: { roomName: string, roomID: string }) => {
 			const { roomName, roomID } = data;
 			globalState.userSocket?.emit('leaveRoom', { roomName: roomName, roomID: roomID });
@@ -140,13 +142,20 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 
 		// event emitted after a joinRoom (new user in channel, updated username)
 		globalState.userSocket?.on('refresh_channel', () => {
-			loadUserList();
+		loadUserList();
+		console.log("userlist", userList);
+		// console.log("chatState.currentTarget", chatState.currentTarget);
+		// const newUser = userList?.find((user: User) => user.id === chatState.currentTarget);
+		
+		// if (newUser)
+		// 	console.log("newUser", newUser);
+		// if (newUser)
+		// 	chatDispatch({ type: 'SET_CURRENT_USER', payload: newUser });
 		});
 
 		globalState.userSocket?.on('recv_notif', (notif: Message) => {
 			setMessages((prevMessages: Message[]) => [...prevMessages, notif]);
 		});
-
 		return () => {
 			globalState.userSocket?.off('userIsBan');
 			globalState.userSocket?.off('onMessage');
@@ -155,17 +164,16 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 			globalState.userSocket?.off('refresh_channel');
 			globalState.userSocket?.off('recv_notif');
 		};
-
 	}, [globalState?.userSocket]);
-
+	
 	useEffect(() => {
 		getMessages();
 	}, []);
-
+	
 	useEffect(() => {
 		loadUserList();
 	}, [globalState.showRefresh]);
-
+	
 	useEffect(() => {
 		scrollToBottom();
 	}, [messages]);
@@ -254,11 +262,11 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 								}
 							</div>
 						</div>
+						{chatState.showOptionsUserChannel && !chatState.currentUser.isOwner && currentUser && chatState.currentUser.id === user.id &&
+							(<OptionsUserChannel user={user} me={currentUser} />)
+						}
 						</>
 					))}
-					{chatState.showOptionsUserChannel && !chatState.currentUser.isOwner && currentUser &&
-						(<OptionsUserChannel user={chatState.currentUser} me={currentUser} />)
-					}
 				</div>
 			</div>
 			<div ref={messagesContainerRef} className="bloc-channel-chat">
@@ -301,8 +309,8 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 			</div>
 
 			{chatState.showTimer && <TimerComponent user={chatState.currentTarget} />}
-			{chatState.showConfirmation && (
-				<ConfirmationComponent phrase={`Etes vous sur de vouloir defier ${chatState.currentTarget.login}`} functionToExecute={handleGameInvite} />
+				{chatState.showConfirmation && (
+					<ConfirmationComponent phrase={`Etes vous sur de vouloir defier ${chatState.currentTarget.login}`} functionToExecute={handleGameInvite} />
 			)}
 		</>
 	);
