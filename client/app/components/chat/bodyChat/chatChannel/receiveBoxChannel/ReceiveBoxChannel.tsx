@@ -101,7 +101,6 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 				setUserList([...data]);
 				setOwnerUser(data.find((user: User) => user.isOwner));
 				setCurrentUser(data.find((user: User) => user.id === Number(sessionStorage.getItem("currentUserID"))));
-				console.log("usssssssssssssssssssssssssssssssssssseeeeeeeeeeeeeeeerrrrrrrrrrrrr",)
 			}
 			else {
 				const error = await response.json();

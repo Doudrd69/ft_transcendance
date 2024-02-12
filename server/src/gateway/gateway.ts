@@ -889,6 +889,23 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		this.server.emit('refreshHeaderNotif');
 	}
 
+	@SubscribeMessage('refreshPrivateOption')
+	@UseGuards(GatewayGuard)
+	handleChannelPrivateOption(@MessageBody() data: { publicValue: boolean } ) {
+		this.server.emit('refreshChannelPrivateOption', {
+			publicValue: data.publicValue,
+		});
+	}
+
+	@SubscribeMessage('refreshProtectedOption')
+	@UseGuards(GatewayGuard)
+	handleChannelprotectedoption(@MessageBody() data: { protectedValue: boolean } ) {
+		this.server.emit('refreshChannelProtectedOption', {
+			protectedValue: data.protectedValue,
+		});
+	}
+
+
 	@SubscribeMessage('refreshUserList')
 	@UseGuards(GatewayGuard)
 	handleRefreshUserlList() {
