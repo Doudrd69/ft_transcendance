@@ -39,8 +39,6 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 	const [ban, setBan] = useState<boolean>(user.isBan);
 	const [confirmationText, setConfirmationText] = useState('');
 	const [funtionToExecute, setFunctionToExecute] = useState<() => void>(() => { });
-	const [gameSocketConnected, setgameSocketConnected] = useState<boolean>(false);
-	const [gameInviteValidation, setgameInviteValidation] = useState<boolean>(false);
 	const [block, setBlock] = useState<boolean>(!!me.blockList.find((userblock: number) => userblock === user.id));
 	
 	// console.log(chatState);

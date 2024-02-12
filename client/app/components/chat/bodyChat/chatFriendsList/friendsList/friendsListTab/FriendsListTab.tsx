@@ -33,11 +33,8 @@ const FriendsListTabComponent: React.FC<FriendsListTabComponentProps> = ({ user,
 
 	const { chatState, chatDispatch } = useChat();
 	const { globalState, dispatch } = useGlobal();
-	const [gameSocketConnected, setgameSocketConnected] = useState<boolean>(false);
-	const [gameInviteValidation, setgameInviteValidation] = useState<boolean>(false);
 	const [confirmationText, setConfirmationText] = useState('');
 	const [funtionToExecute, setFunctionToExecute] = useState<() => void>(() => { });
-	const [accepted, setAccepted] = useState(false);
 
 	chatState.currentTargetStats = useState<targetStat>({id : user.id, username: user.username});
 	console.log(chatState.currentTargetStats);
