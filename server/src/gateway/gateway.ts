@@ -207,6 +207,7 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 					socket: client,
 				}
 
+				this.activeUsers.push(newUser);
 				client.join(client.id);
 				console.log("== Client ", userID, " has joined ", client.id, " room");
 				this.userRejoinsRooms(client, userID);
@@ -257,10 +258,6 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 						this.unsetGameStatus(userID);
 					}
 
-					this.activeUsers.forEach((user: ConnectedUsers) => {
-						if (client.id === user.socket.id)
-							console.log("FOUND USER TO DELETE: ", client.id, user.socket.id);
-					})
 					this.activeUsers = this.activeUsers.filter((user: ConnectedUsers) => client.id !== user.socket.id);
 					console.log("===> Disconnecting user ", userID, " with ID ", userID);
 					this.notifyFriendList(userID, client.id, 'offline');
@@ -293,26 +290,29 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		try {
 			const { roomName, roomID } = data;
 			const user = client.handshake.auth.user;
+			
 			console.log("==== joinRoom Event ====");
-			console.log("Add ", "[", client.id, "]", " to room : ", roomName + roomID);
-
 			// If there is an ID, we are joining a channel room
 			if (roomID && await this.chatService.isUserInConversation(user.sub, Number(roomID))) {
 				// the current user socket joins
-				client.join(roomName + roomID);
+				// client.join(roomName + roomID);
 				// Each socket of the user (multi-window) joins the room
 				this.activeUsers.forEach((user_: ConnectedUsers) => {
-					if (user_.userId == user.sub)
+					if (user_.userId == user.sub) {
 						user_.socket.join(roomName + roomID);
+						console.log("Add ", "[", user_.socket.id, "]", " to room : ", roomName + roomID);
+					}
 				});
 				// event to refresh the user list of a channel
 				this.server.to(roomName + roomID).emit('refresh_channel');
 			}
 			else {
-				client.join(roomName); // joining personnal room
+				// client.join(roomName); // joining personnal room
 				this.activeUsers.forEach((user_: ConnectedUsers) => {
-					if (user_.userId == user.sub)
+					if (user_.userId == user.sub) {
 						user_.socket.join(roomName);
+						console.log("Add ", "[", user_.socket.id, "]", " to room : ", roomName);
+					}
 				});
 			}
 
@@ -338,14 +338,15 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		const { roomName, roomID } = data;
 		const user = client.handshake.auth.user;
 		console.log("==== leaveRoom Event ====");
-		console.log("Remove ", "[", client.id, "]", " to room : ", roomName + roomID);
 		if (roomID) {
 			// the current user socket leaves
-			client.leave(roomName + roomID);
+			// client.leave(roomName + roomID);
 			// Each socket of the user (multi-window) leaves the room
 			this.activeUsers.forEach((user_: ConnectedUsers) => {
-				if (user_.userId == user.sub)
+				if (user_.userId == user.sub) {
 					user_.socket.leave(roomName + roomID);
+					console.log("Remove ", "[", user_.socket.id, "]", " from room : ", roomName + roomID);
+				}
 			});
 			// event to refresh the user list of a channel
 			this.server.to(roomName + roomID).emit('refresh_channel');
@@ -354,8 +355,10 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		else {
 			client.leave(roomName); // leaving personnal room
 			this.activeUsers.forEach((user_: ConnectedUsers) => {
-				if (user_.userId == user.sub)
+				if (user_.userId == user.sub) {
 					user_.socket.leave(roomName);
+					console.log("Remove ", "[", user_.socket.id, "]", " from room : ", roomName + roomID);
+				}
 			});
 		}
 
@@ -771,6 +774,7 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		try {
 			const user = client.handshake.auth.user;
 			if (user) {
+				console.log("---------------------------> ", this.activeUsers);
 				this.activeUsers.forEach((user_: ConnectedUsers) => {
 					console.log(`Refresh ${user.socket.id} user options`);
 					this.server.to(user_.socket.id).except(client.id).emit('refreshOptionsUserChannel');
