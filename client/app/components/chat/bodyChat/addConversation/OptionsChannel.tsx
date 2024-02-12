@@ -234,7 +234,7 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 			chatDispatch({ type: 'ACTIVATE', payload: 'showChannelList' });
 		});
 
-		globalState.userSocket.on('refreshChannelPrivateOption', ( data: { publicValue: boolean } ) => {
+		globalState.userSocket?.on('refreshChannelPrivateOption', ( data: { publicValue: boolean } ) => {
 			if (data.publicValue)
 				chatDispatch({ type: 'ACTIVATE', payload: 'currentConversationIsPrivate' });
 			else
