@@ -118,21 +118,16 @@ const ListMyChannelComponent: React.FC<ListMyChannelComponentProps> = ({ user, f
 
 				if (globalState.userSocket?.connected) {
 
+					// Add users sockets to channel room
 					globalState.userSocket?.emit('addUserToRoom', {
 						convID: conversation.id,
 						convName: conversation.name,
 						friend: user,
 					});
+					
 					// refresh channel list
-
 					globalState.userSocket?.emit('refreshUserChannelList', {
 						userToRefresh: user, 
-					});
-
-					// refresh userList in channel for user arrival update
-					globalState.userSocket?.emit('refreshChannel', {
-						
-						channel: conversation.name + conversation.id,
 					});
 
 					chatDispatch({ type: 'TOGGLEX', payload: 'showAddCreateChannel' });

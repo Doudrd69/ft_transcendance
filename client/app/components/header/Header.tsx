@@ -23,6 +23,7 @@ const HeaderComponent: React.FC = () => {
 	const [showActivateNotif, setShowActivateNotif] = useState(false);
 	const [newNotifications, setNewNotifications] = useState(false);
 	const [reloadNotifications, setReloadNotifications] = useState(false);
+	const [currentUsername, setCurrentUsername] = useState(sessionStorage.getItem("currentUserLogin"));
 
 	const uploadAvatar =  () => {
 		dispatch({ type: 'ACTIVATE', payload: 'showUploadAvatar' });
@@ -160,8 +161,16 @@ const HeaderComponent: React.FC = () => {
 			loadNotifications();
 		});
 
+		globalState.userSocket?.on('refreshUsernameHeader', (newValue: string) => {
+			console.log(newValue);
+			setCurrentUsername(newValue);
+			sessionStorage.setItem("currentUserLogin", newValue);
+			// window.location.reload();
+		});
+
 		return () => {
 			globalState.userSocket?.off('refreshHeaderNotif');
+			globalState.userSocket?.off('refreshUsernameHeader');
 		}
 
 	}, [globalState?.userSocket]);
@@ -188,7 +197,7 @@ const HeaderComponent: React.FC = () => {
 
 					}}}>
 					<img className='profils' src={`${process.env.API_URL}/users/getAvatar/${sessionStorage.getItem("currentUserID")}/${timestmp}`}/>
-					<div className='username'>{sessionStorage.getItem("currentUserLogin")}</div>
+					<div className='username'>{currentUsername}</div>
 				</button>
 			</div>
 		<div className="bloc-pong">PINGPON</div>

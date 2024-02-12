@@ -154,8 +154,10 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 		});
 
 		globalState.userSocket?.on('recv_notif', (notif: Message) => {
+			console.log("Notif: ", notif);
 			setMessages((prevMessages: Message[]) => [...prevMessages, notif]);
 		});
+
 		return () => {
 			globalState.userSocket?.off('userIsBan');
 			globalState.userSocket?.off('onMessage');
