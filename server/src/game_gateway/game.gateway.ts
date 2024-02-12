@@ -159,7 +159,6 @@ export class GameGateway {
             // check les users si bien opposant
             // si pas opposant alors soit mettre le bon userId a la place si il en a un soit juste dec les deux et les unset ingame
             const userOne = client.handshake.auth.user;
-            const userTwo: User = await this.GameService.getUserWithUserId(data.userTwoId);
             this.GameService.addGameInviteSocket(client.id, userOne.sub, data.userTwoGameId, data.userTwoId);
             await this.GameService.linkSocketIDWithUser(client.id, userOne.sub);
             await this.GameService.linkSocketIDWithUser(data.userTwoGameId, data.userTwoId);

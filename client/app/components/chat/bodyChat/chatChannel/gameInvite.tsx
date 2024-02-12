@@ -11,7 +11,6 @@ const GameInviteComponent: React.FC = () => {
 	const gameInvite = () => {
 		globalState.gameInvite = false;
 		globalState.gameInviteValidation = false;
-		globalState.gameSocketConnected = true;
 		globalState.userSocket?.emit('checkAndInviteToGame', {
 			userIdToInvite: globalState.gameTargetId,
 		});

@@ -33,6 +33,7 @@ interface FriendRequestDto {
 interface GameInviteDto {
 	senderUsername: string;
 	senderUserID: number;
+	senderSocketId: string;
 }
 
 interface GameInviteUserTwoDto {
@@ -59,7 +60,6 @@ const GeneralComponent = () => {
 		globalState.userSocket?.off('usersNotInGame');
 		globalState.userSocket?.emit('checkAndsetInGame', gameInviteDto.senderUserID)
 		globalState.userSocket?.on('usersNotInGame', (otherUserId: number) => {
-			console.log("=============================================>");
 			const gameSocket = io(`${process.env.API_URL}/game`, {
 				autoConnect: false,
 				auth: {
@@ -69,9 +69,11 @@ const GeneralComponent = () => {
 			gameSocket.connect();
 			dispatch({ type: 'SET_GAME_SOCKET', payload: gameSocket });
 			gameSocket.on('connect', () => {
+				console.log("CONNNNNEXXTTT", gameInviteDto.senderSocketId)
 				globalState.userSocket?.emit('inviteAccepted', {
 					otherUserId: otherUserId,
 					userGameSocketId: gameSocket.id,
+					senderSocketId: gameInviteDto.senderSocketId,
 				});
 			});
 			return;
@@ -79,8 +81,7 @@ const GeneralComponent = () => {
 	}
 
 	useEffect(() => {
-		globalState.userSocket?.on('gameInviteDUO', (otherUserId: number) => {
-			console.log("=============================================>");
+		globalState.userSocket?.on('gameInviteDUO', (gameInviteDto: GameInviteDto) => {
 			const gameSocket = io(`${process.env.API_URL}/game`, {
 				autoConnect: false,
 				auth: {
@@ -89,11 +90,12 @@ const GeneralComponent = () => {
 			});
 			gameSocket.connect();
 			dispatch({ type: 'SET_GAME_SOCKET', payload: gameSocket });
+
 			gameSocket.on('connect', () => {
-				console.log("otherUserId", otherUserId)
 				globalState.userSocket?.emit('inviteAccepted', {
-					otherUserId: otherUserId,
+					otherUserId: gameInviteDto.senderUserID,
 					userGameSocketId: gameSocket.id,
+					senderSocketId: gameInviteDto.senderSocketId,
 				});
 			});
 		}
@@ -382,19 +384,21 @@ const GeneralComponent = () => {
 	// GAME INVITE
 
 	useEffect(() => {
+
 		globalState.userSocket?.on('createGameInviteSocket', (GameInviteUserTwoDto: GameInviteUserTwoDto) => {
 			globalState.gameSocket?.emit('launchGameInvite', { userTwoId: GameInviteUserTwoDto.userTwoId, userTwoGameId: GameInviteUserTwoDto.userTwoGameId });
 		});
+
 		return () => {
 			globalState.userSocket?.off('createGameInviteSocket');
 		};
+
 	}, [globalState?.userSocket, globalState?.gameSocket]);
 
 	useEffect(() => {
 
 		globalState.userSocket?.on('acceptInvitation', (GameInviteUserTwoDto: GameInviteUserTwoDto) => {
 			globalState.gameInviteValidation = true;
-			globalState.gameSocketConnected = false;
 			const gameSocket: Socket = io(`${process.env.API_URL}/game`, {
 				autoConnect: false,
 				auth: {
@@ -404,25 +408,6 @@ const GeneralComponent = () => {
 			gameSocket.connect();
 			dispatch({ type: 'SET_GAME_SOCKET', payload: gameSocket });
 			globalState.userSocket?.emit('setGameInvite', { userTwoId: GameInviteUserTwoDto.userTwoId, userTwoGameId: GameInviteUserTwoDto.userTwoGameId });
-		});
-		globalState.userSocket?.on('deniedInvitation', () => {
-			globalState.gameSocketConnected = false;
-		});
-		globalState.userSocket?.on('userToInviteAlreadyInGame', () => {
-			globalState.gameSocketConnected = false;
-
-		});
-		globalState.userSocket?.on('usersInGame', () => {
-			globalState.gameSocketConnected = false;
-		})
-		globalState.userSocket?.on('userInGame', () => {
-			globalState.gameSocketConnected = false;
-		})
-		globalState.userSocket?.on('closedInvitation', () => {
-			if (globalState.gameInviteValidation == false) {
-				globalState.gameSocketConnected = false;
-			}
-			globalState.gameSocketConnected = false;
 		});
 
 		// this.server.to(client.id).emit('badsenderIdGameInvite');
@@ -440,16 +425,12 @@ const GeneralComponent = () => {
 			globalState.userSocket?.off('badsenderIdGameInvite');
 		};
 
-	}, [globalState?.gameSocket, globalState.gameInviteValidation, globalState?.userSocket, globalState.gameSocketConnected, globalState.userTwoIdGame, globalState.userTwoGameSocketId]);
+	}, [globalState?.gameSocket, globalState.gameInviteValidation, globalState?.userSocket, globalState.userTwoIdGame, globalState.userTwoGameSocketId]);
 
 	// Game socket handler
 	useEffect(() => {
 
 		globalState.gameSocket?.on('connect', () => {
-		})
-
-		globalState.gameSocket?.on('disconnect', () => {
-			globalState.gameSocketConnected = false;
 		})
 
 		globalState.gameSocket?.on('joinGame', (game: Game) => {
