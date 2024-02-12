@@ -101,6 +101,7 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 				setUserList([...data]);
 				setOwnerUser(data.find((user: User) => user.isOwner));
 				setCurrentUser(data.find((user: User) => user.id === Number(sessionStorage.getItem("currentUserID"))));
+				console.log("usssssssssssssssssssssssssssssssssssseeeeeeeeeeeeeeeerrrrrrrrrrrrr",)
 			}
 			else {
 				const error = await response.json();
@@ -198,6 +199,7 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 				</div>
 				<div className='list-users-channel'>
 					{userList && userList?.map((user: User, index: number) => (
+						<>
 						<div key={index} className='user-list-item'>
 							<div className='avatar-container'>
 								{user.isAdmin && !user.isOwner && !user.isBan &&
@@ -253,6 +255,7 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 								}
 							</div>
 						</div>
+						</>
 					))}
 					{chatState.showOptionsUserChannel && !chatState.currentUser.isOwner && currentUser &&
 						(<OptionsUserChannel user={chatState.currentUser} me={currentUser} />)

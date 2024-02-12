@@ -45,7 +45,6 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 	// if (me && me.blockList) {
 	// 	setBlock (!!me.blockList.find((userblock) => userblock === user.login));
 	// }
-
 	
 	const blockUser = async() => {
 
@@ -563,19 +562,6 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 		};
 	}, []);
 
-	useEffect(() => {
-
-		globalState.userSocket?.on('refreshOptionsUserChannel', () => {
-			console.log("Coucou je refresh les options");
-			handleRefreshOptionsUserChannel();
-		});
-	
-		return () => {
-			globalState.userSocket?.off('refreshOptionsUserChannel');
-		};
-
-	  }, [globalState?.userSocket]);
-
 
 	return (
 		<>
@@ -590,17 +576,17 @@ const OptionsUserChannel: React.FC<OptionsUserChannelProps> = ({ user , me }) =>
 							<img className="option-image" src="bulle.png" onClick={handleDms}/>
 							{me.isAdmin && !user.isOwner &&
 									<>
-									{admin ? (
+									{user.isAdmin ? (
 										<img className="option-image" src="couronne.png" onClick={demoteAdminUser}/>
 									) : (
 										<img className="option-image-opacity" src="couronne.png" onClick={promoteAdminUser}/>
 									)}
-									{mute ? (
+									{user.isMute ? (
 										<img className="option-image" src="bouton-de-sourdine3.png" onClick={unmuteUser}/>
 									) : (
 											<img className="option-image-opacity" src="bouton-de-sourdine3.png" onClick={muteUser}/>
 									)}
-									{ban ? (
+									{user.isBan ? (
 										<img className="option-image" src="interdire.png" onClick={unbanUser}/>
 										) : (
 										<img className="option-image-opacity" src="interdire.png" onClick={banUser}/>

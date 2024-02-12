@@ -874,11 +874,12 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	handleUserRefresh(@MessageBody() data: { userToRefresh: number, target: string, status: boolean }) {
 		const { userToRefresh, target, status } = data;
 		// custom event to refresh on a particular user room
-		this.activeUsers.forEach((user: ConnectedUsers) => {
-			if (user.userId == userToRefresh)
-				this.server.to(user.socket.id).emit(target, status);
-		});
+		// this.activeUsers.forEach((user: ConnectedUsers) => {
+		// 	if (user.userId == userToRefresh)
+		// 		this.server.to(user.socket.id).emit(target, status);
+		// });
 		// event to refresh the user list of a channel
+		this.server.emit(target, status);
 		this.server.emit('refresh_channel');
 	}
 
