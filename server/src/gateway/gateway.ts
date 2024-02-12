@@ -307,7 +307,6 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 				this.server.to(roomName + roomID).emit('refresh_channel');
 			}
 			else {
-				// client.join(roomName); // joining personnal room
 				this.activeUsers.forEach((user_: ConnectedUsers) => {
 					if (user_.userId == user.sub) {
 						user_.socket.join(roomName);
