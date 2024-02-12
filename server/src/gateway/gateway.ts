@@ -307,7 +307,6 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 				this.server.to(roomName + roomID).emit('refresh_channel');
 			}
 			else {
-				// client.join(roomName); // joining personnal room
 				this.activeUsers.forEach((user_: ConnectedUsers) => {
 					if (user_.userId == user.sub) {
 						user_.socket.join(roomName);
@@ -888,6 +887,23 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	handleRefreshheader() {
 		this.server.emit('refreshHeaderNotif');
 	}
+
+	@SubscribeMessage('refreshPrivateOption')
+	@UseGuards(GatewayGuard)
+	handleChannelPrivateOption(@MessageBody() data: { publicValue: boolean } ) {
+		this.server.emit('refreshChannelPrivateOption', {
+			publicValue: data.publicValue,
+		});
+	}
+
+	@SubscribeMessage('refreshProtectedOption')
+	@UseGuards(GatewayGuard)
+	handleChannelprotectedoption(@MessageBody() data: { protectedValue: boolean } ) {
+		this.server.emit('refreshChannelProtectedOption', {
+			protectedValue: data.protectedValue,
+		});
+	}
+
 
 	@SubscribeMessage('refreshUserList')
 	@UseGuards(GatewayGuard)

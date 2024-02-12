@@ -162,7 +162,7 @@ const ChannelListComponent: React.FC = () => {
 				+
 			</button>
 			<div className='create-add'>
-				{ chatState.showAddCreateChannel ?
+				{chatState.showAddCreateChannel ?
 					<div className='blur'>
 						<img className="add_button_cancel" src='./close.png'  onClick={handleCloseAddCreate}/>
 						<div className='bloc-add-create'>

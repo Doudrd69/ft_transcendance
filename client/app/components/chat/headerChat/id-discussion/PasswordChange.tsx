@@ -41,6 +41,9 @@ const PasswordChangeComponent: React.FC = () => {
 						roomName : chatState.currentConversation,
 						roomID: chatState.currentConversationID,
 					});
+					globalState.userSocket?.emit('refreshProtectedOption', {
+						protectedValue: true,
+					});
 					chatDispatch({ type: 'ACTIVATE', payload: 'currentConversationIsProtected' });
 					chatDispatch({ type: 'ACTIVATE', payload: 'showOptionUseChannel' });
 					chatDispatch({ type: 'ACTIVATE', payload: 'showBackComponent' });

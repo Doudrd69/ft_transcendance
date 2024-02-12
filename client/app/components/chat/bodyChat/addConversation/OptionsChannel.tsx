@@ -39,6 +39,7 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 	const updateIsPublicTrue = async() => {
 
 		try {
+
 			const channelOptionDto = {
 				conversationID: Number(chatState.currentConversationID),
 				userID: Number(sessionStorage.getItem("currentUserID")),
@@ -54,10 +55,16 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 			});
 
 			if (response.ok) {
+
+				globalState.userSocket?.emit('refreshPrivateOption', {
+					publicValue: true,
+				});
+				
 				globalState.userSocket?.emit('refreshChannelList', {
 					roomName : chatState.currentConversation,
 					roomID: chatState.currentConversationID,
 				});
+				
 				chatDispatch({ type: 'ACTIVATE', payload: 'currentConversationIsPrivate' });
 			}
 			else {
@@ -90,10 +97,16 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 			});
 
 			if (response.ok) {
+
+				globalState.userSocket?.emit('refreshPrivateOption', {
+					publicValue: false,
+				});
+				
 				globalState.userSocket?.emit('refreshChannelList', {
 					roomName : chatState.currentConversation,
 					roomID: chatState.currentConversationID,
 				});
+				
 				chatDispatch({ type: 'DISABLE', payload: 'currentConversationIsPrivate' });
 			}
 			else {
@@ -170,11 +183,17 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 			});
 	
 			if (response.ok) {
-					globalState.userSocket?.emit('refreshChannelList', {
-						roomName : chatState.currentConversation,
-						roomID: chatState.currentConversationID,
-					});
-					chatDispatch({ type: 'DISABLE', payload: 'currentConversationIsProtected' });
+
+				globalState.userSocket?.emit('refreshProtectedOption', {
+					protectedValue: false,
+				});
+
+				globalState.userSocket?.emit('refreshChannelList', {
+					roomName : chatState.currentConversation,
+					roomID: chatState.currentConversationID,
+				});
+
+				chatDispatch({ type: 'DISABLE', payload: 'currentConversationIsProtected' });
 			}
 			else {
 				const error = await response.json();
@@ -210,13 +229,31 @@ const OptionsChannel: React.FC<OptionsChannelProps> = ({title}) => {
 	}, []);
 
 	useEffect(() => {
+
 		globalState.userSocket?.on('channelDeleted', ( data: {roomName: string, roomID: string} ) => {
 			chatDispatch({ type: 'ACTIVATE', payload: 'showChannelList' });
 		});
 
+		globalState.userSocket.on('refreshChannelPrivateOption', ( data: { publicValue: boolean } ) => {
+			if (data.publicValue)
+				chatDispatch({ type: 'ACTIVATE', payload: 'currentConversationIsPrivate' });
+			else
+				chatDispatch({ type: 'DISABLE', payload: 'currentConversationIsPrivate' });
+		});
+		
+		globalState.userSocket?.on('refreshChannelProtectedOption', ( data: { protectedValue: boolean } ) => {
+			if (data.protectedValue)
+				chatDispatch({ type: 'ACTIVATE', payload: 'currentConversationIsProtected' });
+			else
+				chatDispatch({ type: 'DISABLE', payload: 'currentConversationIsProtected' });
+		});
+
 		return () => {
-			globalState.userSocket?.off('refreshChannelList');
+			globalState.userSocket?.off('channelDeleted');
+			globalState.userSocket?.off('refreshChannelPrivateOption');
+			globalState.userSocket?.off('refreshChannelProtectedOption');
 		}
+
 	}, [globalState?.userSocket]);
 
 	return (
