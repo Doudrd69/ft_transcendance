@@ -811,7 +811,7 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		// This event aims to make the targeted user to rejoin the room
 		this.activeUsers.forEach((user: ConnectedUsers) => {
 			if (user.userId == userToUnban) {
-				this.server.to(user.socket.id).emit('userIsBan', {
+				this.server.to(user.socket.id).emit('userIsUnban', {
 					roomName: roomName,
 					roomID: roomID,
 				});
