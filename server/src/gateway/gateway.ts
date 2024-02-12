@@ -755,7 +755,7 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 					recipient: recipient,
 				})
 				this.activeUsers.forEach((user: ConnectedUsers) => {
-					if (user.userId == checkedInitiator.id) {
+					if (user.userId == checkedRecipient.id) {
 						this.server.to(user.socket.id).emit('refreshFriends');
 						this.server.to(user.socket.id).emit('refreshFriends');
 						this.server.to(user.socket.id).emit('refreshHeaderNotif');
