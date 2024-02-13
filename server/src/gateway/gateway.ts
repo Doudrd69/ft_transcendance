@@ -406,6 +406,7 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	@SubscribeMessage('inviteAccepted')
 	@UseGuards(GatewayGuard)
 	async inviteAccepted(@ConnectedSocket() client: Socket, @MessageBody() data: { otherUserId: number, userGameSocketId: string, senderSocketId: string}) {
+		console.log("[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[INVITEACCEPTED]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]")
 		try {
 
 			console.log("USER SOCKER ID FDP: ", data.senderSocketId);
@@ -434,7 +435,7 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 			this.activeUsers.forEach((user: ConnectedUsers) => {
 				if ((user.userId == targetUser.id) && (user.socket.id == data.senderSocketId))
 				{
-					console.log("BABABABABA", user);
+					console.log("BABABABABA", user.userId);
 					this.server.to(user.socket.id).emit('acceptInvitation', { userTwoId: emitUserId, userTwoGameId: data.userGameSocketId });
 					i++;
 				}

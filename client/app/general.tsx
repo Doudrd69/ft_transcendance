@@ -69,7 +69,7 @@ const GeneralComponent = () => {
 			gameSocket.connect();
 			dispatch({ type: 'SET_GAME_SOCKET', payload: gameSocket });
 			gameSocket.on('connect', () => {
-				console.log("CONNNNNEXXTTT", gameInviteDto.senderSocketId)
+				console.log("CONNNNNNNNNNNNNNNNNNNNNNNNNNNNNNXXXXXXXXXIOOOOOOOOONN", gameInviteDto.senderSocketId)
 				globalState.userSocket?.emit('inviteAccepted', {
 					otherUserId: otherUserId,
 					userGameSocketId: gameSocket.id,
@@ -389,17 +389,17 @@ const GeneralComponent = () => {
 
 	// GAME INVITE
 
-	useEffect(() => {
+	// useEffect(() => {
 
-		globalState.userSocket?.on('createGameInviteSocket', (GameInviteUserTwoDto: GameInviteUserTwoDto) => {
-			globalState.gameSocket?.emit('launchGameInvite', { userTwoId: GameInviteUserTwoDto.userTwoId, userTwoGameId: GameInviteUserTwoDto.userTwoGameId });
-		});
+	// 	globalState.userSocket?.on('createGameInviteSocket', (GameInviteUserTwoDto: GameInviteUserTwoDto) => {
+	// 		globalState.gameSocket?.emit('launchGameInvite', { userTwoId: GameInviteUserTwoDto.userTwoId, userTwoGameId: GameInviteUserTwoDto.userTwoGameId });
+	// 	});
 
-		return () => {
-			globalState.userSocket?.off('createGameInviteSocket');
-		};
+	// 	return () => {
+	// 		globalState.userSocket?.off('createGameInviteSocket');
+	// 	};
 
-	}, [globalState?.userSocket, globalState?.gameSocket]);
+	// }, [globalState?.userSocket, globalState?.gameSocket]);
 
 	useEffect(() => {
 
@@ -414,7 +414,12 @@ const GeneralComponent = () => {
 			});
 			gameSocket.connect();
 			dispatch({ type: 'SET_GAME_SOCKET', payload: gameSocket });
-			globalState.userSocket?.emit('setGameInvite', { userTwoId: GameInviteUserTwoDto.userTwoId, userTwoGameId: GameInviteUserTwoDto.userTwoGameId });
+			gameSocket.on('connect', () => {
+				console.log("CREATION SOCKET INVITATION");
+
+				gameSocket.emit('launchGameInvite', { userTwoId: GameInviteUserTwoDto.userTwoId, userTwoGameId: GameInviteUserTwoDto.userTwoGameId });
+			});
+			// globalState.userSocket?.emit('setGameInvite', { userTwoId: GameInviteUserTwoDto.userTwoId, userTwoGameId: GameInviteUserTwoDto.userTwoGameId });
 		});
 
 		// this.server.to(client.id).emit('badsenderIdGameInvite');

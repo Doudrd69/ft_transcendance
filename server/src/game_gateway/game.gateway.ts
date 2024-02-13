@@ -151,6 +151,8 @@ export class GameGateway {
             console.log(`[launchGameInvite] gameSocket: ${client.id}`);
             const uniqueKey = `${Math.min(emitUserId, targetUserId)}-${Math.max(emitUserId, targetUserId)}`
             if (!inGame[uniqueKey]) {
+                console.log(`[ERREUR !!!!! launchGameInvite] gameSocket: ${client.id}`);
+
                 await this.GameService.unsetUserInGame(emitUserId);
                 this.server.to([client.id]).emit('badsenderIdGameInvite');
                 // delete leurs sockets

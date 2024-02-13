@@ -107,6 +107,7 @@ const PongComponent = () => {
 
 	const [Game, setGame] = useState<Game>(defaultGame);
 	const currentUserId = sessionStorage.getItem("currentUserId");
+	const {dispatch} = useGlobal()
 
 
 	useEffect(() => {
@@ -137,7 +138,28 @@ const PongComponent = () => {
 	useEffect(() => {
 
 		globalState.gameSocket?.on('gameStart', (Game: Game) => {
+	
+			dispatch({ type: 'DISABLE', payload: 'showSettings' })
+			dispatch({ type: 'DISABLE', payload: 'showProfilsSettings' })
+			dispatch({ type: 'DISABLE', payload: 'showGameSettings' })
+			dispatch({ type: 'DISABLE', payload: 'showGeneralSettings' })
+			
 			chatDispatch({ type: 'DISABLE', payload: 'showConfirmation' })
+			chatDispatch({ type: 'DISABLE', payload: 'showCreateChannel' })
+			chatDispatch({ type: 'DISABLE', payload: 'showListChannelAdd' })
+			chatDispatch({ type: 'DISABLE', payload: 'showAddCreateChannel' })
+			chatDispatch({ type: 'DISABLE', payload: 'showPassword' })
+			chatDispatch({ type: 'DISABLE', payload: 'showOptionsUserChannel' })
+			chatDispatch({ type: 'DISABLE', payload: 'showOptionsChannel' })
+			chatDispatch({ type: 'DISABLE', payload: 'showPasswordChange' })
+			chatDispatch({ type: 'DISABLE', payload: 'showAdd' })
+			chatDispatch({ type: 'DISABLE', payload: 'showAddChannel' })
+			chatDispatch({ type: 'DISABLE', payload: 'showAddFriend' })
+			chatDispatch({ type: 'DISABLE', payload: 'showStatistiques' })
+			
+
+
+
 			setGameID(Game.gameId);
 			setGame((prevState) => ({
 				...prevState,
