@@ -366,6 +366,10 @@ const GeneralComponent = () => {
 				});
 		});
 
+		globalState.userSocket?.on('userIsBlocked', () => {
+			toast.warn("You are blocked by this user");
+		});
+
 		return () => {
 			globalState.userSocket?.off('connect');
 			globalState.userSocket?.off('disconnect');
@@ -377,6 +381,7 @@ const GeneralComponent = () => {
 			globalState.userSocket?.off('kickUser');
 			globalState.userSocket?.off('userAddedToRoom');
 			globalState.userSocket?.off('gameInvite');
+			globalState.userSocket?.off('userIsBlocked');
 		}
 
 	}, [globalState?.userSocket]);

@@ -18,6 +18,7 @@ const GlobalSettingsComponent: React.FC = () => {
 
 			const tfaDto = {
 				userID: Number(sessionStorage.getItem("currentUserID")),
+				code: authenticatorCodeInput,
 			}
 		
 			const response = await fetch(`${process.env.API_URL}/auth/desactivate2fa`, {
@@ -33,9 +34,10 @@ const GlobalSettingsComponent: React.FC = () => {
 				const status = await response.json();
 				sessionStorage.setItem("2fa", `${status}`);
 				setActiveUrlImg(false);
-				toast.warn("2fa is now disabled");
+				toast.success("2fa is now disabled");
 			}
 			else {
+				toast.warn('Enter the code on your Google Athenticator app to disable 2FA');
 				const error = await response.json();
 				if (Array.isArray(error.message))
 					toast.warn(error.message[0]);

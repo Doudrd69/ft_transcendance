@@ -63,7 +63,7 @@ export class AuthService {
 					}
 				}
 			}
-			throw new HttpException('Fatal error', HttpStatus.BAD_REQUEST);
+			throw new HttpException('Failed to load data', HttpStatus.BAD_REQUEST);
 		} catch (error) {
 			console.log(error);
 		}
@@ -135,16 +135,20 @@ export class AuthService {
 	/**************************************************************/
 
 
-	async desactivate2FA(userID: number) {
+	async desactivate2FA(dto: AuthenticatorCodeDto, userID: number) {
 
-		const user : User = await this.usersService.getUserByID(userID);
+		try {
+			if (await this.verifyCode(dto, userID)) {
 
-		if (user) {
-			await this.usersService.upate2FAState(user, false);
-			return false;
+				console.log('coucou du deactivate 2fa');
+				const user : User = await this.usersService.getUserByID(userID);
+				await this.usersService.upate2FAState(user, false);
+				return false;
+			}
+
+		} catch (error) {
+			throw error;
 		}
-
-		throw new HttpException('User not found', HttpStatus.BAD_REQUEST);
 	}
 
 	async activate2FA(userID: number) {

@@ -533,6 +533,7 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 			targetToInvite.blockedUsers.forEach((user: number) => {
 				if (user == emitUserId) {
 					console.log("User is blocked");
+					this.server.to(client.id).emit('userIsBlocked');
 					throw new Error("User is blocked");
 				}
 			});
