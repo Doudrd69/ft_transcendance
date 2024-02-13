@@ -398,6 +398,7 @@ const GeneralComponent = () => {
 	useEffect(() => {
 
 		globalState.userSocket?.on('acceptInvitation', (GameInviteUserTwoDto: GameInviteUserTwoDto) => {
+			console.log("ACCEPT INVITATION");
 			globalState.gameInviteValidation = true;
 			const gameSocket: Socket = io(`${process.env.API_URL}/game`, {
 				autoConnect: false,
