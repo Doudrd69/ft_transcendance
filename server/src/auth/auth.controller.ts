@@ -32,11 +32,12 @@ export class AuthController {
 		return this.authService.activate2FA(user.sub);
 	}
 
+	// ici je pourrais rajouter un code dans le body et le verifier pour desactiver
 	@UseGuards(AuthGuard)
 	@Post('desactivate2fa')
-	desactivate2FA(@Req() req) {
+	desactivate2FA(@Req() req, @Body() authenticatorCodeDto: AuthenticatorCodeDto) {
 		const { user } = req;
-		return this.authService.desactivate2FA(user.sub);
+		return this.authService.desactivate2FA(authenticatorCodeDto, user.sub);
 	}
 
 	@UseGuards(AuthGuard)

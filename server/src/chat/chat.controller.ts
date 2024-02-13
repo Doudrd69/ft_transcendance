@@ -55,6 +55,8 @@ export class ChatController {
 		if (addUserToConversationDto.userToAdd) {
 			if (user.sub === addUserToConversationDto.userToAdd)	
 				throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
+			if (this.chatService.userToAddIsBlocked(user.sub, addUserToConversationDto.userToAdd))
+				throw new HttpException('You have blocked this user', HttpStatus.UNAUTHORIZED);
 			return this.chatService.addUserToConversation(addUserToConversationDto.conversationID, addUserToConversationDto.userToAdd, true, false);
 		}
 		else

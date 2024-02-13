@@ -1033,6 +1033,24 @@ export class ChatService {
 		throw new HttpException('Fatal error', HttpStatus.BAD_REQUEST);
 	}
 
+	async userToAddIsBlocked(userID: number, userToAdd: number) {
+
+		const user = await this.usersRepository.findOne({ where: { id: userID } });
+
+		if (user) {
+
+			let blockStatus = false;
+			user.blockedUsers.forEach((user: number) => {
+				if (user == userToAdd)
+					blockStatus = true;
+			});
+
+			return blockStatus;
+		}
+
+		throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+	}
+
 	async addUserToConversation(conversationToAddId: number, userID: number, inviteFlag: boolean, passwordCheck: boolean): Promise<Conversation> {
 		
 		const userToAdd = await this.usersRepository.findOne({
@@ -1057,7 +1075,6 @@ export class ChatService {
 				if (user == userToAdd.id)
 					muteStatus = true;
 			});
-			console.log("Mute status on adduser: ", muteStatus);
 
 			if (userToAdd) {
 	
