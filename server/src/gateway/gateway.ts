@@ -687,25 +687,33 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	@UseGuards(GatewayGuard)
 	async handleMessage(@ConnectedSocket() client: Socket, @MessageBody() data: { dto: MessageDto, conversationName: string }) {
 
-		const { dto, conversationName } = data;
-		const user = client.handshake.auth.user;
+		try {
+			const { dto, conversationName } = data;
+			const user = client.handshake.auth.user;
+	
+			const verifyUser = await this.chatService.isUserInConversation(user.sub, dto.conversationID);
+			if (verifyUser) {
+	
+				if (await this.chatService.checkUserMuteStatus(verifyUser.id, dto.conversationID)) {
+					throw new HttpException('User is muted', HttpStatus.BAD_REQUEST);
+				}
 
-		const verifyUser = await this.chatService.isUserInConversation(user.sub, dto.conversationID);
-		if (verifyUser) {
-
-			// The room's name is not the conversation's name in DB
-			this.server.to(conversationName + dto.conversationID).except(`whoblocked${verifyUser.id}`).emit('onMessage', {
-				from: verifyUser.username,
-				senderId: user.sub,
-				content: dto.content,
-				post_datetime: dto.post_datetime,
-				conversationID: dto.conversationID,
-				conversationName: conversationName,
-			});
-			return;
+				// The room's name is not the conversation's name in DB
+				this.server.to(conversationName + dto.conversationID).except(`whoblocked${verifyUser.id}`).emit('onMessage', {
+					from: verifyUser.username,
+					senderId: user.sub,
+					content: dto.content,
+					post_datetime: dto.post_datetime,
+					conversationID: dto.conversationID,
+					conversationName: conversationName,
+				});
+				return;
+			}
+	
+			throw new HttpException("User not found", HttpStatus.NOT_FOUND);
+		} catch (error) {
+			// throw error;
 		}
-
-		throw new HttpException("User not found", HttpStatus.NOT_FOUND);
 	}
 
 	@SubscribeMessage('addFriend')

@@ -24,6 +24,14 @@ export class Conversation {
 	@Column({ default: false })
 	is_channel: boolean;
 
+	// array d'id pour les user mutes
+	// quand j'add un mec a une conv je regarde s'il est mute et je reset le status a true
+	@Column("int", {
+		array: true,
+		default: null,
+	})
+	mutedUsers: number[];
+
 	@OneToMany(() => Message, (message) => message.conversation)
 	messages: Message[];
 }
