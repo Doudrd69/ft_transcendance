@@ -474,6 +474,7 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 					delete inGame[key];
 				}
 			});
+			this.server.to(client.id).emit('badsenderIdGameInvite');
 			this.unsetGameStatus(client.handshake.auth.user.sub);
 			this.unsetGameStatus(data.otherUserId);
 
@@ -548,6 +549,7 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 				if ((user_.userId == user.sub) && (user_.socket.id == client.id))
 				{
 					console.log("rarararararaara");
+
 					this.server.to(user_.socket.id).emit('gameNotInProgress');
 				}
 			});

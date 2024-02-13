@@ -41,8 +41,6 @@ export class UsersService {
 
 	userInGame(userId: number) {
 		// enelever les appels DB
-		console.log("[CHECK MATCH] userIngame", userInGame);
-		console.log("[CHECK MATCH] useInMatch", userInMatchmaking)
 		// console.log(`[usersInGame] : userInMatchmaking[user1Id] : ${userInMatchmaking[user1Id]}, userInMatchmaking[user2Id] : ${userInMatchmaking[user2Id]}`)
 		if (userInGame[userId] === true || userInMatchmaking[userId] === true) {
 			return true;

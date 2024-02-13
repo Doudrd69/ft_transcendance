@@ -367,6 +367,7 @@ const GeneralComponent = () => {
 		});
 
 		return () => {
+			globalState.userSocket?.off('decconectGqmeSocket');
 			globalState.userSocket?.off('connect');
 			globalState.userSocket?.off('disconnect');
 			globalState.userSocket?.off('refreshUserOnlineState');
@@ -416,6 +417,11 @@ const GeneralComponent = () => {
 			globalState.gameSocket?.disconnect();
 		});
 
+		globalState.gameSocket?.on('badsenderIdGameInvite', () => {
+			globalState.gameSocket?.disconnect();
+		});
+
+
 		return () => {
 			globalState.userSocket?.off('acceptInvitation');
 			globalState.userSocket?.off('closedInvitation');
@@ -424,6 +430,8 @@ const GeneralComponent = () => {
 			globalState.userSocket?.off('usersInGame');
 			globalState.userSocket?.off('userToInviteAlreadyInGame');
 			globalState.userSocket?.off('badsenderIdGameInvite');
+			globalState.gameSocket?.off('badsenderIdGameInvite');
+
 		};
 
 	}, [globalState?.gameSocket, globalState.gameInviteValidation, globalState?.userSocket, globalState.userTwoIdGame, globalState.userTwoGameSocketId]);

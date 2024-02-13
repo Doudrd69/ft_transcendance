@@ -26,6 +26,7 @@ const Menu = () => {
 	}
 
 	useEffect(() => {
+
 		globalState.userSocket?.on('gameNotInProgress', () => {
 			if (!globalState.gameSocket?.connected) {
 				const gameSocket = io(`${process.env.API_URL}/game`, {
@@ -37,13 +38,13 @@ const Menu = () => {
 				gameSocket.connect();
 				dispatch({ type: 'SET_GAME_SOCKET', payload: gameSocket });
 				gameSocket.on('connect', () => {
+					console.log("ajajajajajaja");
 					dispatchGame({ type: 'TOGGLE', payload: 'showGameMatchmaking' });
 					// enlever userLogin, et userId, le gameMode pas besoin (si pas de gameMode peut etre faire un set joinQueue par defaut a NORMAL)
 					gameSocket.emit('join-matchmaking', {gameMode: gameMode});
 				});
 			}
 		});
-
 
 		globalState.gameSocket?.on('setGameInvited', () => {
 			dispatchGame({
