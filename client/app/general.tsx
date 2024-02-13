@@ -371,6 +371,7 @@ const GeneralComponent = () => {
 		});
 
 		return () => {
+			globalState.userSocket?.off('decconectGqmeSocket');
 			globalState.userSocket?.off('connect');
 			globalState.userSocket?.off('disconnect');
 			globalState.userSocket?.off('refreshUserOnlineState');
@@ -403,6 +404,7 @@ const GeneralComponent = () => {
 	useEffect(() => {
 
 		globalState.userSocket?.on('acceptInvitation', (GameInviteUserTwoDto: GameInviteUserTwoDto) => {
+			console.log("ACCEPT INVITATION");
 			globalState.gameInviteValidation = true;
 			const gameSocket: Socket = io(`${process.env.API_URL}/game`, {
 				autoConnect: false,
@@ -420,6 +422,11 @@ const GeneralComponent = () => {
 			globalState.gameSocket?.disconnect();
 		});
 
+		globalState.gameSocket?.on('badsenderIdGameInvite', () => {
+			globalState.gameSocket?.disconnect();
+		});
+
+
 		return () => {
 			globalState.userSocket?.off('acceptInvitation');
 			globalState.userSocket?.off('closedInvitation');
@@ -428,6 +435,8 @@ const GeneralComponent = () => {
 			globalState.userSocket?.off('usersInGame');
 			globalState.userSocket?.off('userToInviteAlreadyInGame');
 			globalState.userSocket?.off('badsenderIdGameInvite');
+			globalState.gameSocket?.off('badsenderIdGameInvite');
+
 		};
 
 	}, [globalState?.gameSocket, globalState.gameInviteValidation, globalState?.userSocket, globalState.userTwoIdGame, globalState.userTwoGameSocketId]);

@@ -39,15 +39,10 @@ export class UsersService {
 		return true;
 	}
 
-	async userInGame(userId: number) {
+	userInGame(userId: number) {
 		// enelever les appels DB
-		const user: User = await this.usersRepository.findOne({ where: { id: userId } })
-		if (!user)
-			throw new Error("userToInvite undefined")
-		console.log(`[usersInGame] : userInGame[user1Id] : ${userInGame[userId]}, userInGame[user2Id] : ${userInGame[userId]}`)
 		// console.log(`[usersInGame] : userInMatchmaking[user1Id] : ${userInMatchmaking[user1Id]}, userInMatchmaking[user2Id] : ${userInMatchmaking[user2Id]}`)
 		if (userInGame[userId] === true || userInMatchmaking[userId] === true) {
-			console.log(`usernametoinvite : game: ${user.inGame} match: ${user.inMatchmaking}`);
 			return true;
 		}
 		return false;
@@ -56,7 +51,7 @@ export class UsersService {
 	usersInGame(user1Id: number, user2Id: number) {
 		// enelever les appels DB
 		console.log(`[usersInGame] : userInGame[user1Id] : ${userInGame[user1Id]}, userInGame[user2Id] : ${userInGame[user2Id]}`)
-		console.log(`[usersInGame] : userInMatchmaking[user1Id] : ${userInMatchmaking[user1Id]}, userInMatchmaking[user2Id] : ${userInMatchmaking[user2Id]}`)
+		console.log(`[usersInMatch] : userInMatchmaking[user1Id] : ${userInMatchmaking[user1Id]}, userInMatchmaking[user2Id] : ${userInMatchmaking[user2Id]}`)
 		if ((userInGame[user1Id] === true) || (userInMatchmaking[user1Id] === true)) {
 			return true;
 		}
