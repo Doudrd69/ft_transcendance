@@ -854,6 +854,7 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 				});
 			}
 		});
+		this.server.emit('refresh_channel');
 	}
 
 	@SubscribeMessage('refreshUserChannelList')

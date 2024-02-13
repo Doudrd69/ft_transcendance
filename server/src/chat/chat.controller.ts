@@ -50,12 +50,13 @@ export class ChatController {
 	@UseGuards(AuthGuard)
 	@HttpCode(HttpStatus.OK)
 	@Post('addUserToConversation')
-	addUserToConversation(@Req() req, @Body() addUserToConversationDto: AddUserToConversationDto): Promise<Conversation> {
+	async addUserToConversation(@Req() req, @Body() addUserToConversationDto: AddUserToConversationDto): Promise<Conversation> {
 		const { user } = req;
 		if (addUserToConversationDto.userToAdd) {
 			if (user.sub === addUserToConversationDto.userToAdd)	
 				throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
-			if (this.chatService.userToAddIsBlocked(user.sub, addUserToConversationDto.userToAdd))
+			const blockStatus = await this.chatService.userToAddIsBlocked(user.sub, addUserToConversationDto.userToAdd);
+			if (blockStatus)
 				throw new HttpException('You have blocked this user', HttpStatus.UNAUTHORIZED);
 			return this.chatService.addUserToConversation(addUserToConversationDto.conversationID, addUserToConversationDto.userToAdd, true, false);
 		}
