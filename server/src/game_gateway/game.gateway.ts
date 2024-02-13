@@ -191,6 +191,7 @@ export class GameGateway {
         }
         catch (error) {
             await this.handleException(error, client)
+			this.server.to(client.id).emit('badsenderIdGameInvite');
         }
     }
     @SubscribeMessage('throwGameInvite')
@@ -291,6 +292,7 @@ export class GameGateway {
                     }
                 }
             }
+			this.server.to(client.id).emit('badsenderIdGameInvite');
         }
     }
 
@@ -321,6 +323,7 @@ export class GameGateway {
         }
         catch (error) {
             await this.handleException(error, client)
+			this.server.to(client.id).emit('badsenderIdGameInvite');
         }
     }
 
@@ -427,6 +430,7 @@ export class GameGateway {
         }
         catch (error) {
             await this.handleException(error, client)
+			this.server.to(client.id).emit('badsenderIdGameInvite');
         }
     }
 
@@ -443,6 +447,7 @@ export class GameGateway {
         }
         catch (error) {
             await this.handleException(error, client)
+			this.server.to(client.id).emit('badsenderIdGameInvite');
         }
     }
 
@@ -457,6 +462,7 @@ export class GameGateway {
         }
         catch (error) {
             await this.handleException(error, client)
+			this.server.to(client.id).emit('badsenderIdGameInvite');
         }
     }
 }

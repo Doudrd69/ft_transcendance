@@ -2,7 +2,7 @@ import { HttpException, HttpStatus, Inject, Injectable, forwardRef } from '@nest
 import { InjectRepository } from '@nestjs/typeorm';
 import * as fs from 'fs';
 import { existsSync, unlinkSync } from 'fs';
-import { join } from 'path';
+import { dirname, join } from 'path';
 import { Conversation } from 'src/chat/entities/conversation.entity';
 import { GroupMember } from 'src/chat/entities/group_member.entity';
 import { Game } from 'src/game/entities/games.entity';
@@ -151,7 +151,7 @@ export class UsersService {
 		if (user) {
 
 			const oldAvatarPath = join(__dirname, user.avatarURL);
-			if (existsSync(oldAvatarPath))
+			if (existsSync(oldAvatarPath) && oldAvatarPath !== join(__dirname, 'avatars/avatar.png'))
 				unlinkSync(oldAvatarPath);
 			const updateResult = await this.usersRepository.update({ id: userID }, { avatarURL });
 			return updateResult;

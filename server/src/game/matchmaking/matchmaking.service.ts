@@ -71,7 +71,7 @@ export class MatchmakingService {
 		if (!newUser)
 			throw new Error(`new user undefined`)
 		// check if user is already in queue normal or speed
-		if (playersNormalQueue.includes(socketIdUserId) || playersSpeedQueue.includes(socketIdUserId))
+		if ((playersNormalQueue.find(player => player.userId === userId)) || (playersSpeedQueue.find(player => player.userId === userId)))
 			throw new Error(`User alredy in Matchmaking`);
 		if (gameMode === "NORMAL")
 			playersNormalQueue.push(socketIdUserId);
