@@ -352,39 +352,29 @@ export class GameGateway {
 
     async handleUserDisconnection(disconnectedSockets: string[], gameInstance: game_instance, gameLoop: NodeJS.Timeout) {
         console.log(`[handleUserDisconnection]: ${disconnectedSockets} `)
-        try {
-            gameInstance.stop = true
-            clearInterval(gameLoop);
-            const user1: User = await this.GameService.getUserWithUserId(gameInstance.usersId[0]);
-            const user2: User = await this.GameService.getUserWithUserId(gameInstance.usersId[1]);
-            await this.GameService.updateStateGameForUsers(user1, user2);
-            let game = await this.GameService.getGameWithUserId(user1.id);
-            await this.GameService.deleteGame(game);
-            await this.GameService.createGameStop(user1, user2, gameInstance, disconnectedSockets);
+		gameInstance.stop = true
+		clearInterval(gameLoop);
+		const user1: User = await this.GameService.getUserWithUserId(gameInstance.usersId[0]);
+		const user2: User = await this.GameService.getUserWithUserId(gameInstance.usersId[1]);
+		await this.GameService.updateStateGameForUsers(user1, user2);
+		let game = await this.GameService.getGameWithUserId(user1.id);
+		await this.GameService.deleteGame(game);
+		await this.GameService.createGameStop(user1, user2, gameInstance, disconnectedSockets);
 
-            this.GameService.deleteGameSocketsIdForPlayers(user1, user2);
-            userInGame[gameInstance.usersId[0]] = false;
-            userInGame[gameInstance.usersId[1]] = false;
-            const uniqueKey = `${Math.min(gameInstance.usersId[0], gameInstance.usersId[1])}-${Math.max(gameInstance.usersId[0], gameInstance.usersId[1])}`
-            if (inGame.hasOwnProperty(uniqueKey)) {
-                delete inGame[uniqueKey];
-                console.log('La paire a été supprimée de la queue.');
-            }
-            this.server.to([gameInstance.players[0], gameInstance.players[1]]).emit('userDisconnected');
-            await this.GameService.clearDisconnections(gameInstance.gameID);
-            console.log("[fin de GAME]", userInGame[gameInstance.usersId[0]], userInGame[gameInstance.usersId[1]])
-
-
-            // delete gameInstance
-        } catch (error) {
-            console.log(error.stack)
-            console.log("User disconnection handling failed")
-        }
+		this.GameService.deleteGameSocketsIdForPlayers(user1, user2);
+		userInGame[gameInstance.usersId[0]] = false;
+		userInGame[gameInstance.usersId[1]] = false;
+		const uniqueKey = `${Math.min(gameInstance.usersId[0], gameInstance.usersId[1])}-${Math.max(gameInstance.usersId[0], gameInstance.usersId[1])}`
+		if (inGame.hasOwnProperty(uniqueKey)) {
+			delete inGame[uniqueKey];
+			console.log('La paire a été supprimée de la queue.');
+		}
+		this.server.to([gameInstance.players[0], gameInstance.players[1]]).emit('userDisconnected');
+		await this.GameService.clearDisconnections(gameInstance.gameID);
+		console.log("[fin de GAME]", userInGame[gameInstance.usersId[0]], userInGame[gameInstance.usersId[1]])
     }
 
     async executeGameTick(gameLoop: NodeJS.Timeout, gameInstance: game_instance, client: string) {
-        try {
-
             if (gameInstance.stop === true) {
                 console.log(`[RETURN GAME STOP] gameinstance: ${gameInstance.game_has_ended}`)
                 return
@@ -403,17 +393,6 @@ export class GameGateway {
                 paddleOne: { x: gameInstance.paddles[0].start.x - 0.025, y: gameInstance.paddles[0].start.y, width: 0.025, height: gameInstance.paddles[0].end.y - gameInstance.paddles[0].start.y },
                 paddleTwo: { x: gameInstance.paddles[1].start.x, y: gameInstance.paddles[1].start.y, width: 0.025, height: gameInstance.paddles[1].end.y - gameInstance.paddles[1].start.y },
             })
-        } catch (error) {
-            console.log(`[GAME_LOOP_ERROR]: ${error.stack}`)
-            console.log(`[GAME_LOOP_ERROR]: ${error.name}, ${error.message}`)
-            const user1: User = await this.GameService.getUserWithUserId(gameInstance.usersId[0]);
-            const user2: User = await this.GameService.getUserWithUserId(gameInstance.usersId[1]);
-            await this.GameService.disconnectSocket(gameInstance.usersId[0], gameInstance.gameID, gameInstance.players[0])
-            await this.GameService.disconnectSocket(gameInstance.usersId[1], gameInstance.gameID, gameInstance.players[0])
-            await this.handleUserDisconnection(
-                [gameInstance.players[0], gameInstance.players[1]], gameInstance, gameLoop
-            )
-        }
     }
 
     @SubscribeMessage('leaveMatchmaking')
