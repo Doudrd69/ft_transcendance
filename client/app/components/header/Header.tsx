@@ -62,7 +62,6 @@ const HeaderComponent: React.FC = () => {
 				setNotify([...notify]);
 			if (notify.length > 0)
 				setNewNotifications(true);
-			console.log(notify)
 		}
 		else {
 			const error = await response.json();
@@ -162,7 +161,6 @@ const HeaderComponent: React.FC = () => {
 		});
 
 		globalState.userSocket?.on('refreshUsernameHeader', (newValue: string) => {
-			console.log(newValue);
 			setCurrentUsername(newValue);
 			sessionStorage.setItem("currentUserLogin", newValue);
 			// window.location.reload();

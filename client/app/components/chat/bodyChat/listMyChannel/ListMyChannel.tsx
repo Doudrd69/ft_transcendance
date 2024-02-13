@@ -122,7 +122,7 @@ const ListMyChannelComponent: React.FC<ListMyChannelComponentProps> = ({ user, f
 					globalState.userSocket?.emit('addUserToRoom', {
 						convID: conversation.id,
 						convName: conversation.name,
-						friend: user,
+						friend: friendID,
 					});
 					
 					// refresh channel list
