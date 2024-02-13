@@ -543,11 +543,13 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 				console.log(`sender already inGame`);
 				return;
 			}
-			userInMatchmaking[user.sub] = true;
 			await this.userService.setUserInMatchmaking(user.sub);
 			this.activeUsers.forEach((user_: ConnectedUsers) => {
 				if ((user_.userId == user.sub) && (user_.socket.id == client.id))
+				{
+					console.log("rarararararaara");
 					this.server.to(user_.socket.id).emit('gameNotInProgress');
+				}
 			});
 		}
 		catch (error) {
@@ -588,7 +590,6 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 					console.log(`[check de l'existence des users] : les deux id sont bien la`);
 					return;
 			}
-
 			// Check if the sender is blocked by the recipient
 			targetToInvite.blockedUsers.forEach((user: number) => {
 				if (user == emitUserId) {
