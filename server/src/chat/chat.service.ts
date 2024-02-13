@@ -138,10 +138,30 @@ export class ChatService {
 		if (updateStatus) {
 			groupToUpdate.isMute = false;
 			groupToUpdate.mutedUntil = null;
+
+			conversation.mutedUsers = conversation.mutedUsers.filter((user_: number) => user_ == user.id);
+			await this.conversationRepository.save(conversation);
 			await this.groupMemberRepository.save(groupToUpdate);
 		}
 
 		return status;
+	}
+
+	async checkUserMuteStatus(userID: number, conversationID: number): Promise<boolean> {
+
+		const user = await this.usersRepository.findOne({
+			where: { id: userID },
+			relations: ['groups', 'groups.conversation'],
+		});
+
+		const conv = await this.conversationRepository.findOne({ where: { id: conversationID } });
+
+		if (user && conv) {
+			const status = await this.getGroupIsMuteStatus(user, conv);
+			return status;
+		}
+
+		throw new HttpException('User not found', HttpStatus.NOT_FOUND);
 	}
 
 	/***					PASSWORD HANDLER				***/
@@ -584,6 +604,9 @@ export class ChatService {
 					const mutedUntil = new Date(currentDate.getTime() + muteUserDto.mutedUntil * 60000);
 					groupToUpdate.mutedUntil = mutedUntil;
 					await this.groupMemberRepository.save(groupToUpdate);
+
+					conversation.mutedUsers.push(userToMute.id);
+					await this.conversationRepository.save(conversation);
 					return true;
 				}
 			}
@@ -619,6 +642,10 @@ export class ChatService {
 					groupToUpdate.isMute = false;
 					groupToUpdate.mutedUntil = null;
 					await this.groupMemberRepository.save(groupToUpdate);
+
+					
+					conversation.mutedUsers = conversation.mutedUsers.filter((user: number) => user == userToMute.id);
+					await this.conversationRepository.save(conversation);
 					return true;	
 				}
 			}
@@ -813,6 +840,17 @@ export class ChatService {
 		});
 
 		if (user && conversation) {
+
+			// let muteStatus : boolean = false;
+			// conversation.mutedUsers.forEach((user_: number) => {
+			// 	if (user_ == user.id)
+			// 		muteStatus = true;
+			// });
+
+			// if (muteStatus) {
+			// 	console.log("== User is muted in this channel ==")
+			// 	return ;
+			// }
 
 			const group = await this.getRelatedGroup(user, conversation);
 			if (group)
@@ -1014,6 +1052,13 @@ export class ChatService {
 			if (!conversationToAdd.isPublic && !inviteFlag)
 				throw new HttpException(`Channel is private: you need an invitation`, HttpStatus.BAD_REQUEST);
 	
+			let muteStatus : boolean = false;
+			conversationToAdd.mutedUsers.forEach((user: number) => {
+				if (user == userToAdd.id)
+					muteStatus = true;
+			});
+			console.log("Mute status on adduser: ", muteStatus);
+
 			if (userToAdd) {
 	
 				const isGroupInUsersArray = await this.getRelatedGroup(userToAdd, conversationToAdd);
@@ -1025,6 +1070,8 @@ export class ChatService {
 	
 				const group = new GroupMember();
 				group.isAdmin = false;
+				if (muteStatus)
+					group.isMute = true;
 				group.joined_datetime = new Date();
 				group.conversation = conversationToAdd;
 				await this.groupMemberRepository.save(group);
@@ -1150,6 +1197,7 @@ export class ChatService {
 			conv.is_channel = conversationDto.is_channel;
 			conv.isPublic = conversationDto.isPublic;
 			conv.isProtected = conversationDto.isProtected;
+			conv.mutedUsers = [];
 
 			if (!conversationDto.password && conversationDto.isProtected)
 				throw new HttpException('Please enter a password', HttpStatus.BAD_REQUEST);
@@ -1373,6 +1421,7 @@ export class ChatService {
 		throw new HttpException('Fatal error', HttpStatus.BAD_REQUEST);
 	}
 
+	// ajouter le mutedUsers[] : number dans le front
 	async getConversationsToAdd(friendID: number, userID: number) {
 
 		const user = await this.usersRepository.findOne({

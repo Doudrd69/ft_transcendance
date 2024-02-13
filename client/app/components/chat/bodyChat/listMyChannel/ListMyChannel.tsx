@@ -17,6 +17,7 @@ interface Conversation {
 	name: string;
 	is_channel: boolean;
 	isProtected: boolean;
+	// mutedusers: number[];
 }
 
 
