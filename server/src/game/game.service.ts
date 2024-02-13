@@ -8,7 +8,7 @@ import { User } from 'src/users/entities/users.entity';
 import { Paddle } from './entities/paddle.entity';
 import { GameEngineService } from './gameEngine.service';
 import { game_instance } from 'src/game_gateway/game.gateway';
-import { MatchmakingService, Queue, playersNormalQueue, playersSpeedQueue, userInGame, userInMatchmaking } from './matchmaking/matchmaking.service';
+import { MatchmakingService, Queue, getPlayerNormalQueue, getPlayerSpeedQueue, playersNormalQueue, playersSpeedQueue, setPlayerNormalQueue, setPlayerSpeedQueue, userInGame, userInMatchmaking } from './matchmaking/matchmaking.service';
 
 interface GameInfoDto {
 	userOneId: number;
@@ -156,16 +156,25 @@ export class GameService {
 
 	deleteQueue(userId: number, gameSocketId: string)
 	{
+		console.log(`AVANT [deleteQueue] : playerNormalQueue: ${playersNormalQueue.length}`);
+		
 		const socketIdUserId: Queue = {
 			gameSocketId : gameSocketId,
 			userId : userId,
 		}
-		if (playersNormalQueue.includes(socketIdUserId)) {
+		console.log("socketIdUserId", socketIdUserId)
+		playersNormalQueue.push(socketIdUserId)
+		playersNormalQueue.push(socketIdUserId)
+		
+		while (playersNormalQueue.find(player => player.userId === userId)) {
 			playersNormalQueue.splice(playersNormalQueue.indexOf(socketIdUserId), 1);
 		}
-		if (playersSpeedQueue.includes(socketIdUserId)) {
+		while (playersSpeedQueue.find(player => player.userId === userId)) {
 			playersSpeedQueue.splice(playersSpeedQueue.indexOf(socketIdUserId), 1);
 		}
+		
+		
+		console.log(`APRES [deleteQueue] : playerNormalQueue: ${playersNormalQueue.length}`);
 	}
 
 	async deleteGame(game: Game) {

@@ -28,7 +28,6 @@ const Menu = () => {
 	useEffect(() => {
 		globalState.userSocket?.on('gameNotInProgress', () => {
 			if (!globalState.gameSocket?.connected) {
-
 				const gameSocket = io(`${process.env.API_URL}/game`, {
 					autoConnect: false,
 					auth: {
