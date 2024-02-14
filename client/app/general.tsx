@@ -69,7 +69,6 @@ const GeneralComponent = () => {
 			gameSocket.connect();
 			dispatch({ type: 'SET_GAME_SOCKET', payload: gameSocket });
 			gameSocket.on('connect', () => {
-				console.log("CONNNNNNNNNNNNNNNNNNNNNNNNNNNNNNXXXXXXXXXIOOOOOOOOONN", gameInviteDto.senderSocketId)
 				globalState.userSocket?.emit('inviteAccepted', {
 					otherUserId: otherUserId,
 					userGameSocketId: gameSocket.id,
@@ -307,7 +306,6 @@ const GeneralComponent = () => {
 	useEffect(() => {
 		// Works on both connection and reconnection
 		globalState.userSocket?.on('connect', () => {
-			console.log("Connected to userSocket", globalState.userSocket?.id);
 			globalState.userSocket?.emit('joinPersonnalRoom', Number(sessionStorage.getItem("currentUserID")));
 		})
 
@@ -404,7 +402,6 @@ const GeneralComponent = () => {
 	useEffect(() => {
 
 		globalState.userSocket?.on('acceptInvitation', (GameInviteUserTwoDto: GameInviteUserTwoDto) => {
-			console.log("ACCEPT INVITATION");
 			globalState.gameInviteValidation = true;
 			const gameSocket: Socket = io(`${process.env.API_URL}/game`, {
 				autoConnect: false,
@@ -415,8 +412,6 @@ const GeneralComponent = () => {
 			gameSocket.connect();
 			dispatch({ type: 'SET_GAME_SOCKET', payload: gameSocket });
 			gameSocket.on('connect', () => {
-				console.log("CREATION SOCKET INVITATION");
-
 				gameSocket.emit('launchGameInvite', { userTwoId: GameInviteUserTwoDto.userTwoId, userTwoGameId: GameInviteUserTwoDto.userTwoGameId });
 			});
 			// globalState.userSocket?.emit('setGameInvite', { userTwoId: GameInviteUserTwoDto.userTwoId, userTwoGameId: GameInviteUserTwoDto.userTwoGameId });

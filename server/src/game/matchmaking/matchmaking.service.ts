@@ -79,8 +79,6 @@ export class MatchmakingService {
 			newUser.inSpeedQueue = true;
 			playersSpeedQueue.push(socketIdUserId);
 		}
-		console.log(`joinSpeedQueue: ${playersSpeedQueue}`)
-		console.log(`joinNormalQueue: ${playersNormalQueue}`)
 		await this.usersRepository.save(newUser);
 	}
 
@@ -105,8 +103,6 @@ export class MatchmakingService {
 			playersSpeedQueue.splice(playersSpeedQueue.indexOf(socketIdUserId), 1);
 		}
 		await this.usersRepository.save(newUser);
-		console.log(`quitSpeedQueue: ${playersSpeedQueue}`)
-		console.log(`quitNormalQueue: ${playersNormalQueue}`)
 		return;
 	}
 

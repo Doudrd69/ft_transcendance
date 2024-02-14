@@ -156,13 +156,11 @@ export class GameService {
 
 	deleteQueue(userId: number, gameSocketId: string)
 	{
-		console.log(`AVANT [deleteQueue] : playerNormalQueue: ${playersNormalQueue.length}`);
 		
 		const socketIdUserId: Queue = {
 			gameSocketId : gameSocketId,
 			userId : userId,
 		}
-		console.log("socketIdUserId", socketIdUserId)
 		playersNormalQueue.push(socketIdUserId)
 		playersNormalQueue.push(socketIdUserId)
 		
@@ -173,8 +171,6 @@ export class GameService {
 			playersSpeedQueue.splice(playersSpeedQueue.indexOf(socketIdUserId), 1);
 		}
 		
-		
-		console.log(`APRES [deleteQueue] : playerNormalQueue: ${playersNormalQueue.length}`);
 	}
 
 	async deleteGame(game: Game) {

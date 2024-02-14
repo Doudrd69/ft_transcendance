@@ -37,7 +37,6 @@ const FriendsListTabComponent: React.FC<FriendsListTabComponentProps> = ({ user,
 	const [funtionToExecute, setFunctionToExecute] = useState<() => void>(() => { });
 
 	chatState.currentTargetStats = useState<targetStat>({id : user.id, username: user.username});
-	console.log(chatState.currentTargetStats);
 
 	const handleDms = async() => {
 

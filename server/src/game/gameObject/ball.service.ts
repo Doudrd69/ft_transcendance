@@ -46,9 +46,7 @@ export class BallService {
 	}
 
 	collisionWithPaddle(ball: ball_instance, paddle: paddle_instance) {
-		// console.log(`POUET: ${ball.position.y + ball.r}, paddle: ${paddle.start.x}`);
 		const newBall: ball_instance = this.nextPositionBall(ball, paddle);
-		// console.log(`BEHIND: ${ball.position.y + ball.r}, paddle: ${paddle.start.x}`);
 		if (this.ballBehindPaddle(newBall, paddle) && this.ballIntersectWithPaddle(ball, paddle)) {
 			// this.ballIntersectWithPaddle(ball, paddle);
 			return true;

@@ -56,7 +56,6 @@ export class ChatService {
 		user.groups.forEach((userGroup: GroupMember) => {
 			groupList.forEach((group: GroupMember) => {
 				if (userGroup.id == group.id) {
-					console.log("Related group: ", group.id);
 					groupFound = group;
 				}
 			});
@@ -253,8 +252,6 @@ export class ChatService {
 
 	private async getAllMessages(conversationID: number, userID: number): Promise<Message[]> {
 
-		console.log("Conversation id for messages: ", conversationID);
-
 		const conversation = await this.conversationRepository.findOne({ where: {id: conversationID} });
 		
 		const user : User = await this.usersRepository.findOne({
@@ -268,7 +265,6 @@ export class ChatService {
 			if (group) {
 
 				const messages = await this.messageRepository.find({ where: {conversation: conversation}});
-				console.log(user.blockedUsers);
 				const filteredMessages = messages.filter((message: Message) => !user.blockedUsers.includes(message.senderId));
 				return filteredMessages;
 			}

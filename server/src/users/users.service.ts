@@ -90,7 +90,7 @@ export class UsersService {
 	async unsetUserInGame(userId: number) {
 		const user: User = await this.usersRepository.findOne({ where: { id: userId } })
 		if (!user)
-			throw new Error("user undefined")
+			throw new Error("User not found")
 		userInGame[userId] = false;
 		user.inGame = false;
 		await this.usersRepository.save(user);

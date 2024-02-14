@@ -58,6 +58,9 @@ export class ChatController {
 			const blockStatus = await this.chatService.userToAddIsBlocked(user.sub, addUserToConversationDto.userToAdd);
 			if (blockStatus)
 				throw new HttpException('You have blocked this user', HttpStatus.UNAUTHORIZED);
+			const blockStatus2 = await this.chatService.userToAddIsBlocked(addUserToConversationDto.userToAdd, user.sub);
+			if (blockStatus2)
+				throw new HttpException('You are blocked by this user', HttpStatus.UNAUTHORIZED);
 			return this.chatService.addUserToConversation(addUserToConversationDto.conversationID, addUserToConversationDto.userToAdd, true, false);
 		}
 		else

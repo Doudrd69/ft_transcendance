@@ -139,8 +139,6 @@ export class AuthService {
 
 		try {
 			if (await this.verifyCode(dto, userID)) {
-
-				console.log('coucou du deactivate 2fa');
 				const user : User = await this.usersService.getUserByID(userID);
 				await this.usersService.upate2FAState(user, false);
 				return false;

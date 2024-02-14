@@ -143,7 +143,6 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 		// event emitted after a joinRoom (new user in channel, updated username)
 		globalState.userSocket?.on('refresh_channel', () => {
 		loadUserList();
-		console.log("userlist", userList);
 		// console.log("chatState.currentTarget", chatState.currentTarget);
 		// const newUser = userList?.find((user: User) => user.id === chatState.currentTarget);
 		
@@ -154,7 +153,6 @@ const ReceiveBoxChannelComponent: React.FC = () => {
 		});
 
 		globalState.userSocket?.on('recv_notif', (notif: Message) => {
-			console.log("Notif: ", notif);
 			setMessages((prevMessages: Message[]) => [...prevMessages, notif]);
 		});
 

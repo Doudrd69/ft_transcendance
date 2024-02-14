@@ -168,7 +168,6 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 					Object.keys(inGame).forEach(key => {
 						const dto : InGameDto = inGame[key];
 						if (dto.emitUserId === userID || dto.targetUserId === userID) {
-							console.log("inGame[key]", inGame[key]);
 							delete inGame[key];
 						}
 					});
@@ -182,7 +181,6 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 					Object.keys(userInGame).forEach(key => {
 						const dto = userInGame[key];
 						if (dto && (Number(key) === (userID))) {
-							console.log(dto);
 							userInGame[key] = false;
 						}
 					});
@@ -211,18 +209,12 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 				client.join(client.id);
 				console.log("== Client ", userID, " has joined ", client.id, " room");
 				this.userRejoinsRooms(client, userID);
-				console.log("Count on co: ", count);
 				if (count == 0)
 					this.notifyFriendList(userID, client.id, 'online');
 				this.server.emit('newUser');
 
 				client.on('disconnect', () => {
-					console.log("Before InGAME", inGame);
-					console.log("Before userInGame", userInGame);
-					console.log("Before userInMatchmaking", userInMatchmaking);
-					console.log("Before gameQueue", gameQueue);
-					console.log("Before playerNormalQueue", getPlayerNormalQueue());
-					console.log("Before playerSpeedQueue", getPlayerSpeedQueue());
+
 					let count = 0;
 					this.activeUsers.forEach((user: ConnectedUsers) => {
 						if (user.userId === userID)
@@ -242,7 +234,6 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 							}
 						});
 						Object.keys(gameQueue).forEach(key => {
-							console.log("gameQueue[key]", gameQueue[key]);
 							const dto = gameQueue[key];
 							if (dto.emitUserId === userID || dto.targetUserId === userID) {
 								delete gameQueue[key];
@@ -250,8 +241,6 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 						});
 						Object.keys(userInMatchmaking).forEach(key => {
 							const dto = userInMatchmaking[key];
-							console.log("key", key);
-							console.log("(userID", (userID));
 							if (dto && (Number(key) === (userID))) {
 								userInMatchmaking[key] = false;
 								
@@ -266,15 +255,8 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 						setPlayerSpeedQueue(playerSpeedQueue);
 						this.unsetGameStatus(userID);
 					}
-					console.log("AFTER InGAME", inGame);
-					console.log("AFTER userInGame", userInGame);
-					console.log("AFTER userInMatchmaking", userInMatchmaking);
-					console.log("AFTER gameQueue", gameQueue);
-					console.log("AFTER playerNormalQueue", getPlayerNormalQueue());
-					console.log("AFTER playerSpeedQueue", getPlayerSpeedQueue());
+
 					this.activeUsers = this.activeUsers.filter((user: ConnectedUsers) => client.id !== user.socket.id);
-					console.log("===> Disconnecting user ", userID, " with ID ", userID);
-					console.log("Count on disco: ", count);
 					if (count == 1)
 						this.notifyFriendList(userID, client.id, 'offline');
 					client.leave(client.id);
@@ -406,10 +388,9 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	@SubscribeMessage('inviteAccepted')
 	@UseGuards(GatewayGuard)
 	async inviteAccepted(@ConnectedSocket() client: Socket, @MessageBody() data: { otherUserId: number, userGameSocketId: string, senderSocketId: string}) {
-		console.log("[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[INVITEACCEPTED]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]")
+
 		try {
 
-			console.log("USER SOCKER ID FDP: ", data.senderSocketId);
 			const emitUserId = client.handshake.auth.user.sub;
 			const targetUser = await this.userService.getUserByID(data.otherUserId);
 			
@@ -423,7 +404,6 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 			if (inGame[uniqueKey])
 				if (!inGame[uniqueKey]) {
 					await this.userService.unsetUserInGame(emitUserId);
-					console.log(`DECO LAUNCH GAME INVITE`,);
 					this.activeUsers.forEach((user: ConnectedUsers) => {
 						if ((user.userId == emitUserId) && (user.socket.id === client.id))
 							this.server.to(user.socket.id).emit('badsenderIdGameInvite');
@@ -435,7 +415,6 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 			this.activeUsers.forEach((user: ConnectedUsers) => {
 				if ((user.userId == targetUser.id) && (user.socket.id == data.senderSocketId))
 				{
-					console.log("BABABABABA", user.userId);
 					this.server.to(user.socket.id).emit('acceptInvitation', { userTwoId: emitUserId, userTwoGameId: data.userGameSocketId });
 					i++;
 				}
@@ -445,20 +424,11 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 				throw new Error(`[inviteAccepted] : user not found`);
 		} catch (error) {
 
-			console.log(`[GAME INVITE ERROR]: ${error.stack}`)
-			console.log("before userIngame", userInGame);
-			console.log("before useInMatch", userInMatchmaking)
-			console.log("before inGame", inGame);
 			Object.keys(userInGame).forEach(key => {
 				const dto = userInGame[key];
-				console.log("dto", userInGame[key]);
-				console.log("key", key )
-				console.log("data.client.handshake.auth.user.sub ", client.handshake.auth.user.sub )
-				console.log("data.otherUserId ", data.otherUserId )
 
 				if (dto && (Number(key) === (client.handshake.auth.user.sub) || Number(key) === data.otherUserId)) {
 					userInGame[key] = false;
-					console.log('alinterieur ', dto);
 				}
 				console.log("userInGame[key]", userInGame[key]);
 			});
@@ -479,10 +449,6 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 			this.unsetGameStatus(client.handshake.auth.user.sub);
 			this.unsetGameStatus(data.otherUserId);
 
-
-			console.log("after userIngame", userInGame);
-			console.log("before useInMatch", userInMatchmaking)
-			console.log("after inGame", inGame);
 		}
 	}
 
@@ -538,9 +504,6 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 				return;
 			}
 			// a changer pour le ingame et le inMatchmaking
-			console.log("[CHECK MATCH] userIngame", userInGame);
-			console.log("[CHECK MATCH] useInMatch", userInMatchmaking)
-			console.log("[CHECK MATCH] inGame", inGame);
 			if (this.userService.userInGame(user.sub)) {
 				console.log(`sender already inGame`);
 				return;
@@ -549,8 +512,6 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 			this.activeUsers.forEach((user_: ConnectedUsers) => {
 				if ((user_.userId == user.sub) && (user_.socket.id == client.id))
 				{
-					console.log("rarararararaara");
-
 					this.server.to(user_.socket.id).emit('gameNotInProgress');
 				}
 			});
@@ -562,24 +523,29 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 
 	@SubscribeMessage('setGameInvite')
 	async handleEvent(@ConnectedSocket() client: Socket, @MessageBody() data: { userTwoId: number, userTwoGameId: string }) {
-		const emitUserId = client.handshake.auth.user.sub;
-		const targetUserId = data.userTwoId;
-
-		const uniqueKey = `${Math.min(emitUserId, targetUserId)}-${Math.max(emitUserId, targetUserId)}`
-
-		if (!inGame[uniqueKey]) {
-			await this.userService.unsetUserInGame(emitUserId);
+		
+		try {
+			const emitUserId = client.handshake.auth.user.sub;
+			const targetUserId = data.userTwoId;
+	
+			const uniqueKey = `${Math.min(emitUserId, targetUserId)}-${Math.max(emitUserId, targetUserId)}`
+	
+			if (!inGame[uniqueKey]) {
+				await this.userService.unsetUserInGame(emitUserId);
+				this.activeUsers.forEach((user: ConnectedUsers) => {
+					if (user.userId == emitUserId)
+						this.server.to(user.socket.id).emit('badsenderIdGameInvite');
+				});
+				return;
+			}
+			// check aussi la game socket?
 			this.activeUsers.forEach((user: ConnectedUsers) => {
-				if (user.userId == emitUserId)
-					this.server.to(user.socket.id).emit('badsenderIdGameInvite');
+				if ((user.userId == emitUserId) && (user.socket.id === client.id))
+					this.server.to(user.socket.id).emit('createGameInviteSocket', { userTwoId: data.userTwoId, userTwoGameId: data.userTwoGameId });
 			});
-			return;
+		} catch (error) {
+			throw new Error(error);
 		}
-		// check aussi la game socket?
-		this.activeUsers.forEach((user: ConnectedUsers) => {
-			if ((user.userId == emitUserId) && (user.socket.id === client.id))
-				this.server.to(user.socket.id).emit('createGameInviteSocket', { userTwoId: data.userTwoId, userTwoGameId: data.userTwoGameId });
-		});
 	}
 
 
@@ -654,17 +620,9 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 					// } else {
 					// 	console.log('La clé spécifiée n\'existe pas dans la queue.');
 					// }
-					console.log("-----------------------------------------> ", gameQueue[uniqueKey].socketTargetUserId);
-					console.log('targetUserId', targetUserId)
-					console.log('gameQueue[uniqueKey].socketTargetUserId', gameQueue[uniqueKey].socketTargetUserId);
 					this.activeUsers.forEach((user: ConnectedUsers) => {
-						console.log('user.socket.id', user.socket.id);
-						console.log('user.userId', user.userId);
 						if ((user.userId == targetUserId) && (user.socket.id == gameQueue[uniqueKey].socketTargetUserId)) 
 						{
-							console.log("targetUserId ------>", targetUserId);
-							console.log("gameQueue[uniqueKey].socketTargetUserId ------>", gameQueue[uniqueKey].socketTargetUserId);
-
 							this.server.to(user.socket.id).emit('gameInviteDUO', {
 								senderUsername: client.handshake.auth.user.username,
 								senderUserID: emitUserId,
@@ -716,8 +674,6 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		console.log("[inviteClosed] CLOSED")
 		try {
 			const emitUserId = client.handshake.auth.user.sub;
-			console.log(`[emitUserId] : ${emitUserId}`)
-			console.log(`[targetUserId] : ${targetUserId}`)
 			const uniqueKey = `${Math.min(emitUserId, targetUserId)}-${Math.max(emitUserId, targetUserId)}`
 			// Supprimez existingPair de gameQueue
 			if (gameQueue.hasOwnProperty(uniqueKey)) {
@@ -849,12 +805,9 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		try {
 			const user = client.handshake.auth.user;
 			if (user) {
-				console.log("---------------------------> ", this.activeUsers);
 				this.activeUsers.forEach((user_: ConnectedUsers) => {
-					console.log(`Refresh ${user.socket.id} user options`);
 					this.server.to(user_.socket.id).except(client.id).emit('refreshOptionsUserChannel');
 				})
-				console.log("Out of user options refresh loop");
 			}
 			throw new HttpException('User not found', HttpStatus.NOT_FOUND);
 		} catch (error) {
@@ -1034,7 +987,6 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	@SubscribeMessage('refreshUsernameInHeader')
 	@UseGuards(GatewayGuard)
 	handleRefreshUsernameInHeader(@ConnectedSocket() client: Socket, @MessageBody() value: string) {
-		console.log("Value for usernmae ==> ", value);
 		const user = client.handshake.auth.user;
 		this.activeUsers.forEach((user_: ConnectedUsers) => {
 			if (user_.userId == user.sub)

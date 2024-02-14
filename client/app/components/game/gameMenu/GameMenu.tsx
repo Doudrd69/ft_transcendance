@@ -38,7 +38,6 @@ const Menu = () => {
 				gameSocket.connect();
 				dispatch({ type: 'SET_GAME_SOCKET', payload: gameSocket });
 				gameSocket.on('connect', () => {
-					console.log("ajajajajajaja");
 					dispatchGame({ type: 'TOGGLE', payload: 'showGameMatchmaking' });
 					// enlever userLogin, et userId, le gameMode pas besoin (si pas de gameMode peut etre faire un set joinQueue par defaut a NORMAL)
 					gameSocket.emit('join-matchmaking', {gameMode: gameMode});

@@ -168,7 +168,6 @@ const ListMyChannelComponent: React.FC<ListMyChannelComponentProps> = ({ user, f
 			});
 
 			if (response.ok) {
-				console.log('addMyselfToConversation');
 				chatDispatch({ type: 'TOGGLEX', payload: 'refreshChannel' });
 				const conversation = await response.json();
 
